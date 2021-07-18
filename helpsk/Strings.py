@@ -1,9 +1,9 @@
-from typing import List
+from typing import List, Union
 
 
-def collapse(*args: List[str], separate: str = '', surround: str = '') -> str:
-    """Takes a list of string and concatenates them, separating each string with `separate` and surrounding each string
-    with `surround`.
+def collapse(*args: Union[str, List[str]], separate: str = '', surround: str = '') -> str:
+    """Takes a list of strings and concatenates them, separating each string with the value of `separate` and
+    surrounding each string with the value of `surround`.
 
     Keyword arguments:
     *args -- list of strings to concatenate
@@ -12,4 +12,5 @@ def collapse(*args: List[str], separate: str = '', surround: str = '') -> str:
     """
     if len(args) == 1 and isinstance(args[0], list):
         args = args[0]
+
     return separate.join([surround + x + surround for x in args])
