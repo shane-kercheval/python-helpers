@@ -5,61 +5,36 @@ import pandas as pd
 
 def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
     """
-    Returns True if any of the values are None, np.Nan, or if the length of the values 
+    Returns `True` if any item in `values` are `None`, `np.Nan`, or if the length of `values` is `0`. 
 
     Parameters
     ----------
-    parameter_1 : int
-        Description of parameter_1
-
-    parameter_1 : int or float
-        Description oof parameter_2:
-            - if float, this indicates a fraction of the total and should be
-              the interval `(0, 1)`;
-            - if int, this indicates the exact number of samples;
-            - if None, this indicates the total number of samples.
+    values : list, np.ndarray, pd.Series, pd.DataFrame
+        A collection of values to check.
 
     Returns
     -------
-    name_of_return_value : int
-        Description of return value
+    bool - True if any item in `values` are None/np.NaN
     """
+    if len(values) == 0:
+        return True
 
     if isinstance(values, pd.Series):
-        return values.empty or values.isnull().any() or values.isna().any()
+        return values.isnull().any() or values.isna().any()
 
     if isinstance(values, pd.DataFrame):
-        return values.empty or values.isnull().any().any() or values.isna().any().any()
+        return values.isnull().any().any() or values.isna().any().any()
 
-    if isinstance(values, np.ndarray):
-        return values.size == 0 or None in values or np.isnan(values).any()
-
-    if not values or values is np.NaN or None in values or np.isnan(values).any():
+    if None in values or np.isnan(values).any():
         return True
 
     return False
 
 
 def any_empty(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
-    """
     
-    :param values:
-    :return:
-    """
+
     pass
-
-
-def raises_exception(function: Callable) -> bool:
-    """Returns True if `function` raises an Exception; returns False if `function` runs without raising an Exception.
-
-    Keyword arguments:
-    function -- a function
-    """
-    try:
-        function()
-        return False
-    except:  # noqa
-        return True
 
 
 def any_duplicated(values: Union[List, pd.Series, np.ndarray],
@@ -131,3 +106,16 @@ def assert_none_duplicated(values, remove_missing_values: bool = True):
 #                     for x, y in zip(data_frame1[col].values, data_frame2[col].values)])
 #
 #     return True
+
+
+def raises_exception(function: Callable) -> bool:
+    """Returns True if `function` raises an Exception; returns False if `function` runs without raising an Exception.
+
+    Keyword arguments:
+    function -- a function
+    """
+    try:
+        function()
+        return False
+    except:  # noqa
+        return True
