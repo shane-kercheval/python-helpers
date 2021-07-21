@@ -53,6 +53,51 @@ class TestAssertion(unittest.TestCase):
         assert not assertion.any_none_nan(pd.DataFrame([[1], [1]]))
         assert not assertion.any_none_nan(pd.DataFrame([[''], [1]]))
 
+    def test_assert_not_none_nan(self):
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(None))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.NaN))  # noqa
+
+        # test list
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan([1, np.nan, None]))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan([1, np.nan]))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan([1, None]))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan([np.nan]))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan([None]))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan([]))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan([1]))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan(['']))  # noqa
+
+        # test numpy array
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.array([1, np.nan, None])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.array([1, np.nan])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.array([1, None])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.array([np.nan])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.array([None])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.array([])))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.array([1])))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan(np.array([''])))  # noqa
+
+        # test pandas series
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.Series([1, np.nan, None])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.Series([1, np.nan])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.Series([1, None])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.Series([np.nan])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.Series([None])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.Series([], dtype=float)))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.Series([1])))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.Series([''])))  # noqa
+
+        # test pandas data.frame
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([[1, np.nan, None], [1, 2, 3]])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([[1, np.nan], [1, 2]])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([[1, None], [1, 2]])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([[np.nan], [1]])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([[None], [1]])))  # noqa
+        assert assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([], dtype=float)))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([1])))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([[1], [1]])))  # noqa
+        assert not assertion.raises_exception(lambda: assertion.assert_not_none_nan(pd.DataFrame([[''], [1]])))  # noqa
+
     def test_any_missing(self):
         assert assertion.any_missing(None)
         assert assertion.any_missing(np.NaN)

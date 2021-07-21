@@ -43,7 +43,8 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
 
 def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
     """
-    Raises an Exception if any item in `values` are `None`, `np.Nan`, or if the length of `values` is `0`.
+    Raises an AssertionError if any item in `values` are `None`, `np.Nan`, or if the length of `values` is 
+    `0`.
     For numeric types only.
 
     Parameters
@@ -56,12 +57,13 @@ def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]
     None
     """
     if any_none_nan(values):
-        raise ValueError()
+        raise AssertionError('None/NaN Values Found')
 
 
 def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
     """
-    Returns `True` if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the length of `values` is `0`.
+    Returns `True` if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the length of
+    `values` is `0`.
 
     Parameters
     ----------
@@ -85,6 +87,24 @@ def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
         return True
 
     return False
+
+
+def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
+    """
+    Raises an AssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the
+    length of `values` is `0`.
+
+    Parameters
+    ----------
+    values : list, pd.Series, pd.DataFrame
+        A collection of values to check.
+
+    Returns
+    -------
+    bool - True if any item in `values` are None/np.NaN/''
+    """
+    if any_missing(values):
+        raise AssertionError('Missing Values Found')
 
 
 def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
