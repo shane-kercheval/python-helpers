@@ -5,7 +5,8 @@ import pandas as pd
 
 def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
     """
-    Returns `True` if any item in `values` are `None`, `np.Nan`, or if the length of `values` is `0`. 
+    Returns `True` if any item in `values` are `None`, `np.Nan`, or if the length of `values` is `0`.
+    For numeric types only.
 
     Parameters
     ----------
@@ -16,6 +17,9 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
     -------
     bool - True if any item in `values` are None/np.NaN
     """
+    if values is None or values is np.NaN:
+        return True
+
     if len(values) == 0:
         return True
 
@@ -25,8 +29,14 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
     if isinstance(values, pd.DataFrame):
         return values.isnull().any().any() or values.isna().any().any()
 
-    if None in values or np.isnan(values).any():
+    if None in values:
         return True
+
+    try:
+        if np.isnan(values).any():
+            return True
+    except TypeError:
+        return False
 
     return False
 

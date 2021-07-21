@@ -20,6 +20,7 @@ class TestAssertion(unittest.TestCase):
         assert assertion.any_none_nan([None])
         assert assertion.any_none_nan([])
         assert not assertion.any_none_nan([1])
+        assert not assertion.any_none_nan([''])
 
         # test numpy array
         assert assertion.any_none_nan(np.array([1, np.nan, None]))
@@ -29,6 +30,7 @@ class TestAssertion(unittest.TestCase):
         assert assertion.any_none_nan(np.array([None]))
         assert assertion.any_none_nan(np.array([]))
         assert not assertion.any_none_nan(np.array([1]))
+        assert not assertion.any_none_nan(np.array(['']))
 
         # test pandas series
         assert assertion.any_none_nan(pd.Series([1, np.nan, None]))
@@ -38,6 +40,7 @@ class TestAssertion(unittest.TestCase):
         assert assertion.any_none_nan(pd.Series([None]))
         assert assertion.any_none_nan(pd.Series([], dtype=float))
         assert not assertion.any_none_nan(pd.Series([1]))
+        assert not assertion.any_none_nan(pd.Series(['']))
 
         # test pandas data.frame
         assert assertion.any_none_nan(pd.DataFrame([[1, np.nan, None], [1, 2, 3]]))
@@ -48,6 +51,7 @@ class TestAssertion(unittest.TestCase):
         assert assertion.any_none_nan(pd.DataFrame([], dtype=float))
         assert not assertion.any_none_nan(pd.DataFrame([1]))
         assert not assertion.any_none_nan(pd.DataFrame([[1], [1]]))
+        assert not assertion.any_none_nan(pd.Series([[''], [1]]))
 
     def test_any_empty(self):
         assert True
