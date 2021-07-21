@@ -215,6 +215,7 @@ def assert_none_duplicated(values, ignore_missing_values: bool = True):
     # if ignore_missing_values is False throw exception if more than one are missing?
     raise NotImplementedError()
 
+
 def raises_exception(function: Callable, exception_type: Type= None) -> bool:
     """Returns True if `function` raises an Exception; returns False if `function` runs without raising an Exception.
 
