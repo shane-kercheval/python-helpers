@@ -167,6 +167,78 @@ class TestValidation(unittest.TestCase):
         assert not vld.any_missing(pd.DataFrame([1]))
         assert not vld.any_missing(pd.DataFrame([[1], [1]]))
 
+    def test_assert_not_any_missing(self):
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(None),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(np.NaN),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(''),
+                                    type(AssertionError()))
+
+        # test list
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing([1, np.nan, None]),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing([1, np.nan]),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing([1, None]),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing([np.nan]),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing([None]),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing([]),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(['']),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(['abc', '']),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing([1, '']),
+                                    type(AssertionError()))
+        assert not vld.raises_exception(lambda: vld.assert_not_any_missing([1]))
+        assert not vld.raises_exception(lambda: vld.assert_not_any_missing(['a']))
+
+        # test pandas series
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([1, np.nan, None])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([1, np.nan])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([1, None])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([np.nan])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([None])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([], dtype=float)),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([''])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series(['abc', ''])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([1, ''])),
+                                    type(AssertionError()))
+        assert not vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series([1])))
+        assert not vld.raises_exception(lambda: vld.assert_not_any_missing(pd.Series(['a'])))
+
+        # test pandas data.frame
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([[1, np.nan, None], [1, 2, 3]])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([[1, np.nan], [1, 2]])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([[1, None], [1, 2]])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([[np.nan], [1]])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([[None], [1]])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([], dtype=float)),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([['abc', ''], ['abc', 'abc']])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([''])),
+                                    type(AssertionError()))
+        assert not vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([1])))
+        assert not vld.raises_exception(lambda: vld.assert_not_any_missing(pd.DataFrame([[1], [1]])))
+
     def test_any_duplicated(self):
         # test list
         assert not vld.any_duplicated([''])
