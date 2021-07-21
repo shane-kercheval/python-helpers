@@ -160,6 +160,31 @@ class TestValidation(unittest.TestCase):
         assert vld.any_duplicated(pd.Series(['', 1, 1]))
         assert vld.any_duplicated(pd.Series(['', 1, None, None]))
 
+    def test_assert_not_duplicated(self):
+        # test list
+        assert not vld.raises_exception(lambda: vld.assert_not_duplicated(['']))
+        assert not vld.raises_exception(lambda: vld.assert_not_duplicated(['', 1]))
+        assert not vld.raises_exception(lambda: vld.assert_not_duplicated(['', 1, None]))
+
+        assert vld.raises_exception(lambda: vld.assert_not_duplicated(['', 1, '']),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_duplicated(['', 1, 1]),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_duplicated(['', 1, None, None]),
+                                    type(AssertionError()))
+
+        # test pd.Series
+        assert not vld.raises_exception(lambda: vld.assert_not_duplicated(pd.Series([''])))
+        assert not vld.raises_exception(lambda: vld.assert_not_duplicated(pd.Series(['', 1])))
+        assert not vld.raises_exception(lambda: vld.assert_not_duplicated(pd.Series(['', 1, None])))
+
+        assert vld.raises_exception(lambda: vld.assert_not_duplicated(pd.Series(['', 1, ''])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_duplicated(pd.Series(['', 1, 1])),
+                                    type(AssertionError()))
+        assert vld.raises_exception(lambda: vld.assert_not_duplicated(pd.Series(['', 1, None, None])),
+                                    type(AssertionError()))
+
     def test_raises_exception(self):
 
         def my_function_exception():

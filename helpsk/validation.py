@@ -123,6 +123,22 @@ def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
     return len(values) != len(set(values))
 
 
+def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
+    """
+    Raises an AssertionError if any items in `values` are duplicated.
+
+    Parameters
+    ----------
+    values : list, np.ndarray, pd.Series
+        A collection of values to check.
+
+    Returns
+    -------
+    """
+    if any_duplicated(values):
+        raise AssertionError('Duplicate Values Found')
+
+
 def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
     """
     Raises an `AssertionError` unless all items in `values` are `True`
