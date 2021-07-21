@@ -142,7 +142,9 @@ class TestAssertion(unittest.TestCase):
             pd.DataFrame([True, True]),
             pd.DataFrame([[True, True], [True, True]]),
         ]
-        passing_cases = [not assertion.raises_exception(lambda: assertion.assert_all(case)) for case in cases]
+        passing_cases = [not assertion.raises_exception(lambda: assertion.assert_all(case),
+                                                        type(AssertionError()))
+                         for case in cases]
         assert all(passing_cases)
 
         cases = [
@@ -161,4 +163,35 @@ class TestAssertion(unittest.TestCase):
                          for case in cases]
         assert all(passing_cases)
 
+    def test_assert_not_any(self):
+        cases = [
+            [False],
+            [False, False],
+            np.array([False]),
+            np.array([False, False]),
+            pd.Series([False]),
+            pd.Series([False, False]),
+            pd.DataFrame([False]),
+            pd.DataFrame([False, False]),
+            pd.DataFrame([[False, False], [False, False]]),
+        ]
+        passing_cases = [not assertion.raises_exception(lambda: assertion.assert_not_any(case),
+                                                        type(AssertionError()))
+                         for case in cases]
+        assert all(passing_cases)
 
+        cases = [
+            [True],
+            [True, False],
+            np.array([True]),
+            np.array([True, False]),
+            pd.Series([True]),
+            pd.Series([True, False]),
+            pd.DataFrame([True]),
+            pd.DataFrame([True, False]),
+            pd.DataFrame([[False, False], [False, True]]),
+        ]
+        passing_cases = [assertion.raises_exception(lambda: assertion.assert_not_any(case),
+                                                    type(AssertionError()))
+                         for case in cases]
+        assert all(passing_cases)

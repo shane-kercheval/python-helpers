@@ -104,7 +104,18 @@ def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
 
 
 def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
+    """
+    Raises an `AssertionError` unless all items in `values` are `True`
 
+    Parameters
+    ----------
+    values : list, np.ndarray, pd.Series, pd.DataFrame
+        A collection of values to check.
+
+    Returns
+    -------
+    None
+    """
     if isinstance(values, pd.Series):
         if not values.all():
             raise AssertionError('Not All True')
@@ -116,14 +127,28 @@ def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
             raise AssertionError('Not All True')
 
 
-    
-
 def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
     """
-    Raises Exception if any values are true
+    Raises an `AssertionError` if any items in `values` are `True`
 
+    Parameters
+    ----------
+    values : list, np.ndarray, pd.Series, pd.DataFrame
+        A collection of values to check.
+
+    Returns
+    -------
+    None
     """
-    raise NotImplementedError()
+    if isinstance(values, pd.Series):
+        if values.any():
+            raise AssertionError('Found True')
+    elif isinstance(values, pd.DataFrame):
+        if values.any().any():
+            raise AssertionError('Found True')
+    else:
+        if any(values):
+            raise AssertionError('Found True')
 
 
 def assert_identical(values):
