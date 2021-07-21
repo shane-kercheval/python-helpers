@@ -1,4 +1,4 @@
-from typing import List, Union, Callable
+from typing import List, Union, Callable, Type
 import numpy as np
 import pandas as pd
 
@@ -39,6 +39,24 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
         return False
 
     return False
+
+
+def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
+    """
+    Raises an Exception if any item in `values` are `None`, `np.Nan`, or if the length of `values` is `0`.
+    For numeric types only.
+
+    Parameters
+    ----------
+    values : list, np.ndarray, pd.Series, pd.DataFrame
+        A collection of values to check.
+
+    Returns
+    -------
+    None
+    """
+    if any_none_nan(values):
+        raise ValueError()
 
 
 def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
@@ -85,12 +103,25 @@ def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
     return len(values) != len(set(values))
 
 
+def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
+
+    if isinstance(values, pd.Series):
+        if not values.all():
+            raise AssertionError('Not All True')
+    elif isinstance(values, pd.DataFrame):
+        if not values.all().all():
+            raise AssertionError('Not All True')
+    else:
+        if not all(values):
+            raise AssertionError('Not All True')
 
 
+    
 
-def assert_not_any(values):
+def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
     """
     Raises Exception if any values are true
+
     """
     raise NotImplementedError()
 
@@ -156,7 +187,7 @@ def assert_none_duplicated(values, ignore_missing_values: bool = True):
 #     return True
 
 
-def raises_exception(function: Callable) -> bool:
+def raises_exception(function: Callable, exception_type: Type= None) -> bool:
     """Returns True if `function` raises an Exception; returns False if `function` runs without raising an Exception.
 
     Keyword arguments:
@@ -165,5 +196,8 @@ def raises_exception(function: Callable) -> bool:
     try:
         function()
         return False
-    except:  # noqa
-        return True
+    except Exception as e:  # noqa
+        if exception_type:
+            return isinstance(e, exception_type)
+        else:
+            return True

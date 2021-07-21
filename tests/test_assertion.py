@@ -118,14 +118,45 @@ class TestAssertion(unittest.TestCase):
     def test_raises_exception(self):
 
         def my_function_exception():
-            raise Exception()
+            raise ValueError()
 
         def my_function_runs():
             return True
 
         assert assertion.raises_exception(my_function_exception)
+        # should return True since my_function_exception raises ValueError
+        assert assertion.raises_exception(my_function_exception, type(ValueError()))
+        # should return False since my_function_exception raises ValueError, not TypeError
+        assert not assertion.raises_exception(my_function_exception, type(TypeError()))
         assert not assertion.raises_exception(my_function_runs)
 
+    def test_assert_all(self):
+        cases = [
+            [True],
+            [True, True],
+            np.array([True]),
+            np.array([True, True]),
+            pd.Series([True]),
+            pd.Series([True, True]),
+            pd.DataFrame([True]),
+            pd.DataFrame([True, True]),
+            pd.DataFrame([[True, True], [True, True]]),
+        ]
+        passing_cases = [not assertion.raises_exception(lambda: assertion.assert_all(case)) for case in cases]
+        assert all(passing_cases)
 
+        cases = [
+            [False],
+            [True, False],
+            np.array([False]),
+            np.array([True, False]),
+            pd.Series([False]),
+            pd.Series([True, False]),
+            pd.DataFrame([False]),
+            pd.DataFrame([True, False]),
+            pd.DataFrame([[True, True], [True, False]]),
+        ]
+        passing_cases = [assertion.raises_exception(lambda: assertion.assert_all(case)) for case in cases]
+        assert all(passing_cases)
 
 
