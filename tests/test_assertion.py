@@ -156,7 +156,9 @@ class TestAssertion(unittest.TestCase):
             pd.DataFrame([True, False]),
             pd.DataFrame([[True, True], [True, False]]),
         ]
-        passing_cases = [assertion.raises_exception(lambda: assertion.assert_all(case)) for case in cases]
+        passing_cases = [assertion.raises_exception(lambda: assertion.assert_all(case),
+                                                    type(AssertionError()))
+                         for case in cases]
         assert all(passing_cases)
 
 
