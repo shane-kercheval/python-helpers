@@ -42,6 +42,18 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
 
 
 def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
+    """
+    Returns `True` if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the length of `values` is `0`.
+
+    Parameters
+    ----------
+    values : list, pd.Series, pd.DataFrame
+        A collection of values to check.
+
+    Returns
+    -------
+    bool - True if any item in `values` are None/np.NaN/''
+    """
     if any_none_nan(values):
         return True
 
@@ -57,27 +69,42 @@ def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
     return False
 
 
-def any_duplicated(values: Union[List, pd.Series, np.ndarray],
-                   remove_missing_values: bool = True) -> bool:
-    #if remove_missing_values:
+def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
+    """
+    Returns `True` if any items in `values` are duplicated.
 
-    return len(values) == len(set(values))
+    Parameters
+    ----------
+    values : list, np.ndarray, pd.Series
+        A collection of values to check.
+
+    Returns
+    -------
+    bool
+    """
+    return len(values) != len(set(values))
+
+
+
 
 
 def assert_not_any(values):
-    """Raises Exception if any values are true
+    """
+    Raises Exception if any values are true
     """
     raise NotImplementedError()
 
 
 def assert_identical(values):
-    """Raises Exception if xyz is not identical
+    """
+    Raises Exception if xyz is not identical
     """    
     raise NotImplementedError()
 
 
 def assert_none_missing(values, empty_string_as_missing: bool = True):
-    """Raises Exception if any values are missing.
+    """
+    Raises Exception if any items in `values` are missing.
 
     Keyword arguments:
     empty_string_as_missing -- if True, treats empty string as missing value
@@ -85,14 +112,15 @@ def assert_none_missing(values, empty_string_as_missing: bool = True):
     raise NotImplementedError()
 
 
-def assert_none_duplicated(values, remove_missing_values: bool = True):
-    """Raises Exception if any values are missing.
+def assert_none_duplicated(values, ignore_missing_values: bool = True):
+    """
+    Raises Exception if any items in `values` are duplicated.
 
     Keyword arguments:
-    remove_missing_values -- if True, removes missing values before checking if duplicated
+    ignore_missing_values -- if True, removes missing values before checking if duplicated
     """
 
-    # if remove_missing_values is False throw exception if more than one are missing?
+    # if ignore_missing_values is False throw exception if more than one are missing?
     raise NotImplementedError()
 
 #  @staticmethod

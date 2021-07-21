@@ -96,6 +96,24 @@ class TestAssertion(unittest.TestCase):
         assert not assertion.any_missing(pd.DataFrame([1]))
         assert not assertion.any_missing(pd.DataFrame([[1], [1]]))
 
+    def test_any_duplicated(self):
+        # test list
+        assert not assertion.any_duplicated([''])
+        assert not assertion.any_duplicated(['', 1])
+        assert not assertion.any_duplicated(['', 1, None])
+
+        assert assertion.any_duplicated(['', 1, ''])
+        assert assertion.any_duplicated(['', 1, 1])
+        assert assertion.any_duplicated(['', 1, None, None])
+
+        # test pd.Series
+        assert not assertion.any_duplicated(pd.Series(['']))
+        assert not assertion.any_duplicated(pd.Series(['', 1]))
+        assert not assertion.any_duplicated(pd.Series(['', 1, None]))
+
+        assert assertion.any_duplicated(pd.Series(['', 1, '']))
+        assert assertion.any_duplicated(pd.Series(['', 1, 1]))
+        assert assertion.any_duplicated(pd.Series(['', 1, None, None]))
 
     def test_raises_exception(self):
 
@@ -108,27 +126,6 @@ class TestAssertion(unittest.TestCase):
         assert assertion.raises_exception(my_function_exception)
         assert not assertion.raises_exception(my_function_runs)
 
-    # def test_any_duplicated(self):
-    #
-    #     values = [1, 2, 3, 4, None]
-    #
-    #     values = np.array([1, 2, 3, 4, None])
-    #     values = np.array([1, 2, 3, 4, np.nan, None, ''])
-    #
-    #     np.nan is np.nan
-    #
-    #     [x for x in values if x is not None]
-    #
-    #
-    #     values_2 = values
-    #     values.append(5)
-    #
-    #     values = list[1]
-    #
-    #     values
-    #     values_2
-    #
-    #     values = np.array(['a', 'b', 'c', 'b'])
-    #
-    #     assertion.any_duplicated(['a', 'b', 'c'])
-    #     assertion.any_duplicated(['a', 'b', 'c', 'b'])
+
+
+
