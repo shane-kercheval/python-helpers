@@ -41,7 +41,7 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
     return False
 
 
-def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
+def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
     """
     Raises an AssertionError if any item in `values` are `None`, `np.Nan`, or if the length of `values` is 
     `0`.
@@ -89,7 +89,7 @@ def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
     return False
 
 
-def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
+def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> None:
     """
     Raises an AssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the
     length of `values` is `0`.
@@ -123,7 +123,7 @@ def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
     return len(values) != len(set(values))
 
 
-def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
+def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> None:
     """
     Raises an AssertionError if any items in `values` are duplicated.
 
@@ -139,7 +139,7 @@ def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
         raise AssertionError('Duplicate Values Found')
 
 
-def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
+def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
     """
     Raises an `AssertionError` unless all items in `values` are `True`
 
@@ -163,7 +163,7 @@ def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
             raise AssertionError('Not All True')
 
 
-def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
+def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
     """
     Raises an `AssertionError` if any items in `values` are `True`
 
@@ -187,14 +187,14 @@ def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]):
             raise AssertionError('Found True')
 
 
-def assert_identical(values):
+def assert_identical(values) -> None:
     """
     Raises Exception if xyz is not identical
     """    
     raise NotImplementedError()
 
 
-def raises_exception(function: Callable, exception_type: Type= None) -> bool:
+def raises_exception(function: Callable, exception_type: Type = None) -> bool:
     """Returns True if `function` raises an Exception; returns False if `function` runs without raising an Exception.
 
     Keyword arguments:
