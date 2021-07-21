@@ -41,10 +41,20 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
     return False
 
 
-def any_empty(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
-    
+def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
+    if any_none_nan(values):
+        return True
 
-    pass
+    if isinstance(values, pd.Series):
+        return values.isin(['']).any()
+
+    if isinstance(values, pd.DataFrame):
+        return values.isin(['']).any().any()
+
+    if '' in values:
+        return True
+
+    return False
 
 
 def any_duplicated(values: Union[List, pd.Series, np.ndarray],

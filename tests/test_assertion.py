@@ -51,10 +51,51 @@ class TestAssertion(unittest.TestCase):
         assert assertion.any_none_nan(pd.DataFrame([], dtype=float))
         assert not assertion.any_none_nan(pd.DataFrame([1]))
         assert not assertion.any_none_nan(pd.DataFrame([[1], [1]]))
-        assert not assertion.any_none_nan(pd.Series([[''], [1]]))
+        assert not assertion.any_none_nan(pd.DataFrame([[''], [1]]))
 
-    def test_any_empty(self):
-        assert True
+    def test_any_missing(self):
+        assert assertion.any_missing(None)
+        assert assertion.any_missing(np.NaN)
+        assert assertion.any_missing('')
+
+        # test list
+        assert assertion.any_missing([1, np.nan, None])
+        assert assertion.any_missing([1, np.nan])
+        assert assertion.any_missing([1, None])
+        assert assertion.any_missing([np.nan])
+        assert assertion.any_missing([None])
+        assert assertion.any_missing([])
+        assert assertion.any_missing([''])
+        assert assertion.any_missing(['abc', ''])
+        assert assertion.any_missing([1, ''])
+        assert not assertion.any_missing([1])
+        assert not assertion.any_missing(['a'])
+
+        # test pandas series
+        assert assertion.any_missing(pd.Series([1, np.nan, None]))
+        assert assertion.any_missing(pd.Series([1, np.nan]))
+        assert assertion.any_missing(pd.Series([1, None]))
+        assert assertion.any_missing(pd.Series([np.nan]))
+        assert assertion.any_missing(pd.Series([None]))
+        assert assertion.any_missing(pd.Series([], dtype=float))
+        assert assertion.any_missing(pd.Series(['']))
+        assert assertion.any_missing(pd.Series(['abc', '']))
+        assert assertion.any_missing(pd.Series([1, '']))
+        assert not assertion.any_missing(pd.Series([1]))
+        assert not assertion.any_missing(pd.Series(['a']))
+
+        # test pandas data.frame
+        assert assertion.any_missing(pd.DataFrame([[1, np.nan, None], [1, 2, 3]]))
+        assert assertion.any_missing(pd.DataFrame([[1, np.nan], [1, 2]]))
+        assert assertion.any_missing(pd.DataFrame([[1, None], [1, 2]]))
+        assert assertion.any_missing(pd.DataFrame([[np.nan], [1]]))
+        assert assertion.any_missing(pd.DataFrame([[None], [1]]))
+        assert assertion.any_missing(pd.DataFrame([], dtype=float))
+        assert assertion.any_missing(pd.DataFrame([['abc', ''], ['abc', 'abc']]))
+        assert assertion.any_missing(pd.DataFrame(['']))
+        assert not assertion.any_missing(pd.DataFrame([1]))
+        assert not assertion.any_missing(pd.DataFrame([[1], [1]]))
+
 
     def test_raises_exception(self):
 
