@@ -194,28 +194,6 @@ def assert_identical(values):
     raise NotImplementedError()
 
 
-def assert_none_missing(values, empty_string_as_missing: bool = True):
-    """
-    Raises Exception if any items in `values` are missing.
-
-    Keyword arguments:
-    empty_string_as_missing -- if True, treats empty string as missing value
-    """
-    raise NotImplementedError()
-
-
-def assert_none_duplicated(values, ignore_missing_values: bool = True):
-    """
-    Raises Exception if any items in `values` are duplicated.
-
-    Keyword arguments:
-    ignore_missing_values -- if True, removes missing values before checking if duplicated
-    """
-
-    # if ignore_missing_values is False throw exception if more than one are missing?
-    raise NotImplementedError()
-
-
 def raises_exception(function: Callable, exception_type: Type= None) -> bool:
     """Returns True if `function` raises an Exception; returns False if `function` runs without raising an Exception.
 
