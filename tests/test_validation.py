@@ -298,6 +298,52 @@ class TestValidation(unittest.TestCase):
         assert not vld.raises_exception(my_function_exception, type(TypeError()))
         assert not vld.raises_exception(my_function_runs)
 
+    def test_assert_true(self):
+        vld.assert_true(True)
+        assert isinstance(np.bool_(True), np.bool_)
+        vld.assert_true(np.bool_(True))
+
+        assert vld.raises_exception(lambda: vld.assert_true([]), type(TypeError()))
+        assert vld.raises_exception(lambda: vld.assert_true([True]), type(TypeError()))
+
+        raised_exception = False
+        try:
+            vld.assert_true(False)
+        except AssertionError:
+            raised_exception = True
+        assert raised_exception
+
+        raised_exception = False
+        try:
+            vld.assert_true(False, message='my message')
+        except AssertionError as error:
+            raised_exception = True
+            assert error.args[0] == 'my message'
+        assert raised_exception
+
+    def test_assert_false(self):
+        vld.assert_false(False)
+        assert isinstance(np.bool_(False), np.bool_)
+        vld.assert_false(np.bool_(False))
+
+        assert vld.raises_exception(lambda: vld.assert_false([]), type(TypeError()))
+        assert vld.raises_exception(lambda: vld.assert_false([False]), type(TypeError()))
+
+        raised_exception = False
+        try:
+            vld.assert_false(True)
+        except AssertionError:
+            raised_exception = True
+        assert raised_exception
+
+        raised_exception = False
+        try:
+            vld.assert_false(True, message='my message')
+        except AssertionError as error:
+            raised_exception = True
+            assert error.args[0] == 'my message'
+        assert raised_exception
+
     def test_assert_all(self):
         cases = [
             [True],

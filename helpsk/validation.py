@@ -56,8 +56,7 @@ def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]
     -------
     None
     """
-    if any_none_nan(values):
-        raise AssertionError('None/NaN Values Found')
+    assert_false(any_none_nan(values), message='None/NaN Values Found')
 
 
 def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
@@ -103,8 +102,7 @@ def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> None
     -------
     bool - True if any item in `values` are None/np.NaN/''
     """
-    if any_missing(values):
-        raise AssertionError('Missing Values Found')
+    assert_false(any_missing(values), message='Missing Values Found')
 
 
 def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
@@ -135,8 +133,7 @@ def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> None:
     Returns
     -------
     """
-    if any_duplicated(values):
-        raise AssertionError('Duplicate Values Found')
+    assert_false(any_duplicated(values), message='Duplicate Values Found')
 
 
 def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
@@ -177,14 +174,28 @@ def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> 
     None
     """
     if isinstance(values, pd.Series):
-        if values.any():
-            raise AssertionError('Found True')
+        assert_false(values.any(), message='Found True')
+
     elif isinstance(values, pd.DataFrame):
-        if values.any().any():
-            raise AssertionError('Found True')
+        assert_false(values.any().any(), message='Found True')
+
     else:
-        if any(values):
-            raise AssertionError('Found True')
+        assert_false(any(values), message='Found True')
+
+
+def assert_true(condition: bool, message:str = 'Condition Not True') -> None:
+    if not (isinstance(condition, bool) or isinstance(condition, np.bool_)):
+        raise TypeError('condition should be boolean')
+
+    if not condition:
+        raise AssertionError(message)
+
+def assert_false(condition: bool, message:str = 'Condition True') -> None:
+    if not (isinstance(condition, bool) or isinstance(condition, np.bool_)):
+        raise TypeError('condition should be boolean')
+
+    if condition:
+        raise AssertionError(message)
 
 
 def assert_identical(values) -> None:
