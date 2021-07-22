@@ -24,10 +24,10 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
         return True
 
     if isinstance(values, pd.Series):
-        return values.isnull().any() or values.isna().any()
+        return values.isnull().any() or values.isna().any()  # noqa
 
     if isinstance(values, pd.DataFrame):
-        return values.isnull().any().any() or values.isna().any().any()
+        return values.isnull().any().any() or values.isna().any().any()  # noqa
 
     if None in values:
         return True
@@ -77,10 +77,10 @@ def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
         return True
 
     if isinstance(values, pd.Series):
-        return values.isin(['']).any()
+        return values.isin(['']).any()  # noqa
 
     if isinstance(values, pd.DataFrame):
-        return values.isin(['']).any().any()
+        return values.isin(['']).any().any()  # noqa
 
     if '' in values:
         return True
@@ -150,10 +150,10 @@ def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None
     None
     """
     if isinstance(values, pd.Series):
-        if not values.all():
+        if not values.all():  # noqa
             raise AssertionError('Not All True')
     elif isinstance(values, pd.DataFrame):
-        if not values.all().all():
+        if not values.all().all():  # noqa
             raise AssertionError('Not All True')
     else:
         if not all(values):
@@ -174,23 +174,24 @@ def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> 
     None
     """
     if isinstance(values, pd.Series):
-        assert_false(values.any(), message='Found True')
+        assert_false(values.any(), message='Found True')  # noqa
 
     elif isinstance(values, pd.DataFrame):
-        assert_false(values.any().any(), message='Found True')
+        assert_false(values.any().any(), message='Found True')  # noqa
 
     else:
         assert_false(any(values), message='Found True')
 
 
-def assert_true(condition: bool, message:str = 'Condition Not True') -> None:
+def assert_true(condition: bool, message: str = 'Condition Not True') -> None:
     if not (isinstance(condition, bool) or isinstance(condition, np.bool_)):
         raise TypeError('condition should be boolean')
 
     if not condition:
         raise AssertionError(message)
 
-def assert_false(condition: bool, message:str = 'Condition True') -> None:
+
+def assert_false(condition: bool, message: str = 'Condition True') -> None:
     if not (isinstance(condition, bool) or isinstance(condition, np.bool_)):
         raise TypeError('condition should be boolean')
 
@@ -199,7 +200,9 @@ def assert_false(condition: bool, message:str = 'Condition True') -> None:
 
 
 def raises_exception(function: Callable, exception_type: Type = None) -> bool:
-    """Returns True if `function` raises an Exception; returns False if `function` runs without raising an Exception.
+    """
+    Returns True if `function` raises an Exception; returns False if `function` runs without raising an
+    Exception.
 
     Keyword arguments:
     function -- a function
@@ -212,35 +215,3 @@ def raises_exception(function: Callable, exception_type: Type = None) -> bool:
             return isinstance(e, exception_type)
         else:
             return True
-
-#  @staticmethod
-# def assert_dataframes_equal(data_frame1: pd.DataFrame,
-#                             data_frame2: pd.DataFrame,
-#                             check_column_types: bool = True):
-#     def is_number(s):
-#         try:
-#             float(s)
-#             return True
-#         except ValueError:
-#             return False
-#
-#     # check that the types of the columns are all the same
-#     if check_column_types:
-#         assert all([x == y for x, y in zip(data_frame1.dtypes.values, data_frame2.dtypes.values)])
-#     assert all(data_frame1.columns.values == data_frame2.columns.values)
-#     assert all(data_frame1.index.values == data_frame2.index.values)
-#     numeric_col, cat_cols = OOLearningHelpers.get_columns_by_type(data_dtypes=data_frame1.dtypes)
-#
-#     for col in numeric_col:
-#         # check if the values are close, or if they are both NaN
-#         assert all([is_close(x, y) or (math.isnan(x) and math.isnan(y))
-#                     for x, y in zip(data_frame1[col].values, data_frame2[col].values)])
-#
-#     for col in cat_cols:
-#         # if the two strings aren't equal, but also aren't 'nan', it will cause a problem because
-#         # isnan will try to convert the string to a number, but it will fail with TypeError, so have to
-#         # ensure both values are a number before we check that they are nan.
-#         assert all([x == y or (is_number(x) and is_number(y) and math.isnan(x) and math.isnan(y))
-#                     for x, y in zip(data_frame1[col].values, data_frame2[col].values)])
-#
-#     return True

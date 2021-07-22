@@ -9,7 +9,7 @@ from helpsk import validation as vld
 class TestValidation(unittest.TestCase):
 
     def test_any_none_nan(self):
-        assert vld.any_none_nan(None)
+        assert vld.any_none_nan(None)  # noqa
         assert vld.any_none_nan(np.NaN)
 
         # test list
@@ -54,7 +54,7 @@ class TestValidation(unittest.TestCase):
         assert not vld.any_none_nan(pd.DataFrame([[''], [1]]))
 
     def test_assert_not_none_nan(self):
-        assert vld.raises_exception(lambda: vld.assert_not_none_nan(None),
+        assert vld.raises_exception(lambda: vld.assert_not_none_nan(None),  # noqa
                                     type(AssertionError()))
         assert vld.raises_exception(lambda: vld.assert_not_none_nan(np.NaN),
                                     type(AssertionError()))
@@ -125,9 +125,9 @@ class TestValidation(unittest.TestCase):
         assert not vld.raises_exception(lambda: vld.assert_not_none_nan(pd.DataFrame([[''], [1]])))
 
     def test_any_missing(self):
-        assert vld.any_missing(None)
+        assert vld.any_missing(None)  # noqa
         assert vld.any_missing(np.NaN)
-        assert vld.any_missing('')
+        assert vld.any_missing('')  # noqa
 
         # test list
         assert vld.any_missing([1, np.nan, None])
@@ -168,11 +168,11 @@ class TestValidation(unittest.TestCase):
         assert not vld.any_missing(pd.DataFrame([[1], [1]]))
 
     def test_assert_not_any_missing(self):
-        assert vld.raises_exception(lambda: vld.assert_not_any_missing(None),
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(None),  # noqa
                                     type(AssertionError()))
         assert vld.raises_exception(lambda: vld.assert_not_any_missing(np.NaN),
                                     type(AssertionError()))
-        assert vld.raises_exception(lambda: vld.assert_not_any_missing(''),
+        assert vld.raises_exception(lambda: vld.assert_not_any_missing(''),  # noqa
                                     type(AssertionError()))
 
         # test list
@@ -303,8 +303,8 @@ class TestValidation(unittest.TestCase):
         assert isinstance(np.bool_(True), np.bool_)
         vld.assert_true(np.bool_(True))
 
-        assert vld.raises_exception(lambda: vld.assert_true([]), type(TypeError()))
-        assert vld.raises_exception(lambda: vld.assert_true([True]), type(TypeError()))
+        assert vld.raises_exception(lambda: vld.assert_true([]), type(TypeError()))  # noqa
+        assert vld.raises_exception(lambda: vld.assert_true([True]), type(TypeError()))  # noqa
 
         raised_exception = False
         try:
@@ -326,8 +326,8 @@ class TestValidation(unittest.TestCase):
         assert isinstance(np.bool_(False), np.bool_)
         vld.assert_false(np.bool_(False))
 
-        assert vld.raises_exception(lambda: vld.assert_false([]), type(TypeError()))
-        assert vld.raises_exception(lambda: vld.assert_false([False]), type(TypeError()))
+        assert vld.raises_exception(lambda: vld.assert_false([]), type(TypeError()))  # noqa
+        assert vld.raises_exception(lambda: vld.assert_false([False]), type(TypeError()))  # noqa
 
         raised_exception = False
         try:
@@ -357,7 +357,7 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([[True, True], [True, True]]),
         ]
         passing_cases = [not vld.raises_exception(lambda: vld.assert_all(case),
-                                                        type(AssertionError()))
+                                                  type(AssertionError()))
                          for case in cases]
         assert all(passing_cases)
 
@@ -373,7 +373,7 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([[True, True], [True, False]]),
         ]
         passing_cases = [vld.raises_exception(lambda: vld.assert_all(case),
-                                                    type(AssertionError()))
+                                              type(AssertionError()))
                          for case in cases]
         assert all(passing_cases)
 
@@ -390,7 +390,7 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([[False, False], [False, False]]),
         ]
         passing_cases = [not vld.raises_exception(lambda: vld.assert_not_any(case),
-                                                        type(AssertionError()))
+                                                  type(AssertionError()))
                          for case in cases]
         assert all(passing_cases)
 
@@ -406,6 +406,6 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([[False, False], [False, True]]),
         ]
         passing_cases = [vld.raises_exception(lambda: vld.assert_not_any(case),
-                                                    type(AssertionError()))
+                                              type(AssertionError()))
                          for case in cases]
         assert all(passing_cases)
