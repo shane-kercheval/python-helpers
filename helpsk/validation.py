@@ -198,13 +198,6 @@ def assert_false(condition: bool, message:str = 'Condition True') -> None:
         raise AssertionError(message)
 
 
-def assert_identical(values) -> None:
-    """
-    Raises Exception if xyz is not identical
-    """    
-    raise NotImplementedError()
-
-
 def raises_exception(function: Callable, exception_type: Type = None) -> bool:
     """Returns True if `function` raises an Exception; returns False if `function` runs without raising an Exception.
 
