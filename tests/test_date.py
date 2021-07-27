@@ -1,7 +1,7 @@
 import unittest
 
 import pandas as pd
-
+import datetime
 from helpsk import date
 from helpsk import validation as vld
 
@@ -27,14 +27,35 @@ class TestValidation(unittest.TestCase):
 
         assert vld.raises_exception(lambda: date.ymd('2021-02-31'), ValueError)
 
-    def test_date_to_string(self):
+    def test_to_string(self):
         pass
 
+    def test_floor_day(self):
+        # test datetime
+        value = datetime.datetime(year=2021, month=2, day=13, hour=23, minute=45, second=55)
+        assert date.floor(value, granularity=date.Granularity.DAY) == date.ymd('2021-02-13')
+        assert date.floor(value) == date.ymd('2021-02-13')
+        # test date
+        value = datetime.date(year=2021, month=2, day=13)
+        assert date.floor(value, granularity=date.Granularity.DAY) == date.ymd('2021-02-13')
+        assert date.floor(value) == date.ymd('2021-02-13')
+
     def test_floor_month(self):
-        assert date.floor_month(date.ymd('2021-01-01')) == date.ymd('2021-01-01')
-        assert date.floor_month(date.ymd('2021-01-31')) == date.ymd('2021-01-01')
-        assert date.floor_month(date.ymd('2021-12-01')) == date.ymd('2021-12-01')
-        assert date.floor_month(date.ymd('2021-12-31')) == date.ymd('2021-12-01')
+        # test datetime
+        value = datetime.datetime(year=2021, month=1, day=1, hour=23, minute=45, second=55)
+        assert date.floor(value, granularity=date.Granularity.MONTH) == date.ymd('2021-01-01')
+        value = datetime.datetime(year=2021, month=1, day=31, hour=23, minute=45, second=55)
+        assert date.floor(value, granularity=date.Granularity.MONTH) == date.ymd('2021-01-01')
+        value = datetime.datetime(year=2021, month=12, day=1, hour=23, minute=45, second=55)
+        assert date.floor(value, granularity=date.Granularity.MONTH) == date.ymd('2021-12-01')
+        value = datetime.datetime(year=2021, month=12, day=31, hour=23, minute=45, second=55)
+        assert date.floor(value, granularity=date.Granularity.MONTH) == date.ymd('2021-12-01')
+
+        # test date
+        assert date.floor(date.ymd('2021-01-01'), granularity=date.Granularity.MONTH) == date.ymd('2021-01-01')
+        assert date.floor(date.ymd('2021-01-31'), granularity=date.Granularity.MONTH) == date.ymd('2021-01-01')
+        assert date.floor(date.ymd('2021-12-01'), granularity=date.Granularity.MONTH) == date.ymd('2021-12-01')
+        assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.MONTH) == date.ymd('2021-12-01')
 
     def test_floor_quarter(self):
         # default argument first_fiscal_month of 1
