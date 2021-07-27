@@ -89,6 +89,33 @@ class TestValidation(unittest.TestCase):
         assert date.floor_quarter(date.ymd('2021-12-01'), first_fiscal_month=11) == date.ymd('2021-11-01')
         assert date.floor_quarter(date.ymd('2021-12-31'), first_fiscal_month=11) == date.ymd('2021-11-01')
 
+        # fiscal quarter starts in June
+        assert date.floor_quarter(date.ymd('2021-01-01'), first_fiscal_month=6) == date.ymd('2020-12-01')
+        assert date.floor_quarter(date.ymd('2021-01-31'), first_fiscal_month=6) == date.ymd('2020-12-01')
+        assert date.floor_quarter(date.ymd('2021-02-01'), first_fiscal_month=6) == date.ymd('2020-12-01')
+        assert date.floor_quarter(date.ymd('2021-02-28'), first_fiscal_month=6) == date.ymd('2020-12-01')
+        assert date.floor_quarter(date.ymd('2021-03-01'), first_fiscal_month=6) == date.ymd('2021-03-01')
+        assert date.floor_quarter(date.ymd('2021-03-31'), first_fiscal_month=6) == date.ymd('2021-03-01')
+        assert date.floor_quarter(date.ymd('2021-04-01'), first_fiscal_month=6) == date.ymd('2021-03-01')
+        assert date.floor_quarter(date.ymd('2021-04-30'), first_fiscal_month=6) == date.ymd('2021-03-01')
+        assert date.floor_quarter(date.ymd('2021-05-01'), first_fiscal_month=6) == date.ymd('2021-03-01')
+        assert date.floor_quarter(date.ymd('2021-05-31'), first_fiscal_month=6) == date.ymd('2021-03-01')
+        assert date.floor_quarter(date.ymd('2021-06-01'), first_fiscal_month=6) == date.ymd('2021-06-01')
+        assert date.floor_quarter(date.ymd('2021-06-30'), first_fiscal_month=6) == date.ymd('2021-06-01')
+        assert date.floor_quarter(date.ymd('2021-07-01'), first_fiscal_month=6) == date.ymd('2021-06-01')
+        assert date.floor_quarter(date.ymd('2021-07-31'), first_fiscal_month=6) == date.ymd('2021-06-01')
+        assert date.floor_quarter(date.ymd('2021-08-01'), first_fiscal_month=6) == date.ymd('2021-06-01')
+        assert date.floor_quarter(date.ymd('2021-08-31'), first_fiscal_month=6) == date.ymd('2021-06-01')
+        assert date.floor_quarter(date.ymd('2021-09-01'), first_fiscal_month=6) == date.ymd('2021-09-01')
+        assert date.floor_quarter(date.ymd('2021-09-30'), first_fiscal_month=6) == date.ymd('2021-09-01')
+        assert date.floor_quarter(date.ymd('2021-10-01'), first_fiscal_month=6) == date.ymd('2021-09-01')
+        assert date.floor_quarter(date.ymd('2021-10-31'), first_fiscal_month=6) == date.ymd('2021-09-01')
+        assert date.floor_quarter(date.ymd('2021-11-01'), first_fiscal_month=6) == date.ymd('2021-09-01')
+        assert date.floor_quarter(date.ymd('2021-11-30'), first_fiscal_month=6) == date.ymd('2021-09-01')
+        assert date.floor_quarter(date.ymd('2021-12-01'), first_fiscal_month=6) == date.ymd('2021-12-01')
+        assert date.floor_quarter(date.ymd('2021-12-31'), first_fiscal_month=6) == date.ymd('2021-12-01')
+
+
     def etc(self):
 
         import datetime
