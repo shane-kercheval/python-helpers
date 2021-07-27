@@ -62,15 +62,15 @@ def floor(value: Union[datetime.datetime, datetime.date],
             return value.replace(day=1)
 
     if granularity == Granularity.QUARTER:
-        return ''
+        relative_start_index = ((first_fiscal_month - 1) % 3) + 1
+        current_month_index = ((value.month - 1) % 3) + 1
+        months_to_subtract = (((relative_start_index * -1) + current_month_index) % 3)
+        return floor(value, granularity=Granularity.MONTH) - relativedelta.relativedelta(months=months_to_subtract)
 
     raise ValueError("Unknown Granularity type")
 
 
-
-
-
-def floor_quarter(date: datetime.date, first_fiscal_month: int = 1) -> datetime.date:
+def floor_quarter_old(date: datetime.date, first_fiscal_month: int = 1) -> datetime.date:
     """
     "Rounds" the date down (i.e. floor) to the start of the current quarter. 
 
