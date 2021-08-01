@@ -73,7 +73,13 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
     Returns the fiscal quarter (or year and quarter numeric value) for a given date. 
 
     For example:
-        TBD            
+        date.fiscal_quarter(date.ymd('2021-01-15')) == 1
+        date.fiscal_quarter(date.ymd('2021-01-15'), include_year=True) == 2021.1
+
+
+        date.fiscal_quarter(date.ymd('2021-01-15'), fiscal_start=2) == 4
+        date.fiscal_quarter(date.ymd('2021-01-15'), include_year=True, fiscal_start=2) == 2021.4
+        date.fiscal_quarter(date.ymd('2020-11-15'), include_year=True, fiscal_start=2) == 2021.4
 
     Logic converted from R's Lubridate package: 
         https://github.com/tidyverse/lubridate/blob/master/R/accessors-quarter.r
