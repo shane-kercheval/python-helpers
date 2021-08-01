@@ -13,8 +13,36 @@ class Granularity(Enum):
     QUARTER = auto()
 
 
-def ymd(date_string: str) -> datetime.date:
-    return datetime.datetime.strptime(date_string, "%Y-%m-%d").date()
+def ymd(yyyy_mm_dd: str) -> datetime.date:
+    """
+    Takes a string in the form of 'YYYY-MM-DD' and returns a datetime.date
+
+    Parameters
+    ----------
+    yyyy_mm_dd : str
+        a string in the form of 'YYYY-MM-DD'
+
+    Returns
+    -------
+    datetime.date
+    """
+    return datetime.datetime.strptime(yyyy_mm_dd, "%Y-%m-%d").date()
+
+
+def ymd_hms(yyyy_mm_dd_hh_mm_ss: str) -> datetime.datetime:
+    """
+    Takes a string in the form of 'YYYY-MM-DD HH:MM:SS' and returns a datetime.datetime
+
+    Parameters
+    ----------
+    yyyy_mm_dd_hh_mm_ss : str
+        a string in the form of 'YYYY-MM-DD HH:MM:SS'
+
+    Returns
+    -------
+    datetime.datetime
+    """
+    return datetime.datetime.strptime(yyyy_mm_dd_hh_mm_ss, "%Y-%m-%d %H:%M:%S")
 
 
 def floor(value: Union[datetime.datetime, datetime.date],
