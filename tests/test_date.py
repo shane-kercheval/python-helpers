@@ -26,6 +26,8 @@ class TestValidation(unittest.TestCase):
 
         assert vld.raises_exception(lambda: date.ymd('2021-02-31'), ValueError)
 
+# todo test with datetimes for fiscal_quarter and to-string
+
     def test_fiscal_quarter(self):
         date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
                        '2021-01-01', '2021-01-15', '2021-01-31',
@@ -157,7 +159,99 @@ class TestValidation(unittest.TestCase):
         assert results == expected
 
     def test_to_string(self):
-        pass
+        date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
+                       '2021-01-01', '2021-01-15', '2021-01-31',
+                       '2021-02-01', '2021-02-15', '2021-02-28',
+                       '2021-03-01', '2021-03-15', '2021-03-31',
+                       '2021-04-01', '2021-04-15', '2021-04-30',
+                       '2021-05-01', '2021-05-15', '2021-05-31',
+                       '2021-06-01', '2021-06-15', '2021-06-30',
+                       '2021-07-01', '2021-07-15', '2021-07-31',
+                       '2021-08-01', '2021-08-15', '2021-08-31',
+                       '2021-09-01', '2021-09-15', '2021-09-30',
+                       '2021-10-01', '2021-10-15', '2021-10-31',
+                       '2021-11-01', '2021-11-15', '2021-11-30',
+                       '2021-12-01', '2021-12-15', '2021-12-31',
+                       '2022-01-01', '2022-01-15', '2022-01-31']
+
+        results = [date.to_string(value=date.ymd(x),
+                                  granularity=date.Granularity.DAY) for x in date_values]
+        assert results == date_values
+
+        results = [date.to_string(value=date.ymd(x),
+                                  granularity=date.Granularity.MONTH) for x in date_values]
+        expected = ['2020-Dec', '2020-Dec', '2020-Dec',
+                    '2021-Jan', '2021-Jan', '2021-Jan',
+                    '2021-Feb', '2021-Feb', '2021-Feb',
+                    '2021-Mar', '2021-Mar', '2021-Mar',
+                    '2021-Apr', '2021-Apr', '2021-Apr',
+                    '2021-May', '2021-May', '2021-May',
+                    '2021-Jun', '2021-Jun', '2021-Jun',
+                    '2021-Jul', '2021-Jul', '2021-Jul',
+                    '2021-Aug', '2021-Aug', '2021-Aug',
+                    '2021-Sep', '2021-Sep', '2021-Sep',
+                    '2021-Oct', '2021-Oct', '2021-Oct',
+                    '2021-Nov', '2021-Nov', '2021-Nov',
+                    '2021-Dec', '2021-Dec', '2021-Dec',
+                    '2022-Jan', '2022-Jan', '2022-Jan']
+        assert results == expected
+
+        results = [date.to_string(value=date.ymd(x),
+                                  granularity=date.Granularity.QUARTER,
+                                  fiscal_start=1) for x in date_values]
+        expected = ['2020-Q4', '2020-Q4', '2020-Q4',  # 2020-Dec
+                    '2021-Q1', '2021-Q1', '2021-Q1',  # 2021-Jan
+                    '2021-Q1', '2021-Q1', '2021-Q1',  # 2021-Feb
+                    '2021-Q1', '2021-Q1', '2021-Q1',  # 2021-Mar
+                    '2021-Q2', '2021-Q2', '2021-Q2',  # 2021-Apr
+                    '2021-Q2', '2021-Q2', '2021-Q2',  # 2021-May
+                    '2021-Q2', '2021-Q2', '2021-Q2',  # 2021-Jun
+                    '2021-Q3', '2021-Q3', '2021-Q3',  # 2021-Jul
+                    '2021-Q3', '2021-Q3', '2021-Q3',  # 2021-Aug
+                    '2021-Q3', '2021-Q3', '2021-Q3',  # 2021-Sep
+                    '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Oct
+                    '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Nov
+                    '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Dec
+                    '2022-Q1', '2022-Q1', '2022-Q1']  # 2022-Jan
+        assert results == expected
+
+        results = [date.to_string(value=date.ymd(x),
+                                  granularity=date.Granularity.QUARTER,
+                                  fiscal_start=2) for x in date_values]
+        expected = ['2021-FQ4', '2021-FQ4', '2021-FQ4',  # 2020-Dec
+                    '2021-FQ4', '2021-FQ4', '2021-FQ4',  # 2021-Jan
+                    '2022-FQ1', '2022-FQ1', '2022-FQ1',  # 2021-Feb
+                    '2022-FQ1', '2022-FQ1', '2022-FQ1',  # 2021-Mar
+                    '2022-FQ1', '2022-FQ1', '2022-FQ1',  # 2021-Apr
+                    '2022-FQ2', '2022-FQ2', '2022-FQ2',  # 2021-May
+                    '2022-FQ2', '2022-FQ2', '2022-FQ2',  # 2021-Jun
+                    '2022-FQ2', '2022-FQ2', '2022-FQ2',  # 2021-Jul
+                    '2022-FQ3', '2022-FQ3', '2022-FQ3',  # 2021-Aug
+                    '2022-FQ3', '2022-FQ3', '2022-FQ3',  # 2021-Sep
+                    '2022-FQ3', '2022-FQ3', '2022-FQ3',  # 2021-Oct
+                    '2022-FQ4', '2022-FQ4', '2022-FQ4',  # 2021-Nov
+                    '2022-FQ4', '2022-FQ4', '2022-FQ4',  # 2021-Dec
+                    '2022-FQ4', '2022-FQ4', '2022-FQ4']  # 2022-Jan
+        assert results == expected
+
+        results = [date.to_string(value=date.ymd(x),
+                                  granularity=date.Granularity.QUARTER,
+                                  fiscal_start=12) for x in date_values]
+        expected = ['2021-FQ1', '2021-FQ1', '2021-FQ1',  # 2020-Dec
+                    '2021-FQ1', '2021-FQ1', '2021-FQ1',  # 2021-Jan
+                    '2021-FQ1', '2021-FQ1', '2021-FQ1',  # 2021-Feb
+                    '2021-FQ2', '2021-FQ2', '2021-FQ2',  # 2021-Mar
+                    '2021-FQ2', '2021-FQ2', '2021-FQ2',  # 2021-Apr
+                    '2021-FQ2', '2021-FQ2', '2021-FQ2',  # 2021-May
+                    '2021-FQ3', '2021-FQ3', '2021-FQ3',  # 2021-Jun
+                    '2021-FQ3', '2021-FQ3', '2021-FQ3',  # 2021-Jul
+                    '2021-FQ3', '2021-FQ3', '2021-FQ3',  # 2021-Aug
+                    '2021-FQ4', '2021-FQ4', '2021-FQ4',  # 2021-Sep
+                    '2021-FQ4', '2021-FQ4', '2021-FQ4',  # 2021-Oct
+                    '2021-FQ4', '2021-FQ4', '2021-FQ4',  # 2021-Nov
+                    '2022-FQ1', '2022-FQ1', '2022-FQ1',  # 2021-Dec
+                    '2022-FQ1', '2022-FQ1', '2022-FQ1']  # 2022-Jan
+        assert results == expected
 
     def test_floor_day(self):
         # test datetime

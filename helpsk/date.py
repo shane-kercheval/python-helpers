@@ -103,6 +103,8 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
     date - the date rounded down to the naerest granularity
     """
 
+    assert 1 <= fiscal_start <= 12
+
     fiscal_start = (fiscal_start - 1) % 12
     shifted = np.arange(fiscal_start, 11 + fiscal_start + 1) % 12 + 1
     quarters = np.repeat([1, 2, 3, 4], 3)
@@ -156,6 +158,9 @@ def to_string(value: Union[datetime.datetime, datetime.date],
         Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g. Jan is 1, Feb, 2,
         etc.) that corresponds to the first month of the fiscal year.
 
+        If fiscal_start start is any other value than `1` quarters will be abbreviated with `F` to denote 
+        non-standard / fiscal quarters. For example, "2021-FQ4" is the 4th fiscal quarter of 2021.
+
     Returns
     -------
     date - the date rounded down to the naerest granularity
@@ -165,6 +170,13 @@ def to_string(value: Union[datetime.datetime, datetime.date],
     elif granularity == Granularity.MONTH:
         return value.strftime("%Y-%b")
     elif granularity == Granularity.QUARTER:
-        return value.strftime("%Y") + "-Q" + str(((value.month - 1) // 3) + 1)
+        if fiscal_start == 1:
+            return str(fiscal_quarter(value,
+                                      include_year=True,
+                                      fiscal_start=fiscal_start)).replace('.', '-Q')
+        else:
+            return str(fiscal_quarter(value,
+                                      include_year=True,
+                                      fiscal_start=fiscal_start)).replace('.', '-FQ')
     else:
         raise TypeError('Unrecognized Granularity')
