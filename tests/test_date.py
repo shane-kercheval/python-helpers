@@ -1,6 +1,5 @@
 import unittest
 
-import pandas as pd
 import datetime
 from helpsk import date
 from helpsk import validation as vld
@@ -26,6 +25,136 @@ class TestValidation(unittest.TestCase):
         assert value.day == 31
 
         assert vld.raises_exception(lambda: date.ymd('2021-02-31'), ValueError)
+
+    def test_fiscal_quarter(self):
+        date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
+                       '2021-01-01', '2021-01-15', '2021-01-31',
+                       '2021-02-01', '2021-02-15', '2021-02-28',
+                       '2021-03-01', '2021-03-15', '2021-03-31',
+                       '2021-04-01', '2021-04-15', '2021-04-30',
+                       '2021-05-01', '2021-05-15', '2021-05-31',
+                       '2021-06-01', '2021-06-15', '2021-06-30',
+                       '2021-07-01', '2021-07-15', '2021-07-31',
+                       '2021-08-01', '2021-08-15', '2021-08-31',
+                       '2021-09-01', '2021-09-15', '2021-09-30',
+                       '2021-10-01', '2021-10-15', '2021-10-31',
+                       '2021-11-01', '2021-11-15', '2021-11-30',
+                       '2021-12-01', '2021-12-15', '2021-12-31',
+                       '2022-01-01', '2022-01-15', '2022-01-31']
+
+        results = [date.fiscal_quarter(value=date.ymd(x),
+                                       include_year=True,
+                                       fiscal_start=1) for x in date_values]
+        expected = [2020.4, 2020.4, 2020.4,
+                    2021.1, 2021.1, 2021.1,
+                    2021.1, 2021.1, 2021.1,
+                    2021.1, 2021.1, 2021.1,
+                    2021.2, 2021.2, 2021.2,
+                    2021.2, 2021.2, 2021.2,
+                    2021.2, 2021.2, 2021.2,
+                    2021.3, 2021.3, 2021.3,
+                    2021.3, 2021.3, 2021.3,
+                    2021.3, 2021.3, 2021.3,
+                    2021.4, 2021.4, 2021.4,
+                    2021.4, 2021.4, 2021.4,
+                    2021.4, 2021.4, 2021.4,
+                    2022.1, 2022.1, 2022.1]
+        assert results == expected
+
+        results = [date.fiscal_quarter(value=date.ymd(x),
+                                       include_year=False,
+                                       fiscal_start=1) for x in date_values]
+        expected = [4, 4, 4,
+                    1, 1, 1,
+                    1, 1, 1,
+                    1, 1, 1,
+                    2, 2, 2,
+                    2, 2, 2,
+                    2, 2, 2,
+                    3, 3, 3,
+                    3, 3, 3,
+                    3, 3, 3,
+                    4, 4, 4,
+                    4, 4, 4,
+                    4, 4, 4,
+                    1, 1, 1]
+        assert results == expected
+
+        results = [date.fiscal_quarter(value=date.ymd(x),
+                                       include_year=True,
+                                       fiscal_start=2) for x in date_values]
+        expected = [2021.4, 2021.4, 2021.4,
+                    2021.4, 2021.4, 2021.4,
+                    2022.1, 2022.1, 2022.1,
+                    2022.1, 2022.1, 2022.1,
+                    2022.1, 2022.1, 2022.1,
+                    2022.2, 2022.2, 2022.2,
+                    2022.2, 2022.2, 2022.2,
+                    2022.2, 2022.2, 2022.2,
+                    2022.3, 2022.3, 2022.3,
+                    2022.3, 2022.3, 2022.3,
+                    2022.3, 2022.3, 2022.3,
+                    2022.4, 2022.4, 2022.4,
+                    2022.4, 2022.4, 2022.4,
+                    2022.4, 2022.4, 2022.4]
+        assert results == expected
+
+        results = [date.fiscal_quarter(value=date.ymd(x),
+                                       include_year=False,
+                                       fiscal_start=2) for x in date_values]
+        expected = [4, 4, 4,
+                    4, 4, 4,
+                    1, 1, 1,
+                    1, 1, 1,
+                    1, 1, 1,
+                    2, 2, 2,
+                    2, 2, 2,
+                    2, 2, 2,
+                    3, 3, 3,
+                    3, 3, 3,
+                    3, 3, 3,
+                    4, 4, 4,
+                    4, 4, 4,
+                    4, 4, 4]
+        assert results == expected
+
+        results = [date.fiscal_quarter(value=date.ymd(x),
+                                       include_year=True,
+                                       fiscal_start=12) for x in date_values]
+        expected = [2021.1, 2021.1, 2021.1,  # 2020-Dec
+                    2021.1, 2021.1, 2021.1,  # 2021-Jan
+                    2021.1, 2021.1, 2021.1,  # 2021-Feb
+                    2021.2, 2021.2, 2021.2,  # 2021-Mar
+                    2021.2, 2021.2, 2021.2,  # 2021-Apr
+                    2021.2, 2021.2, 2021.2,  # 2021-May
+                    2021.3, 2021.3, 2021.3,  # 2021-Jun
+                    2021.3, 2021.3, 2021.3,  # 2021-Jul
+                    2021.3, 2021.3, 2021.3,  # 2021-Aug
+                    2021.4, 2021.4, 2021.4,  # 2021-Sep
+                    2021.4, 2021.4, 2021.4,  # 2021-Oct
+                    2021.4, 2021.4, 2021.4,  # 2021-Nov
+                    2022.1, 2022.1, 2022.1,  # 2021-Dec
+                    2022.1, 2022.1, 2022.1]  # 2022-Jan
+        assert results == expected
+
+        results = [date.fiscal_quarter(value=date.ymd(x),
+                                       include_year=False,
+                                       fiscal_start=12) for x in date_values]
+        expected = [1, 1, 1,  # 2020-Dec
+                    1, 1, 1,  # 2021-Jan
+                    1, 1, 1,  # 2021-Feb
+                    2, 2, 2,  # 2021-Mar
+                    2, 2, 2,  # 2021-Apr
+                    2, 2, 2,  # 2021-May
+                    3, 3, 3,  # 2021-Jun
+                    3, 3, 3,  # 2021-Jul
+                    3, 3, 3,  # 2021-Aug
+                    4, 4, 4,  # 2021-Sep
+                    4, 4, 4,  # 2021-Oct
+                    4, 4, 4,  # 2021-Nov
+                    1, 1, 1,  # 2021-Dec
+                    1, 1, 1]  # 2022-Jan
+        assert results == expected
 
     def test_to_string(self):
         pass
@@ -58,7 +187,7 @@ class TestValidation(unittest.TestCase):
         assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.MONTH) == date.ymd('2021-12-01')
 
     def test_floor_quarter(self):
-        # default argument first_fiscal_month of 1
+        # default argument fiscal_start of 1
         assert date.floor(date.ymd('2021-01-01'), granularity=date.Granularity.QUARTER) == date.ymd('2021-01-01')
         assert date.floor(date.ymd('2021-01-31'), granularity=date.Granularity.QUARTER) == date.ymd('2021-01-01')
         assert date.floor(date.ymd('2021-02-01'), granularity=date.Granularity.QUARTER) == date.ymd('2021-01-01')
@@ -85,156 +214,79 @@ class TestValidation(unittest.TestCase):
         assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.QUARTER) == date.ymd('2021-10-01')
 
         # fiscal quarter starts in February
-        assert date.floor(date.ymd('2021-01-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2020-11-01')
-        assert date.floor(date.ymd('2021-01-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2020-11-01')
-        assert date.floor(date.ymd('2021-02-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-02-28'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-03-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-03-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-04-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-04-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-05-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-05-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-06-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-06-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-07-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-07-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-08-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-08-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-09-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-09-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-10-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-10-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-11-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-11-01')
-        assert date.floor(date.ymd('2021-11-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-11-01')
-        assert date.floor(date.ymd('2021-12-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-11-01')
-        assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=2) == date.ymd('2021-11-01')
+        assert date.floor(date.ymd('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2020-11-01')
+        assert date.floor(date.ymd('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2020-11-01')
+        assert date.floor(date.ymd('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-11-01')
+        assert date.floor(date.ymd('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-11-01')
+        assert date.floor(date.ymd('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-11-01')
+        assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == date.ymd('2021-11-01')
 
         # fiscal quarter starts in November (should be same as February)
-        assert date.floor(date.ymd('2021-01-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2020-11-01')
-        assert date.floor(date.ymd('2021-01-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2020-11-01')
-        assert date.floor(date.ymd('2021-02-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-02-28'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-03-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-03-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-04-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-04-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-02-01')
-        assert date.floor(date.ymd('2021-05-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-05-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-06-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-06-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-07-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-07-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-05-01')
-        assert date.floor(date.ymd('2021-08-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-08-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-09-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-09-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-10-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-10-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-08-01')
-        assert date.floor(date.ymd('2021-11-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-11-01')
-        assert date.floor(date.ymd('2021-11-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-11-01')
-        assert date.floor(date.ymd('2021-12-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-11-01')
-        assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=11) == date.ymd('2021-11-01')
+        assert date.floor(date.ymd('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2020-11-01')
+        assert date.floor(date.ymd('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2020-11-01')
+        assert date.floor(date.ymd('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-02-01')
+        assert date.floor(date.ymd('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-05-01')
+        assert date.floor(date.ymd('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-08-01')
+        assert date.floor(date.ymd('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-11-01')
+        assert date.floor(date.ymd('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-11-01')
+        assert date.floor(date.ymd('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-11-01')
+        assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == date.ymd('2021-11-01')
 
         # fiscal quarter starts in June
-        assert date.floor(date.ymd('2021-01-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2020-12-01')
-        assert date.floor(date.ymd('2021-01-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2020-12-01')
-        assert date.floor(date.ymd('2021-02-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2020-12-01')
-        assert date.floor(date.ymd('2021-02-28'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2020-12-01')
-        assert date.floor(date.ymd('2021-03-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-03-01')
-        assert date.floor(date.ymd('2021-03-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-03-01')
-        assert date.floor(date.ymd('2021-04-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-03-01')
-        assert date.floor(date.ymd('2021-04-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-03-01')
-        assert date.floor(date.ymd('2021-05-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-03-01')
-        assert date.floor(date.ymd('2021-05-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-03-01')
-        assert date.floor(date.ymd('2021-06-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-06-01')
-        assert date.floor(date.ymd('2021-06-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-06-01')
-        assert date.floor(date.ymd('2021-07-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-06-01')
-        assert date.floor(date.ymd('2021-07-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-06-01')
-        assert date.floor(date.ymd('2021-08-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-06-01')
-        assert date.floor(date.ymd('2021-08-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-06-01')
-        assert date.floor(date.ymd('2021-09-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-09-01')
-        assert date.floor(date.ymd('2021-09-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-09-01')
-        assert date.floor(date.ymd('2021-10-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-09-01')
-        assert date.floor(date.ymd('2021-10-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-09-01')
-        assert date.floor(date.ymd('2021-11-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-09-01')
-        assert date.floor(date.ymd('2021-11-30'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-09-01')
-        assert date.floor(date.ymd('2021-12-01'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-12-01')
-        assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.QUARTER, first_fiscal_month=6) == date.ymd('2021-12-01')
-
-
-    def etc(self):
-
-        import datetime
-        datetime.datetime.strptime(string, "%Y-%m-%d").date()
-
-        def ymd(date_string: str) -> datetime.date:
-            return datetime.datetime.strptime(date_string, "%Y-%m-%d").date()
-
-        ymd('2021-01-01')
-        ymd('2021-01-30')
-
-        def floor_month(date: datetime.date) -> datetime.date:
-            return date.replace(day=1)
-
-        floor_month(ymd('2021-01-30'))
-        floor_month(ymd('2021-03-30'))
-
-        from dateutil import relativedelta
-
-        date = ymd('2021-01-31')
-
-
-        def floor_quarter(date: datetime.date, first_fiscal_month: int = 1) -> datetime.date:
-            """
-            "Rounds" the date down (i.e. floor) to the start of the current quarter. 
-
-            For example, if `date` is `2021-03-20` then `floor_quarter` will return `2021-01-01`.
-
-            If the fiscal year starts on November (`first_fiscal_month is `11`; i.e. the quarter is November,
-            December, January) and the date is `2022-01-28` then `floor_quarter` will return `2021-11-01`.
-
-            Parameters
-            ----------
-            date : datetime.date
-                a date
-
-            first_fiscal_month: int
-                the month index (e.g. Jan is 1, Feb, 2, etc.) that corresponds to the first month of the
-                fiscal year.
-
-            Returns
-            -------
-            date - the start of the current quarter
-            """
-            relative_start_index = ((first_fiscal_month - 1) % 3) + 1
-            current_month_index = ((date.month - 1) % 3) + 1
-            months_to_subtract = (((relative_start_index * -1) + current_month_index) % 3)
-
-            return floor_month(date) - relativedelta.relativedelta(months=months_to_subtract)
-
-        
-
-        date = ymd('2021-01-31')
-        date = ymd('2021-04-28')
-
-        def date_to_string(date: datetime.date) -> str:
-            return date.strftime("%Y-%m-%d")
-
-        date_to_string(ymd('2021-01-31'))
-
-
-        def format_as_month(date: datetime.date) -> str:
-            return date.strftime("%Y-%b")
-
-        format_as_month(ymd('2021-01-17'))
-
-        date = ymd('2021-01-04')
-        date.strftime("%Y-%Q")
-
-        [1, 2] - 1
-
-
-        pd.Timestamp(ymd('2021-01-14')).quarter
-
-
+        assert date.floor(date.ymd('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2020-12-01')
+        assert date.floor(date.ymd('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2020-12-01')
+        assert date.floor(date.ymd('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2020-12-01')
+        assert date.floor(date.ymd('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2020-12-01')
+        assert date.floor(date.ymd('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-03-01')
+        assert date.floor(date.ymd('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-03-01')
+        assert date.floor(date.ymd('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-03-01')
+        assert date.floor(date.ymd('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-03-01')
+        assert date.floor(date.ymd('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-03-01')
+        assert date.floor(date.ymd('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-03-01')
+        assert date.floor(date.ymd('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-06-01')
+        assert date.floor(date.ymd('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-06-01')
+        assert date.floor(date.ymd('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-06-01')
+        assert date.floor(date.ymd('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-06-01')
+        assert date.floor(date.ymd('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-06-01')
+        assert date.floor(date.ymd('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-06-01')
+        assert date.floor(date.ymd('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-09-01')
+        assert date.floor(date.ymd('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-09-01')
+        assert date.floor(date.ymd('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-09-01')
+        assert date.floor(date.ymd('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-09-01')
+        assert date.floor(date.ymd('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-09-01')
+        assert date.floor(date.ymd('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-09-01')
+        assert date.floor(date.ymd('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-12-01')
+        assert date.floor(date.ymd('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == date.ymd('2021-12-01')
