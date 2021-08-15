@@ -20,7 +20,8 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
     -------
     bool - True if any item in `values` are None/np.NaN
     """
-    if values is None or values is np.NaN or len(values) == 0:
+    # pylint: disable=too-many-return-statements
+    if values is None or values is np.NaN or len(values) == 0:  # pylint: disable=nan-comparison
         return True
 
     if isinstance(values, pd.Series):
@@ -216,7 +217,7 @@ def raises_exception(function: Callable, exception_type: Type = None) -> bool:
     try:
         function()
         return False
-    except Exception as exception:
+    except Exception as exception:  # pylint: disable=broad-except
         if exception_type:
             return isinstance(exception, exception_type)
 
