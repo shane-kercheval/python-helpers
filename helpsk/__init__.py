@@ -1,1 +1,4 @@
-from .ExampleClass import ExampleClass
+"""
+init file
+"""
+from .example_class import ExampleClass

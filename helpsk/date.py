@@ -1,13 +1,18 @@
-import datetime
-import numpy as np
-from dateutil import relativedelta
+"""
+Contains a collection of date related helper functions.
+"""
 from typing import Union
-
 from enum import unique, Enum, auto
+import datetime
+from dateutil import relativedelta
+import numpy as np
 
 
 @unique
 class Granularity(Enum):
+    """
+    Valid values for date granularity
+    """
     DAY = auto()
     MONTH = auto()
     QUARTER = auto()
@@ -52,10 +57,12 @@ def floor(value: Union[datetime.datetime, datetime.date],
     """
     "Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
 
-    For example, if `date` is `2021-03-20` and granularity is `Granularity.QUARTER` then `floor()` will return `2021-01-01`.
+    For example, if `date` is `2021-03-20` and granularity is `Granularity.QUARTER` then `floor()` will return
+    `2021-01-01`.
 
     If the fiscal year starts on November (`fiscal_start is `11`; i.e. the quarter is November,
-    December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then `floor()` will return `2021-11-01`.
+    December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then `floor()`
+    will return `2021-11-01`.
 
     Parameters
     ----------
@@ -76,20 +83,21 @@ def floor(value: Union[datetime.datetime, datetime.date],
     if granularity == Granularity.DAY:
         if isinstance(value, datetime.datetime):
             return value.date()
-        else :
-            return value
+
+        return value
 
     if granularity == Granularity.MONTH:
         if isinstance(value, datetime.datetime):
             return value.replace(day=1).date()
-        else :
-            return value.replace(day=1)
+
+        return value.replace(day=1)
 
     if granularity == Granularity.QUARTER:
         relative_start_index = ((fiscal_start - 1) % 3) + 1
         current_month_index = ((value.month - 1) % 3) + 1
         months_to_subtract = (((relative_start_index * -1) + current_month_index) % 3)
-        return floor(value, granularity=Granularity.MONTH) - relativedelta.relativedelta(months=months_to_subtract)
+        months_to_subtract = relativedelta.relativedelta(months=months_to_subtract)
+        return floor(value, granularity=Granularity.MONTH) - months_to_subtract
 
     raise ValueError("Unknown Granularity type")
 
@@ -98,7 +106,7 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
                    include_year: bool = False,
                    fiscal_start: int = 1) -> float:
     """
-    Returns the fiscal quarter (or year and quarter numeric value) for a given date. 
+    Returns the fiscal quarter (or year and quarter numeric value) for a given date.
 
     For example:
         date.fiscal_quarter(date.ymd('2021-01-15')) == 1
@@ -109,7 +117,7 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
         date.fiscal_quarter(date.ymd('2021-01-15'), include_year=True, fiscal_start=2) == 2021.4
         date.fiscal_quarter(date.ymd('2020-11-15'), include_year=True, fiscal_start=2) == 2021.4
 
-    Logic converted from R's Lubridate package: 
+    Logic converted from R's Lubridate package:
         https://github.com/tidyverse/lubridate/blob/master/R/accessors-quarter.r
 
     Parameters
@@ -118,8 +126,8 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
         a date or datetime
 
     include_year: bool
-        logical indicating whether or not to include the year    
-        if `True` then returns a float in the form of year.quarter. 
+        logical indicating whether or not to include the year
+        if `True` then returns a float in the form of year.quarter.
         For example, Q4 of 2021 would be returned as `2021.4`
 
     fiscal_start: int
@@ -144,11 +152,11 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
     if include_year:
         if fiscal_start == 0:
             return value.year + (quarter / 10)
-        else:
-            next_year_months = np.arange(fiscal_start + 1, 12 + 1)
-            return value.year + (value.month in next_year_months) + (quarter / 10)
-    else:
-        return quarter
+
+        next_year_months = np.arange(fiscal_start + 1, 12 + 1)
+        return value.year + (value.month in next_year_months) + (quarter / 10)
+
+    return quarter
 
 
 def to_string(value: Union[datetime.datetime, datetime.date],
@@ -164,15 +172,10 @@ def to_string(value: Union[datetime.datetime, datetime.date],
         to_string(value=ymd('2021-01-15'),
                   granularity=Granularity.QUARTER,
                   fiscal_start=2) == "2021-FQ4"
-        
-
-
-
-
-
 
     If the fiscal year starts on November (`fiscal_start is `11`; i.e. the quarter is November,
-    December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then `floor()` will return `2021-11-01`.
+    December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then `floor()`
+    will return `2021-11-01`.
 
     Parameters
     ----------
@@ -186,7 +189,7 @@ def to_string(value: Union[datetime.datetime, datetime.date],
         Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g. Jan is 1, Feb, 2,
         etc.) that corresponds to the first month of the fiscal year.
 
-        If fiscal_start start is any other value than `1` quarters will be abbreviated with `F` to denote 
+        If fiscal_start start is any other value than `1` quarters will be abbreviated with `F` to denote
         non-standard / fiscal quarters. For example, "2021-FQ4" is the 4th fiscal quarter of 2021.
 
     Returns
@@ -195,16 +198,18 @@ def to_string(value: Union[datetime.datetime, datetime.date],
     """
     if granularity == Granularity.DAY:
         return value.strftime("%Y-%m-%d")
-    elif granularity == Granularity.MONTH:
+
+    if granularity == Granularity.MONTH:
         return value.strftime("%Y-%b")
-    elif granularity == Granularity.QUARTER:
+
+    if granularity == Granularity.QUARTER:
         if fiscal_start == 1:
             return str(fiscal_quarter(value,
                                       include_year=True,
                                       fiscal_start=fiscal_start)).replace('.', '-Q')
-        else:
-            return str(fiscal_quarter(value,
-                                      include_year=True,
-                                      fiscal_start=fiscal_start)).replace('.', '-FQ')
-    else:
-        raise TypeError('Unrecognized Granularity')
+
+        return str(fiscal_quarter(value,
+                                  include_year=True,
+                                  fiscal_start=fiscal_start)).replace('.', '-FQ')
+
+    raise TypeError('Unrecognized Granularity')

@@ -1,3 +1,6 @@
+"""
+Contains a collection of helper functions to manipulate strings.
+"""
 from typing import List, Union
 
 

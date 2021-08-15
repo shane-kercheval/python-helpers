@@ -1,3 +1,6 @@
+"""
+A collection of functions that assist in validation of data and conditions.
+"""
 from typing import List, Union, Callable, Type
 import numpy as np
 import pandas as pd
@@ -17,10 +20,7 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
     -------
     bool - True if any item in `values` are None/np.NaN
     """
-    if values is None or values is np.NaN:
-        return True
-
-    if len(values) == 0:
+    if values is None or values is np.NaN or len(values) == 0:
         return True
 
     if isinstance(values, pd.Series):
@@ -43,7 +43,7 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
 
 def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
     """
-    Raises an AssertionError if any item in `values` are `None`, `np.Nan`, or if the length of `values` is 
+    Raises an AssertionError if any item in `values` are `None`, `np.Nan`, or if the length of `values` is
     `0`.
     For numeric types only.
 
@@ -184,7 +184,10 @@ def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> 
 
 
 def assert_true(condition: bool, message: str = 'Condition Not True') -> None:
-    if not (isinstance(condition, bool) or isinstance(condition, np.bool_)):
+    """
+    Raises an AssertionError if `condition` is not True
+    """
+    if not isinstance(condition, (bool, np.bool_)):
         raise TypeError('condition should be boolean')
 
     if not condition:
@@ -192,7 +195,10 @@ def assert_true(condition: bool, message: str = 'Condition Not True') -> None:
 
 
 def assert_false(condition: bool, message: str = 'Condition True') -> None:
-    if not (isinstance(condition, bool) or isinstance(condition, np.bool_)):
+    """
+    Raises an AssertionError if `condition` is not False
+    """
+    if not isinstance(condition, (bool, np.bool_)):
         raise TypeError('condition should be boolean')
 
     if condition:
@@ -210,8 +216,8 @@ def raises_exception(function: Callable, exception_type: Type = None) -> bool:
     try:
         function()
         return False
-    except Exception as e:  # noqa
+    except Exception as exception:  # noqa
         if exception_type:
-            return isinstance(e, exception_type)
-        else:
-            return True
+            return isinstance(exception, exception_type)
+
+        return True
