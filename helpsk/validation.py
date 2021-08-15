@@ -216,7 +216,7 @@ def raises_exception(function: Callable, exception_type: Type = None) -> bool:
     try:
         function()
         return False
-    except Exception as exception:  # noqa
+    except Exception as exception:
         if exception_type:
             return isinstance(exception, exception_type)
 

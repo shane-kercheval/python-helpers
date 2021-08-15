@@ -1,6 +1,8 @@
 """
 Documentation
 """
+
+
 class ExampleClass:
     """
     Documentation

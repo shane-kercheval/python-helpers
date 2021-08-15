@@ -78,7 +78,7 @@ def floor(value: Union[datetime.datetime, datetime.date],
 
     Returns
     -------
-    date - the date rounded down to the naerest granularity
+    date - the date rounded down to the nearest granularity
     """
     if granularity == Granularity.DAY:
         if isinstance(value, datetime.datetime):
@@ -136,7 +136,7 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
 
     Returns
     -------
-    date - the date rounded down to the naerest granularity
+    date - the date rounded down to the nearest granularity
     """
 
     assert 1 <= fiscal_start <= 12
@@ -194,7 +194,7 @@ def to_string(value: Union[datetime.datetime, datetime.date],
 
     Returns
     -------
-    date - the date rounded down to the naerest granularity
+    date - the date rounded down to the nearest granularity
     """
     if granularity == Granularity.DAY:
         return value.strftime("%Y-%m-%d")
