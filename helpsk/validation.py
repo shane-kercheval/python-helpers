@@ -1,5 +1,5 @@
 """
-A collection of functions that assist in validation of data and conditions.
+A collection of functions that assist in validation/comparison of data and conditions.
 """
 from typing import List, Union, Callable, Type
 import numpy as np
@@ -222,3 +222,88 @@ def raises_exception(function: Callable, exception_type: Type = None) -> bool:
             return isinstance(exception, exception_type)
 
         return True
+
+
+def dataframes_match(dataframes: List[pd.DataFrame],
+                     float_tolerance: int = 6,
+                     ignore_indexes: bool = True,
+                     ignore_column_names: bool = True) -> bool:
+    """
+    Because floating point numbers are difficult to accurate represent, when comparing multiple DataFrames,
+    this function first rounds any numeric columns to the number of decimal points indicated
+    `float_tolerance`.
+
+    Parameters
+    ----------
+    dataframes : list of pd.DataFrame
+        Two or more dataframes to compare against each other and test for equality
+
+    float_tolerance: int
+        numeric columns will be rounded to the number of digits to the right of the decimal specified by
+        this parameter.
+
+    ignore_indexes: bool
+        if True, the indexes of each DataFrame will be ignored for considering equality
+
+    ignore_column_names: bool
+        if True, the column names of each DataFrame will be ignored for considering equality
+    """
+    assert isinstance(dataframes, list)
+    assert len(dataframes) >= 2
+
+    first_dataframe = dataframes[0].round(float_tolerance)
+
+    def first_dataframe_equals_other(other_dataframe):
+        if first_dataframe.shape != other_dataframe.shape:
+            return False
+
+        if ignore_indexes or ignore_column_names:
+            # if either of these are True, then we are going to change the index and/or columns, but
+            # python is pass-by-reference so we don't want to change the original DataFrame object.
+            other_dataframe = other_dataframe.copy()
+
+        if ignore_indexes:
+            other_dataframe.index = first_dataframe.index
+
+        if ignore_column_names:
+            other_dataframe.columns = first_dataframe.columns
+
+        return first_dataframe.equals(other_dataframe.round(float_tolerance))
+
+    # compare the first dataframe to the rest of the dataframes, after rounding each to the tolerance, and
+    # performing other modifications
+    # check if all results are True
+    return all(first_dataframe_equals_other(x) for x in dataframes[1:])
+
+
+def assert_dataframes_match(dataframes: List[pd.DataFrame],
+                            float_tolerance: int = 6,
+                            ignore_indexes: bool = True,
+                            ignore_column_names: bool = True,
+                            message: str = 'Dataframes do not match') -> None:
+    """
+    Raises an assertion error
+
+    Parameters
+    ----------
+    dataframes : list of pd.DataFrame
+        Two or more dataframes to compare against each other and test for equality
+
+    float_tolerance: int
+        numeric columns will be rounded to the number of digits to the right of the decimal specified by
+        this parameter.
+
+    ignore_indexes: bool
+        if True, the indexes of each DataFrame will be ignored for considering equality
+
+    ignore_column_names: bool
+        if True, the column names of each DataFrame will be ignored for considering equality
+
+    message: str
+        message to pass to AssertionError
+    """
+    if not dataframes_match(dataframes=dataframes,
+                            float_tolerance=float_tolerance,
+                            ignore_indexes=ignore_indexes,
+                            ignore_column_names=ignore_column_names):
+        raise AssertionError(message)

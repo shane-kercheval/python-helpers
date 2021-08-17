@@ -1,5 +1,5 @@
 import unittest
-from helpsk import ExampleClass
+from helpsk.example_class import ExampleClass
 
 
 # noinspection PyMethodMayBeStatic
