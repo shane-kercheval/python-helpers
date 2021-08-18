@@ -6,10 +6,15 @@ class ExampleClass:
     """Documentation
     """
     def __init__(self, my_variable=0):
+        """init
+
+        args:
+            my_variable:
+                docs
+        """
         self._my_variable = my_variable
 
     def my_method(self, value):
-
         """
         Documentation
         """

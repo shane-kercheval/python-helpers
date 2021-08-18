@@ -39,6 +39,7 @@ def execute_build(path):
         # file_contents[2]
 
         in_docstring = False
+        in_function_or_class = False
 
         for line in file_contents:
             #line = file_contents[7]
@@ -50,6 +51,11 @@ def execute_build(path):
                 #     output.append('\n')
 
                 in_docstring = not in_docstring
+                # if we have entered into a docstring, we are no longer in function/class
+                if in_docstring and in_function_or_class:
+                    in_function_or_class = False
+                    output.append("```\n\n")  # end definition code-block
+
                 docstring_leading_spaces = re.search(r'(^ *)"""', line).group(1)
 
             if in_docstring:
@@ -65,14 +71,27 @@ def execute_build(path):
 
                 if line:
                     output.append(line + "\n")
+            elif in_function_or_class:
+                # use the previous leading_spaces and remove accordingly, save the rest
+                output.append(line.removeprefix(leading_spaces))
             else:
                 function_or_class = re.search('^( *)(?:def|class)', line)
                 if function_or_class:
+                    in_function_or_class = True
+                    # we are in the first line of the function/class (otherwise we'd be in the elif above)
+                    # let's first add the header, then
+                    # let's wrap the entire function/class def in a code-block
                     leading_spaces = function_or_class.group(1)
                     levels = calculate_levels(leading_spaces)
-                    
+
                     line = line.removeprefix(leading_spaces)
-                    output.append(f'\n{top_level_header}{"#" * (levels + 1)} {line}\n')
+
+                    # header
+                    friendly_name = re.sub(r'(\(|:).*', '', line).strip()
+                    output.append(f'\n{top_level_header}{"#" * (levels + 1)} {friendly_name}\n')
+
+
+                    output.append(f"\n```\n{line}")
 
         output.append('\n---\n\n')
 
