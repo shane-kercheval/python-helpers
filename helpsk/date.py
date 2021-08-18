@@ -128,7 +128,7 @@ def to_string(value: Union[datetime.datetime, datetime.date],
     """Converts the date to a string.
 
     Examples:
-        
+
         ```
         from dateutil.parser import parse
 

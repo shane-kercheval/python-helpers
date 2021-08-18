@@ -6,7 +6,7 @@ import pandas as pd
 
 def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
     """Returns `True` if any item in `values` are `None`, `np.Nan`, or if the length of `values` is `0`.
-    
+
     For numeric types only.
 
     Args:
@@ -52,8 +52,8 @@ def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]
 
 
 def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
-    """Returns `True` if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the length of
-    `values` is `0`.
+    """Returns `True` if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the length
+    of `values` is `0`.
 
     Args:
         values:
@@ -78,8 +78,8 @@ def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
 
 
 def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> None:
-    """Raises an AssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the
-    length of `values` is `0`.
+    """Raises an AssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if
+    the length of `values` is `0`.
 
     Args:
         values:
