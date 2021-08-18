@@ -1,5 +1,4 @@
-"""
-Contains a collection of date related helper functions.
+"""Contains a collection of date related helper functions.
 """
 from typing import Union
 from enum import unique, Enum, auto
@@ -18,44 +17,11 @@ class Granularity(Enum):
     QUARTER = auto()
 
 
-def ymd(yyyy_mm_dd: str) -> datetime.date:
-    """
-    Takes a string in the form of 'YYYY-MM-DD' and returns a datetime.date
-
-    Parameters
-    ----------
-    yyyy_mm_dd : str
-        a string in the form of 'YYYY-MM-DD'
-
-    Returns
-    -------
-    datetime.date
-    """
-    return datetime.datetime.strptime(yyyy_mm_dd, "%Y-%m-%d").date()
-
-
-def ymd_hms(yyyy_mm_dd_hh_mm_ss: str) -> datetime.datetime:
-    """
-    Takes a string in the form of 'YYYY-MM-DD HH:MM:SS' and returns a datetime.datetime
-
-    Parameters
-    ----------
-    yyyy_mm_dd_hh_mm_ss : str
-        a string in the form of 'YYYY-MM-DD HH:MM:SS'
-
-    Returns
-    -------
-    datetime.datetime
-    """
-    return datetime.datetime.strptime(yyyy_mm_dd_hh_mm_ss, "%Y-%m-%d %H:%M:%S")
-
-
 def floor(value: Union[datetime.datetime, datetime.date],
           granularity: Granularity = Granularity.DAY,
           fiscal_start: int = 1) -> datetime.date:
 
-    """
-    "Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
+    """"Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
 
     For example, if `date` is `2021-03-20` and granularity is `Granularity.QUARTER` then `floor()` will return
     `2021-01-01`.
@@ -64,21 +30,19 @@ def floor(value: Union[datetime.datetime, datetime.date],
     December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then `floor()`
     will return `2021-11-01`.
 
-    Parameters
-    ----------
-    value : datetime.datetime
-        a datetime
+    Args:
+        value:
+            a datetime
 
-    granularity: Granularity
-        the granularity to round down to (i.e. DAY, MONTH, QUARTER)
+        granularity:
+            the granularity to round down to (i.e. DAY, MONTH, QUARTER)
 
-    fiscal_start: int
-        Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g. Jan is 1, Feb, 2,
-        etc.) that corresponds to the first month of the fiscal year.
+        fiscal_start:
+            Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g. Jan is 1,
+            Feb, 2, etc.) that corresponds to the first month of the fiscal year.
 
-    Returns
-    -------
-    date - the date rounded down to the nearest granularity
+    Returns:
+        date - the date rounded down to the nearest granularity
     """
     if granularity == Granularity.DAY:
         if isinstance(value, datetime.datetime):
@@ -105,38 +69,37 @@ def floor(value: Union[datetime.datetime, datetime.date],
 def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
                    include_year: bool = False,
                    fiscal_start: int = 1) -> float:
-    """
-    Returns the fiscal quarter (or year and quarter numeric value) for a given date.
+    """Returns the fiscal quarter (or year and quarter numeric value) for a given date.
 
     For example:
-        date.fiscal_quarter(date.ymd('2021-01-15')) == 1
-        date.fiscal_quarter(date.ymd('2021-01-15'), include_year=True) == 2021.1
+        from dateutil.parser import parse
+
+        date.fiscal_quarter(parse('2021-01-15')) == 1
+        date.fiscal_quarter(parse('2021-01-15'), include_year=True) == 2021.1
 
 
-        date.fiscal_quarter(date.ymd('2021-01-15'), fiscal_start=2) == 4
-        date.fiscal_quarter(date.ymd('2021-01-15'), include_year=True, fiscal_start=2) == 2021.4
-        date.fiscal_quarter(date.ymd('2020-11-15'), include_year=True, fiscal_start=2) == 2021.4
+        date.fiscal_quarter(parse('2021-01-15'), fiscal_start=2) == 4
+        date.fiscal_quarter(parse('2021-01-15'), include_year=True, fiscal_start=2) == 2021.4
+        date.fiscal_quarter(parse('2020-11-15'), include_year=True, fiscal_start=2) == 2021.4
 
     Logic converted from R's Lubridate package:
         https://github.com/tidyverse/lubridate/blob/master/R/accessors-quarter.r
 
-    Parameters
-    ----------
-    value : datetime.datetime
-        a date or datetime
+    Args:
+        value:
+            a date or datetime
 
-    include_year: bool
-        logical indicating whether or not to include the year
-        if `True` then returns a float in the form of year.quarter.
-        For example, Q4 of 2021 would be returned as `2021.4`
+        include_year:
+            logical indicating whether or not to include the year
+            if `True` then returns a float in the form of year.quarter.
+            For example, Q4 of 2021 would be returned as `2021.4`
 
-    fiscal_start: int
-        numeric indicating the starting month of a fiscal year.
-        A value of 1 indicates standard quarters (i.e. starting in January).
+        fiscal_start:
+            numeric indicating the starting month of a fiscal year.
+            A value of 1 indicates standard quarters (i.e. starting in January).
 
-    Returns
-    -------
-    date - the date rounded down to the nearest granularity
+    Returns:
+        date - the date rounded down to the nearest granularity
     """
 
     assert 1 <= fiscal_start <= 12
@@ -162,39 +125,41 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
 def to_string(value: Union[datetime.datetime, datetime.date],
               granularity: Granularity = Granularity.DAY,
               fiscal_start: int = 1) -> str:
-    """
-    Converts the date to a string.
+    """Converts the date to a string.
 
     Examples:
-        to_string(value=ymd('2021-01-15'), granularity=Granularity.DAY) == "2021-01-15"
-        to_string(value=ymd('2021-01-15'), granularity=Granularity.Month) == "2021-Jan"
-        to_string(value=ymd('2021-01-15'), granularity=Granularity.QUARTER) == "2021-Q1"
-        to_string(value=ymd('2021-01-15'),
+        
+        ```
+        from dateutil.parser import parse
+
+        to_string(value=parse('2021-01-15'), granularity=Granularity.DAY) == "2021-01-15"
+        to_string(value=parse('2021-01-15'), granularity=Granularity.Month) == "2021-Jan"
+        to_string(value=parse('2021-01-15'), granularity=Granularity.QUARTER) == "2021-Q1"
+        to_string(value=parse('2021-01-15'),
                   granularity=Granularity.QUARTER,
                   fiscal_start=2) == "2021-FQ4"
+        ```
 
     If the fiscal year starts on November (`fiscal_start is `11`; i.e. the quarter is November,
     December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then `floor()`
     will return `2021-11-01`.
 
-    Parameters
-    ----------
-    value : datetime.datetime
-        a datetime
+    Args:
+        value:
+            a datetime
 
-    granularity: Granularity
-        the granularity to round down to (i.e. DAY, MONTH, QUARTER)
+        granularity:
+            the granularity to round down to (i.e. DAY, MONTH, QUARTER)
 
-    fiscal_start: int
-        Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g. Jan is 1, Feb, 2,
-        etc.) that corresponds to the first month of the fiscal year.
+        fiscal_start:
+            Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g. Jan is 1,
+            Feb, 2, etc.) that corresponds to the first month of the fiscal year.
 
-        If fiscal_start start is any other value than `1` quarters will be abbreviated with `F` to denote
-        non-standard / fiscal quarters. For example, "2021-FQ4" is the 4th fiscal quarter of 2021.
+            If fiscal_start start is any other value than `1` quarters will be abbreviated with `F` to denote
+            non-standard / fiscal quarters. For example, "2021-FQ4" is the 4th fiscal quarter of 2021.
 
-    Returns
-    -------
-    date - the date rounded down to the nearest granularity
+    Returns:
+        date - the date rounded down to the nearest granularity
     """
     if granularity == Granularity.DAY:
         return value.strftime("%Y-%m-%d")

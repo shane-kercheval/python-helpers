@@ -1,11 +1,9 @@
-"""
-Documentation
+"""Documentation
 """
 
 
 class ExampleClass:
-    """
-    Documentation
+    """Documentation
     """
     def __init__(self, my_variable=0):
         self._my_variable = my_variable
