@@ -1,5 +1,6 @@
 """
-Script that extract's docstrings from Python files and generates documentation in the form of a markdown file.
+This script is a command line program that extract's docstrings from Python files and generates documentation
+in the form of a markdown file.
 
 See `build` method for example usages.
 
