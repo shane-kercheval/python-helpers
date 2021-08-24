@@ -27,7 +27,7 @@ def is_single_line_docstring(line: str) -> bool:
 
 
 def is_line_class_definition(line: str) -> bool:
-    return bool(re.search('^( *)(?:class )', line))
+    return bool(re.search('^( *)class ', line))
 
 
 def is_line_function_definition(line: str) -> bool:
@@ -38,7 +38,7 @@ def is_line_function_definition(line: str) -> bool:
     Args:
         line: a line in a python file
     """
-    return bool(re.search('^( *)(?:def )', line)) and 'def __' not in line
+    return bool(re.search('^( *)def ', line)) and 'def __' not in line
 
 
 def calculate_indentation_levels(leading_spaces: str) -> int:
@@ -57,6 +57,8 @@ def calculate_indentation_levels(leading_spaces: str) -> int:
 
 
 def create_table_of_content_item(leading_spaces, line):
+    """Helper function to recreate a Table of Content line item. 
+    """
     return f'{leading_spaces}- [{line.strip()}](#{line.strip().replace(" ", "-")})\n'
 
 
@@ -64,22 +66,24 @@ def execute_build(input_path: str,
                   output_path: str = './',
                   output_filename: str = 'documentation.md',
                   toc_off: bool = False):
-
+    """Main logic for extracting dostrings from python files
+    """
     if not re.compile(r'/$').search(input_path):
         input_path += '/'
 
-    output = []
-    table_of_contents = []
+    generated_markdown = []
+    generated_table_of_contents = []
 
     for filename in glob.iglob(input_path + '[!_]*.py', recursive=True):
 
-        def remove(list, items_to_remove):
-            return [item for item in list if item not in items_to_remove]
+        def remove(items, items_to_remove):
+            """Remove `items_to_remove` from list of `items`"""
+            return [item for item in items if item not in items_to_remove]
 
         friendly_filename = '/'.join(remove(filename.split('/'), ['.', '..']))
-        output.append(f'{top_level_header} {friendly_filename}\n\n')
+        generated_markdown.append(f'{top_level_header} {friendly_filename}\n\n')
 
-        table_of_contents.append(create_table_of_content_item(leading_spaces='', line=friendly_filename))
+        generated_table_of_contents.append(create_table_of_content_item(leading_spaces='', line=friendly_filename))
 
         with open(filename) as f:
             file_contents = f.readlines()
@@ -94,12 +98,12 @@ def execute_build(input_path: str,
 
                 if is_single_line_docstring(line):
                     line = line.removeprefix(docstring_leading_spaces + '"""').removesuffix('"""\n')
-                    output.append(line + "\n")
+                    generated_markdown.append(line + "\n")
                 else:
                     line = line.removeprefix(docstring_leading_spaces + '"""')
                     line = line.strip()
                     if line:
-                        output.append(line + "\n")
+                        generated_markdown.append(line + "\n")
 
                     # until next line is docstring
                     while not is_line_docstring(file_contents[line_number + 1]):
@@ -111,9 +115,9 @@ def execute_build(input_path: str,
                             line = line.strip().replace(':', '').capitalize()
                             line = f'##### {line}\n\n'
 
-                        output.append(line)
+                        generated_markdown.append(line)
 
-                    output.append('\n')
+                    generated_markdown.append('\n')
                     line_number += 1
 
             if is_line_class_definition(line):
@@ -123,13 +127,11 @@ def execute_build(input_path: str,
                 line = line.removeprefix(leading_spaces)
 
                 # header
-                friendly_name = re.sub(r'(\(|:).*', '', line).strip()
-                output.append(f'\n{top_level_header}{"#" * (levels + 1)} {friendly_name}\n\n')
-                # output.append("```\n\n")  # end definition code-block
-                # output.append(f"\n```\n{line}")
-
-                table_of_contents.append(create_table_of_content_item(leading_spaces=leading_spaces + '    ',
-                                                               line=friendly_name))
+                friendly_name = re.sub(r'([(:]).*', '', line).strip()  # r'(\(|:).*'
+                generated_markdown.append(f'\n{top_level_header}{"#" * (levels + 1)} {friendly_name}\n\n')
+                toc_line_item = create_table_of_content_item(leading_spaces=leading_spaces + '    ',
+                                                             line=friendly_name)
+                generated_table_of_contents.append(toc_line_item)
 
             if is_line_function_definition(line):
                 leading_spaces = re.search('^( *)(?:def|class)', line).group(1)
@@ -137,41 +139,42 @@ def execute_build(input_path: str,
                 line = line.removeprefix(leading_spaces)
 
                 # header
-                friendly_name = re.sub(r'(\(|:).*', '', line).strip()
-                output.append(f'\n{top_level_header}{"#" * (levels + 1)} {friendly_name}\n\n')
+                friendly_name = re.sub(r'([(:]).*', '', line).strip()
+                generated_markdown.append(f'\n{top_level_header}{"#" * (levels + 1)} {friendly_name}\n\n')
                 
-                output.append(f"\n```python\n{line}")
+                generated_markdown.append(f"\n```python\n{line}")
 
                 # until next line is docstring
                 while not is_line_docstring(file_contents[line_number + 1]):
                     line_number += 1
                     line = file_contents[line_number]
-                    line = line.removeprefix(docstring_leading_spaces)
-                    output.append(line)
+                    line = line.removeprefix(docstring_leading_spaces)  # noqa
+                    generated_markdown.append(line)
 
-                output.append("```\n\n")  # end definition code-block
+                generated_markdown.append("```\n\n")  # end definition code-block
 
-                table_of_contents.append(create_table_of_content_item(leading_spaces=leading_spaces + '    ',
-                                                               line=friendly_name))
+                toc_line_item = create_table_of_content_item(leading_spaces=leading_spaces + '    ',
+                                                             line=friendly_name)
+                generated_table_of_contents.append(toc_line_item)
 
             line_number += 1
-        output.append('\n---\n\n')
+        generated_markdown.append('\n---\n\n')
 
-    table_of_contents.append('\n\n')
+    generated_table_of_contents.append('\n\n')
 
     if not output_path.endswith('/'):
         output_path = output_path + '/'
 
     if not toc_off:
         with open(output_path + output_filename, 'w') as the_file:
-            the_file.writelines(table_of_contents)
+            the_file.writelines(generated_table_of_contents)
 
         file_type = 'a'
     else:
         file_type = 'w'
 
     with open(output_path + output_filename, file_type) as the_file:
-        the_file.writelines(output)
+        the_file.writelines(generated_markdown)
 
 
 @click.group()
