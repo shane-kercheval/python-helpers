@@ -206,6 +206,8 @@ def build(input_path, output_path, output_filename, toc_off):
 
     Example Usage:
 
+        python3 build_markdown.py build ../helpsk . -output_filename my_docs.md
+
         python3 build_markdown.py build --help
         python3 build_markdown.py build ../path_to_files
         python3 build_markdown.py build ../path_to_files . -toc_off
