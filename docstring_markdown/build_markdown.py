@@ -75,9 +75,9 @@ def table_of_content_item(leading_spaces, line):
 
 
 def execute_build(input_path: str,
-                  output_path: str=='./',
-                  output_filename: str='documentation.md',
-                  toc_off: bool=False):
+                  output_path: str = './',
+                  output_filename: str = 'documentation.md',
+                  toc_off: bool = False):
 
     if not re.compile(r'/$').search(input_path):
         input_path += '/'
