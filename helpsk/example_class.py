@@ -3,12 +3,12 @@
 
 
 class ExampleClass:
-    """Documentation
+    """ExampleClass Documentation
     """
     def __init__(self, my_variable=0):
-        """init
+        """init documentation
 
-        args:
+        Args:
             my_variable:
                 docs
         """
@@ -16,7 +16,7 @@ class ExampleClass:
 
     def my_method(self, value):
         """
-        Documentation
+        my_method Documentation
         """
         return self._my_variable + value
 

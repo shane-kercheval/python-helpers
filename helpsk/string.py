@@ -44,7 +44,7 @@ def format_number(value: float,
 
     For example, `123560000` is transformed to `123.56M`
 
-    Parameters:
+    Args:
         value : the number (float) to format
 
         granularity : the granularity (e.g. thousands, millions, billions). (default is
