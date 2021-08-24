@@ -82,8 +82,8 @@ def execute_build(input_path: str,
 
         friendly_filename = '/'.join(remove(filename.split('/'), ['.', '..']))
         generated_markdown.append(f'{top_level_header} {friendly_filename}\n\n')
-
-        generated_table_of_contents.append(create_table_of_content_item(leading_spaces='', line=friendly_filename))
+        generated_table_of_contents.append(create_table_of_content_item(leading_spaces='',
+                                                                        line=friendly_filename))
 
         with open(filename) as f:
             file_contents = f.readlines()
@@ -189,7 +189,9 @@ def main():
 @click.argument('input_path')
 @click.argument('output_path')
 @click.option('-output_filename', help="The name of the output (markdown) file.")
-@click.option('-toc_off', is_flag=True, help='Use this flag to exclude the table of contents from the output.')
+@click.option('-toc_off',
+              is_flag=True,
+              help='Use this flag to exclude the table of contents from the output.')
 def build(input_path, output_path, output_filename, toc_off):
     """
     Command that extract's docstrings from Python files and generates documentation in the form of a markdown
@@ -200,7 +202,8 @@ def build(input_path, output_path, output_filename, toc_off):
         python3 build_markdown.py build --help
         python3 build_markdown.py build ../path_to_files
         python3 build_markdown.py build ../path_to_files . -toc_off
-        python3 build_markdown.py build ../path_to_files ../path_to_output -output_filename my_docs.md -toc_off
+        python3 build_markdown.py build ../path_to_files ../path_to_output -output_filename my_docs.md
+            -toc_off
     """
 
     if not output_filename:
