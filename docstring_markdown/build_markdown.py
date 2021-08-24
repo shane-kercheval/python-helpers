@@ -173,8 +173,6 @@ def execute_build(input_path: str,
 
     table_of_contents.append('\n\n')
 
-    file_type = 'a'
-
     if not output_path.endswith('/'):
         output_path = output_path + '/'
 
@@ -182,9 +180,11 @@ def execute_build(input_path: str,
         with open(output_path + output_filename, 'w') as the_file:
             the_file.writelines(table_of_contents)
 
+        file_type = 'a'
+    else:
         file_type = 'w'
 
-    with open(output_path + output_filename, file_type          ) as the_file:
+    with open(output_path + output_filename, file_type) as the_file:
         the_file.writelines(output)
 
 
@@ -216,9 +216,6 @@ def build(input_path, output_path, output_filename, toc_off):
 
     if not output_filename:
         output_filename = 'documentation.md'
-
-    print(type(toc_off))
-
 
     print(f"Path of Python files:        '{input_path}'")
     print(f"Path to place markdown file: '{output_path}'")
