@@ -88,6 +88,9 @@ def execute_build(input_path: str,
         with open(filename) as f:
             file_contents = f.readlines()
 
+        # cycle through each line in the Python file
+        # if certain patterns are detected (e.g. docstring, class, function) then there may be a nested-while
+        # that loops through that section of the file.
         line_number = 0
         while line_number < len(file_contents):
             line = file_contents[line_number]
