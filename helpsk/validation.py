@@ -4,6 +4,7 @@ from typing import List, Union, Callable, Type
 import numpy as np
 import pandas as pd
 
+
 def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
     """Returns `True` if any item in `values` are `None`, `np.Nan`, or if the length of `values` is `0`.
 
