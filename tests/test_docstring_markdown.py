@@ -2,7 +2,11 @@ import unittest
 from os import remove
 from os.path import isfile
 from docstring_markdown import build_markdown
+from docstring_markdown.build_markdown import is_line_docstring, \
+    is_single_line_docstring, is_line_function_definition, is_line_class_definition,\
+    calculate_indentation_levels
 from tests.helpers import get_test_path
+from helpsk.validation import raises_exception
 
 
 # noinspection PyMethodMayBeStatic
@@ -50,3 +54,60 @@ class TestDocstringMarkdown(unittest.TestCase):
                                                          toc_off=True),
                     test_file_name='/test_files/another_file_name.md',
                     expected_contents=expected_contents_without_toc)
+
+    def test_is_line_docstring(self):
+        assert is_line_docstring('"""')
+        assert is_line_docstring('"""\n')
+        assert is_line_docstring('"""asdf\n')
+
+    def test_is_single_line_docstring(self):
+        assert is_single_line_docstring('"""doc"""')
+        assert not is_single_line_docstring('"""')
+        assert not is_single_line_docstring('"""doc')
+
+    def test_is_line_function_definition(self):
+        assert is_line_function_definition('def xxx')
+        assert is_line_function_definition('    def xxx(')
+        assert is_line_function_definition('        def xxx(adsf...')
+
+        assert not is_line_function_definition('def __xxx')
+        assert not is_line_function_definition('    def __xxx(')
+        assert not is_line_function_definition('        def __xxx(adsf...')
+
+        assert not is_line_function_definition('class xxx')
+        assert not is_line_function_definition('    class xxx(')
+        assert not is_line_function_definition('        class xxx(adsf...')
+
+    def test_is_line_class_definition(self):
+        assert not is_line_class_definition('def xxx')
+        assert not is_line_class_definition('    def xxx(')
+        assert not is_line_class_definition('        def xxx(adsf...')
+
+        assert not is_line_class_definition('def __xxx')
+        assert not is_line_class_definition('    def __xxx(')
+        assert not is_line_class_definition('        def __xxx(adsf...')
+
+        assert is_line_class_definition('class xxx')
+        assert is_line_class_definition('    class xxx(')
+        assert is_line_class_definition('        class xxx(adsf...')
+
+    def test_calculate_indentation_levels(self):
+        assert calculate_indentation_levels(leading_spaces='') == 0
+        assert calculate_indentation_levels(leading_spaces='    ') == 1
+        assert calculate_indentation_levels(leading_spaces='        ') == 2
+        assert calculate_indentation_levels(leading_spaces='            ') == 3
+        assert calculate_indentation_levels(leading_spaces='                ') == 4
+
+        assert raises_exception(function=lambda: calculate_indentation_levels(leading_spaces=' '),
+                                exception_type=AssertionError)
+        assert raises_exception(function=lambda: calculate_indentation_levels(leading_spaces='  '),
+                                exception_type=AssertionError)
+        assert raises_exception(function=lambda: calculate_indentation_levels(leading_spaces='   '),
+                                exception_type=AssertionError)
+
+        assert raises_exception(function=lambda: calculate_indentation_levels(leading_spaces='     '),
+                                exception_type=AssertionError)
+        assert raises_exception(function=lambda: calculate_indentation_levels(leading_spaces='      '),
+                                exception_type=AssertionError)
+        assert raises_exception(function=lambda: calculate_indentation_levels(leading_spaces='       '),
+                                exception_type=AssertionError)

@@ -19,21 +19,11 @@ def is_line_docstring(line: str) -> bool:
     return bool(re.search(r'^ *?"""', line))
 
 
-assert is_line_docstring('"""')
-assert is_line_docstring('"""\n')
-assert is_line_docstring('"""asdf\n')
-
-
 def is_single_line_docstring(line: str) -> bool:
     """Returns True if the line starts with 0 or more spaces and begins and ends with \"\"\"
     """
     line = line.strip()
     return line.startswith('"""') and line.endswith('"""') and line.count('"""') == 2
-
-
-assert is_single_line_docstring('"""doc"""')
-assert not is_single_line_docstring('"""')
-assert not is_single_line_docstring('"""doc')
 
 
 def is_line_class_definition(line: str) -> bool:
@@ -51,26 +41,22 @@ def is_line_function_definition(line: str) -> bool:
     return bool(re.search('^( *)(?:def )', line)) and 'def __' not in line
 
 
-assert is_line_function_definition('def xxx')
-assert is_line_function_definition('    def xxx(')
-assert is_line_function_definition('        def xxx(adsf...')
-
-assert not is_line_function_definition('def __xxx')
-assert not is_line_function_definition('    def __xxx(')
-assert not is_line_function_definition('        def __xxx(adsf...')
-
-assert not is_line_function_definition('class xxx')
-assert not is_line_function_definition('    class xxx(')
-assert not is_line_function_definition('        class xxx(adsf...')
+def calculate_indentation_levels(leading_spaces: str) -> int:
+    """Returns the number of indentation levels, where a level is 4 spaces. So 0 leading_spaces has a level of
+    0; 4 leading spaces has a level of 1, and so on. 
 
 
-def calculate_levels(leading_spaces: str) -> int:
+    Args:
+        leading_spaces:
+            A string containing the leading spaces e.g. '', or '    ', and so on.
+
+    """
     assert leading_spaces.strip() == ''
     assert len(leading_spaces) % 4 == 0
     return int(len(leading_spaces) / 4)
 
 
-def table_of_content_item(leading_spaces, line):
+def create_table_of_content_item(leading_spaces, line):
     return f'{leading_spaces}- [{line.strip()}](#{line.strip().replace(" ", "-")})\n'
 
 
@@ -93,7 +79,7 @@ def execute_build(input_path: str,
         friendly_filename = '/'.join(remove(filename.split('/'), ['.', '..']))
         output.append(f'{top_level_header} {friendly_filename}\n\n')
 
-        table_of_contents.append(table_of_content_item(leading_spaces='', line=friendly_filename))
+        table_of_contents.append(create_table_of_content_item(leading_spaces='', line=friendly_filename))
 
         with open(filename) as f:
             file_contents = f.readlines()
@@ -132,7 +118,7 @@ def execute_build(input_path: str,
 
             if is_line_class_definition(line):
                 leading_spaces = re.search("^( *)(?:def|class)", line).group(1)
-                levels = calculate_levels(leading_spaces)
+                levels = calculate_indentation_levels(leading_spaces)
 
                 line = line.removeprefix(leading_spaces)
 
@@ -142,12 +128,12 @@ def execute_build(input_path: str,
                 # output.append("```\n\n")  # end definition code-block
                 # output.append(f"\n```\n{line}")
 
-                table_of_contents.append(table_of_content_item(leading_spaces=leading_spaces + '    ',
+                table_of_contents.append(create_table_of_content_item(leading_spaces=leading_spaces + '    ',
                                                                line=friendly_name))
 
             if is_line_function_definition(line):
                 leading_spaces = re.search('^( *)(?:def|class)', line).group(1)
-                levels = calculate_levels(leading_spaces)
+                levels = calculate_indentation_levels(leading_spaces)
                 line = line.removeprefix(leading_spaces)
 
                 # header
@@ -165,7 +151,7 @@ def execute_build(input_path: str,
 
                 output.append("```\n\n")  # end definition code-block
 
-                table_of_contents.append(table_of_content_item(leading_spaces=leading_spaces + '    ',
+                table_of_contents.append(create_table_of_content_item(leading_spaces=leading_spaces + '    ',
                                                                line=friendly_name))
 
             line_number += 1
