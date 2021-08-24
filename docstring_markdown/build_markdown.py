@@ -1,7 +1,10 @@
 """
 Script that extract's docstrings from Python files and generates documentation in the form of a markdown file.
 
-See `build` method for example usages. 
+See `build` method for example usages.
+
+This was more of a proof of concept than it is actually meant to be used in the package. I'll keep here until
+a later time and then refactor accordingly, perhaps into a different repo.
 """
 
 import click
