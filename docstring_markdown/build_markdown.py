@@ -1,3 +1,9 @@
+"""
+Script that extract's docstrings from Python files and generates documentation in the form of a markdown file.
+
+See `build` method for example usages. 
+"""
+
 import click
 import glob
 import re
@@ -13,18 +19,49 @@ def is_line_docstring(line: str) -> bool:
     return bool(re.search(r'^ *?"""', line))
 
 
+assert is_line_docstring('"""')
+assert is_line_docstring('"""\n')
+assert is_line_docstring('"""asdf\n')
+
+
 def is_single_line_docstring(line: str) -> bool:
     """Returns True if the line starts with 0 or more spaces and begins and ends with \"\"\"
     """
     line = line.strip()
-    return line.startswith('"""') and line.endswith('"""')
+    return line.startswith('"""') and line.endswith('"""') and line.count('"""') == 2
+
+
+assert is_single_line_docstring('"""doc"""')
+assert not is_single_line_docstring('"""')
+assert not is_single_line_docstring('"""doc')
+
 
 def is_line_class_definition(line: str) -> bool:
     return bool(re.search('^( *)(?:class )', line))
 
 
 def is_line_function_definition(line: str) -> bool:
-    return bool(re.search('^( *)(?:def )', line))
+    """Returns true if the corresponding line (of a python file) is the start of a function definition.
+
+    Excludes functions that start with `__` which indicates a private function.
+
+    Args:
+        line: a line in a python file
+    """
+    return bool(re.search('^( *)(?:def )', line)) and 'def __' not in line
+
+
+assert is_line_function_definition('def xxx')
+assert is_line_function_definition('    def xxx(')
+assert is_line_function_definition('        def xxx(adsf...')
+
+assert not is_line_function_definition('def __xxx')
+assert not is_line_function_definition('    def __xxx(')
+assert not is_line_function_definition('        def __xxx(adsf...')
+
+assert not is_line_function_definition('class xxx')
+assert not is_line_function_definition('    class xxx(')
+assert not is_line_function_definition('        class xxx(adsf...')
 
 
 def calculate_levels(leading_spaces: str) -> int:
@@ -33,19 +70,30 @@ def calculate_levels(leading_spaces: str) -> int:
     return int(len(leading_spaces) / 4)
 
 
-def execute_build(path):
-    if not re.compile(r'/$').search(path):
-        path += '/'
+def table_of_content_item(leading_spaces, line):
+    return f'{leading_spaces}- [{line.strip()}](#{line.strip().replace(" ", "-")})\n'
+
+
+def execute_build(input_path: str,
+                  output_path: str=='./',
+                  output_filename: str='documentation.md',
+                  toc_off: bool=False):
+
+    if not re.compile(r'/$').search(input_path):
+        input_path += '/'
 
     output = []
+    table_of_contents = []
 
-    for filename in glob.iglob(path + '[!_]*.py', recursive=True):
+    for filename in glob.iglob(input_path + '[!_]*.py', recursive=True):
 
         def remove(list, items_to_remove):
             return [item for item in list if item not in items_to_remove]
 
         friendly_filename = '/'.join(remove(filename.split('/'), ['.', '..']))
         output.append(f'{top_level_header} {friendly_filename}\n\n')
+
+        table_of_contents.append(table_of_content_item(leading_spaces='', line=friendly_filename))
 
         with open(filename) as f:
             file_contents = f.readlines()
@@ -72,13 +120,18 @@ def execute_build(path):
                         line_number += 1
                         line = file_contents[line_number]
                         line = line.removeprefix(docstring_leading_spaces)
+
+                        if line.strip().lower() in ['args:', 'returns:']:
+                            line = line.strip().replace(':', '').capitalize()
+                            line = f'##### {line}\n\n'
+
                         output.append(line)
 
                     output.append('\n')
                     line_number += 1
 
             if is_line_class_definition(line):
-                leading_spaces = re.search('^( *)(?:def|class)', line).group(1)
+                leading_spaces = re.search("^( *)(?:def|class)", line).group(1)
                 levels = calculate_levels(leading_spaces)
 
                 line = line.removeprefix(leading_spaces)
@@ -89,17 +142,19 @@ def execute_build(path):
                 # output.append("```\n\n")  # end definition code-block
                 # output.append(f"\n```\n{line}")
 
+                table_of_contents.append(table_of_content_item(leading_spaces=leading_spaces + '    ',
+                                                               line=friendly_name))
+
             if is_line_function_definition(line):
                 leading_spaces = re.search('^( *)(?:def|class)', line).group(1)
                 levels = calculate_levels(leading_spaces)
-
                 line = line.removeprefix(leading_spaces)
 
                 # header
                 friendly_name = re.sub(r'(\(|:).*', '', line).strip()
                 output.append(f'\n{top_level_header}{"#" * (levels + 1)} {friendly_name}\n\n')
                 
-                output.append(f"\n```\n{line}")
+                output.append(f"\n```python\n{line}")
 
                 # until next line is docstring
                 while not is_line_docstring(file_contents[line_number + 1]):
@@ -110,51 +165,28 @@ def execute_build(path):
 
                 output.append("```\n\n")  # end definition code-block
 
-
-            #
-            #
-            #
-            #     if docstring_leading_spaces:
-            #         line = line.removeprefix(docstring_leading_spaces)
-            #
-            #     if is_single_line_docstring(line):
-            #         line = line.removesuffix('"""\n')
-            #         in_docstring = False
-            #
-            #     line = re.sub('^"""\n?', '', line)
-            #     line = line.removesuffix('\n')
-            #
-            #     if line:
-            #         output.append(line + "\n")
-            # elif in_function_or_class:
-            #     # use the previous leading_spaces and remove accordingly, save the rest
-            #     output.append(line.removeprefix(leading_spaces))
-            # else:
-            #     function_or_class = re.search('^( *)(?:def|class)', line)
-            #     if function_or_class:
-            #         in_function_or_class = True
-            #         # we are in the first line of the function/class (otherwise we'd be in the elif above)
-            #         # let's first add the header, then
-            #         # let's wrap the entire function/class def in a code-block
-            #         leading_spaces = function_or_class.group(1)
-            #         levels = calculate_levels(leading_spaces)
-            #
-            #         line = line.removeprefix(leading_spaces)
-            #
-            #         # header
-            #         friendly_name = re.sub(r'(\(|:).*', '', line).strip()
-            #         output.append(f'\n{top_level_header}{"#" * (levels + 1)} {friendly_name}\n')
-            #
-            #         output.append("```\n\n")  # end definition code-block
-            #
-            #         output.append(f"\n```\n{line}")
-
+                table_of_contents.append(table_of_content_item(leading_spaces=leading_spaces + '    ',
+                                                               line=friendly_name))
 
             line_number += 1
         output.append('\n---\n\n')
 
-    with open('documentation.md', 'w') as the_file:
+    table_of_contents.append('\n\n')
+
+    file_type = 'a'
+
+    if not output_path.endswith('/'):
+        output_path = output_path + '/'
+
+    if not toc_off:
+        with open(output_path + output_filename, 'w') as the_file:
+            the_file.writelines(table_of_contents)
+
+        file_type = 'w'
+
+    with open(output_path + output_filename, file_type          ) as the_file:
         the_file.writelines(output)
+
 
 @click.group()
 def main():
@@ -165,15 +197,34 @@ def main():
 
 
 @main.command()
-@click.argument('path')
-@click.option('-option_a', help='This is option_a')
-#@click.option('-option_a', help='This is option_a', required=True)
-def build(path, option_a):
-    """path to files/folders of python files"""
-    #click.echo(option_a is None)
-    execute_build(path)
+@click.argument('input_path')
+@click.argument('output_path')
+@click.option('-output_filename', help="The name of the output (markdown) file.")
+@click.option('-toc_off', is_flag=True, help='Use this flag to exclude the table of contents from the output.')
+def build(input_path, output_path, output_filename, toc_off):
+    """
+    Command that extract's docstrings from Python files and generates documentation in the form of a markdown
+    file.
 
-#    click.echo(path) 
+    Example Usage:
+
+        python3 build_markdown.py build --help
+        python3 build_markdown.py build ../path_to_files
+        python3 build_markdown.py build ../path_to_files . -toc_off
+        python3 build_markdown.py build ../path_to_files ../path_to_output -output_filename my_docs.md -toc_off
+    """
+
+    if not output_filename:
+        output_filename = 'documentation.md'
+
+    print(type(toc_off))
+
+
+    print(f"Path of Python files:        '{input_path}'")
+    print(f"Path to place markdown file: '{output_path}'")
+    print(f"Markdown file Name:          '{output_filename}'")
+    print(f"Include Table of Contents:   {str(not toc_off)}")
+    execute_build(input_path, output_path, output_filename, toc_off)
 
 
 if __name__ == "__main__":
