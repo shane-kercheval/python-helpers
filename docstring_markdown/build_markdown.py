@@ -172,15 +172,14 @@ def execute_build(input_path: str,
     if not output_path.endswith('/'):
         output_path = output_path + '/'
 
+
+    next_file_type = 'w'
     if not toc_off:
         with open(output_path + output_filename, 'w') as the_file:
             the_file.writelines(generated_table_of_contents)
+        next_file_type = 'a'
 
-        file_type = 'a'
-    else:
-        file_type = 'w'
-
-    with open(output_path + output_filename, file_type) as the_file:
+    with open(output_path + output_filename, next_file_type) as the_file:
         the_file.writelines(generated_markdown)
 
 
