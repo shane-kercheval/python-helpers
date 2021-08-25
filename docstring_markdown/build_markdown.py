@@ -14,8 +14,6 @@ import re
 
 __author__ = "Shane Kercheval"
 
-top_level_header = '##'
-
 
 def is_line_docstring(line: str) -> bool:
     """Returns True if the line starts with 0 or more spaces and \"\"\"
@@ -72,6 +70,9 @@ def execute_build(input_path: str,
                   toc_off: bool = False):
     """Main logic for extracting dostrings from python files
     """
+
+    top_level_header = '##'
+
     if not re.compile(r'/$').search(input_path):
         input_path += '/'
 
