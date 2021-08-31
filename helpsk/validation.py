@@ -1,8 +1,11 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
-from typing import List, Union, Callable, Type
+from typing import List, Union
+
 import numpy as np
 import pandas as pd
+
+from helpsk.exceptions import *  # pylint: disable=wildcard-import,unused-wildcard-import
 
 
 def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
@@ -40,8 +43,8 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
 
 
 def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
-    """Raises an AssertionError if any item in `values` are `None`, `np.Nan`, or if the length of `values` is
-    `0`.
+    """Raises an HelpskAssertionError if any item in `values` are `None`, `np.Nan`, or if the length of
+    `values` is `0`.
 
     For numeric types only.
 
@@ -79,8 +82,8 @@ def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
 
 
 def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> None:
-    """Raises an AssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if
-    the length of `values` is `0`.
+    """Raises an HelpskAssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '')
+    or if the length of `values` is `0`.
 
     Args:
         values:
@@ -103,7 +106,7 @@ def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
 
 
 def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> None:
-    """Raises an AssertionError if any items in `values` are duplicated.
+    """Raises an HelpskAssertionError if any items in `values` are duplicated.
 
     Args:
         values: list, np.ndarray, pd.Series
@@ -113,7 +116,7 @@ def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> None:
 
 
 def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
-    """Raises an `AssertionError` unless all items in `values` are `True`
+    """Raises an `HelpskAssertionError` unless all items in `values` are `True`
 
     Args:
         values:
@@ -121,17 +124,17 @@ def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None
     """
     if isinstance(values, pd.Series):
         if not values.all():  # noqa
-            raise AssertionError('Not All True')
+            raise HelpskAssertionError('Not All True')
     elif isinstance(values, pd.DataFrame):
         if not values.all().all():  # noqa
-            raise AssertionError('Not All True')
+            raise HelpskAssertionError('Not All True')
     else:
         if not all(values):
-            raise AssertionError('Not All True')
+            raise HelpskAssertionError('Not All True')
 
 
 def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
-    """Raises an `AssertionError` if any items in `values` are `True`
+    """Raises an `HelpskAssertionError` if any items in `values` are `True`
 
     Args:
         values:
@@ -148,53 +151,31 @@ def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> 
 
 
 def assert_true(condition: bool, message: str = 'Condition Not True') -> None:
-    """Raises an AssertionError if `condition` is not True
+    """Raises an HelpskAssertionError if `condition` is not True
 
     Args:
         condition: bool
             Something that evalualates to True/False
     """
     if not isinstance(condition, (bool, np.bool_)):
-        raise TypeError('condition should be boolean')
+        raise HelpskParamTypeError('condition should be boolean')
 
     if not condition:
-        raise AssertionError(message)
+        raise HelpskAssertionError(message)
 
 
 def assert_false(condition: bool, message: str = 'Condition True') -> None:
-    """Raises an AssertionError if `condition` is not False
+    """Raises an HelpskAssertionError if `condition` is not False
 
     Args:
         condition: bool
             Something that evalualates to True/False
     """
     if not isinstance(condition, (bool, np.bool_)):
-        raise TypeError('condition should be boolean')
+        raise HelpskParamTypeError('condition should be boolean')
 
     if condition:
-        raise AssertionError(message)
-
-
-def raises_exception(function: Callable, exception_type: Type = None) -> bool:
-    """Returns True if `function` raises an Exception; returns False if `function` runs without raising an
-    Exception.
-
-    Args:
-        function:
-            the function which does or does not raise an exception.
-        exception_type:
-            if `exception_type` is provided, `raises_exception` returns true only if the `function` argument
-            raises an Exception **and** the exception has type of `exception_type`.
-
-    """
-    try:
-        function()
-        return False
-    except Exception as exception:  # pylint: disable=broad-except
-        if exception_type:
-            return isinstance(exception, exception_type)
-
-        return True
+        raise HelpskAssertionError(message)
 
 
 def dataframes_match(dataframes: List[pd.DataFrame],
@@ -223,8 +204,11 @@ def dataframes_match(dataframes: List[pd.DataFrame],
     Returns:
         Returns True if the dataframes match based on the conditions explained above, otherwise returns False
     """
-    assert isinstance(dataframes, list)
-    assert len(dataframes) >= 2
+    if not isinstance(dataframes, list):
+        raise HelpskParamTypeError("Expected list of pd.DataFrame's.")
+
+    if not len(dataframes) >= 2:
+        raise HelpskParamValueError("Expected 2 or more pd.DataFrame's in list.")
 
     first_dataframe = dataframes[0].round(float_tolerance)
 
@@ -274,10 +258,10 @@ def assert_dataframes_match(dataframes: List[pd.DataFrame],
             if True, the column names of each DataFrame will be ignored for considering equality
 
         message:
-            message to pass to AssertionError
+            message to pass to HelpskAssertionError
     """
     if not dataframes_match(dataframes=dataframes,
                             float_tolerance=float_tolerance,
                             ignore_indexes=ignore_indexes,
                             ignore_column_names=ignore_column_names):
-        raise AssertionError(message)
+        raise HelpskAssertionError(message)

@@ -6,6 +6,7 @@ import pandas as pd
 
 from helpsk import string as hs
 from helpsk import validation as hv
+from helpsk.exceptions import *
 
 
 # noinspection PyMethodMayBeStatic
@@ -57,75 +58,76 @@ class TestValidation(unittest.TestCase):
         assert not hv.any_none_nan(pd.DataFrame([[''], [1]]))
 
     def test_assert_not_none_nan(self):
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(None),  # noqa
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(np.NaN),
-                                   AssertionError)
+
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(None)  # noqa
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(np.NaN)
 
         # test list
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan([1, np.nan, None]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan([1, np.nan]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan([1, None]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan([np.nan]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan([None]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan([]),
-                                   AssertionError)
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan([1]))
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan(['']))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan([1, np.nan, None])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan([1, np.nan])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan([1, None])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan([np.nan])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan([None])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan([])
+        hv.assert_not_none_nan([1])
+        hv.assert_not_none_nan([''])
 
         # test numpy array
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(np.array([1, np.nan, None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(np.array([1, np.nan])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(np.array([1, None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(np.array([np.nan])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(np.array([None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(np.array([])),
-                                   AssertionError)
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan(np.array([1])))
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan(np.array([''])))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(np.array([1, np.nan, None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(np.array([1, np.nan]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(np.array([1, None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(np.array([np.nan]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(np.array([None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(np.array([]))
+        hv.assert_not_none_nan(np.array([1]))
+        hv.assert_not_none_nan(np.array(['']))
 
         # test pandas series
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.Series([1, np.nan, None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.Series([1, np.nan])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.Series([1, None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.Series([np.nan])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.Series([None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.Series([], dtype=float)),
-                                   AssertionError)
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan(pd.Series([1])))
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan(pd.Series([''])))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.Series([1, np.nan, None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.Series([1, np.nan]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.Series([1, None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.Series([np.nan]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.Series([None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.Series([], dtype=float))
+        hv.assert_not_none_nan(pd.Series([1]))
+        hv.assert_not_none_nan(pd.Series(['']))
 
         # test pandas data.frame
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([[1, np.nan, None], [1, 2, 3]])),  # noqa
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([[1, np.nan], [1, 2]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([[1, None], [1, 2]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([[np.nan], [1]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([[None], [1]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([], dtype=float)),
-                                   AssertionError)
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([1])))
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([[1], [1]])))
-        assert not hv.raises_exception(lambda: hv.assert_not_none_nan(pd.DataFrame([[''], [1]])))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.DataFrame([[1, np.nan, None], [1, 2, 3]]))  # noqa
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.DataFrame([[1, np.nan], [1, 2]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.DataFrame([[1, None], [1, 2]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.DataFrame([[np.nan], [1]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.DataFrame([[None], [1]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.DataFrame([], dtype=float))
+        hv.assert_not_none_nan(pd.DataFrame([1]))
+        hv.assert_not_none_nan(pd.DataFrame([[1], [1]]))
+        hv.assert_not_none_nan(pd.DataFrame([[''], [1]]))
 
     def test_any_missing(self):
         assert hv.any_missing(None)  # noqa
@@ -171,76 +173,77 @@ class TestValidation(unittest.TestCase):
         assert not hv.any_missing(pd.DataFrame([[1], [1]]))
 
     def test_assert_not_any_missing(self):
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(None),  # noqa
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(np.NaN),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(''),  # noqa
-                                   AssertionError)
+
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(None)  # noqa
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(np.NaN)
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing('')  # noqa
 
         # test list
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing([1, np.nan, None]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing([1, np.nan]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing([1, None]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing([np.nan]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing([None]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing([]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(['']),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(['abc', '']),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing([1, '']),
-                                   AssertionError)
-        assert not hv.raises_exception(lambda: hv.assert_not_any_missing([1]))
-        assert not hv.raises_exception(lambda: hv.assert_not_any_missing(['a']))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing([1, np.nan, None])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing([1, np.nan])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing([1, None])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing([np.nan])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing([None])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing([])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing([''])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(['abc', ''])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing([1, ''])
+        hv.assert_not_any_missing([1])
+        hv.assert_not_any_missing(['a'])
 
         # test pandas series
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([1, np.nan, None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([1, np.nan])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([1, None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([np.nan])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([None])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([], dtype=float)),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([''])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series(['abc', ''])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([1, ''])),
-                                   AssertionError)
-        assert not hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series([1])))
-        assert not hv.raises_exception(lambda: hv.assert_not_any_missing(pd.Series(['a'])))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series([1, np.nan, None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series([1, np.nan]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series([1, None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series([np.nan]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series([None]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series([], dtype=float))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series(['']))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series(['abc', '']))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.Series([1, '']))
+        hv.assert_not_any_missing(pd.Series([1]))
+        hv.assert_not_any_missing(pd.Series(['a']))
 
         # test pandas data.frame
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([[1, np.nan, None], [1, 2, 3]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([[1, np.nan], [1, 2]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([[1, None], [1, 2]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([[np.nan], [1]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([[None], [1]])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([], dtype=float)),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([['abc', ''], ['abc', 'abc']])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([''])),
-                                   AssertionError)
-        assert not hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([1])))
-        assert not hv.raises_exception(lambda: hv.assert_not_any_missing(pd.DataFrame([[1], [1]])))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.DataFrame([[1, np.nan, None], [1, 2, 3]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.DataFrame([[1, np.nan], [1, 2]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.DataFrame([[1, None], [1, 2]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.DataFrame([[np.nan], [1]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.DataFrame([[None], [1]]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.DataFrame([], dtype=float))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.DataFrame([['abc', ''], ['abc', 'abc']]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.DataFrame(['']))
+        hv.assert_not_any_missing(pd.DataFrame([1]))
+        hv.assert_not_any_missing(pd.DataFrame([[1], [1]]))
 
     def test_any_duplicated(self):
         # test list
@@ -263,89 +266,65 @@ class TestValidation(unittest.TestCase):
 
     def test_assert_not_duplicated(self):
         # test list
-        assert not hv.raises_exception(lambda: hv.assert_not_duplicated(['']))
-        assert not hv.raises_exception(lambda: hv.assert_not_duplicated(['', 1]))
-        assert not hv.raises_exception(lambda: hv.assert_not_duplicated(['', 1, None]))
+        hv.assert_not_duplicated([''])
+        hv.assert_not_duplicated(['', 1])
+        hv.assert_not_duplicated(['', 1, None])
 
-        assert hv.raises_exception(lambda: hv.assert_not_duplicated(['', 1, '']),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_duplicated(['', 1, 1]),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_duplicated(['', 1, None, None]),
-                                   AssertionError)
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_duplicated(['', 1, ''])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_duplicated(['', 1, 1])
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_duplicated(['', 1, None, None])
 
         # test pd.Series
-        assert not hv.raises_exception(lambda: hv.assert_not_duplicated(pd.Series([''])))
-        assert not hv.raises_exception(lambda: hv.assert_not_duplicated(pd.Series(['', 1])))
-        assert not hv.raises_exception(lambda: hv.assert_not_duplicated(pd.Series(['', 1, None])))
+        hv.assert_not_duplicated(pd.Series(['']))
+        hv.assert_not_duplicated(pd.Series(['', 1]))
+        hv.assert_not_duplicated(pd.Series(['', 1, None]))
 
-        assert hv.raises_exception(lambda: hv.assert_not_duplicated(pd.Series(['', 1, ''])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_duplicated(pd.Series(['', 1, 1])),
-                                   AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_not_duplicated(pd.Series(['', 1, None, None])),
-                                   AssertionError)
-
-    def test_raises_exception(self):
-
-        def my_function_exception():
-            raise ValueError()
-
-        def my_function_runs():
-            return True
-
-        assert hv.raises_exception(my_function_exception)
-        # should return True since my_function_exception raises ValueError
-        assert hv.raises_exception(my_function_exception, ValueError)
-        # should return False since my_function_exception raises ValueError, not TypeError
-        assert not hv.raises_exception(my_function_exception, TypeError)
-        assert not hv.raises_exception(my_function_runs)
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_duplicated(pd.Series(['', 1, '']))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_duplicated(pd.Series(['', 1, 1]))
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_duplicated(pd.Series(['', 1, None, None]))
 
     def test_assert_true(self):
         hv.assert_true(True)
         assert isinstance(np.bool_(True), np.bool_)
         hv.assert_true(np.bool_(True))
 
-        assert hv.raises_exception(lambda: hv.assert_true([]), TypeError)  # noqa
-        assert hv.raises_exception(lambda: hv.assert_true([True]), TypeError)  # noqa
+        with self.assertRaises(HelpskParamTypeError):
+            hv.assert_true([])  # noqa
+        with self.assertRaises(HelpskParamTypeError):
+            hv.assert_true([True])  # noqa
 
-        raised_exception = False
-        try:
+        with self.assertRaises(HelpskAssertionError):
             hv.assert_true(False)
-        except AssertionError:
-            raised_exception = True
-        assert raised_exception
 
-        raised_exception = False
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_true(False, message='my message')
         try:
             hv.assert_true(False, message='my message')
-        except AssertionError as error:
-            raised_exception = True
+        except HelpskAssertionError as error:
             assert error.args[0] == 'my message'
-        assert raised_exception
 
     def test_assert_false(self):
         hv.assert_false(False)
         assert isinstance(np.bool_(False), np.bool_)
         hv.assert_false(np.bool_(False))
 
-        assert hv.raises_exception(lambda: hv.assert_false([]), TypeError)  # noqa
-        assert hv.raises_exception(lambda: hv.assert_false([False]), TypeError)  # noqa
+        with self.assertRaises(HelpskParamTypeError):
+            hv.assert_false([])  # noqa
+        with self.assertRaises(HelpskParamTypeError):
+            hv.assert_false([False])  # noqa
 
-        raised_exception = False
-        try:
+        with self.assertRaises(HelpskAssertionError):
             hv.assert_false(True)
-        except AssertionError:
-            raised_exception = True
-        assert raised_exception
-
-        raised_exception = False
         try:
             hv.assert_false(True, message='my message')
-        except AssertionError as error:
-            raised_exception = True
+        except HelpskAssertionError as error:
             assert error.args[0] == 'my message'
-        assert raised_exception
 
     def test_assert_all(self):
         cases = [
@@ -359,10 +338,9 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([True, True]),
             pd.DataFrame([[True, True], [True, True]]),
         ]
-        passing_cases = [not hv.raises_exception(lambda: hv.assert_all(case),
-                                                 AssertionError)
-                         for case in cases]
-        assert all(passing_cases)
+        # running assert all on these cases should not result in any assertion errors
+        for case in cases:
+            hv.assert_all(case)
 
         cases = [
             [False],
@@ -375,10 +353,9 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([True, False]),
             pd.DataFrame([[True, True], [True, False]]),
         ]
-        passing_cases = [hv.raises_exception(lambda: hv.assert_all(case),
-                                             AssertionError)
-                         for case in cases]
-        assert all(passing_cases)
+        for case in cases:
+            with self.assertRaises(HelpskAssertionError):
+                hv.assert_all(case)
 
     def test_assert_not_any(self):
         cases = [
@@ -392,10 +369,9 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([False, False]),
             pd.DataFrame([[False, False], [False, False]]),
         ]
-        passing_cases = [not hv.raises_exception(lambda: hv.assert_not_any(case),
-                                                 AssertionError)
-                         for case in cases]
-        assert all(passing_cases)
+        # running assert all on these cases should not result in any assertion errors
+        for case in cases:
+            hv.assert_not_any(case)
 
         cases = [
             [True],
@@ -408,10 +384,9 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([True, False]),
             pd.DataFrame([[False, False], [False, True]]),
         ]
-        passing_cases = [hv.raises_exception(lambda: hv.assert_not_any(case),
-                                             AssertionError)
-                         for case in cases]
-        assert all(passing_cases)
+        for case in cases:
+            with self.assertRaises(HelpskAssertionError):
+                hv.assert_not_any(case)
 
     def test_dataframes_match(self):
 
@@ -420,11 +395,17 @@ class TestValidation(unittest.TestCase):
                                     'col_enums': [hs.RoundTo.NONE, hs.RoundTo.AUTO, hs.RoundTo.THOUSANDS],
                                     'col_dates': pd.date_range('2021-01-01', periods=3)})
 
-        # test assertion errors when passing in invalid data
-        assert hv.raises_exception(lambda: hv.dataframes_match(dataframes=dataframe_1),  # noqa
-                                   exception_type=AssertionError)
-        assert hv.raises_exception(lambda: hv.dataframes_match(dataframes=[dataframe_1]),
-                                   exception_type=AssertionError)
+        with self.assertRaises(HelpskParamTypeError):
+            hv.dataframes_match(dataframes=None)  # noqa
+
+        with self.assertRaises(HelpskParamTypeError):
+            hv.dataframes_match(dataframes=dataframe_1)  # noqa
+
+        with self.assertRaises(HelpskParamValueError):
+            hv.dataframes_match(dataframes=[])
+
+        with self.assertRaises(HelpskParamValueError):
+            hv.dataframes_match(dataframes=[dataframe_1])
 
         # test that there are no side effects; e.g. we set the index/column values if we ignore them
         dataframe_1_original = dataframe_1.copy()
@@ -514,14 +495,23 @@ class TestValidation(unittest.TestCase):
         dataframe_1 = pd.DataFrame({'col': [1.123456789, 2.123456789, 3.123456789]})
 
         # test assertion errors when passing in invalid data
-        assert hv.raises_exception(lambda: hv.assert_dataframes_match(dataframes=dataframe_1),  # noqa
-                                   exception_type=AssertionError)
-        assert hv.raises_exception(lambda: hv.assert_dataframes_match(dataframes=[dataframe_1]),
-                                   exception_type=AssertionError)
+
+        with self.assertRaises(HelpskParamTypeError):
+            hv.assert_dataframes_match(dataframes=None)  # noqa
+
+        with self.assertRaises(HelpskParamTypeError):
+            hv.assert_dataframes_match(dataframes=dataframe_1)  # noqa
+
+        with self.assertRaises(HelpskParamValueError):
+            hv.assert_dataframes_match(dataframes=[])
+
+        with self.assertRaises(HelpskParamValueError):
+            hv.assert_dataframes_match(dataframes=[dataframe_1])
 
         assert hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_1]) is None
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[0, 0] = np.nan
-        assert hv.raises_exception(lambda: hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_2]),
-                                   exception_type=AssertionError)
+
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_2])
