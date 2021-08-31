@@ -301,7 +301,7 @@ class TestDate(unittest.TestCase):
 
         results = [date.to_string(value=parse(x),
                                   granularity=date.Granularity.DAY) for x in date_values]
-        assert results == date_values
+        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=date_values)
 
         results = [date.to_string(value=parse(x),
                                   granularity=date.Granularity.MONTH) for x in date_values]
@@ -319,7 +319,8 @@ class TestDate(unittest.TestCase):
                     '2021-Nov', '2021-Nov', '2021-Nov',
                     '2021-Dec', '2021-Dec', '2021-Dec',
                     '2022-Jan', '2022-Jan', '2022-Jan']
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
+                                    granularity=date.Granularity.MONTH)
 
         results = [date.to_string(value=parse(x),
                                   granularity=date.Granularity.QUARTER,
@@ -338,7 +339,8 @@ class TestDate(unittest.TestCase):
                     '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Nov
                     '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Dec
                     '2022-Q1', '2022-Q1', '2022-Q1']  # 2022-Jan
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
+                                    granularity=date.Granularity.QUARTER)
 
         results = [date.to_string(value=parse(x),
                                   granularity=date.Granularity.QUARTER,
@@ -357,7 +359,9 @@ class TestDate(unittest.TestCase):
                     '2022-FQ4', '2022-FQ4', '2022-FQ4',  # 2021-Nov
                     '2022-FQ4', '2022-FQ4', '2022-FQ4',  # 2021-Dec
                     '2022-FQ4', '2022-FQ4', '2022-FQ4']  # 2022-Jan
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
+                                    granularity=date.Granularity.QUARTER,
+                                    fiscal_start=2)
 
         results = [date.to_string(value=parse(x),
                                   granularity=date.Granularity.QUARTER,
@@ -376,7 +380,9 @@ class TestDate(unittest.TestCase):
                     '2021-FQ4', '2021-FQ4', '2021-FQ4',  # 2021-Nov
                     '2022-FQ1', '2022-FQ1', '2022-FQ1',  # 2021-Dec
                     '2022-FQ1', '2022-FQ1', '2022-FQ1']  # 2022-Jan
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
+                                    granularity=date.Granularity.QUARTER,
+                                    fiscal_start=12)
 
     def test_to_string_datetime(self):
         date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
