@@ -186,7 +186,9 @@ class TestDate(unittest.TestCase):
                     2021.4, 2021.4, 2021.4,
                     2021.4, 2021.4, 2021.4,
                     2022.1, 2022.1, 2022.1]
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self,
+                                    actual_values=results, expected_values=expected,
+                                    include_year=True, fiscal_start=1)
 
         results = [date.fiscal_quarter(value=parse(x),
                                        include_year=False,
@@ -205,7 +207,9 @@ class TestDate(unittest.TestCase):
                     4, 4, 4,
                     4, 4, 4,
                     1, 1, 1]
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self,
+                                    actual_values=results, expected_values=expected,
+                                    include_year=False, fiscal_start=1)
 
         results = [date.fiscal_quarter(value=parse(x),
                                        include_year=True,
@@ -224,7 +228,9 @@ class TestDate(unittest.TestCase):
                     2022.4, 2022.4, 2022.4,
                     2022.4, 2022.4, 2022.4,
                     2022.4, 2022.4, 2022.4]
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self,
+                                    actual_values=results, expected_values=expected,
+                                    include_year=True, fiscal_start=2)
 
         results = [date.fiscal_quarter(value=parse(x),
                                        include_year=False,
@@ -243,7 +249,9 @@ class TestDate(unittest.TestCase):
                     4, 4, 4,
                     4, 4, 4,
                     4, 4, 4]
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self,
+                                    actual_values=results, expected_values=expected,
+                                    include_year=False, fiscal_start=2)
 
         results = [date.fiscal_quarter(value=parse(x),
                                        include_year=True,
@@ -262,7 +270,9 @@ class TestDate(unittest.TestCase):
                     2021.4, 2021.4, 2021.4,  # 2021-Nov
                     2022.1, 2022.1, 2022.1,  # 2021-Dec
                     2022.1, 2022.1, 2022.1]  # 2022-Jan
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self,
+                                    actual_values=results, expected_values=expected,
+                                    include_year=True, fiscal_start=12)
 
         results = [date.fiscal_quarter(value=parse(x),
                                        include_year=False,
@@ -281,7 +291,9 @@ class TestDate(unittest.TestCase):
                     4, 4, 4,  # 2021-Nov
                     1, 1, 1,  # 2021-Dec
                     1, 1, 1]  # 2022-Jan
-        assert results == expected
+        subtests_expected_vs_actual(test_case=self,
+                                    actual_values=results, expected_values=expected,
+                                    include_year=False, fiscal_start=12)
 
     def test_to_string_date(self):
         date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
