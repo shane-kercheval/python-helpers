@@ -468,131 +468,239 @@ class TestDate(unittest.TestCase):
     def test_floor_day(self):
         # test datetime
         value = datetime.datetime(year=2021, month=2, day=13, hour=23, minute=45, second=55)
-        assert date.floor(value, granularity=date.Granularity.DAY) == parse('2021-02-13').date()
-        assert date.floor(value) == parse('2021-02-13').date()
+        self.assertEqual(date.floor(value, granularity=date.Granularity.DAY),
+                         parse('2021-02-13').date())
+        self.assertEqual(date.floor(value),
+                         parse('2021-02-13').date())
         # test date
         value = datetime.date(year=2021, month=2, day=13)
-        assert date.floor(value, granularity=date.Granularity.DAY) == parse('2021-02-13').date()
-        assert date.floor(value) == parse('2021-02-13').date()
+        self.assertEqual(date.floor(value, granularity=date.Granularity.DAY),
+                         parse('2021-02-13').date())
+        self.assertEqual(date.floor(value),
+                         parse('2021-02-13').date())
 
     def test_floor_month(self):
         # test datetime
         value = datetime.datetime(year=2021, month=1, day=1, hour=23, minute=45, second=55)
-        assert date.floor(value, granularity=date.Granularity.MONTH) == parse('2021-01-01').date()
+        self.assertEqual(date.floor(value, granularity=date.Granularity.MONTH),
+                         parse('2021-01-01').date())
         value = datetime.datetime(year=2021, month=1, day=31, hour=23, minute=45, second=55)
-        assert date.floor(value, granularity=date.Granularity.MONTH) == parse('2021-01-01').date()
+        self.assertEqual(date.floor(value, granularity=date.Granularity.MONTH),
+                         parse('2021-01-01').date())
         value = datetime.datetime(year=2021, month=12, day=1, hour=23, minute=45, second=55)
-        assert date.floor(value, granularity=date.Granularity.MONTH) == parse('2021-12-01').date()
+        self.assertEqual(date.floor(value, granularity=date.Granularity.MONTH),
+                         parse('2021-12-01').date())
         value = datetime.datetime(year=2021, month=12, day=31, hour=23, minute=45, second=55)
-        assert date.floor(value, granularity=date.Granularity.MONTH) == parse('2021-12-01').date()
+        self.assertEqual(date.floor(value, granularity=date.Granularity.MONTH),
+                         parse('2021-12-01').date())
 
         # test date
-        assert date.floor(parse('2021-01-01'), granularity=date.Granularity.MONTH) == parse('2021-01-01').date()
-        assert date.floor(parse('2021-01-31'), granularity=date.Granularity.MONTH) == parse('2021-01-01').date()
-        assert date.floor(parse('2021-12-01'), granularity=date.Granularity.MONTH) == parse('2021-12-01').date()
-        assert date.floor(parse('2021-12-31'), granularity=date.Granularity.MONTH) == parse('2021-12-01').date()
+        self.assertEqual(date.floor(parse('2021-01-01'), granularity=date.Granularity.MONTH),
+                         parse('2021-01-01').date())
+        self.assertEqual(date.floor(parse('2021-01-31'), granularity=date.Granularity.MONTH),
+                         parse('2021-01-01').date())
+        self.assertEqual(date.floor(parse('2021-12-01'), granularity=date.Granularity.MONTH),
+                         parse('2021-12-01').date())
+        self.assertEqual(date.floor(parse('2021-12-31'), granularity=date.Granularity.MONTH),
+                         parse('2021-12-01').date())
 
     def test_floor_quarter(self):
         # default argument fiscal_start of 1
-        assert date.floor(parse('2021-01-01'), granularity=date.Granularity.QUARTER) == parse('2021-01-01').date()
-        assert date.floor(parse('2021-01-31'), granularity=date.Granularity.QUARTER) == parse('2021-01-01').date()
-        assert date.floor(parse('2021-02-01'), granularity=date.Granularity.QUARTER) == parse('2021-01-01').date()
-        assert date.floor(parse('2021-02-28'), granularity=date.Granularity.QUARTER) == parse('2021-01-01').date()
-        assert date.floor(parse('2021-03-01'), granularity=date.Granularity.QUARTER) == parse('2021-01-01').date()
-        assert date.floor(parse('2021-03-31'), granularity=date.Granularity.QUARTER) == parse('2021-01-01').date()
-        assert date.floor(parse('2021-04-01'), granularity=date.Granularity.QUARTER) == parse('2021-04-01').date()
-        assert date.floor(parse('2021-04-30'), granularity=date.Granularity.QUARTER) == parse('2021-04-01').date()
-        assert date.floor(parse('2021-05-01'), granularity=date.Granularity.QUARTER) == parse('2021-04-01').date()
-        assert date.floor(parse('2021-05-31'), granularity=date.Granularity.QUARTER) == parse('2021-04-01').date()
-        assert date.floor(parse('2021-06-01'), granularity=date.Granularity.QUARTER) == parse('2021-04-01').date()
-        assert date.floor(parse('2021-06-30'), granularity=date.Granularity.QUARTER) == parse('2021-04-01').date()
-        assert date.floor(parse('2021-07-01'), granularity=date.Granularity.QUARTER) == parse('2021-07-01').date()
-        assert date.floor(parse('2021-07-31'), granularity=date.Granularity.QUARTER) == parse('2021-07-01').date()
-        assert date.floor(parse('2021-08-01'), granularity=date.Granularity.QUARTER) == parse('2021-07-01').date()
-        assert date.floor(parse('2021-08-31'), granularity=date.Granularity.QUARTER) == parse('2021-07-01').date()
-        assert date.floor(parse('2021-09-01'), granularity=date.Granularity.QUARTER) == parse('2021-07-01').date()
-        assert date.floor(parse('2021-09-30'), granularity=date.Granularity.QUARTER) == parse('2021-07-01').date()
-        assert date.floor(parse('2021-10-01'), granularity=date.Granularity.QUARTER) == parse('2021-10-01').date()
-        assert date.floor(parse('2021-10-31'), granularity=date.Granularity.QUARTER) == parse('2021-10-01').date()
-        assert date.floor(parse('2021-11-01'), granularity=date.Granularity.QUARTER) == parse('2021-10-01').date()
-        assert date.floor(parse('2021-11-30'), granularity=date.Granularity.QUARTER) == parse('2021-10-01').date()
-        assert date.floor(parse('2021-12-01'), granularity=date.Granularity.QUARTER) == parse('2021-10-01').date()
-        assert date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER) == parse('2021-10-01').date()
+        self.assertEqual(date.floor(parse('2021-01-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-01-01').date())
+        self.assertEqual(date.floor(parse('2021-01-31'), granularity=date.Granularity.QUARTER),
+                         parse('2021-01-01').date())
+        self.assertEqual(date.floor(parse('2021-02-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-01-01').date())
+        self.assertEqual(date.floor(parse('2021-02-28'), granularity=date.Granularity.QUARTER),
+                         parse('2021-01-01').date())
+        self.assertEqual(date.floor(parse('2021-03-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-01-01').date())
+        self.assertEqual(date.floor(parse('2021-03-31'), granularity=date.Granularity.QUARTER),
+                         parse('2021-01-01').date())
+        self.assertEqual(date.floor(parse('2021-04-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-04-01').date())
+        self.assertEqual(date.floor(parse('2021-04-30'), granularity=date.Granularity.QUARTER),
+                         parse('2021-04-01').date())
+        self.assertEqual(date.floor(parse('2021-05-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-04-01').date())
+        self.assertEqual(date.floor(parse('2021-05-31'), granularity=date.Granularity.QUARTER),
+                         parse('2021-04-01').date())
+        self.assertEqual(date.floor(parse('2021-06-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-04-01').date())
+        self.assertEqual(date.floor(parse('2021-06-30'), granularity=date.Granularity.QUARTER),
+                         parse('2021-04-01').date())
+        self.assertEqual(date.floor(parse('2021-07-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-07-01').date())
+        self.assertEqual(date.floor(parse('2021-07-31'), granularity=date.Granularity.QUARTER),
+                         parse('2021-07-01').date())
+        self.assertEqual(date.floor(parse('2021-08-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-07-01').date())
+        self.assertEqual(date.floor(parse('2021-08-31'), granularity=date.Granularity.QUARTER),
+                         parse('2021-07-01').date())
+        self.assertEqual(date.floor(parse('2021-09-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-07-01').date())
+        self.assertEqual(date.floor(parse('2021-09-30'), granularity=date.Granularity.QUARTER),
+                         parse('2021-07-01').date())
+        self.assertEqual(date.floor(parse('2021-10-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-10-01').date())
+        self.assertEqual(date.floor(parse('2021-10-31'), granularity=date.Granularity.QUARTER),
+                         parse('2021-10-01').date())
+        self.assertEqual(date.floor(parse('2021-11-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-10-01').date())
+        self.assertEqual(date.floor(parse('2021-11-30'), granularity=date.Granularity.QUARTER),
+                         parse('2021-10-01').date())
+        self.assertEqual(date.floor(parse('2021-12-01'), granularity=date.Granularity.QUARTER),
+                         parse('2021-10-01').date())
+        self.assertEqual(date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER),
+                         parse('2021-10-01').date())
 
         # fiscal quarter starts in February
-        assert date.floor(parse('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2020-11-01').date()
-        assert date.floor(parse('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2020-11-01').date()
-        assert date.floor(parse('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-11-01').date()
-        assert date.floor(parse('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-11-01').date()
-        assert date.floor(parse('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-11-01').date()
-        assert date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=2) == parse('2021-11-01').date()
+        self.assertEqual(date.floor(parse('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2020-11-01').date())
+        self.assertEqual(date.floor(parse('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2020-11-01').date())
+        self.assertEqual(date.floor(parse('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-11-01').date())
+        self.assertEqual(date.floor(parse('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-11-01').date())
+        self.assertEqual(date.floor(parse('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-11-01').date())
+        self.assertEqual(date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=2),
+                         parse('2021-11-01').date())
 
         # fiscal quarter starts in November (should be same as February)
-        assert date.floor(parse('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2020-11-01').date()
-        assert date.floor(parse('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2020-11-01').date()
-        assert date.floor(parse('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-02-01').date()
-        assert date.floor(parse('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-05-01').date()
-        assert date.floor(parse('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-08-01').date()
-        assert date.floor(parse('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-11-01').date()
-        assert date.floor(parse('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-11-01').date()
-        assert date.floor(parse('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-11-01').date()
-        assert date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=11) == parse('2021-11-01').date()
+        self.assertEqual(date.floor(parse('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2020-11-01').date())
+        self.assertEqual(date.floor(parse('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2020-11-01').date())
+        self.assertEqual(date.floor(parse('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-02-01').date())
+        self.assertEqual(date.floor(parse('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-05-01').date())
+        self.assertEqual(date.floor(parse('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-08-01').date())
+        self.assertEqual(date.floor(parse('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-11-01').date())
+        self.assertEqual(date.floor(parse('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-11-01').date())
+        self.assertEqual(date.floor(parse('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-11-01').date())
+        self.assertEqual(date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=11),
+                         parse('2021-11-01').date())
 
         # fiscal quarter starts in June
-        assert date.floor(parse('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2020-12-01').date()
-        assert date.floor(parse('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2020-12-01').date()
-        assert date.floor(parse('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2020-12-01').date()
-        assert date.floor(parse('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2020-12-01').date()
-        assert date.floor(parse('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-03-01').date()
-        assert date.floor(parse('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-03-01').date()
-        assert date.floor(parse('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-03-01').date()
-        assert date.floor(parse('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-03-01').date()
-        assert date.floor(parse('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-03-01').date()
-        assert date.floor(parse('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-03-01').date()
-        assert date.floor(parse('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-06-01').date()
-        assert date.floor(parse('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-06-01').date()
-        assert date.floor(parse('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-06-01').date()
-        assert date.floor(parse('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-06-01').date()
-        assert date.floor(parse('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-06-01').date()
-        assert date.floor(parse('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-06-01').date()
-        assert date.floor(parse('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-09-01').date()
-        assert date.floor(parse('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-09-01').date()
-        assert date.floor(parse('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-09-01').date()
-        assert date.floor(parse('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-09-01').date()
-        assert date.floor(parse('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-09-01').date()
-        assert date.floor(parse('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-09-01').date()
-        assert date.floor(parse('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-12-01').date()
-        assert date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=6) == parse('2021-12-01').date()
+        self.assertEqual(date.floor(parse('2021-01-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2020-12-01').date())
+        self.assertEqual(date.floor(parse('2021-01-31'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2020-12-01').date())
+        self.assertEqual(date.floor(parse('2021-02-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2020-12-01').date())
+        self.assertEqual(date.floor(parse('2021-02-28'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2020-12-01').date())
+        self.assertEqual(date.floor(parse('2021-03-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-03-01').date())
+        self.assertEqual(date.floor(parse('2021-03-31'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-03-01').date())
+        self.assertEqual(date.floor(parse('2021-04-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-03-01').date())
+        self.assertEqual(date.floor(parse('2021-04-30'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-03-01').date())
+        self.assertEqual(date.floor(parse('2021-05-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-03-01').date())
+        self.assertEqual(date.floor(parse('2021-05-31'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-03-01').date())
+        self.assertEqual(date.floor(parse('2021-06-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-06-01').date())
+        self.assertEqual(date.floor(parse('2021-06-30'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-06-01').date())
+        self.assertEqual(date.floor(parse('2021-07-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-06-01').date())
+        self.assertEqual(date.floor(parse('2021-07-31'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-06-01').date())
+        self.assertEqual(date.floor(parse('2021-08-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-06-01').date())
+        self.assertEqual(date.floor(parse('2021-08-31'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-06-01').date())
+        self.assertEqual(date.floor(parse('2021-09-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-09-01').date())
+        self.assertEqual(date.floor(parse('2021-09-30'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-09-01').date())
+        self.assertEqual(date.floor(parse('2021-10-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-09-01').date())
+        self.assertEqual(date.floor(parse('2021-10-31'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-09-01').date())
+        self.assertEqual(date.floor(parse('2021-11-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-09-01').date())
+        self.assertEqual(date.floor(parse('2021-11-30'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-09-01').date())
+        self.assertEqual(date.floor(parse('2021-12-01'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-12-01').date())
+        self.assertEqual(date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER, fiscal_start=6),
+                         parse('2021-12-01').date())
