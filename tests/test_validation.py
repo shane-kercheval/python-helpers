@@ -302,12 +302,9 @@ class TestValidation(unittest.TestCase):
         with self.assertRaises(HelpskAssertionError):
             hv.assert_true(False)
 
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(HelpskAssertionError) as cm:
             hv.assert_true(False, message='my message')
-        try:
-            hv.assert_true(False, message='my message')
-        except HelpskAssertionError as error:
-            assert error.args[0] == 'my message'
+        self.assertEqual(cm.exception.args[0], 'my message')
 
     def test_assert_false(self):
         hv.assert_false(False)
@@ -321,10 +318,10 @@ class TestValidation(unittest.TestCase):
 
         with self.assertRaises(HelpskAssertionError):
             hv.assert_false(True)
-        try:
+
+        with self.assertRaises(HelpskAssertionError) as cm:
             hv.assert_false(True, message='my message')
-        except HelpskAssertionError as error:
-            assert error.args[0] == 'my message'
+        self.assertEqual(cm.exception.args[0], 'my message')
 
     def test_assert_all(self):
         cases = [
