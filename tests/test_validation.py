@@ -351,8 +351,8 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([[True, True], [True, False]]),
         ]
         for index, case in enumerate(cases):
-            with self.subTest(index):
-                with self.assertRaises(HelpskAssertionError, msg=f'case index: {index}'):
+            with self.subTest(index=index):
+                with self.assertRaises(HelpskAssertionError):
                     hv.assert_all(case)
 
 
@@ -384,8 +384,8 @@ class TestValidation(unittest.TestCase):
             pd.DataFrame([[False, False], [False, True]]),
         ]
         for index, case in enumerate(cases):
-            with self.subTest(index):
-                with self.assertRaises(HelpskAssertionError, msg=f'case index: {index}'):
+            with self.subTest(index=index):
+                with self.assertRaises(HelpskAssertionError):
                     hv.assert_not_any(case)
 
     def test_dataframes_match(self):
