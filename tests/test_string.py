@@ -11,38 +11,38 @@ class TestStrings(unittest.TestCase):
     def test_collapse(self):
 
         # test *args as different parameters
-        assert hs.collapse('a') == 'a'
-        assert hs.collapse('a', 'b') == 'ab'
-        assert hs.collapse('a', 'b', 'c') == 'abc'
+        self.assertEqual(hs.collapse('a'), 'a')
+        self.assertEqual(hs.collapse('a', 'b'), 'ab')
+        self.assertEqual(hs.collapse('a', 'b', 'c'), 'abc')
 
-        assert hs.collapse('a', surround="'") == "'a'"
-        assert hs.collapse('a', 'b', surround="'") == "'a''b'"
-        assert hs.collapse('a', 'b', 'c', surround="'") == "'a''b''c'"
+        self.assertEqual(hs.collapse('a', surround="'"), "'a'")
+        self.assertEqual(hs.collapse('a', 'b', surround="'"), "'a''b'")
+        self.assertEqual(hs.collapse('a', 'b', 'c', surround="'"), "'a''b''c'")
 
-        assert hs.collapse('a', separate=', ') == "a"
-        assert hs.collapse('a', 'b', separate=', ') == "a, b"
-        assert hs.collapse('a', 'b', 'c', separate=', ') == "a, b, c"
+        self.assertEqual(hs.collapse('a', separate=', '), "a")
+        self.assertEqual(hs.collapse('a', 'b', separate=', '), "a, b")
+        self.assertEqual(hs.collapse('a', 'b', 'c', separate=', '), "a, b, c")
 
-        assert hs.collapse('a', separate=', ', surround="'") == "'a'"
-        assert hs.collapse('a', 'b', separate=', ', surround="'") == "'a', 'b'"
-        assert hs.collapse('a', 'b', 'c', separate=', ', surround="'") == "'a', 'b', 'c'"
+        self.assertEqual(hs.collapse('a', separate=', ', surround="'"), "'a'")
+        self.assertEqual(hs.collapse('a', 'b', separate=', ', surround="'"), "'a', 'b'")
+        self.assertEqual(hs.collapse('a', 'b', 'c', separate=', ', surround="'"), "'a', 'b', 'c'")
 
         # test *args as list of strings
-        assert hs.collapse(['a']) == 'a'
-        assert hs.collapse(['a', 'b']) == 'ab'
-        assert hs.collapse(['a', 'b', 'c']) == 'abc'
+        self.assertEqual(hs.collapse(['a']), 'a')
+        self.assertEqual(hs.collapse(['a', 'b']), 'ab')
+        self.assertEqual(hs.collapse(['a', 'b', 'c']), 'abc')
 
-        assert hs.collapse(['a'], surround="'") == "'a'"
-        assert hs.collapse(['a', 'b'], surround="'") == "'a''b'"
-        assert hs.collapse(['a', 'b', 'c'], surround="'") == "'a''b''c'"
+        self.assertEqual(hs.collapse(['a'], surround="'"), "'a'")
+        self.assertEqual(hs.collapse(['a', 'b'], surround="'"), "'a''b'")
+        self.assertEqual(hs.collapse(['a', 'b', 'c'], surround="'"), "'a''b''c'")
 
-        assert hs.collapse(['a'], separate=', ') == "a"
-        assert hs.collapse(['a', 'b'], separate=', ') == "a, b"
-        assert hs.collapse(['a', 'b', 'c'], separate=', ') == "a, b, c"
+        self.assertEqual(hs.collapse(['a'], separate=', '), "a")
+        self.assertEqual(hs.collapse(['a', 'b'], separate=', '), "a, b")
+        self.assertEqual(hs.collapse(['a', 'b', 'c'], separate=', '), "a, b, c")
 
-        assert hs.collapse(['a'], separate=', ', surround="'") == "'a'"
-        assert hs.collapse(['a', 'b'], separate=', ', surround="'") == "'a', 'b'"
-        assert hs.collapse(['a', 'b', 'c'], separate=', ', surround="'") == "'a', 'b', 'c'"
+        self.assertEqual(hs.collapse(['a'], separate=', ', surround="'"), "'a'")
+        self.assertEqual(hs.collapse(['a', 'b'], separate=', ', surround="'"), "'a', 'b'")
+        self.assertEqual(hs.collapse(['a', 'b', 'c'], separate=', ', surround="'"), "'a', 'b', 'c'")
 
     def test_format_number(self):
         granularity_options = [hs.RoundTo.AUTO, hs.RoundTo.NONE, hs.RoundTo.THOUSANDS, hs.RoundTo.MILLIONS,
