@@ -57,47 +57,47 @@ class TestDocstringMarkdown(unittest.TestCase):
                     expected_contents=expected_contents_without_toc)
 
     def test_is_line_docstring(self):
-        assert is_line_docstring('"""')
-        assert is_line_docstring('"""\n')
-        assert is_line_docstring('"""asdf\n')
+        self.assertTrue(is_line_docstring('"""'))
+        self.assertTrue(is_line_docstring('"""\n'))
+        self.assertTrue(is_line_docstring('"""asdf\n'))
 
     def test_is_single_line_docstring(self):
-        assert is_single_line_docstring('"""doc"""')
-        assert not is_single_line_docstring('"""')
-        assert not is_single_line_docstring('"""doc')
+        self.assertTrue(is_single_line_docstring('"""doc"""'))
+        self.assertFalse(is_single_line_docstring('"""'))
+        self.assertFalse(is_single_line_docstring('"""doc'))
 
     def test_is_line_function_definition(self):
-        assert is_line_function_definition('def xxx')
-        assert is_line_function_definition('    def xxx(')
-        assert is_line_function_definition('        def xxx(adsf...')
+        self.assertTrue(is_line_function_definition('def xxx'))
+        self.assertTrue(is_line_function_definition('    def xxx('))
+        self.assertTrue(is_line_function_definition('        def xxx(adsf...'))
 
-        assert not is_line_function_definition('def __xxx')
-        assert not is_line_function_definition('    def __xxx(')
-        assert not is_line_function_definition('        def __xxx(adsf...')
+        self.assertFalse(is_line_function_definition('def __xxx'))
+        self.assertFalse(is_line_function_definition('    def __xxx('))
+        self.assertFalse(is_line_function_definition('        def __xxx(adsf...'))
 
-        assert not is_line_function_definition('class xxx')
-        assert not is_line_function_definition('    class xxx(')
-        assert not is_line_function_definition('        class xxx(adsf...')
+        self.assertFalse(is_line_function_definition('class xxx'))
+        self.assertFalse(is_line_function_definition('    class xxx('))
+        self.assertFalse(is_line_function_definition('        class xxx(adsf...'))
 
     def test_is_line_class_definition(self):
-        assert not is_line_class_definition('def xxx')
-        assert not is_line_class_definition('    def xxx(')
-        assert not is_line_class_definition('        def xxx(adsf...')
+        self.assertFalse(is_line_class_definition('def xxx'))
+        self.assertFalse(is_line_class_definition('    def xxx('))
+        self.assertFalse(is_line_class_definition('        def xxx(adsf...'))
 
-        assert not is_line_class_definition('def __xxx')
-        assert not is_line_class_definition('    def __xxx(')
-        assert not is_line_class_definition('        def __xxx(adsf...')
+        self.assertFalse(is_line_class_definition('def __xxx'))
+        self.assertFalse(is_line_class_definition('    def __xxx('))
+        self.assertFalse(is_line_class_definition('        def __xxx(adsf...'))
 
-        assert is_line_class_definition('class xxx')
-        assert is_line_class_definition('    class xxx(')
-        assert is_line_class_definition('        class xxx(adsf...')
+        self.assertTrue(is_line_class_definition('class xxx'))
+        self.assertTrue(is_line_class_definition('    class xxx('))
+        self.assertTrue(is_line_class_definition('        class xxx(adsf...'))
 
     def test_calculate_indentation_levels(self):
-        assert calculate_indentation_levels(leading_spaces='') == 0
-        assert calculate_indentation_levels(leading_spaces='    ') == 1
-        assert calculate_indentation_levels(leading_spaces='        ') == 2
-        assert calculate_indentation_levels(leading_spaces='            ') == 3
-        assert calculate_indentation_levels(leading_spaces='                ') == 4
+        self.assertEqual(calculate_indentation_levels(leading_spaces=''), 0)
+        self.assertEqual(calculate_indentation_levels(leading_spaces='    '), 1)
+        self.assertEqual(calculate_indentation_levels(leading_spaces='        '), 2)
+        self.assertEqual(calculate_indentation_levels(leading_spaces='            '), 3)
+        self.assertEqual(calculate_indentation_levels(leading_spaces='                '), 4)
 
         with self.assertRaises(AssertionError):
             calculate_indentation_levels(leading_spaces=' ')
