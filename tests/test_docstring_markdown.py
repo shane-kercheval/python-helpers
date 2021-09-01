@@ -26,11 +26,11 @@ class TestDocstringMarkdown(unittest.TestCase):
                         expected_contents):
             test_file = get_test_path() + test_file_name
             function()
-            assert isfile(test_file)
+            self.assertTrue(isfile(test_file))
             with open(test_file, 'r') as file_pointer:
                 test_file_contents = file_pointer.read()
             remove(test_file)
-            assert expected_contents == test_file_contents
+            self.assertEqual(expected_contents, test_file_contents)
 
         test_helper(lambda: build_markdown.execute_build(input_path=get_test_path() + '/../helpsk/',
                                                          output_path=get_test_path() + '/test_files'),
