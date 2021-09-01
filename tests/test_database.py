@@ -70,8 +70,7 @@ class TestDatabase(unittest.TestCase):
         database_objects = [Redshift(**redshift_config.get_dictionary()),
                             Redshift.from_config(redshift_config),
                             Snowflake(**snowflake_config.get_dictionary()),
-                            Snowflake.from_config(snowflake_config),
-                            ]
+                            Snowflake.from_config(snowflake_config)]
 
         def sub_test(db_obj):
             """db_obj is a Database object that is in a closed state and has the mock objects set up"""
@@ -103,9 +102,6 @@ class TestDatabase(unittest.TestCase):
             self.assertFalse(db_obj.is_open())
             self.assertIsNone(db_obj.connection_object)
 
-            # text context manager
-            # also tests that the same object can be open/closed multiple times 
-
         for index, db_object in enumerate(database_objects):
             with self.subTest(index=index, database=type(db_object)):
                 self.assertFalse(db_object.is_open())
@@ -116,11 +112,15 @@ class TestDatabase(unittest.TestCase):
                     with patch('psycopg2.connect'), patch('pandas.read_sql_query') as pandas_read_mock:
                         pandas_read_mock.return_value = pd.DataFrame({'test': ['test']})
                         sub_test(db_obj=db_object)
+                        # test that the same object can be opened/closed multiple times
+                        sub_test(db_obj=db_object)
+
                 else:
                     with patch('snowflake.connector.connect') as mock_snowflake_connector:
-                        # mock this logic out:
+                        # mock snowflake logic:
                         # connect() -> cursor() -> ... -> fetch_pandas_all()
                         # actual code
+                        # self.connection_object = snowflake.connector.connect()
                         # cursor = self.connection_object.cursor()
                         # cursor.execute(sql)
                         # dataframe = cursor.fetch_pandas_all()
@@ -128,7 +128,8 @@ class TestDatabase(unittest.TestCase):
                         mock_cur = mock_con.cursor.return_value
                         mock_cur.fetch_pandas_all.return_value = pd.DataFrame({'test': ['test']})
                         sub_test(db_obj=db_object)
+                        # test that the same object can be opened/closed multiple times
+                        sub_test(db_obj=db_object)
 
-# test open connections after closing connection
 # test context manager "with asdf"
 # tests that if failure to connect (i.e. no mock and connection failure) that the db_boject is not in an open state open
