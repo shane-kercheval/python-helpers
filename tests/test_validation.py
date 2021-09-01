@@ -431,8 +431,10 @@ class TestValidation(unittest.TestCase):
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6)]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1, dataframe_1.round(5)]))
-        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)], float_tolerance=5))
-        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6), dataframe_1.round(5)],
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)],
+                                            float_tolerance=5))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6),
+                                                        dataframe_1.round(5)],
                                             float_tolerance=5))
 
         dataframe_2 = dataframe_1.copy()
@@ -486,7 +488,8 @@ class TestValidation(unittest.TestCase):
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_indexes=False))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_column_names=False))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
+                                             ignore_column_names=False))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
                                              ignore_indexes=False,
                                              ignore_column_names=False))
