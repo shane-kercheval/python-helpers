@@ -13,49 +13,49 @@ from helpsk.exceptions import *
 class TestValidation(unittest.TestCase):
 
     def test_any_none_nan(self):
-        assert hv.any_none_nan(None)  # noqa
-        assert hv.any_none_nan(np.NaN)
+        self.assertTrue(hv.any_none_nan(None))  # noqa
+        self.assertTrue(hv.any_none_nan(np.NaN))
 
         # test list
-        assert hv.any_none_nan([1, np.nan, None])
-        assert hv.any_none_nan([1, np.nan])
-        assert hv.any_none_nan([1, None])
-        assert hv.any_none_nan([np.nan])
-        assert hv.any_none_nan([None])
-        assert hv.any_none_nan([])
-        assert not hv.any_none_nan([1])
-        assert not hv.any_none_nan([''])
+        self.assertTrue(hv.any_none_nan([1, np.nan, None]))
+        self.assertTrue(hv.any_none_nan([1, np.nan]))
+        self.assertTrue(hv.any_none_nan([1, None]))
+        self.assertTrue(hv.any_none_nan([np.nan]))
+        self.assertTrue(hv.any_none_nan([None]))
+        self.assertTrue(hv.any_none_nan([]))
+        self.assertFalse(hv.any_none_nan([1]))
+        self.assertFalse(hv.any_none_nan(['']))
 
         # test numpy array
-        assert hv.any_none_nan(np.array([1, np.nan, None]))
-        assert hv.any_none_nan(np.array([1, np.nan]))
-        assert hv.any_none_nan(np.array([1, None]))
-        assert hv.any_none_nan(np.array([np.nan]))
-        assert hv.any_none_nan(np.array([None]))
-        assert hv.any_none_nan(np.array([]))
-        assert not hv.any_none_nan(np.array([1]))
-        assert not hv.any_none_nan(np.array(['']))
+        self.assertTrue(hv.any_none_nan(np.array([1, np.nan, None])))
+        self.assertTrue(hv.any_none_nan(np.array([1, np.nan])))
+        self.assertTrue(hv.any_none_nan(np.array([1, None])))
+        self.assertTrue(hv.any_none_nan(np.array([np.nan])))
+        self.assertTrue(hv.any_none_nan(np.array([None])))
+        self.assertTrue(hv.any_none_nan(np.array([])))
+        self.assertFalse(hv.any_none_nan(np.array([1])))
+        self.assertFalse(hv.any_none_nan(np.array([''])))
 
         # test pandas series
-        assert hv.any_none_nan(pd.Series([1, np.nan, None]))
-        assert hv.any_none_nan(pd.Series([1, np.nan]))
-        assert hv.any_none_nan(pd.Series([1, None]))
-        assert hv.any_none_nan(pd.Series([np.nan]))
-        assert hv.any_none_nan(pd.Series([None]))
-        assert hv.any_none_nan(pd.Series([], dtype=float))
-        assert not hv.any_none_nan(pd.Series([1]))
-        assert not hv.any_none_nan(pd.Series(['']))
+        self.assertTrue(hv.any_none_nan(pd.Series([1, np.nan, None])))
+        self.assertTrue(hv.any_none_nan(pd.Series([1, np.nan])))
+        self.assertTrue(hv.any_none_nan(pd.Series([1, None])))
+        self.assertTrue(hv.any_none_nan(pd.Series([np.nan])))
+        self.assertTrue(hv.any_none_nan(pd.Series([None])))
+        self.assertTrue(hv.any_none_nan(pd.Series([], dtype=float)))
+        self.assertFalse(hv.any_none_nan(pd.Series([1])))
+        self.assertFalse(hv.any_none_nan(pd.Series([''])))
 
         # test pandas data.frame
-        assert hv.any_none_nan(pd.DataFrame([[1, np.nan, None], [1, 2, 3]]))
-        assert hv.any_none_nan(pd.DataFrame([[1, np.nan], [1, 2]]))
-        assert hv.any_none_nan(pd.DataFrame([[1, None], [1, 2]]))
-        assert hv.any_none_nan(pd.DataFrame([[np.nan], [1]]))
-        assert hv.any_none_nan(pd.DataFrame([[None], [1]]))
-        assert hv.any_none_nan(pd.DataFrame([], dtype=float))
-        assert not hv.any_none_nan(pd.DataFrame([1]))
-        assert not hv.any_none_nan(pd.DataFrame([[1], [1]]))
-        assert not hv.any_none_nan(pd.DataFrame([[''], [1]]))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[1, np.nan, None], [1, 2, 3]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[1, np.nan], [1, 2]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[1, None], [1, 2]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[np.nan], [1]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[None], [1]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([], dtype=float)))
+        self.assertFalse(hv.any_none_nan(pd.DataFrame([1])))
+        self.assertFalse(hv.any_none_nan(pd.DataFrame([[1], [1]])))
+        self.assertFalse(hv.any_none_nan(pd.DataFrame([[''], [1]])))
 
     def test_assert_not_none_nan(self):
 
@@ -130,47 +130,47 @@ class TestValidation(unittest.TestCase):
         hv.assert_not_none_nan(pd.DataFrame([[''], [1]]))
 
     def test_any_missing(self):
-        assert hv.any_missing(None)  # noqa
-        assert hv.any_missing(np.NaN)
-        assert hv.any_missing('')  # noqa
+        self.assertTrue(hv.any_missing(None))  # noqa
+        self.assertTrue(hv.any_missing(np.NaN))
+        self.assertTrue(hv.any_missing(''))  # noqa
 
         # test list
-        assert hv.any_missing([1, np.nan, None])
-        assert hv.any_missing([1, np.nan])
-        assert hv.any_missing([1, None])
-        assert hv.any_missing([np.nan])
-        assert hv.any_missing([None])
-        assert hv.any_missing([])
-        assert hv.any_missing([''])
-        assert hv.any_missing(['abc', ''])
-        assert hv.any_missing([1, ''])
-        assert not hv.any_missing([1])
-        assert not hv.any_missing(['a'])
+        self.assertTrue(hv.any_missing([1, np.nan, None]))
+        self.assertTrue(hv.any_missing([1, np.nan]))
+        self.assertTrue(hv.any_missing([1, None]))
+        self.assertTrue(hv.any_missing([np.nan]))
+        self.assertTrue(hv.any_missing([None]))
+        self.assertTrue(hv.any_missing([]))
+        self.assertTrue(hv.any_missing(['']))
+        self.assertTrue(hv.any_missing(['abc', '']))
+        self.assertTrue(hv.any_missing([1, '']))
+        self.assertFalse(hv.any_missing([1]))
+        self.assertFalse(hv.any_missing(['a']))
 
         # test pandas series
-        assert hv.any_missing(pd.Series([1, np.nan, None]))
-        assert hv.any_missing(pd.Series([1, np.nan]))
-        assert hv.any_missing(pd.Series([1, None]))
-        assert hv.any_missing(pd.Series([np.nan]))
-        assert hv.any_missing(pd.Series([None]))
-        assert hv.any_missing(pd.Series([], dtype=float))
-        assert hv.any_missing(pd.Series(['']))
-        assert hv.any_missing(pd.Series(['abc', '']))
-        assert hv.any_missing(pd.Series([1, '']))
-        assert not hv.any_missing(pd.Series([1]))
-        assert not hv.any_missing(pd.Series(['a']))
+        self.assertTrue(hv.any_missing(pd.Series([1, np.nan, None])))
+        self.assertTrue(hv.any_missing(pd.Series([1, np.nan])))
+        self.assertTrue(hv.any_missing(pd.Series([1, None])))
+        self.assertTrue(hv.any_missing(pd.Series([np.nan])))
+        self.assertTrue(hv.any_missing(pd.Series([None])))
+        self.assertTrue(hv.any_missing(pd.Series([], dtype=float)))
+        self.assertTrue(hv.any_missing(pd.Series([''])))
+        self.assertTrue(hv.any_missing(pd.Series(['abc', ''])))
+        self.assertTrue(hv.any_missing(pd.Series([1, ''])))
+        self.assertFalse(hv.any_missing(pd.Series([1])))
+        self.assertFalse(hv.any_missing(pd.Series(['a'])))
 
         # test pandas data.frame
-        assert hv.any_missing(pd.DataFrame([[1, np.nan, None], [1, 2, 3]]))
-        assert hv.any_missing(pd.DataFrame([[1, np.nan], [1, 2]]))
-        assert hv.any_missing(pd.DataFrame([[1, None], [1, 2]]))
-        assert hv.any_missing(pd.DataFrame([[np.nan], [1]]))
-        assert hv.any_missing(pd.DataFrame([[None], [1]]))
-        assert hv.any_missing(pd.DataFrame([], dtype=float))
-        assert hv.any_missing(pd.DataFrame([['abc', ''], ['abc', 'abc']]))
-        assert hv.any_missing(pd.DataFrame(['']))
-        assert not hv.any_missing(pd.DataFrame([1]))
-        assert not hv.any_missing(pd.DataFrame([[1], [1]]))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[1, np.nan, None], [1, 2, 3]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[1, np.nan], [1, 2]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[1, None], [1, 2]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[np.nan], [1]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[None], [1]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([], dtype=float)))
+        self.assertTrue(hv.any_missing(pd.DataFrame([['abc', ''], ['abc', 'abc']])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([''])))
+        self.assertFalse(hv.any_missing(pd.DataFrame([1])))
+        self.assertFalse(hv.any_missing(pd.DataFrame([[1], [1]])))
 
     def test_assert_not_any_missing(self):
 
@@ -247,22 +247,22 @@ class TestValidation(unittest.TestCase):
 
     def test_any_duplicated(self):
         # test list
-        assert not hv.any_duplicated([''])
-        assert not hv.any_duplicated(['', 1])
-        assert not hv.any_duplicated(['', 1, None])
+        self.assertFalse(hv.any_duplicated(['']))
+        self.assertFalse(hv.any_duplicated(['', 1]))
+        self.assertFalse(hv.any_duplicated(['', 1, None]))
 
-        assert hv.any_duplicated(['', 1, ''])
-        assert hv.any_duplicated(['', 1, 1])
-        assert hv.any_duplicated(['', 1, None, None])
+        self.assertTrue(hv.any_duplicated(['', 1, '']))
+        self.assertTrue(hv.any_duplicated(['', 1, 1]))
+        self.assertTrue(hv.any_duplicated(['', 1, None, None]))
 
         # test pd.Series
-        assert not hv.any_duplicated(pd.Series(['']))
-        assert not hv.any_duplicated(pd.Series(['', 1]))
-        assert not hv.any_duplicated(pd.Series(['', 1, None]))
+        self.assertFalse(hv.any_duplicated(pd.Series([''])))
+        self.assertFalse(hv.any_duplicated(pd.Series(['', 1])))
+        self.assertFalse(hv.any_duplicated(pd.Series(['', 1, None])))
 
-        assert hv.any_duplicated(pd.Series(['', 1, '']))
-        assert hv.any_duplicated(pd.Series(['', 1, 1]))
-        assert hv.any_duplicated(pd.Series(['', 1, None, None]))
+        self.assertTrue(hv.any_duplicated(pd.Series(['', 1, ''])))
+        self.assertTrue(hv.any_duplicated(pd.Series(['', 1, 1])))
+        self.assertTrue(hv.any_duplicated(pd.Series(['', 1, None, None])))
 
     def test_assert_not_duplicated(self):
         # test list
@@ -291,7 +291,7 @@ class TestValidation(unittest.TestCase):
 
     def test_assert_true(self):
         hv.assert_true(True)
-        assert isinstance(np.bool_(True), np.bool_)
+        self.assertTrue(isinstance(np.bool_(True), np.bool_))
         hv.assert_true(np.bool_(True))
 
         with self.assertRaises(HelpskParamTypeError):
@@ -308,7 +308,7 @@ class TestValidation(unittest.TestCase):
 
     def test_assert_false(self):
         hv.assert_false(False)
-        assert isinstance(np.bool_(False), np.bool_)
+        self.assertTrue(isinstance(np.bool_(False), np.bool_))
         hv.assert_false(np.bool_(False))
 
         with self.assertRaises(HelpskParamTypeError):
@@ -413,83 +413,83 @@ class TestValidation(unittest.TestCase):
         dataframe_2.index = ['a', 'b', 'c']
         dataframe_2.columns = ['a', 'b', 'c', 'd']
         dataframe_2_original = dataframe_2.copy()
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
-                                   float_tolerance=1,
-                                   ignore_indexes=True,
-                                   ignore_column_names=True)
-        assert dataframe_1.equals(dataframe_1_original)
-        assert (dataframe_1.index == dataframe_1_original.index).all()
-        assert (dataframe_1.columns == dataframe_1_original.columns).all()
-        assert dataframe_2.equals(dataframe_2_original)
-        assert (dataframe_2.index == dataframe_2_original.index).all()
-        assert (dataframe_2.columns == dataframe_2_original.columns).all()
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
+                                            float_tolerance=1,
+                                            ignore_indexes=True,
+                                            ignore_column_names=True))
+        self.assertTrue(dataframe_1.equals(dataframe_1_original))
+        self.assertTrue((dataframe_1.index == dataframe_1_original.index).all())
+        self.assertTrue((dataframe_1.columns == dataframe_1_original.columns).all())
+        self.assertTrue(dataframe_2.equals(dataframe_2_original))
+        self.assertTrue((dataframe_2.index == dataframe_2_original.index).all())
+        self.assertTrue((dataframe_2.columns == dataframe_2_original.columns).all())
 
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_1])
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_1, dataframe_1])
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_1.copy()])
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1]))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1, dataframe_1]))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_1.copy()]))
 
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6)])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1, dataframe_1.round(5)])
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)], float_tolerance=5)
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6), dataframe_1.round(5)],
-                                   float_tolerance=5)
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6)]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1, dataframe_1.round(5)]))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)], float_tolerance=5))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6), dataframe_1.round(5)],
+                                            float_tolerance=5))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[0, 0] = dataframe_2.iat[0, 0] - 0.000001
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[1, 1] = 'c'
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[2, 2] = hs.RoundTo.MILLIONS
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[2, 3] = dataframe_2.iat[2, 3] + timedelta(seconds=1)
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[2, 3] = dataframe_2.iat[2, 3] + timedelta(seconds=1) - timedelta(seconds=1)
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[0, 0] = np.NaN
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[1, 1] = np.NaN
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[1, 2] = np.NaN
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[1, 3] = np.NaN
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2])
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.columns = ['a', 'b', 'c', 'd']
         dataframe_2.index = ['a', 'b', 'c']
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_2])
-        assert hv.dataframes_match(dataframes=[dataframe_1, dataframe_2, dataframe_2])
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_indexes=False)
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_column_names=False)
-        assert not hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
-                                       ignore_indexes=False,
-                                       ignore_column_names=False)
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_indexes=False))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_column_names=False))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
+                                             ignore_indexes=False,
+                                             ignore_column_names=False))
 
     def test_assert_dataframes_match(self):
         dataframe_1 = pd.DataFrame({'col': [1.123456789, 2.123456789, 3.123456789]})
@@ -508,7 +508,7 @@ class TestValidation(unittest.TestCase):
         with self.assertRaises(HelpskParamValueError):
             hv.assert_dataframes_match(dataframes=[dataframe_1])
 
-        assert hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_1]) is None
+        self.assertTrue(hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_1]) is None)
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[0, 0] = np.nan
