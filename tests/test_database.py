@@ -72,6 +72,40 @@ class TestDatabase(unittest.TestCase):
                             Snowflake(**snowflake_config.get_dictionary()),
                             Snowflake.from_config(snowflake_config),
                             ]
+
+        def sub_test(db_obj):
+            """db_obj is a Database object that is in a closed state and has the mock objects set up"""
+            # connection should be closed
+            self.assertFalse(db_object.is_open())
+            self.assertIsNone(db_object.connection_object)
+
+            # test connecting
+            db_obj.open()
+            self.assertTrue(db_obj.is_open())
+            self.assertIsNotNone(db_obj.connection_object)
+            self.assertIsInstance(db_obj.connection_object, unittest.mock.MagicMock)
+            db_obj.open()  # test that calling open again doesn't not fail
+
+            # test querying
+            results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
+            self.assertIsInstance(results, pd.DataFrame)
+            self.assertEqual(results.iloc[0, 0], 'test')
+            # test connection is still open after querying
+            self.assertTrue(db_obj.is_open())
+            self.assertIsNotNone(db_obj.connection_object)
+            # test subsequent query
+            results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
+            self.assertIsInstance(results, pd.DataFrame)
+            self.assertEqual(results.iloc[0, 0], 'test')
+
+            # test closing
+            db_obj.close()
+            self.assertFalse(db_obj.is_open())
+            self.assertIsNone(db_obj.connection_object)
+
+            # text context manager
+            # also tests that the same object can be open/closed multiple times 
+
         for index, db_object in enumerate(database_objects):
             with self.subTest(index=index, database=type(db_object)):
                 self.assertFalse(db_object.is_open())
@@ -79,8 +113,9 @@ class TestDatabase(unittest.TestCase):
 
                 # mock connection method so that we can "open" the connection to the database
                 if isinstance(db_object, Redshift):
-                    with patch('psycopg2.connect'):
-                        db_object.open()
+                    with patch('psycopg2.connect'), patch('pandas.read_sql_query') as pandas_read_mock:
+                        pandas_read_mock.return_value = pd.DataFrame({'test': ['test']})
+                        sub_test(db_obj=db_object)
                 else:
                     with patch('snowflake.connector.connect') as mock_snowflake_connector:
                         # mock this logic out:
@@ -91,25 +126,9 @@ class TestDatabase(unittest.TestCase):
                         # dataframe = cursor.fetch_pandas_all()
                         mock_con = mock_snowflake_connector.return_value
                         mock_cur = mock_con.cursor.return_value
-                        mock_cur.fetch_pandas_all.return_value = pd.DataFrame()
-
-                        # now open the connection and the db_object.connection_object should be populated with
-                        # the mock object
-                        db_object.open()
-
-                self.assertTrue(db_object.is_open())
-                self.assertIsNotNone(db_object.connection_object)
-                self.assertIsInstance(db_object.connection_object, unittest.mock.MagicMock)
-                db_object.open()  # test that calling open again doesn't not fail
-
-                results = db_object.query("SELECT * FROM doesnt_exist LIMIT 100")
-                self.assertIsInstance(results, pd.DataFrame)
-                results = db_object.query("SELECT * FROM doesnt_exist LIMIT 100")
-                self.assertIsInstance(results, pd.DataFrame)
-
-                db_object.close()
-                self.assertFalse(db_object.is_open())
-                self.assertIsNone(db_object.connection_object)
+                        mock_cur.fetch_pandas_all.return_value = pd.DataFrame({'test': ['test']})
+                        sub_test(db_obj=db_object)
 
 # test open connections after closing connection
 # test context manager "with asdf"
+# tests that if failure to connect (i.e. no mock and connection failure) that the db_boject is not in an open state open
