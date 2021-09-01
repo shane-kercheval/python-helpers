@@ -10,4 +10,4 @@ class TestValidation(unittest.TestCase):
 
     def test_is_debugging(self):
         # not sure how to test is_debugging is true, except manually
-        assert not hu.is_debugging()
+        self.assertFalse(hu.is_debugging())
