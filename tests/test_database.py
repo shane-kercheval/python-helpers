@@ -65,28 +65,30 @@ class TestDatabase(unittest.TestCase):
 
     def test_Redshift(self):
         redshift_config = RedshiftConfigFile(config_file=self.sample_redshift_file)
-        database = Redshift(**redshift_config.get_dictionary())
+        database_objects = [Redshift(**redshift_config.get_dictionary()),
+                            Redshift.from_config(redshift_config),
+                            ]
+        for index, db_object in enumerate(database_objects):
+            with self.subTest(index=index, database=type(db_object)):
+                self.assertFalse(db_object.is_open())
+                self.assertIsNone(db_object.connection_object)
 
-        database = Redshift.from_config(redshift_config)
-        self.assertFalse(database.is_open())
-        self.assertIsNone(database.connection_object)
+                # mock psycopg2.connect so that we can "open" the connection to the database
+                with patch('psycopg2.connect'):
+                    db_object.open()
 
-        # mock psycopg2.connect so that we can "open" the connection to the database
-        with patch('psycopg2.connect') as mock:
-            database.open()
+                self.assertTrue(db_object.is_open())
+                self.assertIsNotNone(db_object.connection_object)
+                db_object.open()  # test that calling open again doesn't not fail
 
-        self.assertTrue(database.is_open())
-        self.assertIsNotNone(database.connection_object)
-        database.open()  # test that calling open again doesn't not fail
+                results = db_object.query("SELECT * FROM doesnt_exist LIMIT 100")
+                self.assertIsInstance(results, pd.DataFrame)
+                results = db_object.query("SELECT * FROM doesnt_exist LIMIT 100")
+                self.assertIsInstance(results, pd.DataFrame)
 
-        results = database.query("SELECT * FROM doesnt_exist LIMIT 100")
-        self.assertIsInstance(results, pd.DataFrame)
-        results = database.query("SELECT * FROM doesnt_exist LIMIT 100")
-        self.assertIsInstance(results, pd.DataFrame)
-
-        database.close()
-        self.assertFalse(database.is_open())
-        self.assertIsNone(database.connection_object)
+                db_object.close()
+                self.assertFalse(db_object.is_open())
+                self.assertIsNone(db_object.connection_object)
 
     def test_Snowflake(self):
         pass
