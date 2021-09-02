@@ -1,4 +1,5 @@
 import unittest
+from contextlib import contextmanager
 from os import path
 from unittest.mock import patch
 
@@ -6,6 +7,35 @@ import pandas as pd
 
 from tests.helpers import get_test_path
 from helpsk.database import GenericConfigFile, RedshiftConfigFile, SnowflakeConfigFile, Redshift, Snowflake
+
+
+@contextmanager
+def mock_redshift():
+    """This is basically a wrapper around mock.patch to hide the mock logic. i.e. This is a context manager
+    that wraps the mock context wrapper
+    """
+    with patch('psycopg2.connect'), patch('pandas.read_sql_query') as pandas_read_mock:
+        pandas_read_mock.return_value = pd.DataFrame({'test': ['test']})
+        yield
+
+
+@contextmanager
+def mock_snowflake():
+    """This is basically a wrapper around mock.patch to hide the mock logic. i.e. This is a context manager
+    that wraps the mock context wrapper
+    """
+    with patch('snowflake.connector.connect') as mock_snowflake_connector:
+        # mock snowflake logic:
+        # connect() -> cursor() -> ... -> fetch_pandas_all()
+        # actual code
+        # self.connection_object = snowflake.connector.connect()
+        # cursor = self.connection_object.cursor()
+        # cursor.execute(sql)
+        # dataframe = cursor.fetch_pandas_all()
+        mock_con = mock_snowflake_connector.return_value
+        mock_cur = mock_con.cursor.return_value
+        mock_cur.fetch_pandas_all.return_value = pd.DataFrame({'test': ['test']})
+        yield
 
 
 # noinspection PyMethodMayBeStatic
@@ -63,70 +93,84 @@ class TestDatabase(unittest.TestCase):
         # contains the proper keyboard arguments
         Snowflake(**config_dict)
 
+    def helper_database_subtest(self, db_obj):
+        """db_obj is a Database object that is in a closed state and has the mock objects set up"""
+        for _ in range(2):  # test that the same object can be opened/closed multiple times
+            # connection should be closed
+            self.assertFalse(db_obj.is_open())
+            self.assertIsNone(db_obj.connection_object)
+
+            # test connecting
+            db_obj.open()
+            self.assertTrue(db_obj.is_open())
+            self.assertIsNotNone(db_obj.connection_object)
+            self.assertIsInstance(db_obj.connection_object, unittest.mock.MagicMock)
+            db_obj.open()  # test that calling open again doesn't not fail
+
+            # test querying
+            results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
+            self.assertIsInstance(results, pd.DataFrame)
+            self.assertEqual(results.iloc[0, 0], 'test')
+            # test connection is still open after querying
+            self.assertTrue(db_obj.is_open())
+            self.assertIsNotNone(db_obj.connection_object)
+            # test subsequent query
+            results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
+            self.assertIsInstance(results, pd.DataFrame)
+            self.assertEqual(results.iloc[0, 0], 'test')
+
+            # test closing
+            db_obj.close()
+            self.assertFalse(db_obj.is_open())
+            self.assertIsNone(db_obj.connection_object)
+
     def test_Database(self):
         redshift_config = RedshiftConfigFile(config_file=self.sample_redshift_file)
         snowflake_config = SnowflakeConfigFile(config_file=self.sample_snowflake_file)
 
-        database_objects = [Redshift(**redshift_config.get_dictionary()),
-                            Redshift.from_config(redshift_config),
-                            Snowflake(**snowflake_config.get_dictionary()),
-                            Snowflake.from_config(snowflake_config)]
+        database_classes = [Redshift, Snowflake]
+        database_configs = [redshift_config, snowflake_config]
+        database_mocks = [mock_redshift, mock_snowflake]
 
-        def sub_test(db_obj):
-            """db_obj is a Database object that is in a closed state and has the mock objects set up"""
-            for _ in range(2):  # test that the same object can be opened/closed multiple times
-                # connection should be closed
+        # for each class/config
+        # test each constructor (e.g. `Redshift(**redshift_config.get_dictionary()` &
+        # `Redshift.from_class(redshift_config)`)
+        for type_index, (db_class, db_config, db_mock) in enumerate(zip(database_classes, database_configs, database_mocks)):
+
+            # test context manager
+            with db_mock():
+                with db_class.from_config(db_config) as db_object:
+                    self.assertTrue(db_object.is_open())
+                    self.assertIsNotNone(db_object.connection_object)
+                    self.assertIsInstance(db_object.connection_object, unittest.mock.MagicMock)
+
+                    # test querying
+                    results = db_object.query("SELECT * FROM doesnt_exist LIMIT 100")
+                    self.assertIsInstance(results, pd.DataFrame)
+                    self.assertEqual(results.iloc[0, 0], 'test')
+                    # test connection is still open after querying
+                    self.assertTrue(db_object.is_open())
+                    self.assertIsNotNone(db_object.connection_object)
+
+
                 self.assertFalse(db_object.is_open())
                 self.assertIsNone(db_object.connection_object)
 
-                # test connecting
-                db_obj.open()
-                self.assertTrue(db_obj.is_open())
-                self.assertIsNotNone(db_obj.connection_object)
-                self.assertIsInstance(db_obj.connection_object, unittest.mock.MagicMock)
-                db_obj.open()  # test that calling open again doesn't not fail
+            # test each constructor type
+            database_objects = [db_class(**db_config.get_dictionary()),  # e.g. Redshift(**config_dict))
+                                db_class.from_config(db_config)]  # e.g. Redshift.from_class(config_object)
 
-                # test querying
-                results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
-                self.assertIsInstance(results, pd.DataFrame)
-                self.assertEqual(results.iloc[0, 0], 'test')
-                # test connection is still open after querying
-                self.assertTrue(db_obj.is_open())
-                self.assertIsNotNone(db_obj.connection_object)
-                # test subsequent query
-                results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
-                self.assertIsInstance(results, pd.DataFrame)
-                self.assertEqual(results.iloc[0, 0], 'test')
+            for constructor_index, db_object in enumerate(database_objects):
+                with self.subTest(type_index=type_index,
+                                  constructor_index=constructor_index,
+                                  database=type(db_object)):
 
-                # test closing
-                db_obj.close()
-                self.assertFalse(db_obj.is_open())
-                self.assertIsNone(db_obj.connection_object)
+                    self.assertFalse(db_object.is_open())
+                    self.assertIsNone(db_object.connection_object)
 
-        for index, db_object in enumerate(database_objects):
-            with self.subTest(index=index, database=type(db_object)):
-                self.assertFalse(db_object.is_open())
-                self.assertIsNone(db_object.connection_object)
-
-                # mock connection method so that we can "open" the connection to the database
-                if isinstance(db_object, Redshift):
-                    with patch('psycopg2.connect'), patch('pandas.read_sql_query') as pandas_read_mock:
-                        pandas_read_mock.return_value = pd.DataFrame({'test': ['test']})
-                        sub_test(db_obj=db_object)
-
-                else:
-                    with patch('snowflake.connector.connect') as mock_snowflake_connector:
-                        # mock snowflake logic:
-                        # connect() -> cursor() -> ... -> fetch_pandas_all()
-                        # actual code
-                        # self.connection_object = snowflake.connector.connect()
-                        # cursor = self.connection_object.cursor()
-                        # cursor.execute(sql)
-                        # dataframe = cursor.fetch_pandas_all()
-                        mock_con = mock_snowflake_connector.return_value
-                        mock_cur = mock_con.cursor.return_value
-                        mock_cur.fetch_pandas_all.return_value = pd.DataFrame({'test': ['test']})
-                        sub_test(db_obj=db_object)
+                    # mock connection method so that we can "open" the connection to the database
+                    with db_mock():
+                        self.helper_database_subtest(db_obj=db_object)
 
 # test context manager "with asdf"
 # tests that if failure to connect (i.e. no mock and connection failure) that the db_boject is not in an open state open
