@@ -160,5 +160,10 @@ class TestDatabase(unittest.TestCase):
         test_context_manager(db_class=Redshift, db_config=redshift_config, db_mock=mock_redshift)
         test_context_manager(db_class=Snowflake, db_config=snowflake_config, db_mock=mock_snowflake)
 
-
-# tests that if failure to connect (i.e. no mock and connection failure) that the db_boject is not in an open state open
+        # tests that if failure to connect (i.e. no mock and connection failure) that the object is not in an
+        # open state
+        database = Redshift.from_config(redshift_config)
+        with self.assertRaises(Exception):
+            database.open()
+        self.assertFalse(database.is_open())
+        self.assertIsNone(database.connection_object)
