@@ -7,7 +7,7 @@ from abc import ABCMeta, abstractmethod
 import pandas as pd
 
 
-class Configuration(metaclass=ABCMeta):
+class Configuration(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
     """A basic configuration object will product a dictionary representing the keyword parameters that can
     be passed to a Database object.
     """
@@ -17,14 +17,13 @@ class Configuration(metaclass=ABCMeta):
         Returns:
              a dictionary to be passed to the Database object
         """
-        pass
 
 
 class Database(metaclass=ABCMeta):
     """
     Base class that wraps the connection/querying logic of various databases.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs):  # pylint: disable=unused-argument
         self.connection_object = None
 
     @classmethod
@@ -50,7 +49,6 @@ class Database(metaclass=ABCMeta):
             the connection object (usually returned from the underlying `connect()` method. For example, the
             returning value from `snowflake.connection.connect()`
         """
-        pass
 
     @abstractmethod
     def _close_connection_object(self):
@@ -60,7 +58,6 @@ class Database(metaclass=ABCMeta):
         For example:
             self.connection_object.close()
         """
-        pass
 
     def connect(self):
         """Call this method to open the connection to the database.
@@ -111,4 +108,3 @@ class Database(metaclass=ABCMeta):
         Returns:
             a pandas Dataframe with the results from the query
         """
-        pass

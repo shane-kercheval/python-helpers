@@ -21,7 +21,7 @@ import pandas as pd
 from helpsk.database_base import Configuration, Database
 
 
-class GenericConfigFile(Configuration):
+class GenericConfigFile(Configuration):  # pylint: disable=too-few-public-methods
     """Class that is used to map a configuration file in the format below, to a dictionary that will be passed
     into the corresponding Database object.
 
@@ -91,7 +91,7 @@ class GenericConfigFile(Configuration):
         return {key: config[self._config_key][value] for key, value in self._config_mapping.items()}
 
 
-class RedshiftConfigFile(GenericConfigFile):
+class RedshiftConfigFile(GenericConfigFile):  # pylint: disable=too-few-public-methods
     """Supplies a standard config_key and config_mapping to the GenericConfigFile object.
 
     Corresponds to a configuration file in the format of:
@@ -123,7 +123,7 @@ class RedshiftConfigFile(GenericConfigFile):
         super().__init__(config_file=config_file, config_key=config_key, config_mapping=config_mapping)
 
 
-class SnowflakeConfigFile(GenericConfigFile):
+class SnowflakeConfigFile(GenericConfigFile):  # pylint: disable=too-few-public-methods
     """Supplies a standard config_key and config_mapping to the GenericConfigFile object.
 
     Corresponds to a configuration file in the format of:
@@ -163,7 +163,7 @@ class Redshift(Database):
         with Redshift.from_config(config) as redshift:
             redshift.query("SELECT * FROM table LIMIT 100")
     """
-    def __init__(self, user: str, password: str, database: str, host: str, port: Union[str, int]):
+    def __init__(self, user: str, password: str, database: str, host: str, port: Union[str, int]):  # pylint: disable=too-many-arguments
         """Initialization"""
         super().__init__()
         self._connection_string = "dbname={} host={} port={} user={} password={}". \
@@ -172,7 +172,7 @@ class Redshift(Database):
     def _open_connection_object(self) -> object:
         """Wraps logic for connecting to redshift
         """
-        from psycopg2 import connect
+        from psycopg2 import connect  # pylint: disable=import-outside-toplevel
         return connect(self._connection_string)
 
     def _close_connection_object(self):
@@ -219,6 +219,7 @@ class Snowflake(Database):
     pip install snowflake-connector-python[pandas]
     ```
     """
+    # pylint: disable=too-many-arguments
     def __init__(self, user: str, account: str, authenticator: str,
                  warehouse: str, database: str, autocommit: bool = False):
         """Initialization"""
@@ -233,7 +234,7 @@ class Snowflake(Database):
     def _open_connection_object(self) -> object:
         """Wraps logic for connecting to snowflake
         """
-        from snowflake.connector import connect
+        from snowflake.connector import connect  # pylint: disable=import-outside-toplevel
         return connect(
             user=self.user,
             account=self.account,
