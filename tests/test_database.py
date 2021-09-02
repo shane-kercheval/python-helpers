@@ -98,7 +98,7 @@ class TestDatabase(unittest.TestCase):
         snowflake_config = SnowflakeConfigFile(config_file=self.sample_snowflake_file)
 
         def test_via_constructor(db_obj, db_mock):
-            self.assertFalse(db_obj.is_open())
+            self.assertFalse(db_obj.is_connected())
             self.assertIsNone(db_obj.connection_object)
 
             # mock connection method so that we can "open" the connection to the database
@@ -106,22 +106,22 @@ class TestDatabase(unittest.TestCase):
                 """db_obj is a Database object that is in a closed state and has the mock objects set up"""
                 for _ in range(2):  # test that the same object can be opened/closed multiple times
                     # connection should be closed
-                    self.assertFalse(db_obj.is_open())
+                    self.assertFalse(db_obj.is_connected())
                     self.assertIsNone(db_obj.connection_object)
 
                     # test connecting
-                    db_obj.open()
-                    self.assertTrue(db_obj.is_open())
+                    db_obj.connect()
+                    self.assertTrue(db_obj.is_connected())
                     self.assertIsNotNone(db_obj.connection_object)
                     self.assertIsInstance(db_obj.connection_object, unittest.mock.MagicMock)
-                    db_obj.open()  # test that calling open again doesn't not fail
+                    db_obj.connect()  # test that calling open again doesn't not fail
 
                     # test querying
                     results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
                     self.assertIsInstance(results, pd.DataFrame)
                     self.assertEqual(results.iloc[0, 0], 'test')
                     # test connection is still open after querying
-                    self.assertTrue(db_obj.is_open())
+                    self.assertTrue(db_obj.is_connected())
                     self.assertIsNotNone(db_obj.connection_object)
                     # test subsequent query
                     results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
@@ -130,7 +130,7 @@ class TestDatabase(unittest.TestCase):
 
                     # test closing
                     db_obj.close()
-                    self.assertFalse(db_obj.is_open())
+                    self.assertFalse(db_obj.is_connected())
                     self.assertIsNone(db_obj.connection_object)
 
         test_via_constructor(db_obj=Redshift(**redshift_config.get_dictionary()), db_mock=mock_redshift)
@@ -142,7 +142,7 @@ class TestDatabase(unittest.TestCase):
             # test context manager
             with db_mock():
                 with db_class.from_config(db_config) as db_object:
-                    self.assertTrue(db_object.is_open())
+                    self.assertTrue(db_object.is_connected())
                     self.assertIsNotNone(db_object.connection_object)
                     self.assertIsInstance(db_object.connection_object, unittest.mock.MagicMock)
 
@@ -151,10 +151,10 @@ class TestDatabase(unittest.TestCase):
                     self.assertIsInstance(results, pd.DataFrame)
                     self.assertEqual(results.iloc[0, 0], 'test')
                     # test connection is still open after querying
-                    self.assertTrue(db_object.is_open())
+                    self.assertTrue(db_object.is_connected())
                     self.assertIsNotNone(db_object.connection_object)
 
-                self.assertFalse(db_object.is_open())
+                self.assertFalse(db_object.is_connected())
                 self.assertIsNone(db_object.connection_object)
 
         test_context_manager(db_class=Redshift, db_config=redshift_config, db_mock=mock_redshift)
@@ -164,6 +164,6 @@ class TestDatabase(unittest.TestCase):
         # open state
         database = Redshift.from_config(redshift_config)
         with self.assertRaises(Exception):
-            database.open()
-        self.assertFalse(database.is_open())
+            database.connect()
+        self.assertFalse(database.is_connected())
         self.assertIsNone(database.connection_object)

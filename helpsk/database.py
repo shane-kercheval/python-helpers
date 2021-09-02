@@ -1,13 +1,13 @@
-from typing import Union, Optional
+"""This model contains classes that wrap the connection/querying logic of various databases.
+"""
 
+from typing import Union, Optional
 import pandas as pd
 import configparser
-
 from helpsk.database_base import Configuration, Database
 
 
 class GenericConfigFile(Configuration):
-
     def __init__(self, config_file: str, config_key: str, config_mapping: dict):
         self._config_file = config_file
         self._config_key = config_key
@@ -29,7 +29,6 @@ class RedshiftConfigFile(GenericConfigFile):
         port=[port]
         host=[host]
     """
-
     def __init__(self, config_file: str, config_key: str = 'redshift', config_mapping: Optional[dict] = None):
 
         if not config_mapping:
@@ -66,7 +65,6 @@ class SnowflakeConfigFile(GenericConfigFile):
 
 
 class Redshift(Database):
-
     def __init__(self, user: str, password: str, database: str, host: str, port: Union[str, int]):
         super().__init__()
         self._connection_string = "dbname={} host={} port={} user={} password={}". \
@@ -80,7 +78,7 @@ class Redshift(Database):
         self.connection_object.close()
 
     def query(self, sql: str) -> pd.DataFrame:
-        assert self.is_open()
+        assert self.is_connected()
         return pd.read_sql_query(sql, self.connection_object)
 
 
@@ -126,7 +124,7 @@ class Snowflake(Database):
         self.connection_object.close()
 
     def query(self, sql: str) -> pd.DataFrame:
-        assert self.is_open()
+        assert self.is_connected()
         cursor = self.connection_object.cursor()
         cursor.execute(sql)
         dataframe = cursor.fetch_pandas_all()
