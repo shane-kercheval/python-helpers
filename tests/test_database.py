@@ -65,7 +65,6 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(config.get_dictionary(), expected_value)
 
     def test_RedshiftConfigFile(self):
-
         config = RedshiftConfigFile(config_file=self.sample_redshift_file)
         config_dict = config.get_dictionary()
         expected_value = {'user': 'my_username',
