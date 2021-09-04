@@ -527,9 +527,9 @@ class TestValidation(unittest.TestCase):
             def my_function_runs():
                 return True
 
-            assert hv.raises_exception(my_function_exception)
+            self.assertTrue(hv.raises_exception(my_function_exception))
             # should return True since my_function_exception raises ValueError
-            assert hv.raises_exception(my_function_exception, ValueError)
+            self.assertTrue(hv.raises_exception(my_function_exception, ValueError))
             # should return False since my_function_exception raises ValueError, not TypeError
-            assert not hv.raises_exception(my_function_exception, TypeError)
-            assert not hv.raises_exception(my_function_runs)
+            self.assertFalse(hv.raises_exception(my_function_exception, TypeError))
+            self.assertFalse(hv.raises_exception(my_function_runs))
