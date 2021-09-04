@@ -1,6 +1,6 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
-from typing import List, Union
+from typing import List, Union, Callable, Type
 
 import numpy as np
 import pandas as pd
@@ -265,3 +265,23 @@ def assert_dataframes_match(dataframes: List[pd.DataFrame],
                             ignore_indexes=ignore_indexes,
                             ignore_column_names=ignore_column_names):
         raise HelpskAssertionError(message)
+
+
+def raises_exception(function: Callable, exception_type: Type = None) -> bool:
+    """Returns True if `function` raises an Exception; returns False if `function` runs without raising an
+    Exception.
+    Args:
+        function:
+            the function which does or does not raise an exception.
+        exception_type:
+            if `exception_type` is provided, `raises_exception` returns true only if the `function` argument
+            raises an Exception **and** the exception has type of `exception_type`.
+    """
+    try:
+        function()
+        return False
+    except Exception as exception:  # pylint: disable=broad-except
+        if exception_type:
+            return isinstance(exception, exception_type)
+
+        return True

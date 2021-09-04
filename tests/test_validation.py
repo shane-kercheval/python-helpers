@@ -518,3 +518,18 @@ class TestValidation(unittest.TestCase):
 
         with self.assertRaises(HelpskAssertionError):
             hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_2])
+
+    def test_raises_exception(self):
+
+            def my_function_exception():
+                raise ValueError()
+
+            def my_function_runs():
+                return True
+
+            assert hv.raises_exception(my_function_exception)
+            # should return True since my_function_exception raises ValueError
+            assert hv.raises_exception(my_function_exception, ValueError)
+            # should return False since my_function_exception raises ValueError, not TypeError
+            assert not hv.raises_exception(my_function_exception, TypeError)
+            assert not hv.raises_exception(my_function_runs)
