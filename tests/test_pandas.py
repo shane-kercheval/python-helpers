@@ -1,13 +1,10 @@
 import os
 import unittest
 from enum import Enum, unique, auto
-from typing import Iterable
 
-import numpy as np
-
+from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
-from helpsk import validation as hv
 from tests.helpers import get_data_credit, get_test_path
 
 
@@ -121,7 +118,3 @@ class TestPandas(unittest.TestCase):
         # ensure no side effects on list passed in
         self.assertTrue(hv.iterables_are_equal(self.sample_data.col_a, [np.nan, 2, 3, 4]))
         self.assertTrue(result.cat.ordered)
-
-
-
-
