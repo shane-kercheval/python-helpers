@@ -224,3 +224,35 @@ def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
                                                  mapping.values(),
                                                  ordered=ordered)
     return pd.Series(converted_series)
+
+
+def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
+    """Shows the unique values and corresponding frequencies.
+
+    Args:
+        series:
+        sort_by_frequency:
+
+    Returns:
+        DataFrame with each of the values in `series` as a single row, and `Frequency` and `Percent` columns
+        matching the number of occurrences and percent representation in the series.
+    """
+    results = pd.DataFrame({'Frequency': series.value_counts(normalize=False, dropna=False),
+                            'Percent': series.value_counts(normalize=True, dropna=False)})
+
+    if not sort_by_frequency:
+        if series.dtype == 'category':
+            if series.cat.ordered:
+                results.sort_index(inplace=True)
+            else:
+                # pandas sorts non-ordered categories by whatever order the category shows up, not
+                # alphabetically
+                # so change the categories to be alphabetical and sort
+                values = series.dropna().unique().tolist()
+                values.sort()
+                results['temp'] = results.index
+                results.temp.cat.reorder_categories(values, ordered=True, inplace=True)
+                results = results.sort_values(['temp']).drop('temp', axis=1)
+        else:
+            results.sort_values(['Frequency'], inplace=True)
+    return results

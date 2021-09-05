@@ -184,11 +184,28 @@ def assert_false(condition: bool, message: str = 'Condition True') -> None:
 
 
 def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
-    """
+    """Compares the equality of the values of two iterables.
 
-    :param iterable_a:
-    :param iterable_b:
-    :return:
+    This function will generally give the same result as list equality (e.g. `[x, y, z] == [x, y, z]`)
+    However, in some strange scenarios, `==` will return `False` where it doesn't seem like it should
+
+    For example:
+
+    ```
+    temp = pd.DataFrame({'col_a': [np.nan, 1.0]})
+    temp.col_a.tolist() == [np.nan, 1.0]  # returns False. Why??
+    iterables_are_equal(temp.col_a.tolist(), [np.nan, 1])  # returns True
+    [np.nan, 1.0] == [np.nan, 1.0]  # returns True
+    ```
+
+    Args:
+        iterable_a:
+            an iterable to equate to iterable_b
+        iterable_b:
+            an iterable to equate to iterable_a
+
+    Returns:
+        True if iterable_a is equal to iterable_b
     """
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

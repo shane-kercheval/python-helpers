@@ -118,3 +118,48 @@ class TestPandas(unittest.TestCase):
         # ensure no side effects on list passed in
         self.assertTrue(hv.iterables_are_equal(self.sample_data.col_a, [np.nan, 2, 3, 4]))
         self.assertTrue(result.cat.ordered)
+
+    def test_value_frequency(self):
+        credit_history_order = ['delayed previously',
+                                'critical/other existing credit',
+                                'existing paid',
+                                'no credits/all paid',
+                                'all paid']
+        credit_history_alphabetical = credit_history_order.copy()
+        credit_history_alphabetical.sort()
+
+        test_series_unordered = self.credit_data['credit_history'].copy()
+        self.assertFalse(test_series_unordered.cat.ordered)
+        test_series_unordered[0:10] = np.nan
+
+        test_series_ordered = test_series_unordered.cat.reorder_categories(credit_history_order,
+                                                                           ordered=True, inplace=False)
+        self.assertTrue(test_series_ordered.cat.ordered)
+
+        results = value_frequency(test_series_unordered, sort_by_frequency=True)
+        expected_value_order = test_series_unordered.value_counts(dropna=False).index.tolist()
+        self.assertEqual(results.index.tolist(), expected_value_order)
+        self.assertTrue((results['Frequency'] == test_series_unordered.value_counts(dropna=False).values).all())  # noqa
+        self.assertTrue((results['Percent'] == test_series_unordered.value_counts(normalize=True, dropna=False).values).all())  # noqa
+
+        # cache the verified results
+        cached_results = results
+
+        # test unordered categorical - sort_by_frequency=False
+        results = value_frequency(test_series_unordered, sort_by_frequency=False)
+        self.assertEqual(results.index.tolist(), credit_history_alphabetical + [np.nan])
+        self.assertEqual(cached_results.loc[results.index.tolist(), 'Frequency'].tolist(), results['Frequency'].tolist())
+        self.assertTrue(cached_results.loc[results.index.tolist(), 'Percent'].tolist() == results['Percent'].tolist())
+
+        # test ordered categorical - sort_by_frequency=False
+        results = value_frequency(test_series_ordered, sort_by_frequency=False)
+        self.assertEqual(results.index.tolist(), credit_history_order + [np.nan])
+        self.assertTrue(cached_results.loc[results.index.tolist(), 'Frequency'].tolist() == results['Frequency'].tolist())
+        self.assertTrue(cached_results.loc[results.index.tolist(), 'Percent'].tolist() == results['Percent'].tolist())
+
+        # test ordered categorical - sort_by_frequency=True
+        results = value_frequency(test_series_ordered, sort_by_frequency=True)
+        self.assertEqual(results.index.tolist(), cached_results.index.tolist())
+        self.assertTrue(cached_results['Frequency'].tolist() == results['Frequency'].tolist())
+        self.assertTrue(cached_results['Percent'].tolist() == results['Percent'].tolist())
+        self.assertTrue(hv.dataframes_match([cached_results, results]))
