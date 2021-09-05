@@ -6,6 +6,8 @@ from typing import List, Union
 import numpy as np
 import pandas as pd
 
+from helpsk.exceptions import HelpskParamValueError
+
 
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
     """Returns the column names from the dataframe that are numeric.
@@ -50,25 +52,27 @@ def is_series_date(series: pd.Series) -> bool:
 
 
 def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
-    """
-    Returns the following attributes (as columns) for each of the numeric features (as rows).
+    """Provides a summary of basic stats for the numeric columns of a DataFrame.
+
+    Args:
+        dataframe:
+            a pandas dataframe
 
     Returns:
-        a pandas Dataframe with the following row indexes:
+        Returns a pandas DataFrame with the following attributes (returned as columns) for each of the
+        numeric columns in `dataframe` (which are returned as rows).
 
-        `# of Non-Nulls`: The number of non-null values found for the given feature.
-        `# of Nulls`: The number of null values found for the given feature.
-        `% Nulls`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given feature.
-        `# of Zeros`: The number of values that equal `0`, found for the given feature.
-        `% Zeros`: The percent of `0`s found (i.e. `num_zeros / number of values in series`) for a given
-            feature. Note: `number of values in series` is `count` + `nulls`, so this shows the percent of
-            zeros found considering all of the values in the series, not just the non-null values.
-        `Mean`: The `mean` of all the values for a given feature.
-        `St Dev.`: The `standard deviation` of all the values for a given feature.
+        `# of Non-Nulls`: The number of non-null values found for the given column.
+        `# of Nulls`: The number of null values found for the given column.
+        `% Nulls`: The percent of null values found for a given column.
+        `# of Zeros`: The number of values that equal `0`, found for the given column.
+        `% Zeros`: The percent of `0`s found.
+        `Mean`: The `mean` of all the values for a given column.
+        `St Dev.`: The `standard deviation` of all the values for a given column.
         `Coef of Var`: The `coefficient of variation (CV)`, is defined as the standard deviation divided by
-            the mean, and describes the variability of the feature's values relative to its mean.
+            the mean, and describes the variability of the column's values relative to its mean.
 
-            We can use this metric to compare the variation of two different variables (i.e. features) that
+            We can use this metric to compare the variation of two different variables (i.e. columns) that
             have different units or scales.
         `Skewness`: "unbiased skew"; utilizes `pandas` DataFrame underlying `.skew()` function
         `Kurtosis`: "unbiased kurtosis ... using Fisher’s definition of kurtosis"; utilizes `pandas` DataFrame
@@ -81,7 +85,7 @@ def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
         `90%`: the value found at the 90th percentile of data
         `Max`: maximum value found
     """
-    # if there aren't any numeric features and the target variable is not numeric, we don't have anything
+    # if there aren't any numeric columns and the target variable is not numeric, we don't have anything
     # to display, return None
     numeric_columns = get_numeric_columns(dataframe=dataframe)
 
@@ -125,19 +129,25 @@ def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
 
 
 def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
-    """
-    Returns the following attributes (as columns) for each of the categoric features (as rows).
+    """Provides a summary of basic stats for the non-numeric columns of a DataFrame.
+
+    Args:
+        dataframe:
+            a pandas dataframe
 
     Returns:
-        `# of Non-Nulls`: The number of non-null values found for the given feature.
-        `# of Nulls`: The number of null values found for the given feature.
-        `% Null`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given feature.
-        `Most Freq. Value`: The most frequent value found for a given feature.
-        `# of Unique`: The number of unique values found for a given feature.
+        Returns a pandas DataFrame with the following attributes (returned as columns) for each of the
+        non-numeric columns in `dataframe` (which are returned as rows).
+
+        `# of Non-Nulls`: The number of non-null values found for the given column.
+        `# of Nulls`: The number of null values found for the given column.
+        `% Null`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given column.
+        `Most Freq. Value`: The most frequent value found for a given column.
+        `# of Unique`: The number of unique values found for a given column.
         `% Unique`: The percent of unique values found (i.e. `unique` divided by the total number of values
-            (null or non-null) for a given feature.
+            (null or non-null) for a given column.
     """
-    # if there aren't any non-numeric features and the target variable is numeric, we don't have anything
+    # if there aren't any non-numeric columns and the target variable is numeric, we don't have anything
     # to display, return None
 
     non_numeric_columns = get_non_numeric_columns(dataframe=dataframe)
@@ -172,3 +182,45 @@ def print_dataframe(dataframe: pd.DataFrame) -> None:
     with pd.option_context('display.max_columns', None), \
             pd.option_context('display.width', 20000):
         print(dataframe)
+
+
+def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
+                                          ordered: bool = False) -> pd.Series:
+    """Converts a Series object from integers to Categorical for a given mapping of integers to strings.
+
+    Args:
+        series:
+            a pandas series containing integers values
+        mapping:
+            dictionary containing the unique values of the integers in the current data as the key, and the
+            categoric string as the value.
+
+            The mapping dict is required to have each value in the series accounted for. However, the
+            series does not have to have all the values in the mapping. (For example, converting a small
+            sample of data that doesn't contain all possible values should not fail.)
+        ordered:
+            a boolean representing whether the resulting Categorical series will be ordered, or not.
+
+    Returns:
+        A pandas Categorical Series
+    """
+    # check that the keys in mapping contains all numbers found in the series
+    unique_values = series.unique()
+    unique_values = unique_values[~np.isnan(unique_values)]
+    missing_keys = [x for x in unique_values if x not in mapping.keys()]
+    if missing_keys:
+        message = f'The following value(s) were found in `series` but not in `mapping` keys `{missing_keys}`'
+        raise HelpskParamValueError(message)
+
+    # Pandas expects the underlying values to be a sequence starting with 0 (i.e. to be `0, 1, 2, ...`),
+    # which won't always be the case (e.g. the values in the Series might start with 1, or at any number,
+    # or might not be in sequence.
+    # We need to first map the actual values to the sequence pandas expects.
+    # e.g. if the actual values being mapped are [1, 2, 3] then the actual_to_expected_mapping will be
+    # {actual: expected, ...} i.e. {1: 0, 2: 1, 3: 2}
+    actual_to_expected_mapping = dict(zip(mapping.keys(), np.arange(len(mapping))))
+    converted_series = pd.Series(series).map(actual_to_expected_mapping).fillna(-1)
+    converted_series = pd.Categorical.from_codes(converted_series.astype(int),
+                                                 mapping.values(),
+                                                 ordered=ordered)
+    return pd.Series(converted_series)

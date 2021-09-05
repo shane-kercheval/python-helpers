@@ -1,9 +1,13 @@
 import os
 import unittest
 from enum import Enum, unique, auto
+from typing import Iterable
+
+import numpy as np
 
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
+from helpsk import validation as hv
 from tests.helpers import get_data_credit, get_test_path
 
 
@@ -81,3 +85,43 @@ class TestPandas(unittest.TestCase):
 
         self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__sample.txt',
                                  non_numeric_summary(self.sample_data))
+
+    def test_convert_integer_series_to_categorical(self):
+        # check that function fails if mapping doesn't contains all numbers in data
+        with self.assertRaises(HelpskParamValueError):
+            mapping = {2: 'a', 3: 'b'}
+            convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)
+
+        with self.assertRaises(HelpskParamValueError):
+            mapping = {2: 'a'}
+            convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)
+
+        with self.assertRaises(HelpskParamValueError):
+            mapping = {}
+            convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)
+
+        # check that series will work even if it doesn't have all the values in mapping
+        mapping = {1: 'value not found', 2: 'a', 3: 'b', 4: 'c'}
+        result = convert_integer_series_to_categorical(series=self.sample_data.col_a,
+                                                       mapping=mapping,
+                                                       ordered=False)
+        self.assertTrue(hv.iterables_are_equal(result.cat.categories, mapping.values()))
+        self.assertTrue(hv.iterables_are_equal(list(result.values), [np.nan, 'a', 'b', 'c']))
+        # ensure no side effects on list passed in
+        self.assertTrue(hv.iterables_are_equal(self.sample_data.col_a, [np.nan, 2, 3, 4]))
+        self.assertFalse(result.cat.ordered)
+
+        # same thing but with ordered Categorical
+        mapping = {1: 'not found', 2: 'a', 3: 'b', 4: 'c'}
+        result = convert_integer_series_to_categorical(series=self.sample_data.col_a,
+                                                       mapping=mapping,
+                                                       ordered=True)
+        self.assertTrue(hv.iterables_are_equal(result.cat.categories, mapping.values()))
+        self.assertTrue(hv.iterables_are_equal(list(result.values), [np.nan, 'a', 'b', 'c']))
+        # ensure no side effects on list passed in
+        self.assertTrue(hv.iterables_are_equal(self.sample_data.col_a, [np.nan, 2, 3, 4]))
+        self.assertTrue(result.cat.ordered)
+
+
+
+

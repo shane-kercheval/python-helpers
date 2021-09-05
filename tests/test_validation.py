@@ -355,7 +355,6 @@ class TestValidation(unittest.TestCase):
                 with self.assertRaises(HelpskAssertionError):
                     hv.assert_all(case)
 
-
     def test_assert_not_any(self):
         cases = [
             [False],
@@ -388,12 +387,58 @@ class TestValidation(unittest.TestCase):
                 with self.assertRaises(HelpskAssertionError):
                     hv.assert_not_any(case)
 
+    def test_iterables_are_equal(self):
+
+        def subtest_iterables_are_equal(iterable_a, iterable_b, dtype):
+            assert hv.iterables_are_equal(iterable_a, iterable_b)
+            if dtype != str:
+                assert hv.iterables_are_equal(np.array(iterable_a), np.array(iterable_b))
+                assert hv.iterables_are_equal(np.array(iterable_a), iterable_b)
+            assert hv.iterables_are_equal(pd.Series(iterable_a, dtype=dtype), pd.Series(iterable_b, dtype=dtype))
+
+        subtest_iterables_are_equal([], [], dtype=np.float64)
+        subtest_iterables_are_equal([np.nan], [np.nan], np.float64)
+        subtest_iterables_are_equal([1, 2, 3, 4], [1, 2, 3, 4], np.float64)
+        subtest_iterables_are_equal([np.nan, 1, 2, 3, 4], [np.nan, 1, 2, 3, 4], np.float64)
+        subtest_iterables_are_equal([np.nan, 1, 2, 3, 4, np.nan], [np.nan, 1, 2, 3, 4, np.nan], np.float64)
+
+        subtest_iterables_are_equal(iterable_a=['a', 'b', 'c', 'd'], iterable_b=['a', 'b', 'c', 'd'], dtype=str)
+        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 'd'], [np.nan, 'a', 'b', 'c', 'd'], str)
+        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 'd', np.nan], [np.nan, 'a', 'b', 'c', 'd', np.nan], str)
+
+        subtest_iterables_are_equal(['a', 'b', 'c', 4], ['a', 'b', 'c', 4], str)
+        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 4], [np.nan, 'a', 'b', 'c', 4], str)
+        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 4, np.nan], [np.nan, 'a', 'b', 'c', 4, np.nan], str)
+
+        def subtest_iterables_are_not_equal(iterable_a, iterable_b, dtype):
+            assert not hv.iterables_are_equal(iterable_a, iterable_b)
+            assert not hv.iterables_are_equal(np.array(iterable_a), np.array(iterable_b))
+            assert not hv.iterables_are_equal(pd.Series(iterable_a, dtype=dtype), pd.Series(iterable_b, dtype=dtype))
+
+        subtest_iterables_are_not_equal(iterable_a=[], iterable_b=[1], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[1], iterable_b=[], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[], iterable_b=[np.nan], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[np.nan], iterable_b=[], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[], iterable_b=[''], dtype=str)
+        subtest_iterables_are_not_equal(iterable_a=[''], iterable_b=[], dtype=str)
+
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1, 2, 3, 4], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[0, 1, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[1.000001, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1.000001, 2, 3], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1.000001, 2, 3], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[np.nan, 2, 3], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[np.nan, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[None, 2, 3], dtype=np.float64)
+
     def test_dataframes_match(self):
 
-        dataframe_1 = pd.DataFrame({'col_floats': [1.123456789, 2.123456789, 3.123456789],
-                                    'col_strings': ['a', 'b', 'c'],
-                                    'col_enums': [hs.RoundTo.NONE, hs.RoundTo.AUTO, hs.RoundTo.THOUSANDS],
-                                    'col_dates': pd.date_range('2021-01-01', periods=3)})
+        dataframe_1 = pd.DataFrame({'col_floats': [1.123456789, 2.123456789, 3.123456789, np.nan],
+                                    'col_strings': [np.nan, 'a', 'b', 'c'],
+                                    'col_enums': [np.nan, hs.RoundTo.NONE, hs.RoundTo.AUTO, hs.RoundTo.THOUSANDS],
+                                    'col_dates': pd.date_range('2021-01-01', periods=4),
+                                    'col_missing': [np.nan, np.nan, np.nan, np.nan]})
+        dataframe_1.loc[0, 'col_dates'] = np.nan
 
         with self.assertRaises(HelpskParamTypeError):
             hv.dataframes_match(dataframes=None)  # noqa
@@ -410,8 +455,8 @@ class TestValidation(unittest.TestCase):
         # test that there are no side effects; e.g. we set the index/column values if we ignore them
         dataframe_1_original = dataframe_1.copy()
         dataframe_2 = dataframe_1.copy()
-        dataframe_2.index = ['a', 'b', 'c']
-        dataframe_2.columns = ['a', 'b', 'c', 'd']
+        dataframe_2.index = ['a', 'b', 'c', 'd']
+        dataframe_2.columns = ['a', 'b', 'c', 'd', 'e']
         dataframe_2_original = dataframe_2.copy()
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
                                             float_tolerance=1,
@@ -438,59 +483,81 @@ class TestValidation(unittest.TestCase):
                                             float_tolerance=5))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[0, 0]))
         dataframe_2.iat[0, 0] = dataframe_2.iat[0, 0] - 0.000001
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[1, 1]))
         dataframe_2.iat[1, 1] = 'c'
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[2, 2]))
         dataframe_2.iat[2, 2] = hs.RoundTo.MILLIONS
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[2, 3]))
         dataframe_2.iat[2, 3] = dataframe_2.iat[2, 3] + timedelta(seconds=1)
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[2, 3]))
         dataframe_2.iat[2, 3] = dataframe_2.iat[2, 3] + timedelta(seconds=1) - timedelta(seconds=1)
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[0, 0]))
         dataframe_2.iat[0, 0] = np.NaN
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[1, 1]))
         dataframe_2.iat[1, 1] = np.NaN
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[1, 2]))
         dataframe_2.iat[1, 2] = np.NaN
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
+        self.assertFalse(pd.isna(dataframe_2.iat[1, 3]))
         dataframe_2.iat[1, 3] = np.NaN
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
 
         dataframe_2 = dataframe_1.copy()
-        dataframe_2.columns = ['a', 'b', 'c', 'd']
-        dataframe_2.index = ['a', 'b', 'c']
+        dataframe_2.index = ['a', 'b', 'c', 'd']
+        dataframe_2.columns = ['a', 'b', 'c', 'd', 'e']
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_indexes=False))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
                                              ignore_column_names=False))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1],
+                                             ignore_column_names=False))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
+                                             ignore_indexes=False,
+                                             ignore_column_names=False))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1],
                                              ignore_indexes=False,
                                              ignore_column_names=False))
 
@@ -521,15 +588,15 @@ class TestValidation(unittest.TestCase):
 
     def test_raises_exception(self):
 
-            def my_function_exception():
-                raise ValueError()
+        def my_function_exception():
+            raise ValueError()
 
-            def my_function_runs():
-                return True
+        def my_function_runs():
+            return True
 
-            self.assertTrue(hv.raises_exception(my_function_exception))
-            # should return True since my_function_exception raises ValueError
-            self.assertTrue(hv.raises_exception(my_function_exception, ValueError))
-            # should return False since my_function_exception raises ValueError, not TypeError
-            self.assertFalse(hv.raises_exception(my_function_exception, TypeError))
-            self.assertFalse(hv.raises_exception(my_function_runs))
+        self.assertTrue(hv.raises_exception(my_function_exception))
+        # should return True since my_function_exception raises ValueError
+        self.assertTrue(hv.raises_exception(my_function_exception, ValueError))
+        # should return False since my_function_exception raises ValueError, not TypeError
+        self.assertFalse(hv.raises_exception(my_function_exception, TypeError))
+        self.assertFalse(hv.raises_exception(my_function_runs))

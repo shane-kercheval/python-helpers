@@ -45,7 +45,7 @@ class Database(metaclass=ABCMeta):
 
         The returning value will be stored in self.connection_object
 
-        Return:
+        Returns:
             the connection object (usually returned from the underlying `connect()` method. For example, the
             returning value from `snowflake.connection.connect()`
         """

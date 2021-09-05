@@ -1,6 +1,7 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
-from typing import List, Union, Callable, Type
+import warnings
+from typing import List, Union, Callable, Type, Iterable
 
 import numpy as np
 import pandas as pd
@@ -154,8 +155,10 @@ def assert_true(condition: bool, message: str = 'Condition Not True') -> None:
     """Raises an HelpskAssertionError if `condition` is not True
 
     Args:
-        condition: bool
-            Something that evalualates to True/False
+        condition:
+            Something that evaluates to True/False
+        message:
+            Message passed to the HelpskAssertionError
     """
     if not isinstance(condition, (bool, np.bool_)):
         raise HelpskParamTypeError('condition should be boolean')
@@ -169,13 +172,27 @@ def assert_false(condition: bool, message: str = 'Condition True') -> None:
 
     Args:
         condition: bool
-            Something that evalualates to True/False
+            Something that evaluates to True/False
+        message:
+            Message passed to the HelpskAssertionError
     """
     if not isinstance(condition, (bool, np.bool_)):
         raise HelpskParamTypeError('condition should be boolean')
 
     if condition:
         raise HelpskAssertionError(message)
+
+
+def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
+    """
+
+    :param iterable_a:
+    :param iterable_b:
+    :return:
+    """
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        return pd.Series(iterable_a).equals(pd.Series(iterable_b))
 
 
 def dataframes_match(dataframes: List[pd.DataFrame],
