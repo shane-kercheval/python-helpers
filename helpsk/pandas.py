@@ -1,3 +1,5 @@
+"""This module contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
+
 import datetime
 from typing import List, Union
 
@@ -106,13 +108,18 @@ def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
          '% Zeros': perc_zeros,
          'Mean': [round(dataframe[x].mean(), 3) for x in numeric_columns],
          'St Dev.': [round(dataframe[x].std(), 3) for x in numeric_columns],
-         'Coef of Var': [round(dataframe[x].std() / dataframe[x].mean(), 3) if dataframe[x].mean() != 0 else np.nan for x in numeric_columns],
-         'Skewness': [round(dataframe[x].skew(), 3) for x in numeric_columns], 'Kurtosis': [round(dataframe[x].kurt(), 3) for x in numeric_columns],
-         'Min': [round(dataframe[x].min(), 3) for x in numeric_columns], '10%': [round(dataframe[x].quantile(q=0.10), 3) for x in numeric_columns],
+         'Coef of Var': [round(dataframe[x].std() / dataframe[x].mean(), 3)
+                         if dataframe[x].mean() != 0 else np.nan
+                         for x in numeric_columns],
+         'Skewness': [round(dataframe[x].skew(), 3) for x in numeric_columns],
+         'Kurtosis': [round(dataframe[x].kurt(), 3) for x in numeric_columns],
+         'Min': [round(dataframe[x].min(), 3) for x in numeric_columns],
+         '10%': [round(dataframe[x].quantile(q=0.10), 3) for x in numeric_columns],
          '25%': [round(dataframe[x].quantile(q=0.25), 3) for x in numeric_columns],
          '50%': [round(dataframe[x].quantile(q=0.50), 3) for x in numeric_columns],
          '75%': [round(dataframe[x].quantile(q=0.75), 3) for x in numeric_columns],
-         '90%': [round(dataframe[x].quantile(q=0.90), 3) for x in numeric_columns], 'Max': [round(dataframe[x].max(), 3) for x in numeric_columns]},
+         '90%': [round(dataframe[x].quantile(q=0.90), 3) for x in numeric_columns],
+         'Max': [round(dataframe[x].max(), 3) for x in numeric_columns]},
         index=columns)
     return results.transpose()
 
