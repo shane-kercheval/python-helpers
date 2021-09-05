@@ -181,6 +181,6 @@ class TestPandas(unittest.TestCase):
         expected_indexes = expected_indexes.tolist() + [np.nan]
 
         self.assertEqual(results.index.values.tolist()[0:-1], expected_indexes[0:-1])
-        self.assertTrue(hv.iterables_are_equal(results.index.values.tolist(), expected_indexes))
+        self.assertTrue(hv.iterables_are_equal(results.index.values.tolist(), expected_indexes))  # noqa
         self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, cached_results.loc[results.index.values, 'Frequency'].values))
         self.assertTrue(hv.iterables_are_equal(results['Percent'].values, cached_results.loc[results.index.values, 'Percent'].values))
