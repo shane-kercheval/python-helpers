@@ -1,7 +1,7 @@
-       count  nulls  perc_nulls                  top  unique  perc_unique
-col_b      3      1        0.25                    b       3          1.0
-col_c      3      1        0.25  2021-01-02 00:00:00       3          1.0
-col_d      2      2        0.50           2021-04-02       1          0.5
-col_h      2      2        0.50     TestEnum.VALUE_A       2          1.0
-col_i      2      2        0.50  2021-04-02 00:00:00       1          0.5
-col_g      3      1        0.25                    b       3          1.0
+       # of Non-Nulls  # of Nulls  % Null     Most Freq. Value  # of Unique  % Unique
+col_b               3           1    0.25                    d            2     0.667
+col_c               3           1    0.25  2021-01-02 00:00:00            3     1.000
+col_d               2           2    0.50           2021-04-02            1     0.500
+col_h               3           1    0.25     TestEnum.VALUE_B            2     0.667
+col_i               2           2    0.50  2021-04-02 00:00:00            1     0.500
+col_g               3           1    0.25                    d            2     0.667

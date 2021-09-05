@@ -121,7 +121,7 @@ def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
          '90%': [round(dataframe[x].quantile(q=0.90), 3) for x in numeric_columns],
          'Max': [round(dataframe[x].max(), 3) for x in numeric_columns]},
         index=columns)
-    return results.transpose()
+    return results
 
 
 def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
@@ -150,15 +150,14 @@ def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
                   round(dataframe[column].isnull().sum() / len(dataframe), 3))
                  for column in non_numeric_columns]
     columns, num_nulls, perc_nulls = zip(*null_data)
-    results = pd.DataFrame({'count': [dataframe[x].count() for x in non_numeric_columns],
-                            'nulls': num_nulls,
-                            'perc_nulls': perc_nulls,
-                            'top': [dataframe[x].value_counts().index[0] for x in non_numeric_columns],
-                            'unique': [len(dataframe[x].dropna().unique()) for x in non_numeric_columns],
-                            'perc_unique': [round(len(dataframe[x].dropna().unique()) / dataframe[x].count(),
+    results = pd.DataFrame({'# of Non-Nulls': [dataframe[x].count() for x in non_numeric_columns],
+                            '# of Nulls': num_nulls,
+                            '% Null': perc_nulls,
+                            'Most Freq. Value': [dataframe[x].value_counts().index[0] for x in non_numeric_columns],
+                            '# of Unique': [len(dataframe[x].dropna().unique()) for x in non_numeric_columns],
+                            '% Unique': [round(len(dataframe[x].dropna().unique()) / dataframe[x].count(),
                                                   3) for x in non_numeric_columns]},
-                           index=columns,
-                           columns=['count', 'nulls', 'perc_nulls', 'top', 'unique', 'perc_unique'])
+                           index=columns)
     return results
 
 
