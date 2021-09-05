@@ -56,30 +56,30 @@ def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
     Returns:
         a pandas Dataframe with the following row indexes:
 
-        `count`: The number of non-null values found for the given feature.
-        `nulls`: The number of null values found for the given feature.
-        `perc_nulls`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given feature.
-        `num_zeros`: The number of values that equal `0`, found for the given feature.
-        `perc_zeros`: The percent of `0`s found (i.e. `num_zeros / number of values in series`) for a given
+        `# of Non-Nulls`: The number of non-null values found for the given feature.
+        `# of Nulls`: The number of null values found for the given feature.
+        `% Nulls`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given feature.
+        `# of Zeros`: The number of values that equal `0`, found for the given feature.
+        `% Zeros`: The percent of `0`s found (i.e. `num_zeros / number of values in series`) for a given
             feature. Note: `number of values in series` is `count` + `nulls`, so this shows the percent of
             zeros found considering all of the values in the series, not just the non-null values.
-        `mean`: The `mean` of all the values for a given feature.
-        `st_dev`: The `standard deviation` of all the values for a given feature.
-        `Coef of var`: The `coefficient of variation (CV)`, is defined as the standard deviation divided by
+        `Mean`: The `mean` of all the values for a given feature.
+        `St Dev.`: The `standard deviation` of all the values for a given feature.
+        `Coef of Var`: The `coefficient of variation (CV)`, is defined as the standard deviation divided by
             the mean, and describes the variability of the feature's values relative to its mean.
 
             We can use this metric to compare the variation of two different variables (i.e. features) that
             have different units or scales.
-        `skewness`: "unbiased skew"; utilizes `pandas` DataFrame underlying `.skew()` function
-        `kurtosis`: "unbiased kurtosis ... using Fisher’s definition of kurtosis"; utilizes `pandas` DataFrame
+        `Skewness`: "unbiased skew"; utilizes `pandas` DataFrame underlying `.skew()` function
+        `Kurtosis`: "unbiased kurtosis ... using Fisher’s definition of kurtosis"; utilizes `pandas` DataFrame
             underlying `.skew()` function
-        `min`: minimum value found
+        `Min`: minimum value found
         `10%`: the value found at the 10th percentile of data
         `25%`: the value found at the 25th percentile of data
         `50%`: the value found at the 50th percentile of data
         `75%`: the value found at the 75th percentile of data
         `90%`: the value found at the 90th percentile of data
-        `max`: maximum value found
+        `Max`: maximum value found
     """
     # if there aren't any numeric features and the target variable is not numeric, we don't have anything
     # to display, return None
@@ -96,10 +96,10 @@ def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
     columns, num_nulls, perc_nulls = zip(*null_data)
 
     # column, number of 0's, percent of 0's
-    zeros_data = [(column, sum(dataframe[column] == 0),
+    zeros_data = [(sum(dataframe[column] == 0),
                    round(sum(dataframe[column] == 0) / len(dataframe), 3))
                   for column in numeric_columns]
-    columns, num_zeros, perc_zeros = zip(*zeros_data)
+    num_zeros, perc_zeros = zip(*zeros_data)
     results = pd.DataFrame(
         {'# of Non-Nulls': [dataframe[x].count() for x in numeric_columns],
          '# of Nulls': num_nulls,
@@ -129,12 +129,12 @@ def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
     Returns the following attributes (as columns) for each of the categoric features (as rows).
 
     Returns:
-        `count`: The number of non-null values found for the given feature.
-        `nulls`: The number of null values found for the given feature.
-        `perc_nulls`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given feature.
-        `top`: The most frequent value found for a given feature.
-        `unique`: The number of unique values found for a given feature.
-        `perc_unique`: The percent of unique values found (i.e. `unique` divided by the total number of values
+        `# of Non-Nulls`: The number of non-null values found for the given feature.
+        `# of Nulls`: The number of null values found for the given feature.
+        `% Null`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given feature.
+        `Most Freq. Value`: The most frequent value found for a given feature.
+        `# of Unique`: The number of unique values found for a given feature.
+        `% Unique`: The percent of unique values found (i.e. `unique` divided by the total number of values
             (null or non-null) for a given feature.
     """
     # if there aren't any non-numeric features and the target variable is numeric, we don't have anything
@@ -157,7 +157,7 @@ def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
                                                  for x in non_numeric_columns],
                             '# of Unique': [len(dataframe[x].dropna().unique()) for x in non_numeric_columns],
                             '% Unique': [round(len(dataframe[x].dropna().unique()) / dataframe[x].count(),
-                                                  3) for x in non_numeric_columns]},
+                                               3) for x in non_numeric_columns]},
                            index=columns)
     return results
 
