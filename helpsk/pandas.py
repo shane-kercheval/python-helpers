@@ -153,7 +153,8 @@ def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
     results = pd.DataFrame({'# of Non-Nulls': [dataframe[x].count() for x in non_numeric_columns],
                             '# of Nulls': num_nulls,
                             '% Null': perc_nulls,
-                            'Most Freq. Value': [dataframe[x].value_counts().index[0] for x in non_numeric_columns],
+                            'Most Freq. Value': [dataframe[x].value_counts().index[0]
+                                                 for x in non_numeric_columns],
                             '# of Unique': [len(dataframe[x].dropna().unique()) for x in non_numeric_columns],
                             '% Unique': [round(len(dataframe[x].dropna().unique()) / dataframe[x].count(),
                                                   3) for x in non_numeric_columns]},
