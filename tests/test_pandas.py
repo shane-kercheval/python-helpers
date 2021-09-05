@@ -163,3 +163,24 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(cached_results['Frequency'].tolist() == results['Frequency'].tolist())
         self.assertTrue(cached_results['Percent'].tolist() == results['Percent'].tolist())
         self.assertTrue(hv.dataframes_match([cached_results, results]))
+
+        # test numeric
+        test_series_float = self.credit_data['duration'].copy()
+        test_series_float[0:10] = np.nan
+
+        results = value_frequency(test_series_float, sort_by_frequency=True)
+        expected_value_counts = test_series_float.value_counts(normalize=False, dropna=False)
+        self.assertTrue(hv.iterables_are_equal(results.index.values, expected_value_counts.index.values))
+        self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, expected_value_counts.values))
+
+        cached_results = results
+
+        results = value_frequency(test_series_float, sort_by_frequency=False)
+        expected_indexes = test_series_float.dropna().unique()
+        expected_indexes.sort()
+        expected_indexes = expected_indexes.tolist() + [np.nan]
+
+        self.assertEqual(results.index.values.tolist()[0:-1], expected_indexes[0:-1])
+        self.assertTrue(hv.iterables_are_equal(results.index.values.tolist(), expected_indexes))
+        self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, cached_results.loc[results.index.values, 'Frequency'].values))
+        self.assertTrue(hv.iterables_are_equal(results['Percent'].values, cached_results.loc[results.index.values, 'Percent'].values))

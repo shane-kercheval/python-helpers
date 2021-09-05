@@ -241,7 +241,7 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
                             'Percent': series.value_counts(normalize=True, dropna=False)})
 
     if not sort_by_frequency:
-        if series.dtype == 'category':
+        if series.dtype.name == 'category':
             if series.cat.ordered:
                 results.sort_index(inplace=True)
             else:
@@ -254,5 +254,5 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
                 results.temp.cat.reorder_categories(values, ordered=True, inplace=True)
                 results = results.sort_values(['temp']).drop('temp', axis=1)
         else:
-            results.sort_values(['Frequency'], inplace=True)
+            results.sort_index(inplace=True)
     return results
