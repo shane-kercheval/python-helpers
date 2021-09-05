@@ -1,3 +1,9 @@
+import os
+from importlib import reload
+from typing import Callable, Union
+
+from matplotlib import pyplot as plt
+
 from helpsk.utility import is_debugging
 from unittest import TestCase
 from os import getcwd
@@ -61,6 +67,28 @@ def subtests_expected_vs_actual(test_case: TestCase,
     for index, (expected, actual) in enumerate(zip(expected_values, actual_values)):
         with test_case.subTest(index=index, expected=expected, actual=actual, **kwargs):
             test_case.assertEqual(expected, actual)
+
+
+def check_plot(file_name: str, plot_function: Callable, set_size_w_h: Union[tuple, None] = (10, 6)):
+    reload(plt)  # necessary because mtplotlib throws strange errors about alpha values
+
+    def clear():
+        plt.gcf().clear()
+        plt.cla()
+        plt.clf()
+        plt.close()
+
+    clear()
+    if os.path.isfile(file_name):
+        os.remove(file_name)
+    assert os.path.isfile(file_name) is False
+    plot_function()
+    if set_size_w_h is not None:
+        fig = plt.gcf()
+        fig.set_size_inches(set_size_w_h[0], set_size_w_h[1])
+    plt.savefig(file_name)
+    clear()
+    assert os.path.isfile(file_name)
 
 
 #https://www.openml.org/d/31
