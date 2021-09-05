@@ -1,6 +1,7 @@
 from helpsk.utility import is_debugging
 from unittest import TestCase
 from os import getcwd
+from sklearn.datasets import fetch_openml
 
 
 def get_test_path() -> str:
@@ -60,3 +61,15 @@ def subtests_expected_vs_actual(test_case: TestCase,
     for index, (expected, actual) in enumerate(zip(expected_values, actual_values)):
         with test_case.subTest(index=index, expected=expected, actual=actual, **kwargs):
             test_case.assertEqual(expected, actual)
+
+
+#https://www.openml.org/d/31
+
+def get_data_credit():
+    credit_g = fetch_openml('credit-g', version=1)
+    return credit_g['data']
+
+
+def get_data_titanic():
+    titanic = fetch_openml('titanic', version=1)
+    return titanic['data']

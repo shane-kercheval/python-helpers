@@ -1,0 +1,18 @@
+                col_a  col_e  col_f
+# of Non-Nulls  3.000    0.0  4.000
+# of Nulls      1.000    4.0  0.000
+% Nulls         0.250    1.0  0.000
+# of Zeros      0.000    0.0  0.000
+% Zeros         0.000    0.0  0.000
+Mean            3.000    NaN  2.500
+St Dev.         1.000    NaN  1.291
+Coef of Var     0.333    NaN  0.516
+Skewness        0.000    NaN  0.000
+Kurtosis          NaN    NaN -1.200
+Min             2.000    NaN  1.000
+10%             2.200    NaN  1.300
+25%             2.500    NaN  1.750
+50%             3.000    NaN  2.500
+75%             3.500    NaN  3.250
+90%             3.800    NaN  3.700
+Max             4.000    NaN  4.000
