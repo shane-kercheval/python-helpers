@@ -91,6 +91,7 @@ class TestPandas(unittest.TestCase):
         # also, we are testing a Categorical object; verify it is categorical, then later test non-categorical
         self.assertEqual(categorical.dtype.name, 'category')
         results = reorder_categories(categorical=categorical, ascending=True, ordered=False)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
         self.assertTrue(iterables_are_equal(results, original_categorical))
         self.assertEqual(list(results.categories), expected_categories)
         self.assertFalse(results.ordered)
@@ -102,6 +103,7 @@ class TestPandas(unittest.TestCase):
 
         # test ascending=False & ordered=True
         results = reorder_categories(categorical=categorical, ascending=False, ordered=True)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
         self.assertTrue(iterables_are_equal(results, original_categorical))
         self.assertEqual(list(results.categories), expected_categories_rev)
         self.assertTrue(results.ordered)
@@ -114,6 +116,7 @@ class TestPandas(unittest.TestCase):
 
         series = pd.Series(['a', 'b', 'b', 'c', 'b', 'c'])
         results = reorder_categories(categorical=series, ascending=False, ordered=True)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
         self.assertTrue(iterables_are_equal(results, series))
         self.assertEqual(list(results.categories), ['b', 'c', 'a'])
         self.assertTrue(results.ordered)
@@ -148,6 +151,7 @@ class TestPandas(unittest.TestCase):
         # also, we are testing a Categorical object; verify it is categorical, then later test non-categorical
         self.assertEqual(categorical.dtype.name, 'category')
         results = reorder_categories(categorical=categorical, weights=weights, ascending=True, ordered=False)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
         self.assertTrue(iterables_are_equal(results, original_categorical))
         self.assertEqual(list(results.categories), expected_categories)
         self.assertFalse(results.ordered)
@@ -160,6 +164,7 @@ class TestPandas(unittest.TestCase):
 
         # test ascending=False & ordered=True
         results = reorder_categories(categorical=categorical, weights=weights, ascending=False, ordered=True)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
         self.assertTrue(iterables_are_equal(results, original_categorical))
         self.assertEqual(list(results.categories), expected_categories_rev)
         self.assertTrue(results.ordered)
@@ -173,9 +178,126 @@ class TestPandas(unittest.TestCase):
         series = pd.Series(['a', 'b', 'c'] * 2)
         weights = pd.Series([1, 3, 2] * 2)
         results = reorder_categories(categorical=series, weights=weights, ascending=False, ordered=True)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
         self.assertTrue(iterables_are_equal(results, series))
         self.assertEqual(list(results.categories), ['b', 'c', 'a'])
         self.assertTrue(results.ordered)
+
+    def test_top_n_categories__occurrences(self):
+        categorical = self.credit_data['purpose'].copy()
+        categorical[0:50] = np.nan
+        original_categorical = categorical.copy()
+        categorical_counts = categorical.value_counts(dropna=False)
+
+        results = top_n_categories(categorical=categorical)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
+        self.assertEqual(list(results.categories), list(categorical_counts.index.values[0:5]) + ['Other'])
+        self.assertEqual(results.value_counts(dropna=False).sum(), 1000)
+
+        result_counts = results.value_counts().head(-1)
+        expected_counts = categorical_counts.head(5)
+        self.assertEqual(list(result_counts.index), list(expected_counts.index))
+        self.assertEqual(list(result_counts.values), list(expected_counts.values))
+
+        # check no side effects
+        results[0] = 'new car'
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
+
+        # if top_n is set to a higher number than there are categories, then we should get back an object
+        # with the same values
+        results = top_n_categories(categorical=categorical, top_n=20)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
+        self.assertTrue(set(results.cat.categories) == set(categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(results, categorical))
+
+        # check no side effects
+        results[0] = 'new car'
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
+
+        results = top_n_categories(categorical=categorical, top_n=3, other_category='Some others',
+                                   ordered=True)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
+        self.assertEqual(list(results.categories),
+                         list(categorical_counts.index.values[0:3]) + ['Some others'])
+        self.assertEqual(results.value_counts(dropna=False).sum(), 1000)
+
+        result_counts = results.value_counts().head(-1)
+        expected_counts = categorical_counts.head(3)
+        self.assertEqual(list(result_counts.index), list(expected_counts.index))
+        self.assertEqual(list(result_counts.values), list(expected_counts.values))
+
+        # check no side effects
+        results[0] = 'new car'
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
+
+    def test_top_n_categories__weights(self):
+        categorical = self.credit_data['purpose'].copy()
+        categorical[0:50] = np.nan
+        original_categorical = categorical.copy()
+        weights = pd.Series([-1] * len(categorical))
+        # ascending True because we are going sum by negative -1 so categories with least amount of
+        # occurrences will be in the "top" categories i.e. -1 > -100
+        # now we expect our top_n to be the lowest frequency of categories
+        categorical_counts = categorical.value_counts(dropna=False, ascending=True)
+
+        with self.assertRaises(HelpskParamValueError):
+            top_n_categories(categorical=categorical[0:-1], weights=weights)
+
+        with self.assertRaises(HelpskParamValueError):
+            top_n_categories(categorical=categorical, weights=weights[0:-1])
+
+        results = top_n_categories(categorical=categorical, weights=weights, weight_function=np.sum)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
+        self.assertEqual(list(results.categories), list(categorical_counts.index.values[0:5]) + ['Other'])
+        self.assertEqual(results.value_counts(dropna=False).sum(), 1000)
+
+        result_counts = results.value_counts().head(-1)
+        expected_counts = categorical_counts.head(5)
+        self.assertEqual(list(result_counts.index), list(expected_counts.index))
+        self.assertEqual(list(result_counts.values), list(expected_counts.values))
+
+        # check no side effects
+        results[0] = 'vacation'
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
+
+        # if top_n is set to a higher number than there are categories, then we should get back an object
+        # with the same values
+        results = top_n_categories(categorical=categorical, top_n=20, weights=weights, weight_function=np.sum)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
+        self.assertTrue(set(results.cat.categories) == set(categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(results, categorical))
+
+        # check no side effects
+        results[0] = 'vacation'
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
+
+        results = top_n_categories(categorical=categorical, top_n=3, other_category='Some others',
+                                   ordered=True, weights=weights, weight_function=np.sum)
+        self.assertTrue(results is not categorical)  # check that a new object was returned
+        self.assertEqual(list(results.categories),
+                         list(categorical_counts.index.values[0:3]) + ['Some others'])
+        self.assertEqual(results.value_counts(dropna=False).sum(), 1000)
+
+        result_counts = results.value_counts().head(-1)
+        expected_counts = categorical_counts.head(3)
+        self.assertEqual(list(result_counts.index), list(expected_counts.index))
+        self.assertEqual(list(result_counts.values), list(expected_counts.values))
+
+        # check no side effects
+        results[0] = 'vacation'
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
 
     def test_numeric_summary(self):
         self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__credit.txt',

@@ -1,7 +1,7 @@
 """This module contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
 
 import datetime
-from typing import List, Union, Iterable, Optional
+from typing import List, Union, Optional, Callable
 
 import numpy as np
 import pandas as pd
@@ -51,9 +51,9 @@ def is_series_date(series: pd.Series) -> bool:
     return False
 
 
-def reorder_categories(categorical: Union[pd.Series, pd.Categorical, Iterable],
+def reorder_categories(categorical: Union[pd.Series, pd.Categorical],
                        weights: Optional[Union[pd.Series, np.ndarray]] = None,
-                       weight_function=np.median,
+                       weight_function: Callable = np.median,
                        ascending=True,
                        ordered=False) -> pd.Categorical:
     """Returns copy of the `categorical` series, with categories reordered based on the number of occurrences
@@ -103,6 +103,79 @@ def reorder_categories(categorical: Union[pd.Series, pd.Categorical, Iterable],
                              categories=list(ordered_categories.index.values),
                              ordered=ordered)
     return results
+
+
+# pylint: disable=too-many-arguments
+def top_n_categories(categorical: Union[pd.Series, pd.Categorical],
+                     top_n: int = 5,
+                     other_category: str = 'Other',
+                     weights: Optional[Union[pd.Series, np.ndarray]] = None,
+                     weight_function: Callable = np.median,
+                     ordered: bool = False) -> pd.Categorical:
+    """Returns copy of `categorical` series, with the top `n` categories retained based on either the count of
+    values (if `weight` is None) or based on the values in `weight` determined by `aggregate_function`, and
+    all other categories converted to `other`
+
+    similar to `fct_lump()` in R.
+
+    Args:
+        categorical: A collection of categorical values that will be turned into a Categorical object with
+            ordered categories.
+        top_n:
+            the number of categories to retain. All other categories (i.e. the values in the series) will be
+            replaced with the value contained in `other_category`.
+            Therefore, a total of `top_n + 1` categories will be return.
+        other_category:
+            the value given to all other categories
+        weights:
+            Numeric values used to reorder the categorical. Must be the same length as `categorical`.
+        weight_function:
+            Function that determines the order of the categories. The default is `np.median`, meaning that
+            order of the categories in the returned Categorical object is determined by the median value (of
+            the corresponding `values`) for each category.
+        ordered:
+            passed to `pd.Categorical` to indicate if returned object should be `ordered`.
+    """
+
+    # if there are less than (or the same amount of) unique values than top_n; then we don't have to do
+    # anything
+    if len(categorical.unique()) <= top_n:
+        return categorical.copy()
+
+    if weights is None:
+        top_categories = categorical.value_counts(ascending=False, dropna=True).head(top_n)
+        top_categories = list(top_categories.index.values)
+
+    else:
+        if len(categorical) != len(weights):
+            message = f'Length of `categorical` ({len(categorical)}) ' \
+                      f'must match length of `values ({len(weights)})'
+            raise HelpskParamValueError(message)
+
+        if isinstance(weights, pd.Series):
+            weights = weights.values
+
+        weights = pd.Series(weights, index=categorical)
+        # for each categoric value, calculate the associated value of the categoric, based on the func
+        # e.g. if func is np.median, get the median value associated with categoric value
+        top_categories = weights.groupby(level=0).agg(weight_function).fillna(0).\
+            sort_values(ascending=False).head(top_n)
+        top_categories = list(top_categories.index.values)
+
+    # TODO: this needs to be clean up; Categorical is causing issues
+    final_series = pd.Categorical(categorical)
+    if other_category not in final_series.categories:
+        final_series = final_series.add_categories(other_category)
+    final_series = pd.Series(final_series)
+    final_series[final_series.apply(lambda x: x not in top_categories).fillna(False)] = other_category
+
+    if other_category not in top_categories:
+        top_categories = top_categories + [other_category]
+
+    final_series = pd.Categorical(final_series,
+                                  categories=top_categories,
+                                  ordered=ordered)
+    return final_series
 
 
 def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
