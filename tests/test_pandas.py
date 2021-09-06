@@ -2,8 +2,6 @@ import os
 import unittest
 from enum import Enum, unique, auto
 
-import pandas as pd
-
 from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
@@ -128,7 +126,6 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(iterables_are_equal(results, series))
         self.assertEqual(list(results.categories), ['b', 'c', 'a'])
         self.assertTrue(results.ordered)
-
 
     def test_numeric_summary(self):
         self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__credit.txt',

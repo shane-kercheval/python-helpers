@@ -295,7 +295,7 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
                 # alphabetically
                 # so change the categories to be alphabetical and sort
 
-                values = results.index.values.dropna().unique().tolist()
+                values = results.index.values.dropna().unique().tolist()  # noqa
                 values.sort()
                 results['temp'] = results.index
                 results.temp.cat.reorder_categories(values, ordered=True, inplace=True)
