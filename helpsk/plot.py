@@ -9,14 +9,14 @@ import seaborn as sns
 import helpsk.pandas as hpandas
 from helpsk.exceptions import HelpskParamValueError
 
-STANDARD_HEIGHT = 10
+STANDARD_WIDTH = 10
 GOLDEN_RATIO = 1.61803398875
-STANDARD_WIDTH = STANDARD_HEIGHT / GOLDEN_RATIO
-STANDARD_HEIGHT_WIDTH = (STANDARD_HEIGHT, STANDARD_WIDTH)
+STANDARD_HEIGHT = STANDARD_WIDTH / GOLDEN_RATIO
+STANDARD_WIDTH_HEIGHT = (STANDARD_WIDTH, STANDARD_HEIGHT)
 
 
 def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
-                         figure_size: Tuple[int, int] = STANDARD_HEIGHT_WIDTH,
+                         figure_size: Tuple[int, int] = STANDARD_WIDTH_HEIGHT,
                          x_axis_rotation: int = 30) -> None:
     """Shows the unique values and corresponding frequencies.
 
@@ -27,7 +27,7 @@ def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
             if True then sort by frequency desc; otherwise sort by index (either numerically ascending if
             series is numeric, or alphabetically if non-ordered categoric, or by category if ordered categoric
         figure_size:
-            tuple containing `(height, width)` of plot. The default height is defined by
+            tuple containing `(width, height)` of plot. The default height is defined by
             `STANDARD_HEIGHT`, and the default width is `STANDARD_HEIGHT / GOLDEN_RATIO`
         x_axis_rotation:
             the angle to rotate the x-axis text.
@@ -64,7 +64,7 @@ def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
 def plot_correlation_heatmap(dataframe: pd.DataFrame,
                              threshold: Optional[float] = None,
                              title: Optional[str] = None,
-                             figure_size: tuple = (STANDARD_HEIGHT, STANDARD_HEIGHT),
+                             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                              round_by: int = 2,
                              features_to_highlight: Optional[list] = None) -> None:
     """Creates a heatmap of the correlations between all of the numeric columns.
@@ -83,7 +83,8 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
         title:
             title of plot
         figure_size:
-            tuple (height, width)
+            tuple containing `(width, height)` of plot. The default height is defined by
+            `STANDARD_HEIGHT`, and the default width is `STANDARD_HEIGHT / GOLDEN_RATIO`
         round_by:
             the number of decimal places to round to when showing the correlations in the heatmap
         features_to_highlight:
