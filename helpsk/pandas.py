@@ -94,6 +94,48 @@ def reorder_from_values(categorical: Union[pd.Series, pd.Categorical, Iterable],
     return results
 
 
+def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
+                                          ordered: bool = False) -> pd.Series:
+    """Converts a Series object from integers to Categorical for a given mapping of integers to strings.
+
+    Args:
+        series:
+            a pandas series containing integers values
+        mapping:
+            dictionary containing the unique values of the integers in the current data as the key, and the
+            categoric string as the value.
+
+            The mapping dict is required to have each value in the series accounted for. However, the
+            series does not have to have all the values in the mapping. (For example, converting a small
+            sample of data that doesn't contain all possible values should not fail.)
+        ordered:
+            a boolean representing whether the resulting Categorical series will be ordered, or not.
+
+    Returns:
+        A pandas Categorical Series
+    """
+    # check that the keys in mapping contains all numbers found in the series
+    unique_values = series.unique()
+    unique_values = unique_values[~np.isnan(unique_values)]
+    missing_keys = [x for x in unique_values if x not in mapping.keys()]
+    if missing_keys:
+        message = f'The following value(s) were found in `series` but not in `mapping` keys `{missing_keys}`'
+        raise HelpskParamValueError(message)
+
+    # Pandas expects the underlying values to be a sequence starting with 0 (i.e. to be `0, 1, 2, ...`),
+    # which won't always be the case (e.g. the values in the Series might start with 1, or at any number,
+    # or might not be in sequence.
+    # We need to first map the actual values to the sequence pandas expects.
+    # e.g. if the actual values being mapped are [1, 2, 3] then the actual_to_expected_mapping will be
+    # {actual: expected, ...} i.e. {1: 0, 2: 1, 3: 2}
+    actual_to_expected_mapping = dict(zip(mapping.keys(), np.arange(len(mapping))))
+    converted_series = pd.Series(series).map(actual_to_expected_mapping).fillna(-1)
+    converted_series = pd.Categorical.from_codes(converted_series.astype(int),
+                                                 mapping.values(),
+                                                 ordered=ordered)
+    return pd.Series(converted_series)
+
+
 def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
     """Provides a summary of basic stats for the numeric columns of a DataFrame.
 
@@ -225,48 +267,6 @@ def print_dataframe(dataframe: pd.DataFrame) -> None:
     with pd.option_context('display.max_columns', None), \
             pd.option_context('display.width', 20000):
         print(dataframe)
-
-
-def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
-                                          ordered: bool = False) -> pd.Series:
-    """Converts a Series object from integers to Categorical for a given mapping of integers to strings.
-
-    Args:
-        series:
-            a pandas series containing integers values
-        mapping:
-            dictionary containing the unique values of the integers in the current data as the key, and the
-            categoric string as the value.
-
-            The mapping dict is required to have each value in the series accounted for. However, the
-            series does not have to have all the values in the mapping. (For example, converting a small
-            sample of data that doesn't contain all possible values should not fail.)
-        ordered:
-            a boolean representing whether the resulting Categorical series will be ordered, or not.
-
-    Returns:
-        A pandas Categorical Series
-    """
-    # check that the keys in mapping contains all numbers found in the series
-    unique_values = series.unique()
-    unique_values = unique_values[~np.isnan(unique_values)]
-    missing_keys = [x for x in unique_values if x not in mapping.keys()]
-    if missing_keys:
-        message = f'The following value(s) were found in `series` but not in `mapping` keys `{missing_keys}`'
-        raise HelpskParamValueError(message)
-
-    # Pandas expects the underlying values to be a sequence starting with 0 (i.e. to be `0, 1, 2, ...`),
-    # which won't always be the case (e.g. the values in the Series might start with 1, or at any number,
-    # or might not be in sequence.
-    # We need to first map the actual values to the sequence pandas expects.
-    # e.g. if the actual values being mapped are [1, 2, 3] then the actual_to_expected_mapping will be
-    # {actual: expected, ...} i.e. {1: 0, 2: 1, 3: 2}
-    actual_to_expected_mapping = dict(zip(mapping.keys(), np.arange(len(mapping))))
-    converted_series = pd.Series(series).map(actual_to_expected_mapping).fillna(-1)
-    converted_series = pd.Categorical.from_codes(converted_series.astype(int),
-                                                 mapping.values(),
-                                                 ordered=ordered)
-    return pd.Series(converted_series)
 
 
 def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
