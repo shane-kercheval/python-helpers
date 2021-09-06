@@ -1,5 +1,5 @@
 """This module contains helper functions for plotting."""
-from typing import Tuple, Union, Optional
+from typing import Tuple, Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -61,6 +61,7 @@ def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
     plt.tight_layout()
 
 
+# pylint: disable=too-many-arguments
 def plot_correlation_heatmap(dataframe: pd.DataFrame,
                              threshold: Optional[float] = None,
                              title: Optional[str] = None,
@@ -90,7 +91,6 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
         features_to_highlight:
             feature labels to highlight in red
     """
-    
     correlations = dataframe.corr()
 
     if threshold is not None:
@@ -101,8 +101,8 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
         if not meets_threshold.any():
             raise HelpskParamValueError('correlation `threshold` set too high.')
 
-        features_meets_threshold = features[meets_threshold]
-        correlations = correlations.loc[features_meets_threshold, features_meets_threshold]
+        features = features[meets_threshold]
+        correlations = correlations.loc[features, features]
 
     if title is None:
         title = ''
@@ -112,8 +112,8 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
     mask[np.triu_indices_from(mask)] = True
 
     with sns.axes_style("white"):
-        f, ax = plt.subplots()
-        f.set_size_inches(figure_size[0], figure_size[1])
+        figure, axis = plt.subplots()
+        figure.set_size_inches(figure_size[0], figure_size[1])
         sns.heatmap(correlations,
                     mask=mask,
                     annot=True,
@@ -121,7 +121,8 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
                     cmap=sns.diverging_palette(220, 10, as_cmap=True),
                     vmin=-1,
                     vmax=1,
-                    square=True, ax=ax,
+                    square=True,
+                    ax=axis,
                     center=0)
         plt.xticks(rotation=20, ha='right')
         plt.yticks(rotation=0)
