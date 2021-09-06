@@ -52,12 +52,13 @@ def is_series_date(series: pd.Series) -> bool:
 
 
 def reorder_categories(categorical: Union[pd.Series, pd.Categorical, Iterable],
-                       weights: Union[pd.Series, np.ndarray],
+                       weights: Optional[Union[pd.Series, np.ndarray]] = None,
                        weight_function=np.median,
                        ascending=True,
                        ordered=False) -> pd.Categorical:
-    """Returns copy of `categorical` series, with categories reordered according to numeric values in
-    `values`, based ont the function `func`.
+    """Returns copy of the `categorical` series, with categories reordered based on the number of occurrences
+     of the category (if `weights` is set to None`), or (if `weights` is not None) to numeric values in
+     `weights` based on the function `weight_function`.
 
     similar to `fct_reorder()` in R.
 
@@ -65,7 +66,8 @@ def reorder_categories(categorical: Union[pd.Series, pd.Categorical, Iterable],
         categorical: A collection of categorical values that will be turned into a Categorical object with
             ordered categories.
         weights:
-            Numeric values used to reorder the categorical. Must be the same length as `categorical`.
+            Numeric values used to reorder the categorical. Must be the same length as `categorical`. If
+            `None`, then the categories will be reordered based on number of occurrences for each category.
         weight_function:
             Function that determines the order of the categories. The default is `np.median`, meaning that
             order of the categories in the returned Categorical object is determined by the median value (of
@@ -75,19 +77,28 @@ def reorder_categories(categorical: Union[pd.Series, pd.Categorical, Iterable],
         ordered:
             passed to `pd.Categorical` to indicate if returned object should be `ordered`.
     """
-    if len(categorical) != len(weights):
-        mess = f'Length of `categorical` ({len(categorical)}) must match length of `values ({len(weights)})'
-        raise HelpskParamValueError(mess)
+    if weights is None:
+        ordered_categories = categorical.value_counts(ascending=ascending, dropna=True)
+    else:
+        if len(categorical) != len(weights):
+            message = f'Length of `categorical` ({len(categorical)}) ' \
+                      f'must match length of `values ({len(weights)})'
+            raise HelpskParamValueError(message)
 
-    if isinstance(weights, pd.Series):
-        weights = weights.values
+        if isinstance(weights, pd.Series):
+            weights = weights.values
 
-    weights = pd.Series(weights, index=categorical)
+        weights = pd.Series(weights, index=categorical)
+        # for each categoric value, calculate the associated value of the categoric, based on the func
+        # e.g. if func is np.median, get the median value associated with categoric value
+        ordered_categories = weights.groupby(level=0).agg(weight_function)\
+            .fillna(0).sort_values(ascending=ascending)
 
-    # for each categoric value, calculate the associated value of the categoric, based on the func
-    # e.g. if func is np.median, get the median value associated with categoric value
-    ordered_categories = weights.groupby(level=0).agg(weight_function)\
-        .fillna(0).sort_values(ascending=ascending)
+    # check that the unique values in categorical are a subset of the categories that we are setting
+    # (subset because for categorical series there might be a category set on the series (i.e.
+    # series.cat.categories) that doesn't have any associated values in the series)
+    assert set(categorical.dropna()).issubset(set(ordered_categories.index.dropna()))
+
     results = pd.Categorical(values=categorical,
                              categories=list(ordered_categories.index.values),
                              ordered=ordered)

@@ -70,7 +70,54 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(is_series_date(self.sample_data['col_i']))
         self.assertFalse(is_series_date(pd.Series(dtype=np.float64)))
 
-    def test_reorder_categories(self):
+    def test_reorder_categories__occurrences(self):
+        categorical = self.credit_data['purpose'].copy()
+        categorical[0:50] = np.nan
+        original_categorical = categorical.copy()
+
+        original_categories = ['new car', 'used car', 'furniture/equipment', 'radio/tv',
+                               'domestic appliance', 'repairs', 'education', 'vacation', 'retraining',
+                               'business', 'other']
+
+        expected_categories = list(categorical.value_counts(ascending=True, dropna=True).index.values)
+        expected_categories_rev = expected_categories.copy()
+        expected_categories_rev.reverse()
+
+        # check that the purpose column hasn't changed and that it is not ordered and has original categories
+        self.assertFalse(categorical.cat.ordered)
+        self.assertEqual(list(categorical.cat.categories), original_categories)
+
+        # test default weights
+        # also, we are testing a Categorical object; verify it is categorical, then later test non-categorical
+        self.assertEqual(categorical.dtype.name, 'category')
+        results = reorder_categories(categorical=categorical, ascending=True, ordered=False)
+        self.assertTrue(iterables_are_equal(results, original_categorical))
+        self.assertEqual(list(results.categories), expected_categories)
+        self.assertFalse(results.ordered)
+
+        # check no side effects
+        results[0] = 'new car'
+        self.assertEqual(list(original_categorical.cat.categories), original_categories)
+        self.assertTrue(pd.isna(original_categorical[0]))
+
+        # test ascending=False & ordered=True
+        results = reorder_categories(categorical=categorical, ascending=False, ordered=True)
+        self.assertTrue(iterables_are_equal(results, original_categorical))
+        self.assertEqual(list(results.categories), expected_categories_rev)
+        self.assertTrue(results.ordered)
+
+        # check no side effects
+        results[0] = 'new car'
+        self.assertEqual(list(original_categorical.cat.categories), original_categories)
+        self.assertTrue(pd.isna(original_categorical[0]))
+
+        series = pd.Series(['a', 'b', 'b', 'c', 'b', 'c'])
+        results = reorder_categories(categorical=series, ascending=False, ordered=True)
+        self.assertTrue(iterables_are_equal(results, series))
+        self.assertEqual(list(results.categories), ['b', 'c', 'a'])
+        self.assertTrue(results.ordered)
+
+    def test_reorder_categories__weights(self):
         categorical = self.credit_data['purpose'].copy()
         categorical[0:50] = np.nan
         original_categorical = categorical.copy()
