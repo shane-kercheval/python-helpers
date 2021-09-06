@@ -431,6 +431,33 @@ class TestValidation(unittest.TestCase):
         subtest_iterables_are_not_equal(iterable_a=[np.nan, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)
         subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[None, 2, 3], dtype=np.float64)
 
+    def test_iterables_are_equal__ordered(self):
+        # found a bug where two pd.Categorical series will not return True even if they have the same values,
+        # but with different ordered; but we only care about the values
+        values = [np.nan, 'a', 'b', 'c', 'd']
+        series = pd.Series(values)
+        unordered_categorical = pd.Categorical(values=values, ordered=False)
+        ordered_categorical = pd.Categorical(values=values, categories=['d', 'c', 'a', 'b'], ordered=True)
+
+        self.assertTrue(hv.iterables_are_equal(values, series))
+        self.assertTrue(hv.iterables_are_equal(values, unordered_categorical))
+        self.assertTrue(hv.iterables_are_equal(values, ordered_categorical))
+        self.assertTrue(hv.iterables_are_equal(series, unordered_categorical))
+        self.assertTrue(hv.iterables_are_equal(series, ordered_categorical))
+        self.assertTrue(hv.iterables_are_equal(unordered_categorical, ordered_categorical))
+
+        different_values = values.copy()
+        different_values[-1] = 'z'
+
+        self.assertFalse(hv.iterables_are_equal(different_values, series))
+        self.assertFalse(hv.iterables_are_equal(different_values, unordered_categorical))
+        self.assertFalse(hv.iterables_are_equal(different_values, ordered_categorical))
+        self.assertFalse(hv.iterables_are_equal(pd.Categorical(different_values, ordered=False),
+                                                unordered_categorical))
+        self.assertFalse(hv.iterables_are_equal(pd.Categorical(different_values, ordered=True),
+                                                ordered_categorical))
+
+
     def test_dataframes_match(self):
 
         dataframe_1 = pd.DataFrame({'col_floats': [1.123456789, 2.123456789, 3.123456789, np.nan],

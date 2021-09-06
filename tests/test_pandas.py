@@ -2,9 +2,12 @@ import os
 import unittest
 from enum import Enum, unique, auto
 
+import pandas as pd
+
 from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
+from helpsk.validation import iterables_are_equal
 from tests.helpers import get_data_credit, get_test_path
 
 
@@ -68,6 +71,64 @@ class TestPandas(unittest.TestCase):
         self.assertFalse(is_series_date(self.sample_data['col_h']))
         self.assertTrue(is_series_date(self.sample_data['col_i']))
         self.assertFalse(is_series_date(pd.Series(dtype=np.float64)))
+
+    def test_reorder_from_values(self):
+        categorical = self.credit_data['purpose'].copy()
+        categorical[0:50] = np.nan
+        original_categorical = categorical.copy()
+        values = self.credit_data['credit_amount'].copy()
+        values[25:75] = np.nan
+
+        original_categories = ['new car', 'used car', 'furniture/equipment', 'radio/tv',
+                               'domestic appliance', 'repairs', 'education', 'vacation', 'retraining',
+                               'business', 'other']
+
+        expected_categories = ['vacation', 'retraining', 'domestic appliance', 'repairs', 'education',
+                               'radio/tv', 'new car', 'furniture/equipment', 'business', 'used car', 'other']
+        expected_categories_rev = expected_categories.copy()
+        expected_categories_rev.reverse()
+
+        with self.assertRaises(HelpskParamValueError):
+            reorder_from_values(categorical=categorical[0:-1], values=values)
+
+        with self.assertRaises(HelpskParamValueError):
+            reorder_from_values(categorical=categorical, values=values[0:-1])
+
+        # check that the purpose column hasn't changed and that it is not ordered and has original categories
+        self.assertFalse(categorical.cat.ordered)
+        self.assertEqual(list(categorical.cat.categories), original_categories)
+
+        # test default values
+        # also, we are testing a Categorical object; verify it is categorical, then later test non-categorical
+        self.assertEqual(categorical.dtype.name, 'category')
+        results = reorder_from_values(categorical=categorical, values=values, ascending=True, ordered=False)
+        self.assertTrue(iterables_are_equal(results, original_categorical))
+        self.assertEqual(list(results.categories), expected_categories)
+        self.assertFalse(results.ordered)
+
+        # check no side effects
+        results[0] = 'new car'
+        self.assertEqual(list(original_categorical.cat.categories), original_categories)
+        self.assertTrue(pd.isna(original_categorical[0]))
+
+        # test ascending=False & ordered=True
+        results = reorder_from_values(categorical=categorical, values=values, ascending=False, ordered=True)
+        self.assertTrue(iterables_are_equal(results, original_categorical))
+        self.assertEqual(list(results.categories), expected_categories_rev)
+        self.assertTrue(results.ordered)
+
+        # check no side effects
+        results[0] = 'new car'
+        self.assertEqual(list(original_categorical.cat.categories), original_categories)
+        self.assertTrue(pd.isna(original_categorical[0]))
+
+        series = pd.Series(['a', 'b', 'c'] * 2)
+        values = pd.Series([1, 3, 2] * 2)
+        results = reorder_from_values(categorical=series, values=values, ascending=False, ordered=True)
+        self.assertTrue(iterables_are_equal(results, series))
+        self.assertEqual(list(results.categories), ['b', 'c', 'a'])
+        self.assertTrue(results.ordered)
+
 
     def test_numeric_summary(self):
         self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__credit.txt',

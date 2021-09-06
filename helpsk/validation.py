@@ -196,6 +196,11 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
     temp.col_a.tolist() == [np.nan, 1.0]  # returns False. Why??
     iterables_are_equal(temp.col_a.tolist(), [np.nan, 1])  # returns True
     [np.nan, 1.0] == [np.nan, 1.0]  # returns True
+
+
+    Also, when comparing a series with an ordered Categorical when the values are the same,
+    pd.Series.equals() will return False if the categories have different order. But we only care if the
+    values are the same, so this function will return True.
     ```
 
     Args:
@@ -207,9 +212,27 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
     Returns:
         True if iterable_a is equal to iterable_b
     """
+    # seems to be confusion and inconsistencies across stack overflow on how to properly check for category
+    # so this might be overkill but not exactly sure
+    def is_categorical(series):
+        if isinstance(series, (pd.Categorical, pd.CategoricalDtype)):
+            return True
+        if isinstance(series, pd.Series):
+            return series.dtype.name == 'category'
+        return False
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        return pd.Series(iterable_a).equals(pd.Series(iterable_b))
+
+        # if either list-like structure is categorical, then we need to convert both to unordered categorical
+        if is_categorical(iterable_a) or is_categorical(iterable_b):
+            iterable_a = pd.Categorical(iterable_a, ordered=False)
+            iterable_b = pd.Categorical(iterable_b, ordered=False)
+        else:
+            iterable_a = pd.Series(iterable_a)
+            iterable_b = pd.Series(iterable_b)
+
+        return iterable_a.equals(iterable_b)
 
 
 def dataframes_match(dataframes: List[pd.DataFrame],

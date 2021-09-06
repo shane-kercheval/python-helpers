@@ -1,7 +1,7 @@
 """This module contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
 
 import datetime
-from typing import List, Union
+from typing import List, Union, Iterable
 
 import numpy as np
 import pandas as pd
@@ -49,6 +49,49 @@ def is_series_date(series: pd.Series) -> bool:
         return isinstance(series.iloc[valid_index], datetime.date)
 
     return False
+
+
+def reorder_from_values(categorical: Union[pd.Series, pd.Categorical, Iterable],
+                        values: Union[pd.Series, np.ndarray],
+                        aggregation_function=np.median,
+                        ascending=True,
+                        ordered=False) -> pd.Categorical:
+    """Returns copy of `categorical` series, with categories reordered according to numeric values in
+    `values`, based ont the function `func`.
+
+    similar to `fct_reorder()` in R.
+
+    Args:
+        categorical: A collection of categorical values that will be turned into a Categorical object with
+            ordered categories.
+        values:
+            Numeric values used to reorder the categorical. Must be the same length as `categorical`.
+        aggregation_function:
+            Function that determines the order of the categories. The default is `np.median`, meaning that
+            order of the categories in the returned Categorical object is determined by the median value (of
+            the corresponding `values`) for each category.
+        ascending:
+            if True, categories are ordered in ascending order based on result of `aggregation_function`
+        ordered:
+            passed to `pd.Categorical` to indicate if returned object should be `ordered`.
+    """
+    if len(categorical) != len(values):
+        message = f'Length of `categorical` ({len(categorical)}) must match length of `values ({len(values)})'
+        raise HelpskParamValueError(message)
+
+    if isinstance(values, pd.Series):
+        values = values.values
+
+    values = pd.Series(values, index=categorical)
+
+    # for each categoric value, calculate the associated value of the categoric, based on the func
+    # e.g. if func is np.median, get the median value associated with categoric value
+    ordered_categories = values.groupby(level=0).agg(aggregation_function)\
+        .fillna(0).sort_values(ascending=ascending)
+    results = pd.Categorical(values=categorical,
+                             categories=list(ordered_categories.index.values),
+                             ordered=ordered)
+    return results
 
 
 def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
