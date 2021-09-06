@@ -2,12 +2,12 @@ import os
 from importlib import reload
 from typing import Callable, Union
 
+import pandas as pd
 from matplotlib import pyplot as plt
 
 from helpsk.utility import is_debugging
 from unittest import TestCase
 from os import getcwd
-from sklearn.datasets import fetch_openml
 
 
 def get_test_path() -> str:
@@ -91,13 +91,18 @@ def check_plot(file_name: str, plot_function: Callable, set_size_w_h: Union[tupl
     assert os.path.isfile(file_name)
 
 
-#https://www.openml.org/d/31
-
 def get_data_credit():
-    credit_g = fetch_openml('credit-g', version=1)
-    return credit_g['data']
+    # https://www.openml.org/d/31
+    # save locally in case dataset changes or is removed
+    # from sklearn.datasets import fetch_openml
+    # credit_g = fetch_openml('credit-g', version=1)
+    # credit_g['data'].to_pickle(get_test_path() + '/test_data/credit.pkl')
+    return pd.read_pickle(get_test_path() + '/test_data/credit.pkl')
 
 
 def get_data_titanic():
-    titanic = fetch_openml('titanic', version=1)
-    return titanic['data']
+    # save locally in case dataset changes or is removed
+    # from sklearn.datasets import fetch_openml
+    # titanic = fetch_openml('titanic', version=1)
+    # titanic['data'].to_pickle(get_test_path() + '/test_data/titanic.pkl')
+    return pd.read_pickle(get_test_path() + '/test_data/titanic.pkl')
