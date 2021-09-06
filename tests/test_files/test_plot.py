@@ -3,7 +3,6 @@ import unittest
 # noinspection PyMethodMayBeStatic
 from enum import unique, Enum, auto
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
