@@ -70,12 +70,12 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(is_series_date(self.sample_data['col_i']))
         self.assertFalse(is_series_date(pd.Series(dtype=np.float64)))
 
-    def test_reorder_from_values(self):
+    def test_reorder_categories(self):
         categorical = self.credit_data['purpose'].copy()
         categorical[0:50] = np.nan
         original_categorical = categorical.copy()
-        values = self.credit_data['credit_amount'].copy()
-        values[25:75] = np.nan
+        weights = self.credit_data['credit_amount'].copy()
+        weights[25:75] = np.nan
 
         original_categories = ['new car', 'used car', 'furniture/equipment', 'radio/tv',
                                'domestic appliance', 'repairs', 'education', 'vacation', 'retraining',
@@ -87,19 +87,19 @@ class TestPandas(unittest.TestCase):
         expected_categories_rev.reverse()
 
         with self.assertRaises(HelpskParamValueError):
-            reorder_from_values(categorical=categorical[0:-1], values=values)
+            reorder_categories(categorical=categorical[0:-1], weights=weights)
 
         with self.assertRaises(HelpskParamValueError):
-            reorder_from_values(categorical=categorical, values=values[0:-1])
+            reorder_categories(categorical=categorical, weights=weights[0:-1])
 
         # check that the purpose column hasn't changed and that it is not ordered and has original categories
         self.assertFalse(categorical.cat.ordered)
         self.assertEqual(list(categorical.cat.categories), original_categories)
 
-        # test default values
+        # test default weights
         # also, we are testing a Categorical object; verify it is categorical, then later test non-categorical
         self.assertEqual(categorical.dtype.name, 'category')
-        results = reorder_from_values(categorical=categorical, values=values, ascending=True, ordered=False)
+        results = reorder_categories(categorical=categorical, weights=weights, ascending=True, ordered=False)
         self.assertTrue(iterables_are_equal(results, original_categorical))
         self.assertEqual(list(results.categories), expected_categories)
         self.assertFalse(results.ordered)
@@ -110,7 +110,7 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(pd.isna(original_categorical[0]))
 
         # test ascending=False & ordered=True
-        results = reorder_from_values(categorical=categorical, values=values, ascending=False, ordered=True)
+        results = reorder_categories(categorical=categorical, weights=weights, ascending=False, ordered=True)
         self.assertTrue(iterables_are_equal(results, original_categorical))
         self.assertEqual(list(results.categories), expected_categories_rev)
         self.assertTrue(results.ordered)
@@ -121,8 +121,8 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(pd.isna(original_categorical[0]))
 
         series = pd.Series(['a', 'b', 'c'] * 2)
-        values = pd.Series([1, 3, 2] * 2)
-        results = reorder_from_values(categorical=series, values=values, ascending=False, ordered=True)
+        weights = pd.Series([1, 3, 2] * 2)
+        results = reorder_categories(categorical=series, weights=weights, ascending=False, ordered=True)
         self.assertTrue(iterables_are_equal(results, series))
         self.assertEqual(list(results.categories), ['b', 'c', 'a'])
         self.assertTrue(results.ordered)

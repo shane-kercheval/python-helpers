@@ -1,7 +1,7 @@
 """This module contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
 
 import datetime
-from typing import List, Union, Iterable
+from typing import List, Union, Iterable, Optional
 
 import numpy as np
 import pandas as pd
@@ -51,11 +51,11 @@ def is_series_date(series: pd.Series) -> bool:
     return False
 
 
-def reorder_from_values(categorical: Union[pd.Series, pd.Categorical, Iterable],
-                        values: Union[pd.Series, np.ndarray],
-                        aggregation_function=np.median,
-                        ascending=True,
-                        ordered=False) -> pd.Categorical:
+def reorder_categories(categorical: Union[pd.Series, pd.Categorical, Iterable],
+                       weights: Union[pd.Series, np.ndarray],
+                       weight_function=np.median,
+                       ascending=True,
+                       ordered=False) -> pd.Categorical:
     """Returns copy of `categorical` series, with categories reordered according to numeric values in
     `values`, based ont the function `func`.
 
@@ -64,29 +64,29 @@ def reorder_from_values(categorical: Union[pd.Series, pd.Categorical, Iterable],
     Args:
         categorical: A collection of categorical values that will be turned into a Categorical object with
             ordered categories.
-        values:
+        weights:
             Numeric values used to reorder the categorical. Must be the same length as `categorical`.
-        aggregation_function:
+        weight_function:
             Function that determines the order of the categories. The default is `np.median`, meaning that
             order of the categories in the returned Categorical object is determined by the median value (of
             the corresponding `values`) for each category.
         ascending:
-            if True, categories are ordered in ascending order based on result of `aggregation_function`
+            if True, categories are ordered in ascending order based on result of `weight_function`
         ordered:
             passed to `pd.Categorical` to indicate if returned object should be `ordered`.
     """
-    if len(categorical) != len(values):
-        message = f'Length of `categorical` ({len(categorical)}) must match length of `values ({len(values)})'
-        raise HelpskParamValueError(message)
+    if len(categorical) != len(weights):
+        mess = f'Length of `categorical` ({len(categorical)}) must match length of `values ({len(weights)})'
+        raise HelpskParamValueError(mess)
 
-    if isinstance(values, pd.Series):
-        values = values.values
+    if isinstance(weights, pd.Series):
+        weights = weights.values
 
-    values = pd.Series(values, index=categorical)
+    weights = pd.Series(weights, index=categorical)
 
     # for each categoric value, calculate the associated value of the categoric, based on the func
     # e.g. if func is np.median, get the median value associated with categoric value
-    ordered_categories = values.groupby(level=0).agg(aggregation_function)\
+    ordered_categories = weights.groupby(level=0).agg(weight_function)\
         .fillna(0).sort_values(ascending=ascending)
     results = pd.Categorical(values=categorical,
                              categories=list(ordered_categories.index.values),
