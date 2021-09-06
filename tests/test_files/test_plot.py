@@ -3,10 +3,11 @@ import unittest
 # noinspection PyMethodMayBeStatic
 from enum import unique, Enum, auto
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from helpsk.plot import plot_value_frequency
+import helpsk.plot as hplot
 from tests.helpers import get_data_credit, check_plot, get_test_path
 
 
@@ -40,5 +41,13 @@ class TestPlot(unittest.TestCase):
         test_series = self.credit_data['purpose'].copy()
         test_series[0:10] = np.nan
 
-        check_plot(file_name=get_test_path() + '/plot/test_plot_value_frequency.png',
-                   plot_function=lambda: plot_value_frequency(series=test_series, sort_by_frequency=True, figure_size=(10, 7)))
+        from helpsk.pandas import value_frequency
+        value_frequency(series=test_series)
+
+        check_plot(file_name=get_test_path() + '/plot/test_plot_value_frequency__sort_true.png',
+                   plot_function=lambda: hplot.plot_value_frequency(series=test_series,
+                                                                    sort_by_frequency=True))
+
+        check_plot(file_name=get_test_path() + '/plot/test_plot_value_frequency__sort_false.png',
+                   plot_function=lambda: hplot.plot_value_frequency(series=test_series,
+                                                                    sort_by_frequency=False))

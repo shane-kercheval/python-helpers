@@ -184,3 +184,25 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(hv.iterables_are_equal(results.index.values.tolist(), expected_indexes))  # noqa
         self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, cached_results.loc[results.index.values, 'Frequency'].values))
         self.assertTrue(hv.iterables_are_equal(results['Percent'].values, cached_results.loc[results.index.values, 'Percent'].values))
+
+    def test_value_frequency__missing_category(self):
+        # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
+        # a count of `0` for a category (i.e. category existed but not any values)
+        test_series = self.credit_data['checking_status']
+        test_series[test_series == 'no checking'] = np.nan
+
+        results = value_frequency(test_series, sort_by_frequency=True)
+        expected_value_counts = test_series.value_counts(normalize=False, dropna=False)
+
+        self.assertTrue(hv.iterables_are_equal(results.index.values, expected_value_counts.index.values))
+        self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, expected_value_counts.values))
+
+        cached_results = results
+
+        results = value_frequency(test_series, sort_by_frequency=False)
+        expected_indexes = ['0<=X<200', '<0', '>=200', 'no checking', np.nan]
+
+        self.assertEqual(results.index.values.tolist()[0:-1], expected_indexes[0:-1])
+        self.assertTrue(hv.iterables_are_equal(results.index.values.tolist(), expected_indexes))  # noqa
+        self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, cached_results.loc[results.index.values, 'Frequency'].values))
+        self.assertTrue(hv.iterables_are_equal(results['Percent'].values, cached_results.loc[results.index.values, 'Percent'].values))
