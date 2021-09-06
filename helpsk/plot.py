@@ -9,10 +9,11 @@ import helpsk.pandas as hpandas
 STANDARD_PLOT_HEIGHT = 10
 GOLDEN_RATIO = 1.61803398875
 STANDARD_PLOT_WIDTH = STANDARD_PLOT_HEIGHT / GOLDEN_RATIO
+STANDARD_PLOT_HEIGHT_WIDTH = (STANDARD_PLOT_HEIGHT, STANDARD_PLOT_WIDTH)
 
 
 def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
-                         figure_size: Tuple[int, int] = (STANDARD_PLOT_HEIGHT, STANDARD_PLOT_WIDTH),
+                         figure_size: Tuple[int, int] = STANDARD_PLOT_HEIGHT_WIDTH,
                          x_axis_rotation: int = 30) -> None:
     """Shows the unique values and corresponding frequencies.
 
