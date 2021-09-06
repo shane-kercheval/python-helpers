@@ -52,8 +52,18 @@ class TestPlot(unittest.TestCase):
                                                                     sort_by_frequency=False))
 
     def test_plot_correlation_heatmap(self):
-        pass
-        # test_series = self.credit_data.copy()
-        # test_series[0:10] = np.nan
-        #
-        # hplot.plot_correlation_heatmap(test_series)
+        test_series = self.credit_data.copy()
+        test_series[0:10] = np.nan
+
+        check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_correlation_heatmap__default.png',
+                   plot_function=lambda: hplot.plot_correlation_heatmap(test_series))
+
+        check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_correlation_heatmap__params.png',
+                   plot_function=lambda: hplot.plot_correlation_heatmap(test_series, threshold=0.2,
+                                                                        title='Credit Data: Correlations Above 0.2',
+                                                                        figure_size=(6, 6),
+                                                                        round_by=3,
+                                                                        features_to_highlight=['credit_amount',
+                                                                                               'num_dependents']))
+
+
