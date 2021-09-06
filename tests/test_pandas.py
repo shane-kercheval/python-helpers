@@ -108,8 +108,9 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(original_categorical.cat.categories), original_categories)
-        self.assertTrue(pd.isna(original_categorical[0]))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
 
         series = pd.Series(['a', 'b', 'b', 'c', 'b', 'c'])
         results = reorder_categories(categorical=series, ascending=False, ordered=True)
@@ -153,8 +154,9 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(original_categorical.cat.categories), original_categories)
-        self.assertTrue(pd.isna(original_categorical[0]))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
 
         # test ascending=False & ordered=True
         results = reorder_categories(categorical=categorical, weights=weights, ascending=False, ordered=True)
@@ -164,8 +166,9 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(original_categorical.cat.categories), original_categories)
-        self.assertTrue(pd.isna(original_categorical[0]))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertTrue(iterables_are_equal(categorical, original_categorical))
+        self.assertTrue(pd.isna(categorical[0]))
 
         series = pd.Series(['a', 'b', 'c'] * 2)
         weights = pd.Series([1, 3, 2] * 2)
