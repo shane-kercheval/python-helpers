@@ -158,15 +158,17 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
             `STANDARD_HEIGHT`, and the default width is `STANDARD_HEIGHT / GOLDEN_RATIO`
         missing_value_replacement
     """
-    # todo cleanup
-    dataframe = dataframe.copy()
-    dataframe = dataframe[[outer_column, inner_column]]
-    dataframe[outer_column] = dataframe[outer_column].cat.add_categories(missing_value_replacement)
-    dataframe[inner_column] = dataframe[inner_column].cat.add_categories(missing_value_replacement)
+    dataframe = dataframe[[outer_column, inner_column]].copy()
+    
+    if dataframe[outer_column].dtype.name == 'category':
+        dataframe[outer_column] = dataframe[outer_column].cat.add_categories(missing_value_replacement)
+
+    if dataframe[inner_column].dtype.name == 'category':
+        dataframe[inner_column] = dataframe[inner_column].cat.add_categories(missing_value_replacement)
+    
     dataframe = dataframe.fillna(missing_value_replacement)
     grouped_data = dataframe.groupby([outer_column, inner_column]).size()
 
-    # todo sort?
     outer_labels = dataframe[outer_column].unique().tolist()
     inner_labels = dataframe[inner_column].unique().tolist()
 

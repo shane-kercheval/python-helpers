@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 import helpsk.plot as hplot
+import helpsk.validation as hval
 from tests.helpers import get_data_credit, check_plot, get_test_path
 
 
@@ -72,7 +73,11 @@ class TestPlot(unittest.TestCase):
         test_series.loc[0:10, 'credit_history'] = np.nan
         test_series.loc[5:15, 'own_telephone'] = np.nan
 
+        original = test_series.copy()
+
         check_plot(file_name=get_test_path() + '/test_files/plot/plot_dodged_barchart__default.png',
                    plot_function=lambda: hplot.plot_dodged_barchart(dataframe=test_series,
                                                                     outer_column='own_telephone',
                                                                     inner_column='credit_history'))
+
+        self.assertTrue(hval.dataframes_match([original, test_series]))
