@@ -81,3 +81,17 @@ class TestPlot(unittest.TestCase):
                                                                     inner_column='credit_history'))
 
         self.assertTrue(hval.dataframes_match([original, test_series]))
+
+    def test_plot_histogram_with_categorical(self):
+        test_series = self.credit_data.copy()
+        test_series.loc[0:10, 'credit_history'] = np.nan
+        test_series.loc[5:15, 'credit_amount'] = np.nan
+
+        original = test_series.copy()
+
+        check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_histogram_with_categorical__default.png',
+                   plot_function=lambda: hplot.plot_histogram_with_categorical(dataframe=test_series,
+                                                                               numeric_column='credit_amount',
+                                                                               categorical_column='credit_history'))
+
+        self.assertTrue(hval.dataframes_match([original, test_series]))
