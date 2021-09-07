@@ -53,7 +53,8 @@ class TestPlot(unittest.TestCase):
 
     def test_plot_correlation_heatmap(self):
         test_series = self.credit_data.copy()
-        test_series[0:10] = np.nan
+        test_series.loc[0:10, 'credit_amount'] = np.nan
+        test_series.loc[0:10, 'num_dependents'] = np.nan
 
         check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_correlation_heatmap__default.png',
                    plot_function=lambda: hplot.plot_correlation_heatmap(test_series))
@@ -66,4 +67,12 @@ class TestPlot(unittest.TestCase):
                                                                         features_to_highlight=['credit_amount',
                                                                                                'num_dependents']))
 
+    def test_plot_dodged_barchart(self):
+        test_series = self.credit_data.copy()
+        test_series.loc[0:10, 'credit_history'] = np.nan
+        test_series.loc[5:15, 'own_telephone'] = np.nan
 
+        check_plot(file_name=get_test_path() + '/test_files/plot/plot_dodged_barchart__default.png',
+                   plot_function=lambda: hplot.plot_dodged_barchart(dataframe=test_series,
+                                                                    outer_column='own_telephone',
+                                                                    inner_column='credit_history'))

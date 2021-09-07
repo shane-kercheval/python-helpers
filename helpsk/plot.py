@@ -138,3 +138,89 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
                 plt.gca().get_yticklabels()[index_to_highlight].set_color('red')
 
     plt.tight_layout()
+
+
+# pylint: disable=too-many-locals
+def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
+                         figure_size: Tuple[int, int] = STANDARD_WIDTH_HEIGHT,
+                         missing_value_replacement: str = '<Missing>'):
+    """First attempt at dodged barchart.. It needs some work.
+
+    args:
+        dataframe:
+            pandas data.frame
+        outer_column:
+            column name associated with outer bars
+        inner_column:
+            column name associated with inner bars
+        figure_size:
+            tuple containing `(width, height)` of plot. The default height is defined by
+            `STANDARD_HEIGHT`, and the default width is `STANDARD_HEIGHT / GOLDEN_RATIO`
+        missing_value_replacement
+    """
+    # todo cleanup
+    dataframe = dataframe.copy()
+    dataframe = dataframe[[outer_column, inner_column]]
+    dataframe[outer_column] = dataframe[outer_column].cat.add_categories(missing_value_replacement)
+    dataframe[inner_column] = dataframe[inner_column].cat.add_categories(missing_value_replacement)
+    dataframe = dataframe.fillna(missing_value_replacement)
+    grouped_data = dataframe.groupby([outer_column, inner_column]).size()
+
+    # todo sort?
+    outer_labels = dataframe[outer_column].unique().tolist()
+    inner_labels = dataframe[inner_column].unique().tolist()
+
+    outer_totals = [grouped_data[index].sum() for index in outer_labels]
+    group_locations = np.arange(len(outer_labels))  # the x locations for the groups
+
+    bar_midpoints = group_locations  # + (width / len(inner_labels))
+
+    fig, axis = plt.subplots()
+    fig.set_size_inches(figure_size[0], figure_size[1])
+
+    outer_bar_width = 0.9
+    inner_bar_width = outer_bar_width / len(inner_labels)
+
+    ax_totals = axis.bar(x=bar_midpoints,
+                         height=outer_totals,
+                         width=outer_bar_width,
+                         color='black', alpha=0.15)
+
+    # from matplotlib.pyplot import cm
+    # colors = cm.rainbow(np.linspace(0, 1, 10)[::-1])
+    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+
+    if len(inner_labels) > len(colors):
+        raise NotImplementedError(
+            'Need to update implementation to use >' + str(len(colors)) + ' colors :(')
+
+    ax_list = []
+    for index in range(len(inner_labels)):
+        # the 'if' is because it's not guaranteed that every class of the target variable will be found
+        # in each category of 'outer_column', especially if the category is very small in size.
+        counts = [grouped_data[x, inner_labels[index]]
+                  if inner_labels[index] in grouped_data.loc[x].index else 0
+                  for x in outer_labels]
+
+        # `starting_offset` is the amount we have to subtract from our inner bars so the start of the
+        # inner/outer are aligned
+        starting_offset = (outer_bar_width / 2) - (inner_bar_width / 2)
+        # (inner_bar_width * index) is the offset for each of the inner bars
+        # i.e. it's the distance we have to add so that we aren't overlapping inner bars
+        ax_list.append(
+            axis.bar(x=group_locations - starting_offset + (inner_bar_width * index),
+                     height=tuple(counts),
+                     width=inner_bar_width,
+                     color=colors[index]))
+
+    # add some text for labels, title and axes ticks
+    axis.set_ylabel('Count')
+    axis.set_xlabel(outer_column)
+    axis.set_title(f'`{outer_column}` vs. `{inner_column}`')
+    axis.set_xticks(group_locations)
+    axis.set_xticklabels(labels=outer_labels, rotation=20, ha='right')
+
+    axis.legend([ax[0] for ax in ax_list] + [ax_totals[0]], inner_labels + ['Total'],
+                title=inner_column)
+
+    plt.tight_layout()
