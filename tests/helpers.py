@@ -96,7 +96,9 @@ def get_data_credit():
     # save locally in case dataset changes or is removed
     # from sklearn.datasets import fetch_openml
     # credit_g = fetch_openml('credit-g', version=1)
-    # credit_g['data'].to_pickle(get_test_path() + '/test_data/credit.pkl')
+    # data = credit_g['data']
+    # data['target'] = credit_g['target']
+    # data.to_pickle(get_test_path() + '/test_data/credit.pkl')
     return pd.read_pickle(get_test_path() + '/test_data/credit.pkl')
 
 
@@ -104,5 +106,7 @@ def get_data_titanic():
     # save locally in case dataset changes or is removed
     # from sklearn.datasets import fetch_openml
     # titanic = fetch_openml('titanic', version=1)
-    # titanic['data'].to_pickle(get_test_path() + '/test_data/titanic.pkl')
+    # data = titanic['data']
+    # data['survived'] = titanic['target']
+    # data.to_pickle(get_test_path() + '/test_data/titanic.pkl')
     return pd.read_pickle(get_test_path() + '/test_data/titanic.pkl')
