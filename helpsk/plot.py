@@ -199,7 +199,7 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
                          color='black', alpha=0.15)
 
     # from matplotlib.pyplot import cm
-    # colors = cm.rainbow(np.linspace(0, 1, 10)[::-1])
+    # colors = cm.rainbow(np.linspace(0, 1, 10)[::-1])  # noqa
     colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
     if len(inner_labels) > len(colors):

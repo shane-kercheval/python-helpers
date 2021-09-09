@@ -209,7 +209,7 @@ class TestPandas(unittest.TestCase):
         # with the same values
         results = top_n_categories(categorical=categorical, top_n=20)
         self.assertTrue(results is not categorical)  # check that a new object was returned
-        self.assertTrue(set(results.cat.categories) == set(categorical.cat.categories))
+        self.assertTrue(set(results.cat.categories) == set(categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(results, categorical))
 
         # check no side effects
@@ -272,7 +272,7 @@ class TestPandas(unittest.TestCase):
         # with the same values
         results = top_n_categories(categorical=categorical, top_n=20, weights=weights, weight_function=np.sum)
         self.assertTrue(results is not categorical)  # check that a new object was returned
-        self.assertTrue(set(results.cat.categories) == set(categorical.cat.categories))
+        self.assertTrue(set(results.cat.categories) == set(categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(results, categorical))
 
         # check no side effects

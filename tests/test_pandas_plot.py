@@ -6,6 +6,7 @@ from helpsk.pandas import *
 from tests.helpers import get_data_credit, get_test_path
 import warnings
 
+
 @unique
 class TestEnum(Enum):
     VALUE_A = auto()

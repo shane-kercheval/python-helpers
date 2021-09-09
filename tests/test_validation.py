@@ -457,7 +457,6 @@ class TestValidation(unittest.TestCase):
         self.assertFalse(hv.iterables_are_equal(pd.Categorical(different_values, ordered=True),
                                                 ordered_categorical))
 
-
     def test_dataframes_match(self):
 
         dataframe_1 = pd.DataFrame({'col_floats': [1.123456789, 2.123456789, 3.123456789, np.nan],

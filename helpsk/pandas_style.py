@@ -1,22 +1,42 @@
 """Collection of helpers methods that help to style tables in Jupyter Notebooks
 """
 from typing import Union, Optional
+from html import escape
 
 import pandas as pd
 import numpy as np
-from html import escape
 
 from pandas.io.formats.style import Styler
 from pandas.api.types import is_list_like  # noqa
 from pandas._typing import Axis  # noqa
 from seaborn import color_palette
 
+
+# pylint: disable=redefined-builtin,too-many-arguments
 def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
            round_to: int = 2,
            fill_missing_value: Optional[str] = '<NA>',
            missing_color: Optional[str] = 'yellow',
            thousands: Optional[str] = ',',
            hide_index: bool = False) -> Styler:
+    """Applies basic formatting to pandas Dataframe.
+    Args:
+        styler:
+            either pd.Dataframe or pd.Dataframe.style
+        round_to:
+            number of digits to round numeric columns to
+        fill_missing_value:
+            the value to replace missing data (e.g. NaN)
+        missing_color:
+            The background color for cells that have missing values.
+        thousands:
+            the seperator used for thousands e.g. `'` will result in `10,000` while ` ` will result in
+            `10 000`.
+        hide_index:
+            Hide the index of the dataframe.
+    Returns:
+        styler
+    """
 
     if isinstance(styler, pd.DataFrame):
         styler = styler.style
@@ -34,15 +54,23 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
 
 def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa,
                      **kwargs) -> Styler:
-
+    """Applies a background color to pandas Dataframe.
+        Args:
+            styler:
+                either pd.Dataframe or pd.Dataframe.style
+            kwargs:
+                additional arguments that will be passed to the pandas `.background_gradient()` function.
+        Returns:
+            styler
+        """
     if isinstance(styler, pd.DataFrame):
         styler = styler.style
-    # cm = sns.light_palette("green", as_cmap=True)
-    # cm = sns.color_palette("dark:salmon_r", as_cmap=True)
-    # cm = sns.color_palette(['red', 'blue', 'green'], as_cmap=True)
-    # cm = sns.color_palette("light:#5A9", as_cmap=True)
-    cm = color_palette("Blues", as_cmap=True)
-    return styler.background_gradient(cmap=cm, **kwargs)
+    # color_map = sns.light_palette("green", as_cmap=True)
+    # color_map = sns.color_palette("dark:salmon_r", as_cmap=True)
+    # color_map = sns.color_palette(['red', 'blue', 'green'], as_cmap=True)
+    # color_map = sns.color_palette("light:#5A9", as_cmap=True)
+    color_map = color_palette("Blues", as_cmap=True)
+    return styler.background_gradient(cmap=color_map, **kwargs)
 
 
 # pylint: disable=too-many-arguments
