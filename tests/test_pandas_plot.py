@@ -42,12 +42,24 @@ class TestPandasStyle(unittest.TestCase):
     def test_bar_inverse(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
         # a count of `0` for a category (i.e. category existed but not any values)
+        test_data = self.sample_data
+        with open(get_test_path() + '/test_files/pandas_style/inverse_bar.html', 'w') as file:
+            table_html = test_data. \
+                head(20). \
+                pipe(pstyle.bar_inverse, subset='credit_amount_copy', color='gray'). \
+                bar(subset=['credit_amount'], color='grey'). \
+                render()
+            file.write(table_html)
+
+    def test_all_styles(self):
+        # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
+        # a count of `0` for a category (i.e. category existed but not any values)
         test_data = self.credit_data
         test_data.loc[0:5, 'credit_amount'] = np.nan
         test_data.insert(loc=5,
                          column='credit_amount_copy',
                          value=test_data['credit_amount'].copy())
-        with open(get_test_path() + '/test_files/pandas_style/inverse_bar.html', 'w') as file:
+        with open(get_test_path() + '/test_files/pandas_style/all_styles.html', 'w') as file:
             table_html = test_data. \
                 head(20). \
                 pipe(pstyle.bar_inverse, subset='credit_amount_copy', color='gray'). \
