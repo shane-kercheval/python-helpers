@@ -4,7 +4,7 @@ from enum import Enum, unique, auto
 import helpsk.pandas_style as pstyle
 from helpsk.pandas import *
 from tests.helpers import get_data_credit, get_test_path
-
+import warnings
 
 @unique
 class TestEnum(Enum):
@@ -37,8 +37,10 @@ class TestPandasStyle(unittest.TestCase):
             file.write(pstyle.format(self.sample_data).render())
 
     def test_background_color(self):
-        with open(get_test_path() + '/test_files/pandas_style/background_color__default.html', 'w') as file:
-            file.write(pstyle.background_color(self.sample_data).render())
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            with open(get_test_path() + '/test_files/pandas_style/background_color__default.html', 'w') as file:
+                file.write(pstyle.background_color(self.sample_data).render())
 
     def test_bar_inverse(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
