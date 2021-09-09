@@ -39,9 +39,9 @@ class TestPandasStyle(unittest.TestCase):
         sample_data['col_g'] = sample_data['col_b'].astype('category')
         cls.sample_data = sample_data
 
-    # def test_format(self):
-    #     with open(get_test_path() + '/test_files/pandas_style/format__default.html', 'w') as file:
-    #         file.write(pstyle.format(self.sample_data).render())
+    def test_format(self):
+        with open(get_test_path() + '/test_files/pandas_style/format__default.html', 'w') as file:
+            file.write(pstyle.format(self.sample_data).render())
 
     def test_bar_inverse(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
