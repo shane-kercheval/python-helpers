@@ -44,6 +44,10 @@ def __bar_inverse(style_object, align: str, colors: list[str], width: float = 10
                 css += f" {color} {start:.1f}%, transparent {start:.1f}%, "
             min_e = min(end, width)
             css += f"transparent {min_e:.1f}%, {color} {min_e:.1f}%)"
+        elif end == start == 0:
+            css += "background: linear-gradient(90deg,"
+            css += f" {color} {100:.1f}%, transparent {100:.1f}%, "
+            css += f"transparent {100:.1f}%, {color} {100:.1f}%)"
         return css
 
     def css(row_item):

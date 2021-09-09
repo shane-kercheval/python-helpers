@@ -43,12 +43,21 @@ class TestPandasStyle(unittest.TestCase):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
         # a count of `0` for a category (i.e. category existed but not any values)
         test_data = self.sample_data
+        test_data.insert(loc=1,
+                         column='col_a_copy',
+                         value=test_data['col_a'].copy())
+        test_data.insert(loc=7,
+                         column='bar_inverse',
+                         value=test_data['col_f'].copy())
+
         with open(get_test_path() + '/test_files/pandas_style/inverse_bar.html', 'w') as file:
-            table_html = test_data. \
-                head(20). \
-                pipe(pstyle.bar_inverse, subset='credit_amount_copy', color='gray'). \
-                bar(subset=['credit_amount'], color='grey'). \
+            table_html = test_data.style. \
+                bar(subset=['col_a'], color='pink', vmin=2). \
+                pipe(pstyle.bar_inverse, subset='col_a_copy', color='pink', min_value=2). \
+                bar(subset=['col_f'], color='green'). \
+                pipe(pstyle.bar_inverse, subset='bar_inverse', color='green'). \
                 render()
+
             file.write(table_html)
 
     def test_all_styles(self):
