@@ -385,7 +385,7 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
                 values = results.index.values.dropna().unique().tolist()  # noqa
                 values.sort()
                 results['temp'] = results.index
-                results.temp.cat.reorder_categories(values, ordered=True, inplace=True)
+                results['temp'] = results['temp'].cat.reorder_categories(values, ordered=True)
                 results = results.sort_values(['temp']).drop(columns='temp')
         else:
             results.sort_index(inplace=True)

@@ -362,8 +362,7 @@ class TestPandas(unittest.TestCase):
         self.assertFalse(test_series_unordered.cat.ordered)
         test_series_unordered[0:10] = np.nan
 
-        test_series_ordered = test_series_unordered.cat.reorder_categories(credit_history_order,
-                                                                           ordered=True, inplace=False)
+        test_series_ordered = test_series_unordered.cat.reorder_categories(credit_history_order, ordered=True)
         self.assertTrue(test_series_ordered.cat.ordered)
 
         results = value_frequency(test_series_unordered, sort_by_frequency=True)
