@@ -8,6 +8,7 @@ import helpsk.database_base
 import helpsk.date
 import helpsk.exceptions
 import helpsk.pandas
+import helpsk.pandas_style
 import helpsk.plot
 import helpsk.string
 import helpsk.utility
