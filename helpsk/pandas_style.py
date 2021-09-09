@@ -1,6 +1,6 @@
 """Collection of helpers methods that help to style tables in Jupyter Notebooks
 """
-from typing import Union
+from typing import Union, Optional
 
 import pandas as pd
 import numpy as np
@@ -9,6 +9,19 @@ from pandas.io.formats.style import Styler
 from pandas.api.types import is_list_like  # noqa
 from pandas._typing import Axis  # noqa
 
+def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
+           round_to: int = 2,
+           fill_missing_value: Optional[str] = '<Missing>',
+           thousands: Optional[str] = ',') -> Styler:
+
+    if isinstance(styler, pd.DataFrame):
+        styler = styler.style
+
+
+
+    return styler.format(precision=round_to,  # noqa
+                         na_rep=fill_missing_value,  # noqa
+                         thousands=thousands)  # noqa
 
 # pylint: disable=too-many-arguments
 def __bar_inverse(style_object, align: str, colors: list[str], width: float = 100, min_value: float = None,
