@@ -220,12 +220,15 @@ def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
     return pd.Series(converted_series)
 
 
-def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
+def numeric_summary(dataframe: pd.DataFrame,
+                    round_by: int = 2) -> Union[pd.DataFrame, None]:
     """Provides a summary of basic stats for the numeric columns of a DataFrame.
 
     Args:
         dataframe:
             a pandas dataframe
+        round_by:
+            the number of decimal places to round the results
 
     Returns:
         Returns a pandas DataFrame with the following attributes (returned as columns) for each of the
@@ -264,13 +267,13 @@ def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
     # column, number of nulls in column, percent of nulls in column
     null_data = [(column,
                   dataframe[column].isnull().sum(),
-                  round(dataframe[column].isnull().sum() / len(dataframe), 3))
+                  round(dataframe[column].isnull().sum() / len(dataframe), round_by))
                  for column in numeric_columns]
     columns, num_nulls, perc_nulls = zip(*null_data)
 
     # column, number of 0's, percent of 0's
     zeros_data = [(sum(dataframe[column] == 0),
-                   round(sum(dataframe[column] == 0) / len(dataframe), 3))
+                   round(sum(dataframe[column] == 0) / len(dataframe), round_by))
                   for column in numeric_columns]
     num_zeros, perc_zeros = zip(*zeros_data)
     results = pd.DataFrame(
@@ -279,20 +282,20 @@ def numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
          '% Nulls': perc_nulls,
          '# of Zeros': num_zeros,
          '% Zeros': perc_zeros,
-         'Mean': [round(dataframe[x].mean(), 3) for x in numeric_columns],
-         'St Dev.': [round(dataframe[x].std(), 3) for x in numeric_columns],
-         'Coef of Var': [round(dataframe[x].std() / dataframe[x].mean(), 3)
+         'Mean': [round(dataframe[x].mean(), round_by) for x in numeric_columns],
+         'St Dev.': [round(dataframe[x].std(), round_by) for x in numeric_columns],
+         'Coef of Var': [round(dataframe[x].std() / dataframe[x].mean(), round_by)
                          if dataframe[x].mean() != 0 else np.nan
                          for x in numeric_columns],
-         'Skewness': [round(dataframe[x].skew(), 3) for x in numeric_columns],
-         'Kurtosis': [round(dataframe[x].kurt(), 3) for x in numeric_columns],
-         'Min': [round(dataframe[x].min(), 3) for x in numeric_columns],
-         '10%': [round(dataframe[x].quantile(q=0.10), 3) for x in numeric_columns],
-         '25%': [round(dataframe[x].quantile(q=0.25), 3) for x in numeric_columns],
-         '50%': [round(dataframe[x].quantile(q=0.50), 3) for x in numeric_columns],
-         '75%': [round(dataframe[x].quantile(q=0.75), 3) for x in numeric_columns],
-         '90%': [round(dataframe[x].quantile(q=0.90), 3) for x in numeric_columns],
-         'Max': [round(dataframe[x].max(), 3) for x in numeric_columns]},
+         'Skewness': [round(dataframe[x].skew(), round_by) for x in numeric_columns],
+         'Kurtosis': [round(dataframe[x].kurt(), round_by) for x in numeric_columns],
+         'Min': [round(dataframe[x].min(), round_by) for x in numeric_columns],
+         '10%': [round(dataframe[x].quantile(q=0.10), round_by) for x in numeric_columns],
+         '25%': [round(dataframe[x].quantile(q=0.25), round_by) for x in numeric_columns],
+         '50%': [round(dataframe[x].quantile(q=0.50), round_by) for x in numeric_columns],
+         '75%': [round(dataframe[x].quantile(q=0.75), round_by) for x in numeric_columns],
+         '90%': [round(dataframe[x].quantile(q=0.90), round_by) for x in numeric_columns],
+         'Max': [round(dataframe[x].max(), round_by) for x in numeric_columns]},
         index=columns)
     return results
 
