@@ -1,16 +1,9 @@
-import os
 import unittest
 from enum import Enum, unique, auto
 
-import numpy as np
-
-from helpsk import validation as hv
-from helpsk.pandas import *
-from helpsk.utility import redirect_stdout_to_file
-from helpsk.validation import iterables_are_equal
-from tests.helpers import get_data_credit, get_test_path
-
 import helpsk.pandas_style as pstyle
+from helpsk.pandas import *
+from tests.helpers import get_data_credit, get_test_path
 
 
 @unique
@@ -42,6 +35,10 @@ class TestPandasStyle(unittest.TestCase):
     def test_format(self):
         with open(get_test_path() + '/test_files/pandas_style/format__default.html', 'w') as file:
             file.write(pstyle.format(self.sample_data).render())
+
+    def test_background_color(self):
+        with open(get_test_path() + '/test_files/pandas_style/background_color__default.html', 'w') as file:
+            file.write(pstyle.background_color(self.sample_data).render())
 
     def test_bar_inverse(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had

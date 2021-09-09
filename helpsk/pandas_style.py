@@ -9,19 +9,40 @@ from html import escape
 from pandas.io.formats.style import Styler
 from pandas.api.types import is_list_like  # noqa
 from pandas._typing import Axis  # noqa
-
+from seaborn import color_palette
 
 def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
            round_to: int = 2,
            fill_missing_value: Optional[str] = '<NA>',
-           thousands: Optional[str] = ',') -> Styler:
+           missing_color: Optional[str] = 'yellow',
+           thousands: Optional[str] = ',',
+           hide_index: bool = False) -> Styler:
 
     if isinstance(styler, pd.DataFrame):
         styler = styler.style
 
+    if missing_color:
+        styler = styler.highlight_null(null_color=missing_color)
+
+    if hide_index:
+        styler = styler.hide_index()
+
     return styler.format(precision=round_to,  # noqa
                          na_rep=escape(fill_missing_value),  # noqa
                          thousands=thousands)  # noqa
+
+
+def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa,
+                     **kwargs) -> Styler:
+
+    if isinstance(styler, pd.DataFrame):
+        styler = styler.style
+    # cm = sns.light_palette("green", as_cmap=True)
+    # cm = sns.color_palette("dark:salmon_r", as_cmap=True)
+    # cm = sns.color_palette(['red', 'blue', 'green'], as_cmap=True)
+    # cm = sns.color_palette("light:#5A9", as_cmap=True)
+    cm = color_palette("Blues", as_cmap=True)
+    return styler.background_gradient(cmap=cm, **kwargs)
 
 
 # pylint: disable=too-many-arguments
