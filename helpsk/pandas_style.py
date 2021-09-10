@@ -1,6 +1,6 @@
 """Collection of helpers methods that help to style tables in Jupyter Notebooks
 """
-from typing import Union, Optional
+from typing import Union, Optional, List
 from html import escape
 
 import pandas as pd
@@ -15,6 +15,7 @@ from helpsk import color
 
 # pylint: disable=redefined-builtin,too-many-arguments
 def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
+           subset: Optional[List[str]] = None,
            round_to: int = 2,
            fill_missing_value: Optional[str] = '<NA>',
            missing_color: Optional[str] = color.WARNING,
@@ -24,6 +25,10 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
     Args:
         styler:
             either pd.Dataframe or pd.Dataframe.style
+        subset:
+            A valid 2d input to DataFrame.loc[<subset>], or, in the case of a 1d input or single key,
+            to DataFrame.loc[:, <subset>] where the columns are prioritised, to limit data to before applying
+            the function.
         round_to:
             number of digits to round numeric columns to
         fill_missing_value:
@@ -48,7 +53,8 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
     if hide_index:
         styler = styler.hide_index()
 
-    return styler.format(precision=round_to,  # noqa
+    return styler.format(subset=subset,  # noqa
+                         precision=round_to,  # noqa
                          na_rep=escape(fill_missing_value),  # noqa
                          thousands=thousands)  # noqa
 
