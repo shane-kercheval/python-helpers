@@ -107,6 +107,7 @@ def __bar_inverse(style_object, align: str, colors: list[str], width: float = 10
     normed = width * (style_object.to_numpy(dtype=float) - object_min) / (object_max - object_min + 1e-12)
     zero = -width * object_min / (object_max - object_min + 1e-12)
 
+    # pylint: disable=redefined-outer-name
     def css_bar(start: float, end: float, color: str) -> str:
         """
         Generate CSS code to draw a bar from start to end.
@@ -151,7 +152,7 @@ def bar_inverse(
         styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
         subset: "Subset" = None,  # noqa
         axis: Axis = 0,
-        color="#d65f5f",
+        color="#d65f5f",  # pylint: disable=redefined-outer-name  # noqa
         width: float = 100,
         align: str = "left",
         min_value: float = None,
