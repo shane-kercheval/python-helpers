@@ -16,7 +16,7 @@ from helpsk import color
 # pylint: disable=redefined-builtin,too-many-arguments
 def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
            subset: Optional[List[str]] = None,
-           round_to: int = 2,
+           round_by: int = 2,
            fill_missing_value: Optional[str] = '<NA>',
            missing_color: Optional[str] = color.WARNING,
            thousands: Optional[str] = ',',
@@ -29,7 +29,7 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
             A valid 2d input to DataFrame.loc[<subset>], or, in the case of a 1d input or single key,
             to DataFrame.loc[:, <subset>] where the columns are prioritised, to limit data to before applying
             the function.
-        round_to:
+        round_by:
             number of digits to round numeric columns to
         fill_missing_value:
             the value to replace missing data (e.g. NaN)
@@ -54,7 +54,7 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
         styler = styler.hide_index()
 
     return styler.format(subset=subset,  # noqa
-                         precision=round_to,  # noqa
+                         precision=round_by,  # noqa
                          na_rep=escape(fill_missing_value),  # noqa
                          thousands=thousands)  # noqa
 
@@ -82,6 +82,28 @@ def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler
     # color_map = sns.color_palette("light:#5A9", as_cmap=True)
     color_map = color_palette(palette, as_cmap=True)
     return styler.background_gradient(cmap=color_map, **kwargs)
+
+
+# def tuning_results(tuning_results: pd.DataFrame):
+#
+#
+#     format(styler=tuning_results,
+#            subset=,
+#            round_to=,
+#            fill_missing_value=,
+#            missing_color=,
+#            thousands=,
+#            hide_index=)
+#
+#     tuning_results.style.
+#
+#     results_mod.style.format(precision=3, na_rep='<Missing>', thousands=",").\
+#         bar(subset=['mean_score'], color='#5fba7d').\
+#         bar(subset=['mean*+2SD'], color='gray').\
+#         pipe(hlp.pandas_style.bar_inverse, subset=['mean*-2SD'], color='gray').\
+#         hide_index().\
+#         highlight_null(null_color=hlp.color.Colors.ERROR)
+
 
 
 # pylint: disable=too-many-arguments

@@ -1,12 +1,16 @@
 """This module contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
 
 import datetime
+import math
 from typing import List, Union, Optional, Callable
 
 import numpy as np
 import pandas as pd
+from pandas.io.formats.style import Styler
 
 from helpsk.exceptions import HelpskParamValueError
+import helpsk.pandas_style as pstyle
+from helpsk import color
 
 
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
@@ -221,7 +225,8 @@ def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
 
 
 def numeric_summary(dataframe: pd.DataFrame,
-                    round_by: int = 2) -> Union[pd.DataFrame, None]:
+                    round_by: int = 2,
+                    return_style: bool = False) -> Union[pd.DataFrame, Styler, None]:
     """Provides a summary of basic stats for the numeric columns of a DataFrame.
 
     Args:
@@ -229,6 +234,9 @@ def numeric_summary(dataframe: pd.DataFrame,
             a pandas dataframe
         round_by:
             the number of decimal places to round the results
+        return_style:
+            If True, returns a pd.DataFrame.style object. This can be used for displaying in Jupyter Notebook.
+            If False, returns a pd.DataFrame
 
     Returns:
         Returns a pandas DataFrame with the following attributes (returned as columns) for each of the
@@ -247,6 +255,7 @@ def numeric_summary(dataframe: pd.DataFrame,
             We can use this metric to compare the variation of two different variables (i.e. columns) that
             have different units or scales.
         `Skewness`: "unbiased skew"; utilizes `pandas` DataFrame underlying `.skew()` function
+            https://pythontic.com/pandas/dataframe-computations/skew
         `Kurtosis`: "unbiased kurtosis ... using Fisher’s definition of kurtosis"; utilizes `pandas` DataFrame
             underlying `.skew()` function
         `Min`: minimum value found
@@ -297,15 +306,37 @@ def numeric_summary(dataframe: pd.DataFrame,
          '90%': [round(dataframe[x].quantile(q=0.90), round_by) for x in numeric_columns],
          'Max': [round(dataframe[x].max(), round_by) for x in numeric_columns]},
         index=columns)
+
+    if return_style:
+        columns_to_format = [x for x in results.columns
+                             if x not in ['# of Non-Nulls', '# of Nulls', '% Nulls', '# of Zeros', '% Zeros']]
+        results = results.style. \
+            format({
+                '% Nulls': '{:,.1%}'.format,
+                '% Zeros': '{:,.1%}'.format,
+            }). \
+            pipe(pstyle.format,
+                 subset=['# of Non-Nulls', '# of Nulls', '# of Zeros'],
+                 round_by=0).\
+            pipe(pstyle.format, subset=columns_to_format, round_by=1). \
+            highlight_between(left=0.00000001, right=math.inf, subset=['# of Nulls', '% Nulls', '# of Zeros',
+                                                                       '% Zeros'],
+                              color=color.WARNING). \
+            bar(subset=['Coef of Var'], color=color.GRAY, vmin=0, vmax=1). \
+            bar(subset=['Skewness'], color=color.GRAY,  align='mid', vmin=-2, vmax=2)
+
     return results
 
 
-def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
+def non_numeric_summary(dataframe: pd.DataFrame, return_style: bool = False) -> Union[pd.DataFrame, None]:
     """Provides a summary of basic stats for the non-numeric columns of a DataFrame.
 
     Args:
         dataframe:
             a pandas dataframe
+        return_style:
+            If True, returns a pd.DataFrame.style object. This can be used for displaying in Jupyter Notebook.
+            If False, returns a pd.DataFrame
 
     Returns:
         Returns a pandas DataFrame with the following attributes (returned as columns) for each of the
@@ -313,7 +344,7 @@ def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
 
         `# of Non-Nulls`: The number of non-null values found for the given column.
         `# of Nulls`: The number of null values found for the given column.
-        `% Null`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given column.
+        `% Nulls`: The percent of null values found (i.e. `nulls / (count + nulls)`) for a given column.
         `Most Freq. Value`: The most frequent value found for a given column.
         `# of Unique`: The number of unique values found for a given column.
         `% Unique`: The percent of unique values found (i.e. `unique` divided by the total number of values
@@ -334,13 +365,26 @@ def non_numeric_summary(dataframe: pd.DataFrame) -> Union[pd.DataFrame, None]:
     columns, num_nulls, perc_nulls = zip(*null_data)
     results = pd.DataFrame({'# of Non-Nulls': [dataframe[x].count() for x in non_numeric_columns],
                             '# of Nulls': num_nulls,
-                            '% Null': perc_nulls,
+                            '% Nulls': perc_nulls,
                             'Most Freq. Value': [dataframe[x].value_counts().index[0]
                                                  for x in non_numeric_columns],
                             '# of Unique': [len(dataframe[x].dropna().unique()) for x in non_numeric_columns],
                             '% Unique': [round(len(dataframe[x].dropna().unique()) / dataframe[x].count(),
                                                3) for x in non_numeric_columns]},
                            index=columns)
+
+    if return_style:
+        results = results.style.format({
+                '% Unique': '{:,.1%}'.format
+            }). \
+            pipe(pstyle.format,
+                 subset=['# of Non-Nulls', '# of Nulls'],
+                 round_by=0). \
+            pipe(pstyle.format, subset=['# of Unique'], round_by=1). \
+            highlight_between(left=0.00000001, right=math.inf, subset=['# of Nulls', '% Nulls'],
+                              color=color.WARNING). \
+            bar(subset=['% Unique'], color=color.GRAY, vmin=0, vmax=1)
+
     return results
 
 

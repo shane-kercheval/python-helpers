@@ -49,3 +49,6 @@ GOOD = Colors.AVOCADO.value
 BAD = Colors.TOMATO.value
 GOOD_BAD = (GOOD, BAD)
 WARNING = Colors.TULIP_TREE.value
+ERROR = BAD
+
+GRAY = Colors.LOBLOLLY_GRAY.value

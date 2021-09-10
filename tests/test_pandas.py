@@ -306,12 +306,33 @@ class TestPandas(unittest.TestCase):
         self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__sample.txt',
                                  numeric_summary(self.sample_data))
 
+    def test_numeric_summary_style(self):
+        test_data = self.credit_data
+        test_data.loc[0:46, ['duration']] = np.nan
+        test_data.loc[10:54, ['credit_amount']] = 0
+
+        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__style__credit.html',
+                                 numeric_summary(test_data, return_style=True).render())
+
+        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__style__sample.html',
+                                 numeric_summary(self.sample_data, return_style=True).render())
+
     def test_non_numeric_summary(self):
         self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__credit.txt',
                                  non_numeric_summary(self.credit_data))
 
         self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__sample.txt',
                                  non_numeric_summary(self.sample_data))
+
+    def test_non_numeric_summary_test(self):
+        test_data = self.credit_data
+        test_data.loc[25:75, ['checking_status']] = np.nan
+
+        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__style__credit.html',
+                                 non_numeric_summary(test_data, return_style=True).render())
+
+        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__style__sample.html',
+                                 non_numeric_summary(self.sample_data, return_style=True).render())
 
     def test_convert_integer_series_to_categorical(self):
         # check that function fails if mapping doesn't contains all numbers in data
