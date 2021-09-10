@@ -45,4 +45,7 @@ class Colors(Enum):
     RED_CLAY = '#A43820'
 
 
-GOOD_BAD = (Colors.AVOCADO, Colors.TOMATO)
+GOOD = Colors.AVOCADO.value
+BAD = Colors.TOMATO.value
+GOOD_BAD = (GOOD, BAD)
+WARNING = Colors.TULIP_TREE.value

@@ -11,12 +11,13 @@ from pandas.api.types import is_list_like  # noqa
 from pandas._typing import Axis  # noqa
 from seaborn import color_palette
 
+from helpsk import color
 
 # pylint: disable=redefined-builtin,too-many-arguments
 def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
            round_to: int = 2,
            fill_missing_value: Optional[str] = '<NA>',
-           missing_color: Optional[str] = 'yellow',
+           missing_color: Optional[str] = color.WARNING,
            thousands: Optional[str] = ',',
            hide_index: bool = False) -> Styler:
     """Applies basic formatting to pandas Dataframe.
@@ -53,11 +54,14 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
 
 
 def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa,
+                     palette: str = 'Blues',
                      **kwargs) -> Styler:
     """Applies a background color to pandas Dataframe.
         Args:
             styler:
                 either pd.Dataframe or pd.Dataframe.style
+            palette:
+                name of the palette (value passed into seaborn `color_palette()`
             kwargs:
                 additional arguments that will be passed to the pandas `.background_gradient()` function.
         Returns:
@@ -65,11 +69,12 @@ def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler
         """
     if isinstance(styler, pd.DataFrame):
         styler = styler.style
+
     # color_map = sns.light_palette("green", as_cmap=True)
     # color_map = sns.color_palette("dark:salmon_r", as_cmap=True)
     # color_map = sns.color_palette(['red', 'blue', 'green'], as_cmap=True)
     # color_map = sns.color_palette("light:#5A9", as_cmap=True)
-    color_map = color_palette("Blues", as_cmap=True)
+    color_map = color_palette(palette, as_cmap=True)
     return styler.background_gradient(cmap=color_map, **kwargs)
 
 
