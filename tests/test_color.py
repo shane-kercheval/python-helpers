@@ -17,7 +17,7 @@ def plot_colors(colors, title, sort_colors=True, empty_cols=0):
     cell_height = 22
     swatch_width = 48
     margin = 12
-    topmargin = 40
+    top_margin = 40
 
     # Sort colors by hue, saturation, value and name.
     if sort_colors is True:
@@ -28,19 +28,19 @@ def plot_colors(colors, title, sort_colors=True, empty_cols=0):
     else:
         names = list(colors)
 
-    n = len(names)
     nrows = 7
+    # n = len(names)
     # ncols = n // nrows + int(n % nrows > 0)
     # ncols = 4 - empty_cols
     # nrows = n // ncols + int(n % ncols > 0)
 
     width = cell_width * 4 + 2 * margin
-    height = cell_height * nrows + margin + topmargin
+    height = cell_height * nrows + margin + top_margin
     dpi = 72
 
     fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
     fig.subplots_adjust(margin/width, margin/height,
-                        (width-margin)/width, (height-topmargin)/height)
+                        (width-margin)/width, (height-top_margin)/height)
     ax.set_xlim(0, cell_width * 4)
     ax.set_ylim(cell_height * (nrows-0.5), -cell_height/2.)
     ax.yaxis.set_visible(False)
