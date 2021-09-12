@@ -1,5 +1,4 @@
 """This module contains helper functions when working with sklearn (scikit-learn) objects"""
-
 from typing import Optional
 import math
 import scipy.stats as st
