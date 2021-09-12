@@ -79,6 +79,15 @@ class TestSklearn(unittest.TestCase):
         grid_search.fit(X_train, y_train)
         cls.credit_data__grid_search = grid_search
 
+        grid_search = GridSearchCV(full_pipeline,
+                                   param_grid=param_grad,
+                                   cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),
+                                   scoring='roc_auc',
+                                   refit=False,
+                                   return_train_score=True)
+        grid_search.fit(X_train, y_train)
+        cls.credit_data__grid_search__roc_auc = grid_search
+
     def test_plot_value_frequency(self):
         grid_search = self.credit_data__grid_search
         score_names = ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate']
@@ -91,4 +100,16 @@ class TestSklearn(unittest.TestCase):
                                               score_names=score_names,
                                               return_styler=True)
         with open(get_test_path() + '/test_files/sklearn/credit__grid_search.html', 'w') as file:
+            file.write(results.render())
+
+        grid_search = self.credit_data__grid_search__roc_auc
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = cv_results_to_dataframe(cv_results=grid_search.cv_results_,
+                                              num_folds=3,
+                                              num_repeats=1,
+                                              score_names=None,
+                                              return_styler=True)
+        test_file = get_test_path() + '/test_files/sklearn/credit__grid_search__default_scores.html'
+        with open(test_file, 'w') as file:
             file.write(results.render())
