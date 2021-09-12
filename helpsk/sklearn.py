@@ -16,7 +16,7 @@ from helpsk.exceptions import HelpskParamValueError
 def cv_results_to_dataframe(searcher: BaseSearchCV,
                             num_folds: int,
                             num_repeats: int,
-                            return_styler: bool = True):
+                            return_style: bool = True):
     """
 
     Args:
@@ -40,7 +40,7 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
         num_repeats:
             the number of repeats used for the cross validation; used to calculate the standard error of the
             mean for each score
-        return_styler:
+        return_style:
             if True, return pd.DataFrame().style object after being styled
     """
     sample_size = num_folds * num_repeats
@@ -105,7 +105,7 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
 
     results = results.sort_values(by=str(list(score_names)[0]) + ' Mean', ascending=False)
 
-    if return_styler:
+    if return_style:
         results = results.style
 
         for score in score_names:

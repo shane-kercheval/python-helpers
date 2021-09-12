@@ -96,7 +96,7 @@ class TestSklearn(unittest.TestCase):
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
-                                              return_styler=True)
+                                              return_style=True)
         with open(get_test_path() + '/test_files/sklearn/credit__grid_search.html', 'w') as file:
             file.write(results.render())
 
@@ -106,7 +106,7 @@ class TestSklearn(unittest.TestCase):
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
-                                              return_styler=True)
+                                              return_style=True)
         test_file = get_test_path() + '/test_files/sklearn/credit__grid_search__default_scores.html'
         with open(test_file, 'w') as file:
             file.write(results.render())
