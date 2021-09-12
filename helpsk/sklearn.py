@@ -59,68 +59,64 @@ def cv_results_to_dataframe(cv_results: dict,
             cv_results_to_dataframe(grid_search.cv_results, score_names=list(scores.keys()))
             ```
     """
+    sample_size = num_folds * num_repeats
     results = None
 
-    if score_names:
+    if not score_names:
+        score_names = ['score']
 
-        # extract mean and standard deviation for each score
-        for score in score_names:
-            results = pd.concat([
-                results,
-                pd.DataFrame({
-                    score + " Mean": cv_results['mean_test_' + score],
-                    score + " St. Dev": cv_results['std_test_' + score],
-                })
-            ], axis=1)
+    # extract mean and standard deviation for each score
+    for score in score_names:
+        results = pd.concat([
+            results,
+            pd.DataFrame({
+                score + " Mean": cv_results['mean_test_' + score],
+                score + " St. Dev": cv_results['std_test_' + score],
+            })
+        ], axis=1)
 
-        # for each score, calculate the 95% confidence interval for the mean
+    # for each score, calculate the 95% confidence interval for the mean
+    for score in score_names:
+        mean_key = score + ' Mean'
+        st_dev_key = score + ' St. Dev'
 
-        sample_size = num_folds * num_repeats
+        score_means = results[mean_key]
+        score_standard_errors = results[st_dev_key] / math.sqrt(sample_size)
+
+        confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
+                                             df=sample_size - 1,  # degrees of freedom
+                                             loc=score_means,
+                                             scale=score_standard_errors)
+
+        results = results.drop(columns=st_dev_key)
+
+        insertion_index = results.columns.get_loc(mean_key) + 1
+        results.insert(loc=insertion_index, column=score + ' 95CI.HI', value=confidence_intervals[1])
+        results.insert(loc=insertion_index, column=score + ' 95CI.LO', value=confidence_intervals[0])
+
+    parameter_dataframe = pd.DataFrame(cv_results["params"])
+    parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
+
+    results = pd.concat([
+        results,
+        parameter_dataframe,
+    ], axis=1)
+
+    results = results.sort_values(by=str(list(score_names)[0]) + ' Mean', ascending=False)
+
+    if return_styler:
+        results = results.style
 
         for score in score_names:
             mean_key = score + ' Mean'
-            st_dev_key = score + ' St. Dev'
+            ci_low_key = score + ' 95CI.LO'
+            ci_high_key = score + ' 95CI.HI'
 
-            score_means = results[mean_key]
-            score_standard_errors = results[st_dev_key] / math.sqrt(sample_size)
-
-            confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
-                                                 df=sample_size - 1,  # degrees of freedom
-                                                 loc=score_means,
-                                                 scale=score_standard_errors)
-
-            results = results.drop(columns=st_dev_key)
-
-            insertion_index = results.columns.get_loc(mean_key) + 1
-            results.insert(loc=insertion_index, column=score + ' 95CI.HI', value=confidence_intervals[1])
-            results.insert(loc=insertion_index, column=score + ' 95CI.LO', value=confidence_intervals[0])
-
-        parameter_dataframe = pd.DataFrame(cv_results["params"])
-        parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
-
-        results = pd.concat([
-            results,
-            parameter_dataframe,
-        ], axis=1)
-
-        results = results.sort_values(by=str(list(score_names)[0]) + ' Mean', ascending=False)
-
-        if return_styler:
-            results = results.style
-
-            for score in score_names:
-                mean_key = score + ' Mean'
-                ci_low_key = score + ' 95CI.LO'
-                ci_high_key = score + ' 95CI.HI'
-
-                results. \
-                    bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value). \
-                    bar(subset=[ci_high_key], color=hcolor.GRAY). \
-                    pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY). \
-                    pipe(hstyle.format, round_by=3, hide_index=True)
-
-    else:
-        results = None
+            results. \
+                bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value). \
+                bar(subset=[ci_high_key], color=hcolor.GRAY). \
+                pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY). \
+                pipe(hstyle.format, round_by=3, hide_index=True)
 
     return results
 
