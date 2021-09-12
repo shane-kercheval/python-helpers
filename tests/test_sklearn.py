@@ -47,7 +47,7 @@ class TestSklearn(unittest.TestCase):
             ('numeric_pipeline', numeric_pipeline, numeric_columns),
             ('non_numeric_pipeline', non_numeric_pipeline, non_numeric_columns)
         ])
-        random_forest_model = RandomForestClassifier()
+        random_forest_model = RandomForestClassifier(random_state=42)
         full_pipeline = Pipeline([
             ('preparation', transformations_pipeline),
             ('model', random_forest_model)

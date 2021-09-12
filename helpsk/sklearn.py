@@ -95,9 +95,12 @@ def cv_results_to_dataframe(cv_results: dict,
             results.insert(loc=insertion_index, column=score + ' 95CI.HI', value=confidence_intervals[1])
             results.insert(loc=insertion_index, column=score + ' 95CI.LO', value=confidence_intervals[0])
 
+        parameter_dataframe = pd.DataFrame(cv_results["params"])
+        parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
+
         results = pd.concat([
             results,
-            pd.DataFrame(cv_results["params"]),
+            parameter_dataframe,
         ], axis=1)
 
         results = results.sort_values(by=str(list(score_names)[0]) + ' Mean', ascending=False)
@@ -113,9 +116,8 @@ def cv_results_to_dataframe(cv_results: dict,
                 results. \
                     bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value). \
                     bar(subset=[ci_high_key], color=hcolor.GRAY). \
-                    pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY)
-
-            results = hstyle.format(styler=results, round_by=3, hide_index=True)
+                    pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY). \
+                    pipe(hstyle.format, round_by=3, hide_index=True)
 
     else:
         results = None
