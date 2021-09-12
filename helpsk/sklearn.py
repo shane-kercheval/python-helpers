@@ -18,7 +18,6 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
                             num_repeats: int,
                             return_style: bool = True):
     """
-
     Args:
         searcher:
             A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
