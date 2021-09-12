@@ -90,14 +90,12 @@ class TestSklearn(unittest.TestCase):
 
     def test_plot_value_frequency(self):
         grid_search = self.credit_data__grid_search
-        score_names = ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate']
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            results = cv_results_to_dataframe(cv_results=grid_search.cv_results_,
+            results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
-                                              score_names=score_names,
                                               return_styler=True)
         with open(get_test_path() + '/test_files/sklearn/credit__grid_search.html', 'w') as file:
             file.write(results.render())
@@ -105,10 +103,9 @@ class TestSklearn(unittest.TestCase):
         grid_search = self.credit_data__grid_search__roc_auc
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            results = cv_results_to_dataframe(cv_results=grid_search.cv_results_,
+            results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
-                                              score_names=None,
                                               return_styler=True)
         test_file = get_test_path() + '/test_files/sklearn/credit__grid_search__default_scores.html'
         with open(test_file, 'w') as file:

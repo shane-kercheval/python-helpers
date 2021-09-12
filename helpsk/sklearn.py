@@ -1,32 +1,39 @@
 """This module contains helper functions when working with sklearn (scikit-learn) objects"""
-from typing import Optional
 import math
-import scipy.stats as st
+
 import pandas as pd
+import scipy.stats as st
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.model_selection._search import BaseSearchCV  # noqa
 from sklearn.preprocessing import OrdinalEncoder
 
 import helpsk.color as hcolor
 import helpsk.pandas_style as hstyle
-
-
 # pylint: disable=too-many-locals
-def cv_results_to_dataframe(cv_results: dict,
+from helpsk.exceptions import HelpskParamValueError
+
+
+def cv_results_to_dataframe(searcher: BaseSearchCV,
                             num_folds: int,
                             num_repeats: int,
-                            score_names: Optional[list] = None,
                             return_styler: bool = True):
     """
 
     Args:
-        cv_results:
-            a dictionary returned by `.cv_results_` property of a `BaseSearchCV` object
+        searcher:
+            A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
+            constructor (e.g. `GridSearchCV(..., scoring='roc_auc', ...)` or a dictionary with metric names as
+            keys and callables a values.
 
-            ```
-            grid_search = GridSearchCV(...)
-            grid_search.fit(...)
-            cv_results_to_dataframe(grid_search.cv_results, ...)
-            ```
+            An example of the dictionary option:
+
+                scores = {
+                    'ROC/AUC': SCORERS['roc_auc'],
+                    'F1': make_scorer(f1_score, greater_is_better=True),
+                    'Pos. Pred. Val': make_scorer(precision_score, greater_is_better=True),
+                    'True Pos. Rate': make_scorer(recall_score, greater_is_better=True),
+                }
+                grid_search = GridSearchCV(..., scoring=scores, ...)
         num_folds:
             the number of folds used for the cross validation; used to calculate the standard error of the
             mean for each score
@@ -35,45 +42,39 @@ def cv_results_to_dataframe(cv_results: dict,
             mean for each score
         return_styler:
             if True, return pd.DataFrame().style object after being styled
-        score_names:
-            If custom scores are passed to `BaseSearchCV` object's __init__ `scoring` parameter via
-            dictionary, then this list should be the keys of that dictionary.
-            If a string is passed to `scoring` parameter, then `score_names` should be None
-
-            Example:
-
-            ```
-            scores = {
-                'ROC/AUC':  SCORERS['roc_auc'],
-                'F1': make_scorer(f1_score, greater_is_better=True),
-                'Pos. Pred. Val': make_scorer(precision_score, greater_is_better=True),
-                'True Pos. Rate': make_scorer(recall_score, greater_is_better=True),
-            }
-            grid_search = GridSearchCV(full_pipeline,
-                                       param_grid=param_grad,
-                                       cv=RepeatedKFold(n_splits=5, n_repeats=2),
-                                       scoring=scores,
-                                       refit='ROC/AUC',
-                                       ...
-            )
-            cv_results_to_dataframe(grid_search.cv_results, score_names=list(scores.keys()))
-            ```
     """
     sample_size = num_folds * num_repeats
     results = None
+    cv_results = searcher.cv_results_
 
-    if not score_names:
+    str_score_name = None
+    if isinstance(searcher.scoring, dict):
+        score_names = list(searcher.scoring.keys())
+    elif isinstance(searcher.scoring, str):
         score_names = ['score']
+        str_score_name = searcher.scoring
+    else:
+        mess = 'The `searcher` does not have a string or dictionary .scoring property. Cannot extract scores.'
+        raise HelpskParamValueError(mess)
 
     # extract mean and standard deviation for each score
+    # if a string was passed into the searcher `scoring` parameter (e.g. 'roc/auc') then the score name will
+    # just be 'mean_test_score' but we will convert it to `roc/auc Mean`. Same for standard deviation.
+    # In that case, then after we are done, we need to change `score_names = ['score']` to
+    # `score_names = [str_score_name]`
     for score in score_names:
+        score_name = score if str_score_name is None else str_score_name
         results = pd.concat([
             results,
             pd.DataFrame({
-                score + " Mean": cv_results['mean_test_' + score],
-                score + " St. Dev": cv_results['std_test_' + score],
+                score_name + " Mean": cv_results['mean_test_' + score],
+                score_name + " St. Dev": cv_results['std_test_' + score],
             })
         ], axis=1)
+
+    # see comment above
+    if str_score_name is not None:
+        score_names = [str_score_name]
 
     # for each score, calculate the 95% confidence interval for the mean
     for score in score_names:
