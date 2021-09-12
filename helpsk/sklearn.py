@@ -97,6 +97,12 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
     parameter_dataframe = pd.DataFrame(cv_results["params"])
     parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
 
+    for column in parameter_dataframe.columns:
+        # this will convert objects (like Transformers) into strings, which makes further operations on the
+        # column (e.g. aggregations/group_by/etc) much easier.
+        if parameter_dataframe[column].dtype.name == 'object':
+            parameter_dataframe[column] = parameter_dataframe[column].astype(str)
+
     results = pd.concat([
         results,
         parameter_dataframe,

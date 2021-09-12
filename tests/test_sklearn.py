@@ -2,6 +2,7 @@ import unittest
 import warnings  # noqa
 
 import numpy as np
+import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.impute import SimpleImputer
@@ -88,8 +89,17 @@ class TestSklearn(unittest.TestCase):
         grid_search.fit(X_train, y_train)
         cls.credit_data__grid_search__roc_auc = grid_search
 
-    def test_plot_value_frequency(self):
+    def test_cv_results_to_dataframe(self):
         grid_search = self.credit_data__grid_search
+
+        results = cv_results_to_dataframe(searcher=grid_search,
+                                          num_folds=3,
+                                          num_repeats=1,
+                                          return_style=False)
+
+        self.assertIsInstance(results, pd.DataFrame)
+        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | base_transformer'].iloc[0],
+                              str)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
