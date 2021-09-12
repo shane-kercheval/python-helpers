@@ -1,5 +1,4 @@
 """This module contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
-
 import datetime
 import math
 from typing import List, Union, Optional, Callable
