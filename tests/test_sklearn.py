@@ -56,7 +56,7 @@ class TestSklearn(unittest.TestCase):
             {
                 'preparation__non_numeric_pipeline__encoder_chooser__base_transformer': [OneHotEncoder(),
                                                                                          CustomOrdinalEncoder()],
-                'model__max_features': [2, 100, 'auto'],
+                'model__max_features': [100, 'auto'],
                 'model__n_estimators': [10, 50]
             },
         ]
