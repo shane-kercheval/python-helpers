@@ -30,9 +30,9 @@ class TestSklearn(unittest.TestCase):
         credit_data.loc[25:75, ['checking_status']] = np.nan
         credit_data.loc[10:54, ['credit_amount']] = 0
         y_full = credit_data['target']
-        X_full = credit_data.drop(columns='target')
+        X_full = credit_data.drop(columns='target')  # noqa
         y_full = label_binarize(y_full, classes=['bad', 'good']).flatten()
-        X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)  # noqa
         del y_full, X_full
         numeric_columns = hlp.pandas.get_numeric_columns(X_train)
         non_numeric_columns = hlp.pandas.get_non_numeric_columns(X_train)
