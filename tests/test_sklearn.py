@@ -1,5 +1,5 @@
 import unittest
-import warnings
+import warnings  # noqa
 
 import numpy as np
 from sklearn.compose import ColumnTransformer
@@ -11,9 +11,13 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
-import helpsk.sklearn as hsklearn
 from helpsk.sklearn import CustomOrdinalEncoder, cv_results_to_dataframe
 from tests.helpers import get_data_credit, get_test_path
+
+
+def warn(*args, **kwargs):  # noqa
+    pass
+warnings.warn = warn  # noqa
 
 
 # noinspection PyMethodMayBeStatic
@@ -76,9 +80,9 @@ class TestSklearn(unittest.TestCase):
         cls.credit_data__grid_search = grid_search
 
     def test_plot_value_frequency(self):
-
         grid_search = self.credit_data__grid_search
         score_names = ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate']
+
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             results = cv_results_to_dataframe(cv_results=grid_search.cv_results_,
