@@ -345,11 +345,16 @@ class TwoClassEvaluator:
                                                             'False Negative Rate'], :].index, :]
             subset_secondary = pd.IndexSlice[result.loc[['Two-Class Accuracy', 'Error Rate',
                                                          'Prevalence', 'No Information Rate'], :].index, :]
+            subset_total_observations = pd.IndexSlice[result.loc[['Total Observations'], :].index, :]
 
             result = result.style
 
             if round_by:
                 result = result.format(precision=round_by)
+
+            result = result.format(subset=subset_total_observations,
+                                   thousands=',',
+                                   precision=0)
 
             result = result. \
                 bar(subset=subset_scores, color=hcolor.Colors.PIGMENT_GREEN.value, vmin=0, vmax=1). \

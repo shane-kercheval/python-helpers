@@ -105,7 +105,6 @@ def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler
 #         highlight_null(null_color=hlp.color.Colors.ERROR)
 
 
-
 # pylint: disable=too-many-arguments
 def __bar_inverse(style_object, align: str, colors: list[str], width: float = 100, min_value: float = None,
                   max_value: float = None):
