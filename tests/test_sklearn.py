@@ -1,4 +1,3 @@
-import math
 import unittest
 import warnings  # noqa
 
@@ -159,7 +158,21 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(round(evaluator.kappa, 9), round(cohen_kappa_score(y1=y_true, y2=y_pred), 9))
 
         self.assertIsInstance(evaluator.all_metrics, dict)
-        self.assertIsInstance(evaluator.all_metrics_df, pd.DataFrame)
+        self.assertIsInstance(evaluator.all_metrics_df(return_style=False), pd.DataFrame)
+
+        with open(get_test_path() + '/test_files/sklearn/all_metrics_df.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True).render()
+            file.write(table_html)
+
+        with open(get_test_path() + '/test_files/sklearn/all_metrics_df__round_3.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True,
+                                                  round_by=3).render()
+
+            evaluator.all_metrics_df()
+            evaluator.all_metrics_df().style.format(precision=3).render()
+
+
+            file.write(table_html)
 
     def test_plot_confusion_matrix(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,

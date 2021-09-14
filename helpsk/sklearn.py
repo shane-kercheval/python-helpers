@@ -1,12 +1,13 @@
 """This module contains helper functions when working with sklearn (scikit-learn) objects"""
 import math
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 
 import numpy as np
 import pandas as pd
 import scipy.stats as st
 from matplotlib import pyplot as plt
 import seaborn as sns
+from pandas.io.formats.style import Styler
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.model_selection._search import BaseSearchCV  # noqa
@@ -21,7 +22,7 @@ from helpsk.exceptions import HelpskParamValueError
 def cv_results_to_dataframe(searcher: BaseSearchCV,
                             num_folds: int,
                             num_repeats: int,
-                            return_style: bool = True):
+                            return_style: bool = True) -> Union[pd.DataFrame, Styler]:
     """
     Args:
         searcher:
@@ -305,7 +306,7 @@ class TwoClassEvaluator:
     @property
     def all_metrics(self) -> dict:
         """All of the metrics are returned as a dictionary."""
-        return {'AUC / ROC': self.roc_auc,
+        return {'ROC / AUC': self.roc_auc,
                 'True Positive Rate': self.sensitivity,
                 'True Negative Rate': self.specificity,
                 'False Positive Rate': self.false_positive_rate,
@@ -320,10 +321,42 @@ class TwoClassEvaluator:
                 'No Information Rate': max(self.prevalence, 1 - self.prevalence),  # i.e. largest class %
                 'Total Observations': self.sample_size}
 
-    @property
-    def all_metrics_df(self) -> pd.DataFrame:
-        """All of the metrics are returned as a DataFrame."""
-        return pd.DataFrame.from_dict(self.all_metrics, orient='index', columns=['Scores'])
+    def all_metrics_df(self,
+                       return_style: bool = False,
+                       round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
+        """All of the metrics are returned as a DataFrame.
+
+        Args:
+            return_style:
+                if True, return styler object; else return dataframe
+            round_by:
+                the number of digits to round by; if None, then don't round
+        """
+        result = pd.DataFrame.from_dict(self.all_metrics, orient='index', columns=['Scores'])
+
+        if round_by:
+            result['Scores'] = result['Scores'].round(round_by)
+
+        if return_style:
+            subset_scores = [x for x in result.index.values if x != 'Total Observations']
+
+            subset_scores = pd.IndexSlice[result.loc[subset_scores, :].index, :]
+            subset_negative_bad = pd.IndexSlice[result.loc[['False Positive Rate',
+                                                            'False Negative Rate'], :].index, :]
+            subset_secondary = pd.IndexSlice[result.loc[['Two-Class Accuracy', 'Error Rate',
+                                                         'Prevalence', 'No Information Rate'], :].index, :]
+
+            result = result.style
+
+            if round_by:
+                result = result.format(precision=round_by)
+
+            result = result. \
+                bar(subset=subset_scores, color=hcolor.Colors.PIGMENT_GREEN.value, vmin=0, vmax=1). \
+                bar(subset=subset_negative_bad, color=hcolor.Colors.POPPY.value, vmin=0, vmax=1). \
+                bar(subset=subset_secondary, color=hcolor.GRAY, vmin=0, vmax=1)
+
+        return result
 
     def plot_confusion_matrix(self):
         """Plots a heatmap of the confusion matrix."""
