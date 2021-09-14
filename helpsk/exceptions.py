@@ -2,6 +2,7 @@
 ensure that unit tests that use self.raiseException test for the correct exception types.
 """
 
+
 class HelpskError(Exception):
     """Base-class for all exceptions raised by this package."""
 

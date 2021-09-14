@@ -1,9 +1,14 @@
 """This module contains helper functions when working with sklearn (scikit-learn) objects"""
 import math
+from typing import Tuple, Union
 
+import numpy as np
 import pandas as pd
 import scipy.stats as st
+from matplotlib import pyplot as plt
+import seaborn as sns
 from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.model_selection._search import BaseSearchCV  # noqa
 from sklearn.preprocessing import OrdinalEncoder
 
@@ -125,6 +130,225 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
                 pipe(hstyle.format, round_by=3, hide_index=True)
 
     return results
+
+
+# pylint: disable=too-many-instance-attributes,too-many-public-methods
+class TwoClassEvaluator:
+    """This class calculates various metrics for Two Class (i.e. 0's/1's) prediction scenarios."""
+    def __init__(self,
+                 actual_values: np.ndarray,
+                 predicted_scores: np.ndarray,
+                 labels: Tuple[str, str],
+                 score_threshold: float = 0.5
+                 ):
+        """
+        Args:
+            actual_values:
+                array of 0's and 1's
+            predicted_scores:
+                array of values from `predict_proba()`; NOT the actual labels
+            labels:
+                tuple containing the label of the negative class in the first index and the positive class
+                in the second index
+            score_threshold:
+                the score/probability threshold for turning scores into 0's and 1's and corresponding labels
+        """
+        if not all(np.unique(actual_values) == [0, 1]):
+            message = f"Values of `actual_values` should 0 or 1. Found `{np.unique(actual_values)}`"
+            raise HelpskParamValueError(message)
+
+        if not all(np.logical_and(predicted_scores >= 0, predicted_scores <= 1)):
+            message = "Values of `predicted_scores` should be between 0 and 1."
+            raise HelpskParamValueError(message)
+
+        if not any(np.logical_and(predicted_scores > 0, predicted_scores < 1)):
+            message = "Values of `predicted_scores` should not all be 0's and 1's."
+            raise HelpskParamValueError(message)
+
+        self._labels = labels
+        self._actual_values = actual_values
+        self._predicted_scores = predicted_scores
+        self.score_threshold = score_threshold
+        predicted_values = np.where(predicted_scores > self.score_threshold, 1, 0)
+        self._confusion_matrix = confusion_matrix(y_true=actual_values, y_pred=predicted_values)
+
+        self.sample_size = len(actual_values)
+        assert self.sample_size == self._confusion_matrix.sum()
+
+        true_negatives, false_positives, false_negatives, true_positives = self._confusion_matrix.ravel()
+
+        self._actual_positives = true_positives + false_negatives
+        self._actual_negatives = true_negatives + false_positives
+
+        self._true_negatives = true_negatives
+        self._false_positives = false_positives
+        self._false_negatives = false_negatives
+        self._true_positives = true_positives
+
+        self.roc_auc = roc_auc_score(y_true=actual_values, y_score=predicted_scores)
+
+    @property
+    def true_positive_rate(self) -> float:
+        """True Positive Rate"""
+        return 0 if self._actual_positives == 0 else self._true_positives / self._actual_positives
+
+    @property
+    def true_negative_rate(self) -> float:
+        """True Negative Rate i.e. Specificity"""
+        return 0 if self._actual_negatives == 0 else self._true_negatives / self._actual_negatives
+
+    @property
+    def false_negative_rate(self) -> float:
+        """False Negative Rate"""
+        return 0 if self._actual_positives == 0 else self._false_negatives / self._actual_positives
+
+    @property
+    def false_positive_rate(self) -> float:
+        """False Positive Rate"""
+        return 0 if self._actual_negatives == 0 else self._false_positives / self._actual_negatives
+
+    @property
+    def accuracy(self) -> Union[float, None]:
+        """accuracy"""
+        return None if self.sample_size == 0 else \
+            (self._true_negatives + self._true_positives) / self.sample_size
+
+    @property
+    def error_rate(self) -> Union[float, None]:
+        """error_rate"""
+        return None if self.sample_size == 0 else \
+            (self._false_positives + self._false_negatives) / self.sample_size
+
+    @property
+    def positive_predictive_value(self) -> float:
+        """Positive Predictive Value i.e. Precision"""
+        return 0 if (self._true_positives + self._false_positives) == 0 else \
+            self._true_positives / (self._true_positives + self._false_positives)
+
+    @property
+    def negative_predictive_value(self) -> float:
+        """Negative Predictive Value"""
+        return 0 if (self._true_negatives + self._false_negatives) == 0 else \
+            self._true_negatives / (self._true_negatives + self._false_negatives)
+
+    @property
+    def prevalence(self) -> Union[float, None]:
+        """Prevalence"""
+        return None if self.sample_size == 0 else \
+            (self._true_positives + self._false_negatives) / self.sample_size
+
+    @property
+    def kappa(self) -> Union[float, None]:
+        """Kappa"""
+        if self.sample_size == 0 or \
+                ((self._true_negatives + self._false_negatives) / self.sample_size) == 0:
+            return None
+        # proportion of the actual agreements
+        # add the proportion of all instances where the predicted type and actual type agree
+        pr_a = (self._true_negatives + self._true_positives) / self.sample_size
+        # probability of both predicted and actual being negative
+        p_negative_prediction_and_actual = \
+            ((self._true_negatives + self._false_positives) / self.sample_size) * \
+            ((self._true_negatives + self._false_negatives) / self.sample_size)
+        # probability of both predicted and actual being positive
+        p_positive_prediction_and_actual = \
+            self.prevalence * ((self._false_positives + self._true_positives) / self.sample_size)
+        # probability that chance alone would lead the predicted and actual values to match, under the
+        # assumption that both are selected randomly (i.e. implies independence) according to the observed
+        # proportions (probability of independent events = P(A & B) == P(A) * P(B)
+        pr_e = p_negative_prediction_and_actual + p_positive_prediction_and_actual
+        return (pr_a - pr_e) / (1 - pr_e)
+
+    @property
+    def f1_score(self) -> float:
+        """F1 Score
+        https://en.wikipedia.org/wiki/F-score
+        """
+        return self.fbeta_score(beta=1)
+
+    def fbeta_score(self, beta: float) -> float:
+        """
+        :param beta: The `beta` parameter determines the weight of precision in the combined score.
+            `beta < 1` lends more weight to precision (i.e. positive predictive value), while
+            `beta > 1` favors recall (i.e. true positive rate)
+            (`beta -> 0` considers only precision, `beta -> inf` only recall).
+            http://scikit-learn.org/stable/modules/generated/sklearn.metrics.fbeta_score.html
+        :return:
+        """
+        if self.positive_predictive_value is None or self.sensitivity is None or \
+                (self.positive_predictive_value + self.sensitivity) == 0:
+            return 0
+
+        return (1 + (beta ** 2)) * (self.positive_predictive_value * self.sensitivity) / \
+               (((beta ** 2) * self.positive_predictive_value) + self.sensitivity)
+
+    @property
+    def sensitivity(self) -> float:
+        """Sensitivity i.e. True Positive Rate"""
+        return self.true_positive_rate
+
+    @property
+    def specificity(self) -> float:
+        """Specificity i.e. True Negative Rate"""
+        return self.true_negative_rate
+
+    @property
+    def precision(self) -> float:
+        """Precision i.e. Positive Predictive Value"""
+        return self.positive_predictive_value
+
+    @property
+    def recall(self):
+        """Recall i.e. True Positive Rate"""
+        return self.true_positive_rate
+
+    @property
+    def all_metrics(self) -> dict:
+        """All of the metrics are returned as a dictionary."""
+        return {'AUC / ROC': self.roc_auc,
+                'True Positive Rate': self.sensitivity,
+                'True Negative Rate': self.specificity,
+                'False Positive Rate': self.false_positive_rate,
+                'False Negative Rate': self.false_negative_rate,
+                'Positive Predictive Value': self.positive_predictive_value,
+                'Negative Predictive Value': self.negative_predictive_value,
+                'F1 Score': self.f1_score,
+                'Kappa': self.kappa,
+                'Two-Class Accuracy': self.accuracy,
+                'Error Rate': self.error_rate,
+                'Prevalence': self.prevalence,
+                'No Information Rate': max(self.prevalence, 1 - self.prevalence),  # i.e. largest class %
+                'Total Observations': self.sample_size}
+
+    @property
+    def all_metrics_df(self) -> pd.DataFrame:
+        """All of the metrics are returned as a DataFrame."""
+        return pd.DataFrame.from_dict(self.all_metrics, orient='index', columns=['Scores'])
+
+    def plot_confusion_matrix(self):
+        """Plots a heatmap of the confusion matrix."""
+        labels = np.array([[f'True Negatives\n{self._true_negatives}\n{self._true_negatives / self.sample_size:.1%}',  # pylint: disable=line-too-long  # noqa
+                            f'False Positives\n{self._false_positives}\n{self._false_positives / self.sample_size:.1%}'],  # pylint: disable=line-too-long  # noqa
+                           [f'False Negatives\n{self._false_negatives}\n{self._false_negatives / self.sample_size:.1%}',  # pylint: disable=line-too-long  # noqa
+                            f'True Positives\n{self._true_positives}\n{self._true_positives / self.sample_size:.1%}']])  # pylint: disable=line-too-long  # noqa
+
+        axis = plt.subplot()
+        sns.heatmap(self._confusion_matrix, annot=labels, cmap='Blues', ax=axis, fmt='')
+        # labels, title and ticks
+        axis.set_xlabel('Predicted')
+        axis.set_ylabel('Actual')
+        # axis.set_title('Confusion Matrix');
+        axis.xaxis.set_ticklabels([self._labels[0], self._labels[1]])
+        axis.yaxis.set_ticklabels([self._labels[0], self._labels[1]])
+        plt.tight_layout()
+
+    def plot_roc_auc(self):
+        """Plots the ROC AUC"""
+        pass
+
+    def plot_lift(self):
+        """Plots lift."""
+        pass
 
 
 class TransformerChooser(BaseEstimator, TransformerMixin):
