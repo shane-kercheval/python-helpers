@@ -188,4 +188,3 @@ class TestSklearn(unittest.TestCase):
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_auc_curve.png',
                    plot_function=lambda: evaluator.plot_auc_curve())
-
