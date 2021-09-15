@@ -420,11 +420,11 @@ class TwoClassEvaluator:
                                           score_threshold=threshold)
 
             return threshold,\
-                   temp_eval.true_positive_rate,\
-                   temp_eval.false_positive_rate,\
-                   temp_eval.positive_predictive_value,\
-                   temp_eval.false_negative_rate,\
-                   temp_eval.true_negative_rate
+                temp_eval.true_positive_rate,\
+                temp_eval.false_positive_rate,\
+                temp_eval.positive_predictive_value,\
+                temp_eval.false_negative_rate,\
+                temp_eval.true_negative_rate
 
         threshold_curves = [get_threshold_scores(threshold=x) for x in np.arange(score_threshold_range[0],
                                                                                  score_threshold_range[1],
