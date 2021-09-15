@@ -392,11 +392,12 @@ class TwoClassEvaluator:
             return threshold, temp_eval.true_positive_rate, temp_eval.false_positive_rate
 
         auc_curve = [get_true_pos_false_pos(threshold=x) for x in np.arange(0.0, 1.01, 0.01)]
-        auc_curve = pd.DataFrame(auc_curve, columns=['threshold', 'True Positive Rate', 'False Positive Rate'])
+        auc_curve = pd.DataFrame(auc_curve,
+                                 columns=['threshold', 'True Positive Rate', 'False Positive Rate'])
 
         axis = sns.lineplot(data=auc_curve, x='False Positive Rate', y='True Positive Rate', ci=None)
         axis.set_title(f"AUC: {round(self.auc, 3)}")
-        for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],
+        for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],  # pylint: disable=invalid-name
                                           auc_curve['True Positive Rate'],
                                           auc_curve['threshold'])):
             if i % 5 == 0:
