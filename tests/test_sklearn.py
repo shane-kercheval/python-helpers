@@ -170,8 +170,6 @@ class TestSklearn(unittest.TestCase):
 
             evaluator.all_metrics_df()
             evaluator.all_metrics_df().style.format(precision=3).render()
-
-
             file.write(table_html)
 
     def test_plot_confusion_matrix(self):
