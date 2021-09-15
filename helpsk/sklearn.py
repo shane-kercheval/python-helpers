@@ -404,6 +404,15 @@ class TwoClassEvaluator:
         plt.tight_layout()
 
     def plot_threshold_curves(self, score_threshold_range: Tuple[int, int] = (0.3, 0.9)):
+        """Plots various scores (e.g. True Positive Rate, False Positive Rate, etc.) for various score
+        thresholds. (A score threshold is the value for which you would predict a positive label if the
+        value of the score is above the threshold (e.g. usually 0.5).
+
+        Args:
+            score_threshold_range:
+                range of score thresholds to plot (x-axis); tuple with minimum threshold in first index and
+                maximum threshold in second index.
+        """
         def get_threshold_scores(threshold):
             temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
                                           predicted_scores=self._predicted_scores,
