@@ -5,11 +5,11 @@ from typing import Tuple, Union, Optional
 import numpy as np
 import pandas as pd
 import scipy.stats as st
-from matplotlib import pyplot as plt
 import seaborn as sns
+from matplotlib import pyplot as plt
 from pandas.io.formats.style import Styler
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.metrics import confusion_matrix, roc_auc_score, precision_score
+from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.model_selection._search import BaseSearchCV  # noqa
 from sklearn.preprocessing import OrdinalEncoder
 
@@ -27,7 +27,7 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
     Args:
         searcher:
             A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
-            constructor (e.g. `GridSearchCV(..., scoring='roc_auc', ...)` or a dictionary with metric names as
+            constructor (e.g. `GridSearchCV(..., scoring='auc', ...)` or a dictionary with metric names as
             keys and callables a values.
 
             An example of the dictionary option:
@@ -186,7 +186,7 @@ class TwoClassEvaluator:
         self._false_negatives = false_negatives
         self._true_positives = true_positives
 
-        self.roc_auc = roc_auc_score(y_true=actual_values, y_score=predicted_scores)
+        self.auc = roc_auc_score(y_true=actual_values, y_score=predicted_scores)
 
     @property
     def true_positive_rate(self) -> float:
@@ -306,7 +306,7 @@ class TwoClassEvaluator:
     @property
     def all_metrics(self) -> dict:
         """All of the metrics are returned as a dictionary."""
-        return {'AUC': self.roc_auc,
+        return {'AUC': self.auc,
                 'True Positive Rate': self.sensitivity,
                 'True Negative Rate': self.specificity,
                 'False Positive Rate': self.false_positive_rate,
@@ -380,7 +380,7 @@ class TwoClassEvaluator:
         axis.yaxis.set_ticklabels([self._labels[0], self._labels[1]])
         plt.tight_layout()
 
-    def plot_roc_auc(self):
+    def plot_auc_curve(self):
         """Plots the ROC AUC"""
 
         def get_true_pos_false_pos(threshold):
@@ -395,6 +395,7 @@ class TwoClassEvaluator:
         auc_curve = pd.DataFrame(auc_curve, columns=['threshold', 'True Positive Rate', 'False Positive Rate'])
 
         axis = sns.lineplot(data=auc_curve, x='False Positive Rate', y='True Positive Rate', ci=None)
+        axis.set_title(f"AUC: {round(self.auc, 3)}")
         for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],
                                           auc_curve['True Positive Rate'],
                                           auc_curve['threshold'])):

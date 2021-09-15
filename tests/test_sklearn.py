@@ -149,7 +149,7 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(evaluator.positive_predictive_value, evaluator.precision)
         self.assertEqual(evaluator.precision, precision_score(y_true=y_true, y_pred=y_pred))
         self.assertEqual(evaluator.f1_score, f1_score(y_true=y_true, y_pred=y_pred))
-        self.assertEqual(evaluator.roc_auc, roc_auc_score(y_true=y_true, y_score=y_score))
+        self.assertEqual(evaluator.auc, roc_auc_score(y_true=y_true, y_score=y_score))
         self.assertEqual(evaluator.fbeta_score(beta=0), fbeta_score(y_true=y_true, y_pred=y_pred, beta=0))
         self.assertEqual(evaluator.fbeta_score(beta=1), fbeta_score(y_true=y_true, y_pred=y_pred, beta=1))
         self.assertEqual(evaluator.fbeta_score(beta=1), evaluator.f1_score)
@@ -186,6 +186,6 @@ class TestSklearn(unittest.TestCase):
                                       labels=('Bad', 'Good'),
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_roc_auc.png',
-                   plot_function=lambda: evaluator.plot_roc_auc())
+        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_auc_curve.png',
+                   plot_function=lambda: evaluator.plot_auc_curve())
 
