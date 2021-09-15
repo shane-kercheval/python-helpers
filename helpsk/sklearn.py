@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 from pandas.io.formats.style import Styler
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.metrics import confusion_matrix, roc_auc_score
+from sklearn.metrics import confusion_matrix, roc_auc_score, precision_score
 from sklearn.model_selection._search import BaseSearchCV  # noqa
 from sklearn.preprocessing import OrdinalEncoder
 
@@ -306,7 +306,7 @@ class TwoClassEvaluator:
     @property
     def all_metrics(self) -> dict:
         """All of the metrics are returned as a dictionary."""
-        return {'ROC / AUC': self.roc_auc,
+        return {'AUC': self.roc_auc,
                 'True Positive Rate': self.sensitivity,
                 'True Negative Rate': self.specificity,
                 'False Positive Rate': self.false_positive_rate,
@@ -382,7 +382,25 @@ class TwoClassEvaluator:
 
     def plot_roc_auc(self):
         """Plots the ROC AUC"""
-        pass
+
+        def get_true_pos_false_pos(threshold):
+            temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
+                                          predicted_scores=self._predicted_scores,
+                                          labels=('x', 'y'),
+                                          score_threshold=threshold)
+
+            return threshold, temp_eval.true_positive_rate, temp_eval.false_positive_rate
+
+        auc_curve = [get_true_pos_false_pos(threshold=x) for x in np.arange(0.0, 1.01, 0.01)]
+        auc_curve = pd.DataFrame(auc_curve, columns=['threshold', 'True Positive Rate', 'False Positive Rate'])
+
+        axis = sns.lineplot(data=auc_curve, x='False Positive Rate', y='True Positive Rate', ci=None)
+        for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],
+                                          auc_curve['True Positive Rate'],
+                                          auc_curve['threshold'])):
+            if i % 5 == 0:
+                axis.text(x, y, f'{s:.3}')
+        plt.tight_layout()
 
     def plot_lift(self):
         """Plots lift."""

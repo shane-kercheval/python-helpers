@@ -127,7 +127,6 @@ class TestSklearn(unittest.TestCase):
             file.write(results.render())
 
     def test_TwoClassEvaluator(self):
-
         y_true = self.credit_data__y_test
         y_score = self.credit_data__y_scores
         score_threshold = 0.5
@@ -138,7 +137,6 @@ class TestSklearn(unittest.TestCase):
                                       score_threshold=0.5)
 
         con_matrix = confusion_matrix(y_true=y_true, y_pred=y_pred)
-
         self.assertEqual(evaluator._true_negatives, con_matrix[0, 0])
         self.assertEqual(evaluator._false_positives, con_matrix[0, 1])
         self.assertEqual(evaluator._false_negatives, con_matrix[1, 0])
@@ -146,8 +144,9 @@ class TestSklearn(unittest.TestCase):
         self.assertEqual(evaluator.sample_size, len(self.credit_data__y_test))
         self.assertTrue(evaluator.true_positive_rate == evaluator.sensitivity == evaluator.recall)
         self.assertEqual(evaluator.recall, recall_score(y_true=y_true, y_pred=y_pred))
-        self.assertTrue(evaluator.true_negative_rate == evaluator.specificity)
-        self.assertTrue(evaluator.positive_predictive_value == evaluator.precision)
+        self.assertEqual(evaluator.true_negative_rate, evaluator.specificity)
+        self.assertEqual(round(evaluator.false_positive_rate, 9), round(1 - evaluator.specificity, 9))
+        self.assertEqual(evaluator.positive_predictive_value, evaluator.precision)
         self.assertEqual(evaluator.precision, precision_score(y_true=y_true, y_pred=y_pred))
         self.assertEqual(evaluator.f1_score, f1_score(y_true=y_true, y_pred=y_pred))
         self.assertEqual(evaluator.roc_auc, roc_auc_score(y_true=y_true, y_score=y_score))
@@ -180,3 +179,13 @@ class TestSklearn(unittest.TestCase):
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_confusion_matrix.png',
                    plot_function=lambda: evaluator.plot_confusion_matrix())
+
+    def test_plot_roc_auc(self):
+        evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
+                                      predicted_scores=self.credit_data__y_scores,
+                                      labels=('Bad', 'Good'),
+                                      score_threshold=0.5)
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_roc_auc.png',
+                   plot_function=lambda: evaluator.plot_roc_auc())
+
