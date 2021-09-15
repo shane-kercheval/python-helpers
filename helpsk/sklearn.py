@@ -382,7 +382,6 @@ class TwoClassEvaluator:
 
     def plot_auc_curve(self):
         """Plots the ROC AUC"""
-
         def get_true_pos_false_pos(threshold):
             temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
                                           predicted_scores=self._predicted_scores,
@@ -402,6 +401,39 @@ class TwoClassEvaluator:
                                           auc_curve['threshold'])):
             if i % 5 == 0:
                 axis.text(x, y, f'{s:.3}')
+        plt.tight_layout()
+
+    def plot_threshold_curves(self, score_threshold_range: Tuple[int, int] = (0.3, 0.9)):
+        def get_threshold_scores(threshold):
+            temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
+                                          predicted_scores=self._predicted_scores,
+                                          labels=('x', 'y'),
+                                          score_threshold=threshold)
+
+            return threshold,\
+                   temp_eval.true_positive_rate,\
+                   temp_eval.false_positive_rate,\
+                   temp_eval.positive_predictive_value,\
+                   temp_eval.false_negative_rate,\
+                   temp_eval.true_negative_rate
+
+        threshold_curves = [get_threshold_scores(threshold=x) for x in np.arange(score_threshold_range[0],
+                                                                                 score_threshold_range[1],
+                                                                                 0.025)]
+        threshold_curves = pd.DataFrame(threshold_curves,
+                                        columns=['Score Threshold',
+                                                 'True Pos. Rate (Recall)',
+                                                 'False Pos. Rate',
+                                                 'Pos. Predictive Value (Precision)',
+                                                 'False Neg. Rate',
+                                                 'True Neg. Rate (Specificity)'])
+
+        axis = sns.lineplot(x='Score Threshold', y='value', hue='variable',
+                            data=pd.melt(frame=threshold_curves, id_vars=['Score Threshold']))
+        axis.set_xticks(np.arange(score_threshold_range[0], score_threshold_range[1] + 0.1, 0.1))
+        axis.set_yticks(np.arange(0, 1.1, .1))
+        plt.vlines(x=0.5, ymin=0, ymax=1, colors='black')
+        plt.grid()
         plt.tight_layout()
 
     def plot_lift(self):

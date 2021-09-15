@@ -180,7 +180,7 @@ class TestSklearn(unittest.TestCase):
         check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_confusion_matrix.png',
                    plot_function=lambda: evaluator.plot_confusion_matrix())
 
-    def test_plot_roc_auc(self):
+    def test_plot_auc_curve(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
                                       labels=('Bad', 'Good'),
@@ -188,3 +188,12 @@ class TestSklearn(unittest.TestCase):
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_auc_curve.png',
                    plot_function=lambda: evaluator.plot_auc_curve())
+
+    def test_plot_threshold_curves(self):
+        evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
+                                      predicted_scores=self.credit_data__y_scores,
+                                      labels=('Bad', 'Good'),
+                                      score_threshold=0.5)
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_threshold_curves.png',
+                   plot_function=lambda: evaluator.plot_threshold_curves())
