@@ -504,7 +504,10 @@ class TwoClassEvaluator:
 
         if return_style:
             gain_lift_data = gain_lift_data.style
-            gain_lift_data.format(precision=2).bar(color=hcolor.Colors.PASTEL_BLUE.value)
+            gain_lift_data.format(precision=2). \
+                bar(subset='Gain', color=hcolor.Colors.PASTEL_BLUE.value,
+                    vmin=0, vmax=1). \
+                bar(subset='Lift', color=hcolor.Colors.PASTEL_BLUE.value)
 
         return gain_lift_data
 
