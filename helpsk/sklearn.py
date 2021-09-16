@@ -403,6 +403,9 @@ class TwoClassEvaluator:
                                           auc_curve['threshold'])):
             if i % 5 == 0:
                 axis.text(x, y, f'{s:.3}')
+        axis.set_xticks(np.arange(0, 1.1, .1))
+        axis.set_yticks(np.arange(0, 1.1, .1))
+        plt.grid()
         plt.tight_layout()
 
     def plot_threshold_curves(self, score_threshold_range: Tuple[int, int] = (0.3, 0.9)):
