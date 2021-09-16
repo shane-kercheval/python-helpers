@@ -450,26 +450,21 @@ class TwoClassEvaluator:
     def calculate_lift_gain(self,
                             num_buckets: int = 20,
                             return_style: bool = False,
-                            include_all_info: bool = False):
+                            include_all_info: bool = False) -> Union[pd.DataFrame, Styler]:
         """
         https://www.listendata.com/2014/08/excel-template-gain-and-lift-charts.html
 
-        :return: Lift chart shows when we are selecting the top X (x-axis) percent of the predictions such
-            that the highest predictions are looked at first, we can expected Y-times (y-axis) the total
-            number of positive events found than by randomly selecting X% of the data.
-
-
-        :return: A Gain Chart shows the % of positive events we have 'captured' i.e. located by looking at the
-        top x% of population of predictions such that the highest predictions are looked at first.
-        So we can say we've captured X% of all the positive events by searching Y% of highest predictions.
-
-        For example, if X (and the x-axis) is 20% and Y (and the y-axis) is 83%, and we are predicting
-        the probability that a customer will purchase a widget, then we can say something like:
-        "In the case of propensity to buy, we can say we can identify and target 83% of the customers
-        who are likely to buy the product by target 20% of total customers (in the population we are
-        looking at)". This gives us an idea of effort vs payoff in sales/marketing/etc. activities.
-
-
+        Gain is the % of positive (actual) events we have 'captured' i.e. located by looking at the
+        top x% of predicted scores, such that the highest scores are looked at first.
+        For example, if the percentile is `5%` and the gain value is `0.3`, we can say that if we randomly
+        searched `5%` of the data, we would expect to uncover about `5%` of the positive events;
+        however, we have uncovered 30% of events by searching the highest 5% of scores.
+        Lift is simply the ratio of the percent of events that what we have uncovered for a given percentile
+        of data (i.e. gain) divided by what we would have expected by random chance (i.e. the percentile).
+        So in the previous example, we uncovered 30% of positive events by searching the top 5% of scores;
+        whereas if we took a random sample, we would have only expected to find 5% of the positive events.
+        The lift is `0.3 / 0.05` which is `6`; meaning we found `6` times the amount of positive events by
+        searching the top 5% of scores, than if we were to randomly sample the data.
         """
         data = pd.DataFrame({
             'predicted_scores': self._predicted_scores,
