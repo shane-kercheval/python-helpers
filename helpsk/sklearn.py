@@ -179,6 +179,8 @@ class TwoClassEvaluator:
         true_negatives, false_positives, false_negatives, true_positives = self._confusion_matrix.ravel()
 
         self._actual_positives = true_positives + false_negatives
+        assert self._actual_positives == sum(self._actual_values == 1)
+
         self._actual_negatives = true_negatives + false_positives
 
         self._true_negatives = true_negatives
@@ -455,7 +457,7 @@ class TwoClassEvaluator:
         :return: Lift chart shows when we are selecting the top X (x-axis) percent of the predictions such
             that the highest predictions are looked at first, we can expected Y-times (y-axis) the total
             number of positive events found than by randomly selecting X% of the data.
-       
+
 
         :return: A Gain Chart shows the % of positive events we have 'captured' i.e. located by looking at the
         top x% of population of predictions such that the highest predictions are looked at first.
@@ -482,35 +484,23 @@ class TwoClassEvaluator:
 
         data['Percentile'] = bins
 
-        def gain_grouping(x):
-            # noinspection PyTypeChecker
-            number_positive_events = sum(x.actual_values == 1)
-            d = {
-                'Number of Observations': len(x.actual_values),
-                'Number of Positive Events': number_positive_events
+        def gain_grouping(group):
+            results = {
+                '# of Obs.': len(group.actual_values),
+                '# of Pos. Events': sum(group.actual_values == 1)
             }
-            return pd.Series(d, index=['Number of Observations', 'Number of Positive Events'])
+            return pd.Series(results, index=['# of Obs.', '# of Pos. Events'])
 
-        number_of_positive_events = sum(self._actual_values == 1)
         gain_lift_data = data.groupby('Percentile').apply(gain_grouping)
-        temp = pd.DataFrame({'Number of Observations': 0, 'Number of Positive Events': 0}, index=[0])
+        temp = pd.DataFrame({'# of Obs.': 0, '# of Pos. Events': 0}, index=[0])
         temp.index.names = ['Percentile']
         gain_lift_data = pd.concat([gain_lift_data, temp])
         gain_lift_data.sort_index(ascending=True, inplace=True)
 
-        gain_lift_data['Cumulative Observations'] = gain_lift_data['Number of Observations'].cumsum()
-        gain_lift_data['Cumulative Positive Events'] = gain_lift_data['Number of Positive Events'].cumsum()
-        gain_lift_data['Percentage of Positive Events'] = gain_lift_data['Cumulative Positive Events'] / \
-                                                          number_of_positive_events
-        gain_lift_data['Random Gain'] = gain_lift_data.index.values
-        gain_lift_data['Gain'] = gain_lift_data['Percentage of Positive Events']
-
-        total_observations = len(self._actual_values)
-
-        gain_lift_data['Lift'] = gain_lift_data['Gain'] / \
-                                  (gain_lift_data['Cumulative Observations'] / total_observations)
-
+        gain_lift_data['Cumul. Pos. Events'] = gain_lift_data['# of Pos. Events'].cumsum()
+        gain_lift_data['Gain'] = gain_lift_data['Cumul. Pos. Events'] / self._actual_positives
         gain_lift_data = gain_lift_data.loc[~(gain_lift_data.index == 0), :]
+        gain_lift_data['Lift'] = gain_lift_data['Gain'] / (gain_lift_data.index.values / 100)
 
         if not include_all_info:
             gain_lift_data = gain_lift_data[['Gain', 'Lift']]

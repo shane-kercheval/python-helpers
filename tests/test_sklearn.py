@@ -212,6 +212,7 @@ class TestSklearn(unittest.TestCase):
 
         with open(get_test_path() + '/test_files/sklearn/calculate_lift_gain.html', 'w') as file:
             table_html = evaluator.calculate_lift_gain(return_style=True).render()
+            file.write(table_html)
 
         with open(get_test_path() + '/test_files/sklearn/calculate_lift_gain__10_buckets.html', 'w') as file:
             table_html = evaluator.calculate_lift_gain(return_style=True, num_buckets=10).render()
