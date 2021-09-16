@@ -445,9 +445,83 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
-    def plot_lift(self):
-        """Plots lift."""
-        pass
+    def calculate_lift_gain(self,
+                            num_buckets: int = 20,
+                            return_style: bool = False,
+                            include_all_info: bool = False):
+        """
+        https://www.listendata.com/2014/08/excel-template-gain-and-lift-charts.html
+
+        :return: Lift chart shows when we are selecting the top X (x-axis) percent of the predictions such
+            that the highest predictions are looked at first, we can expected Y-times (y-axis) the total
+            number of positive events found than by randomly selecting X% of the data.
+       
+
+        :return: A Gain Chart shows the % of positive events we have 'captured' i.e. located by looking at the
+        top x% of population of predictions such that the highest predictions are looked at first.
+        So we can say we've captured X% of all the positive events by searching Y% of highest predictions.
+
+        For example, if X (and the x-axis) is 20% and Y (and the y-axis) is 83%, and we are predicting
+        the probability that a customer will purchase a widget, then we can say something like:
+        "In the case of propensity to buy, we can say we can identify and target 83% of the customers
+        who are likely to buy the product by target 20% of total customers (in the population we are
+        looking at)". This gives us an idea of effort vs payoff in sales/marketing/etc. activities.
+
+
+        """
+        data = pd.DataFrame({
+            'predicted_scores': self._predicted_scores,
+            'actual_values': self._actual_values,
+        })
+        data.sort_values(['predicted_scores'], ascending=False, inplace=True)
+
+        # .qcut gets percentiles
+        bins = pd.qcut(x=data['predicted_scores'],
+                       q=num_buckets,
+                       labels=list(range(100, 0, round(-100 / num_buckets))))
+
+        data['Percentile'] = bins
+
+        def gain_grouping(x):
+            # noinspection PyTypeChecker
+            number_positive_events = sum(x.actual_values == 1)
+            d = {
+                'Number of Observations': len(x.actual_values),
+                'Number of Positive Events': number_positive_events
+            }
+            return pd.Series(d, index=['Number of Observations', 'Number of Positive Events'])
+
+        number_of_positive_events = sum(self._actual_values == 1)
+        gain_lift_data = data.groupby('Percentile').apply(gain_grouping)
+        temp = pd.DataFrame({'Number of Observations': 0, 'Number of Positive Events': 0}, index=[0])
+        temp.index.names = ['Percentile']
+        gain_lift_data = pd.concat([gain_lift_data, temp])
+        gain_lift_data.sort_index(ascending=True, inplace=True)
+
+        gain_lift_data['Cumulative Observations'] = gain_lift_data['Number of Observations'].cumsum()
+        gain_lift_data['Cumulative Positive Events'] = gain_lift_data['Number of Positive Events'].cumsum()
+        gain_lift_data['Percentage of Positive Events'] = gain_lift_data['Cumulative Positive Events'] / \
+                                                          number_of_positive_events
+        gain_lift_data['Random Gain'] = gain_lift_data.index.values
+        gain_lift_data['Gain'] = gain_lift_data['Percentage of Positive Events']
+
+        total_observations = len(self._actual_values)
+
+        gain_lift_data['Lift'] = gain_lift_data['Gain'] / \
+                                  (gain_lift_data['Cumulative Observations'] / total_observations)
+
+        gain_lift_data = gain_lift_data.loc[~(gain_lift_data.index == 0), :]
+
+        if not include_all_info:
+            gain_lift_data = gain_lift_data[['Gain', 'Lift']]
+
+        gain_lift_data = gain_lift_data.round(2)
+
+        if return_style:
+            gain_lift_data = gain_lift_data.style
+            gain_lift_data.format(precision=2).bar(color=hcolor.Colors.PASTEL_BLUE.value)
+
+        return gain_lift_data
 
 
 class TransformerChooser(BaseEstimator, TransformerMixin):

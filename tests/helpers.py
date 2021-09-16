@@ -7,7 +7,8 @@ from unittest import TestCase
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from helpsk.utility import is_debugging
+from helpsk.pandas import print_dataframe
+from helpsk.utility import is_debugging, redirect_stdout_to_file
 
 
 def get_test_path() -> str:
@@ -110,3 +111,11 @@ def get_data_titanic() -> pd.DataFrame:
     # data['survived'] = titanic['target']
     # data.to_pickle(get_test_path() + '/test_data/titanic.pkl')
     return pd.read_pickle(get_test_path() + '/test_data/titanic.pkl')
+
+
+def helper_test_dataframe(file_name, dataframe):
+    if os.path.isfile(file_name):
+        os.remove(file_name)
+    with redirect_stdout_to_file(file_name):
+        print_dataframe(dataframe)
+    assert os.path.isfile(file_name)

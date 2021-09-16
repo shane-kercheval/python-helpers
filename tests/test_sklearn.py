@@ -14,7 +14,7 @@ from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
 from helpsk.sklearn import CustomOrdinalEncoder, cv_results_to_dataframe, TwoClassEvaluator
-from tests.helpers import get_data_credit, get_test_path, check_plot
+from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe
 
 
 def warn(*args, **kwargs):  # noqa
@@ -197,3 +197,22 @@ class TestSklearn(unittest.TestCase):
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_threshold_curves.png',
                    plot_function=lambda: evaluator.plot_threshold_curves())
+
+    def test_calculate_lift_gain(self):
+        evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
+                                      predicted_scores=self.credit_data__y_scores,
+                                      labels=('Bad', 'Good'),
+                                      score_threshold=0.5)
+
+        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn/calculate_lift_gain.txt',
+                              dataframe=evaluator.calculate_lift_gain())
+
+        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn/calculate_lift_gain__10_buckets.txt',
+                              dataframe=evaluator.calculate_lift_gain(num_buckets=10))
+
+        with open(get_test_path() + '/test_files/sklearn/calculate_lift_gain.html', 'w') as file:
+            table_html = evaluator.calculate_lift_gain(return_style=True).render()
+
+        with open(get_test_path() + '/test_files/sklearn/calculate_lift_gain__10_buckets.html', 'w') as file:
+            table_html = evaluator.calculate_lift_gain(return_style=True, num_buckets=10).render()
+            file.write(table_html)
