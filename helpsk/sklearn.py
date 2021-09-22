@@ -22,6 +22,7 @@ from helpsk.exceptions import HelpskParamValueError
 def cv_results_to_dataframe(searcher: BaseSearchCV,
                             num_folds: int,
                             num_repeats: int,
+                            return_train_score: bool = True,
                             return_style: bool = True) -> Union[pd.DataFrame, Styler]:
     """
     Args:
@@ -45,6 +46,8 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
         num_repeats:
             the number of repeats used for the cross validation; used to calculate the standard error of the
             mean for each score
+        return_train_score:
+            if True, then return the training scores if they exist in the `cv_results_` dict.
         return_style:
             if True, return pd.DataFrame().style object after being styled
     """
@@ -77,28 +80,47 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
             })
         ], axis=1)
 
+        if return_train_score and 'mean_train_' + score in cv_results:
+            results = pd.concat([
+                results,
+                pd.DataFrame({
+                    score_name + " Training Mean": cv_results['mean_train_' + score],
+                    score_name + " Training St. Dev": cv_results['std_train_' + score],
+                })
+            ], axis=1)
+
     # see comment above
     if str_score_name is not None:
         score_names = [str_score_name]
 
-    # for each score, calculate the 95% confidence interval for the mean
-    for score in score_names:
-        mean_key = score + ' Mean'
-        st_dev_key = score + ' St. Dev'
-
-        score_means = results[mean_key]
-        score_standard_errors = results[st_dev_key] / math.sqrt(sample_size)
+    def add_confidence_interval(score_name, dataframe):
+        mean_column_name = score_name + ' Mean'
+        st_dev_column_name = score_name + ' St. Dev'
+        score_means = dataframe[mean_column_name]
+        score_standard_errors = dataframe[st_dev_column_name] / math.sqrt(sample_size)
 
         confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
                                              df=sample_size - 1,  # degrees of freedom
                                              loc=score_means,
                                              scale=score_standard_errors)
 
-        results = results.drop(columns=st_dev_key)
+        dataframe = dataframe.drop(columns=st_dev_column_name)
 
-        insertion_index = results.columns.get_loc(mean_key) + 1
-        results.insert(loc=insertion_index, column=score + ' 95CI.HI', value=confidence_intervals[1])
-        results.insert(loc=insertion_index, column=score + ' 95CI.LO', value=confidence_intervals[0])
+        insertion_index = dataframe.columns.get_loc(mean_column_name) + 1
+        dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.HI', value=confidence_intervals[1])
+        dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.LO', value=confidence_intervals[0])
+
+        return dataframe
+
+    # for each score, calculate the 95% confidence interval for the mean
+    for score in score_names:
+        results = add_confidence_interval(score_name=score,
+                                          dataframe=results)
+
+        # if there are training scores, then drop the St. Dev, and don't add confidence intervals,
+        # which would add too many columns (noise) and not that interesting.
+        if return_train_score and score + ' Training Mean' in results.columns:
+            results = results.drop(columns=score + ' Training St. Dev')
 
     parameter_dataframe = pd.DataFrame(cv_results["params"])
     parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
@@ -119,6 +141,7 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
     if return_style:
         results = results.style
 
+        # note that we are not adding styles to the training scores; training scores are secondary info
         for score in score_names:
             mean_key = score + ' Mean'
             ci_low_key = score + ' 95CI.LO'

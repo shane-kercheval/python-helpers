@@ -100,19 +100,59 @@ class TestSklearn(unittest.TestCase):
         results = cv_results_to_dataframe(searcher=grid_search,
                                           num_folds=3,
                                           num_repeats=1,
+                                          return_train_score=True,
                                           return_style=False)
 
         self.assertIsInstance(results, pd.DataFrame)
         self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | base_transformer'].iloc[0],
                               str)
+        equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
+                                    'ROC/AUC Training Mean',
+                                    'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
+                                    'F1 Training Mean',
+                                    'Pos. Pred. Val Mean', 'Pos. Pred. Val 95CI.LO', 'Pos. Pred. Val 95CI.HI',
+                                    'Pos. Pred. Val Training Mean',
+                                    'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
+                                    'True Pos. Rate Training Mean',
+                                    'model | max_features', 'model | n_estimators',
+                                    'preparation | non_numeric_pipeline | encoder_chooser | base_transformer']
+        self.assertTrue(all(equal))
+
+        results = cv_results_to_dataframe(searcher=grid_search,
+                                          num_folds=3,
+                                          num_repeats=1,
+                                          return_train_score=False,
+                                          return_style=False)
+
+        self.assertIsInstance(results, pd.DataFrame)
+        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | base_transformer'].iloc[0],
+                              str)
+        equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
+                                    'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
+                                    'Pos. Pred. Val Mean', 'Pos. Pred. Val 95CI.LO', 'Pos. Pred. Val 95CI.HI',
+                                    'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
+                                    'model | max_features', 'model | n_estimators',
+                                    'preparation | non_numeric_pipeline | encoder_chooser | base_transformer']
+        self.assertTrue(all(equal))
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
+                                              return_train_score=True,
                                               return_style=True)
-        with open(get_test_path() + '/test_files/sklearn/credit__grid_search.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn/credit__grid_search__with_training.html', 'w') as file:
+            file.write(results.render())
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = cv_results_to_dataframe(searcher=grid_search,
+                                              num_folds=3,
+                                              num_repeats=1,
+                                              return_train_score=False,
+                                              return_style = True)
+        with open(get_test_path() + '/test_files/sklearn/credit__grid_search__without_training.html', 'w') as file:
             file.write(results.render())
 
         grid_search = self.credit_data__grid_search__roc_auc
@@ -121,8 +161,20 @@ class TestSklearn(unittest.TestCase):
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
+                                              return_train_score=True,
                                               return_style=True)
-        test_file = get_test_path() + '/test_files/sklearn/credit__grid_search__default_scores.html'
+        test_file = get_test_path() + '/test_files/sklearn/credit__grid_search__default_scores__with_training.html'
+        with open(test_file, 'w') as file:
+            file.write(results.render())
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = cv_results_to_dataframe(searcher=grid_search,
+                                              num_folds=3,
+                                              num_repeats=1,
+                                              return_train_score=False,
+                                              return_style=True)
+        test_file = get_test_path() + '/test_files/sklearn/credit__grid_search__default_scores__without_training.html'
         with open(test_file, 'w') as file:
             file.write(results.render())
 
