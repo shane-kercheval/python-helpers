@@ -258,6 +258,15 @@ class TestSklearn(unittest.TestCase):
         check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_threshold_curves.png',
                    plot_function=lambda: evaluator.plot_threshold_curves())
 
+    def test_plot_precision_recall_tradeoff(self):
+        evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
+                                      predicted_scores=self.credit_data__y_scores,
+                                      labels=('Bad', 'Good'),
+                                      score_threshold=0.5)
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_precision_recall_tradeoff.png',
+                   plot_function=lambda: evaluator.plot_precision_recall_tradeoff())
+
     def test_calculate_lift_gain(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,

@@ -483,7 +483,7 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
-    def plot_threshold_curves(self, score_threshold_range: Tuple[int, int] = (0.3, 0.9)):
+    def plot_threshold_curves(self, score_threshold_range: Tuple[float, float] = (0.3, 0.9)):
         """Plots various scores (e.g. True Positive Rate, False Positive Rate, etc.) for various score
         thresholds. (A score threshold is the value for which you would predict a positive label if the
         value of the score is above the threshold (e.g. usually 0.5).
@@ -521,7 +521,43 @@ class TwoClassEvaluator:
                             data=pd.melt(frame=threshold_curves, id_vars=['Score Threshold']))
         axis.set_xticks(np.arange(score_threshold_range[0], score_threshold_range[1] + 0.1, 0.1))
         axis.set_yticks(np.arange(0, 1.1, .1))
-        plt.vlines(x=0.5, ymin=0, ymax=1, colors='black')
+        plt.vlines(x=self.score_threshold, ymin=0, ymax=1, colors='black')
+        plt.grid()
+        plt.tight_layout()
+
+    def plot_precision_recall_tradeoff(self, score_threshold_range: Tuple[float, float] = (0, 1)):
+        """Plots the tradeoff between precision (i.e. positive predict value) and recall (i.e. True Positive
+        Rate) for various score thresholds. (A score threshold is the value for which you would predict a
+        positive label if the value of the score is above the threshold (e.g. usually 0.5).
+
+        Args:
+            score_threshold_range:
+                range of score thresholds to plot (x-axis); tuple with minimum threshold in first index and
+                maximum threshold in second index.
+        """
+        def get_threshold_scores(threshold):
+            temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
+                                          predicted_scores=self._predicted_scores,
+                                          labels=('x', 'y'),
+                                          score_threshold=threshold)
+
+            return threshold,\
+                temp_eval.true_positive_rate,\
+                temp_eval.positive_predictive_value
+
+        threshold_curves = [get_threshold_scores(threshold=x) for x in np.arange(score_threshold_range[0],
+                                                                                 score_threshold_range[1],
+                                                                                 0.025)]
+        threshold_curves = pd.DataFrame(threshold_curves,
+                                        columns=['Score Threshold',
+                                                 'True Pos. Rate (Recall)',
+                                                 'Pos. Predictive Value (Precision)'])
+
+        axis = sns.lineplot(x='Score Threshold', y='value', hue='variable',
+                            data=pd.melt(frame=threshold_curves, id_vars=['Score Threshold']))
+        axis.set_xticks(np.arange(score_threshold_range[0], score_threshold_range[1] + 0.1, 0.1))
+        axis.set_yticks(np.arange(0, 1.1, .1))
+        plt.vlines(x=self.score_threshold, ymin=0, ymax=1, colors='black')
         plt.grid()
         plt.tight_layout()
 
