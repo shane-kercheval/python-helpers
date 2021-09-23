@@ -93,7 +93,7 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
     if str_score_name is not None:
         score_names = [str_score_name]
 
-    def add_confidence_interval(score_name, dataframe):
+    def add_confidence_interval(score_name, dataframe):  # noqa
         mean_column_name = score_name + ' Mean'
         st_dev_column_name = score_name + ' St. Dev'
         score_means = dataframe[mean_column_name]
@@ -261,7 +261,7 @@ class TwoClassEvaluator:
     def prevalence(self) -> Union[float, None]:
         """Prevalence"""
         return None if self.sample_size == 0 else \
-            (self._true_positives + self._false_negatives) / self.sample_size
+            self._actual_positives / self.sample_size
 
     @property
     def kappa(self) -> Union[float, None]:
@@ -331,33 +331,84 @@ class TwoClassEvaluator:
     @property
     def all_metrics(self) -> dict:
         """All of the metrics are returned as a dictionary."""
-        return {'AUC': self.auc,
-                'True Positive Rate': self.sensitivity,
-                'True Negative Rate': self.specificity,
-                'False Positive Rate': self.false_positive_rate,
-                'False Negative Rate': self.false_negative_rate,
-                'Positive Predictive Value': self.positive_predictive_value,
-                'Negative Predictive Value': self.negative_predictive_value,
-                'F1 Score': self.f1_score,
-                'Kappa': self.kappa,
-                'Two-Class Accuracy': self.accuracy,
-                'Error Rate': self.error_rate,
-                'Prevalence': self.prevalence,
-                'No Information Rate': max(self.prevalence, 1 - self.prevalence),  # i.e. largest class %
-                'Total Observations': self.sample_size}
+
+        auc_message = 'Area under the ROC curve (true pos. rate vs false pos. rate); ' \
+                      'ranges from 0.5 (purely random classifier) to 1.0 (perfect classifier)'
+
+        tpr_message = f'{self.true_positive_rate:.1%} of positive instances were correctly identified.; ' \
+                      f'i.e. {self._true_positives} "{self._labels[1]}" labels were correctly identified ' \
+                      f'out of {self._actual_positives} instances; a.k.a Sensitivity/Recall'
+
+        tnr_message = f'{self.true_negative_rate:.1%} of negative instances were correctly identified.; ' \
+                      f'i.e. {self._true_negatives} "{self._labels[0]}" labels were correctly identified ' \
+                      f'out of {self._actual_negatives} instances'
+
+        fpr_message = f'{self.false_positive_rate:.1%} of negative instances were incorrectly identified ' \
+                      f'as positive; ' \
+                      f'i.e. {self._false_positives} "{self._labels[0]}" labels were incorrectly ' \
+                      f'identified as "{self._labels[1]}", out of {self._actual_negatives} instances'
+
+        fnr_message = f'{self.false_negative_rate:.1%} of positive instances were incorrectly identified ' \
+                      f'as negative; ' \
+                      f'i.e. {self._false_negatives} "{self._labels[1]}" labels were incorrectly ' \
+                      f'identified as "{self._labels[0]}", out of {self._actual_positives} instances'
+
+        ppv_message = f'When the model claims an instance is positive, it is correct ' \
+                      f'{self.positive_predictive_value:.1%} of the time; ' \
+                      f'i.e. out of the {self._true_positives + self._false_positives} times the model ' \
+                      f'predicted "{self._labels[1]}", it was correct {self._true_positives} ' \
+                      f'times; a.k.a precision'
+
+        npv_message = f'When the model claims an instance is negative, it is correct ' \
+                      f'{self.negative_predictive_value:.1%} of the time; ' \
+                      f'i.e. out of the {self._true_negatives + self._false_negatives} times the model ' \
+                      f'predicted "{self._labels[0]}", it was correct {self._true_negatives} times'
+
+        f1_message = 'The F1 score can be interpreted as a weighted average of the precision and recall, ' \
+                     'where an F1 score reaches its best value at 1 and worst score at 0.'
+
+        accuracy_message = f'{self.accuracy:.1%} of instances were correctly identified'
+        error_message = f'{self.error_rate:.1%} of instances were incorrectly identified'
+        prevalence_message = f'{self.prevalence:.1%} of the data are positive; i.e. out of ' \
+                             f'{self.sample_size} total observations; {self._actual_positives} are labeled ' \
+                             f'as "{self._labels[1]}"'
+        total_obs_message = f'There are {self.sample_size} total observations; i.e. sample size'
+
+        return {'AUC': (self.auc, auc_message),
+                'True Positive Rate': (self.true_positive_rate, tpr_message),
+                'True Negative Rate': (self.true_negative_rate, tnr_message),
+                'False Positive Rate': (self.false_positive_rate, fpr_message),
+                'False Negative Rate': (self.false_negative_rate, fnr_message),
+                'Positive Predictive Value': (self.positive_predictive_value, ppv_message),
+                'Negative Predictive Value': (self.negative_predictive_value, npv_message),
+                'F1 Score': (self.f1_score, f1_message),
+                'Accuracy': (self.accuracy, accuracy_message),
+                'Error Rate': (self.error_rate, error_message),
+                '% Positive': (self.prevalence, prevalence_message),
+                'Total Observations': (self.sample_size, total_obs_message)}
 
     def all_metrics_df(self,
+                       return_details: bool = True,
                        return_style: bool = False,
                        round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
         """All of the metrics are returned as a DataFrame.
 
         Args:
+            return_details:
+                if True, then return descriptions of score and more information in an additional column
             return_style:
                 if True, return styler object; else return dataframe
             round_by:
                 the number of digits to round by; if None, then don't round
         """
-        result = pd.DataFrame.from_dict(self.all_metrics, orient='index', columns=['Scores'])
+        if return_details:
+            result = pd.DataFrame.from_dict(self.all_metrics,
+                                            orient='index',
+                                            columns=['Scores', 'Details'])
+        else:
+            result = pd.DataFrame.from_dict({key: value[0] for key, value in self.all_metrics.items()},
+                                            orient='index',
+                                            columns=['Scores'])
 
         if round_by:
             result['Scores'] = result['Scores'].round(round_by)
@@ -365,12 +416,13 @@ class TwoClassEvaluator:
         if return_style:
             subset_scores = [x for x in result.index.values if x != 'Total Observations']
 
-            subset_scores = pd.IndexSlice[result.loc[subset_scores, :].index, :]
+            subset_scores = pd.IndexSlice[result.loc[subset_scores, :].index, 'Scores']
             subset_negative_bad = pd.IndexSlice[result.loc[['False Positive Rate',
-                                                            'False Negative Rate'], :].index, :]
-            subset_secondary = pd.IndexSlice[result.loc[['Two-Class Accuracy', 'Error Rate',
-                                                         'Prevalence', 'No Information Rate'], :].index, :]
-            subset_total_observations = pd.IndexSlice[result.loc[['Total Observations'], :].index, :]
+                                                            'False Negative Rate'], 'Scores'].index, 'Scores']
+            subset_secondary = pd.IndexSlice[result.loc[['Accuracy', 'Error Rate', '% Positive'],
+                                                        'Scores'].index, 'Scores']
+            subset_total_observations = pd.IndexSlice[result.loc[['Total Observations'],
+                                                                 'Scores'].index, 'Scores']
 
             result = result.style
 

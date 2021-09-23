@@ -212,15 +212,23 @@ class TestSklearn(unittest.TestCase):
         self.assertIsInstance(evaluator.all_metrics_df(return_style=False), pd.DataFrame)
 
         with open(get_test_path() + '/test_files/sklearn/all_metrics_df.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_style=True).render()
+            table_html = evaluator.all_metrics_df(return_details=False, return_style=True).render()
             file.write(table_html)
 
         with open(get_test_path() + '/test_files/sklearn/all_metrics_df__round_3.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_style=True,
+            table_html = evaluator.all_metrics_df(return_details=False,
+                                                  return_style=True,
                                                   round_by=3).render()
+            file.write(table_html)
 
-            evaluator.all_metrics_df()
-            evaluator.all_metrics_df().style.format(precision=3).render()
+        with open(get_test_path() + '/test_files/sklearn/all_metrics_df__with_details.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_details=True, return_style=True).render()
+            file.write(table_html)
+
+        with open(get_test_path() + '/test_files/sklearn/all_metrics_df__with_details__round_3.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_details=True,
+                                                  return_style=True,
+                                                  round_by=3).render()
             file.write(table_html)
 
     def test_plot_confusion_matrix(self):
