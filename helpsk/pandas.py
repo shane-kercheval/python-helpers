@@ -362,14 +362,25 @@ def non_numeric_summary(dataframe: pd.DataFrame, return_style: bool = False) -> 
                   round(dataframe[column].isnull().sum() / len(dataframe), 3))
                  for column in non_numeric_columns]
     columns, num_nulls, perc_nulls = zip(*null_data)
-    results = pd.DataFrame({'# of Non-Nulls': [dataframe[x].count() for x in non_numeric_columns],
+
+    num_non_nulls = [dataframe[x].count() for x in non_numeric_columns]
+
+    def get_top_value(series: pd.Series):
+        counts = series.value_counts()
+        return counts.index[0] if len(counts) > 0 else None
+
+    most_frequent_value = [get_top_value(dataframe[x]) for x in non_numeric_columns]
+    num_unique = [len(dataframe[x].dropna().unique()) for x in non_numeric_columns]
+
+    perc_unique = [np.nan if num_non_null == 0 else len(dataframe[col_name].dropna().unique()) / num_non_null
+                   for col_name, num_non_null in zip(non_numeric_columns, num_non_nulls)]
+    perc_unique = np.round(perc_unique, 3)
+    results = pd.DataFrame({'# of Non-Nulls': num_non_nulls,
                             '# of Nulls': num_nulls,
                             '% Nulls': perc_nulls,
-                            'Most Freq. Value': [dataframe[x].value_counts().index[0]
-                                                 for x in non_numeric_columns],
-                            '# of Unique': [len(dataframe[x].dropna().unique()) for x in non_numeric_columns],
-                            '% Unique': [round(len(dataframe[x].dropna().unique()) / dataframe[x].count(),
-                                               3) for x in non_numeric_columns]},
+                            'Most Freq. Value': most_frequent_value,
+                            '# of Unique': num_unique,
+                            '% Unique': perc_unique},
                            index=columns)
 
     if return_style:

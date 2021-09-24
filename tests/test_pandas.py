@@ -2,6 +2,8 @@ import os
 import unittest
 from enum import Enum, unique, auto
 
+import numpy as np
+
 from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
@@ -306,8 +308,17 @@ class TestPandas(unittest.TestCase):
         self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__sample.txt',
                                  numeric_summary(self.sample_data))
 
+    def test_numeric_summary__nan_column(self):
+        test_data = self.credit_data.copy()
+        test_data['all_missing'] = np.nan
+        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__credit__all_missing.txt',
+                                 numeric_summary(test_data))
+
+        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__style__credit__all_missing.html',
+                                 numeric_summary(test_data, return_style=True).render())
+
     def test_numeric_summary_style(self):
-        test_data = self.credit_data
+        test_data = self.credit_data.copy()
         test_data.loc[0:46, ['duration']] = np.nan
         test_data.loc[10:54, ['credit_amount']] = 0
 
@@ -324,8 +335,17 @@ class TestPandas(unittest.TestCase):
         self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__sample.txt',
                                  non_numeric_summary(self.sample_data))
 
+    def test_non_numeric_summary__nan_column(self):
+        test_data = self.credit_data.copy()
+        test_data['all_missing'] = None
+        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__credit__all_missing.txt',
+                                 non_numeric_summary(test_data))
+
+        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__style__credit__all_missing.html',
+                                 non_numeric_summary(test_data, return_style=True).render())
+
     def test_non_numeric_summary_test(self):
-        test_data = self.credit_data
+        test_data = self.credit_data.copy()
         test_data.loc[25:75, ['checking_status']] = np.nan
 
         self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__style__credit.html',
@@ -438,7 +458,7 @@ class TestPandas(unittest.TestCase):
     def test_value_frequency__missing_category(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
         # a count of `0` for a category (i.e. category existed but not any values)
-        test_series = self.credit_data['checking_status']
+        test_series = self.credit_data['checking_status'].copy()
         test_series[test_series == 'no checking'] = np.nan
 
         results = value_frequency(test_series, sort_by_frequency=True)
