@@ -328,7 +328,12 @@ class TestSklearn(unittest.TestCase):
             file.write(table_html)
 
     def test_RegressionEvaluator(self):
-        evaluator = RegressionEvaluator(None, None)
+        evaluator = RegressionEvaluator(actual_values=self.housing_data__y_test,
+                                        predicted_values=self.housing_data__y_predictions)
+
+        #evaluator.plot_residuals_vs_fits()
+        #evaluator.plot_residuals_vs_actuals()
+        #evaluator.plot_predictions_vs_actuals()
 
     def test_plot_confusion_matrix(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
