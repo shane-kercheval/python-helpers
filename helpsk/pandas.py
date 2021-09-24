@@ -318,9 +318,10 @@ def numeric_summary(dataframe: pd.DataFrame,
                  subset=['# of Non-Nulls', '# of Nulls', '# of Zeros'],
                  round_by=0).\
             pipe(pstyle.format, subset=columns_to_format, round_by=1). \
-            highlight_between(left=0.00000001, right=math.inf, subset=['# of Nulls', '% Nulls', '# of Zeros',
-                                                                       '% Zeros'],
+            highlight_between(left=0.00000001, right=math.inf, subset=['# of Nulls', '# of Zeros'],
                               color=color.WARNING). \
+            bar(subset=['% Nulls'], color=color.BAD, vmin=0, vmax=1). \
+            bar(subset=['% Zeros'], color=color.GRAY, vmin=0, vmax=1). \
             bar(subset=['Coef of Var'], color=color.GRAY, vmin=0, vmax=1). \
             bar(subset=['Skewness'], color=color.GRAY,  align='mid', vmin=-2, vmax=2)
 
@@ -385,14 +386,16 @@ def non_numeric_summary(dataframe: pd.DataFrame, return_style: bool = False) -> 
 
     if return_style:
         results = results.style.format({
+                '% Nulls': '{:,.1%}'.format,
                 '% Unique': '{:,.1%}'.format
             }). \
             pipe(pstyle.format,
                  subset=['# of Non-Nulls', '# of Nulls'],
                  round_by=0). \
             pipe(pstyle.format, subset=['# of Unique'], round_by=1). \
-            highlight_between(left=0.00000001, right=math.inf, subset=['# of Nulls', '% Nulls'],
+            highlight_between(left=0.00000001, right=math.inf, subset=['# of Nulls'],
                               color=color.WARNING). \
+            bar(subset=['% Nulls'], color=color.BAD, vmin=0, vmax=1). \
             bar(subset=['% Unique'], color=color.GRAY, vmin=0, vmax=1)
 
     return results
