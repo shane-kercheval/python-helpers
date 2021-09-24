@@ -146,6 +146,10 @@ class Database(metaclass=ABCMeta):
         end_time = time.time()
 
         if show_elapsed_time:
-            print(end_time - start_time)
+            elapsed_time = end_time - start_time
+            time_units = 'minutes' if elapsed_time > 60 else 'seconds'
+            elapsed_time = elapsed_time / 60 if elapsed_time > 60 else elapsed_time
+            elapsed_time = round(elapsed_time, 1)
+            print(f'Elapsed Time: {elapsed_time} {time_units}')
 
         return results
