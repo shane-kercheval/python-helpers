@@ -22,6 +22,7 @@ from helpsk.exceptions import HelpskParamValueError
 def cv_results_to_dataframe(searcher: BaseSearchCV,
                             num_folds: int,
                             num_repeats: int,
+                            greater_is_better: bool = True,
                             return_train_score: bool = True,
                             return_style: bool = True) -> Union[pd.DataFrame, Styler]:
     """
@@ -46,6 +47,10 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
         num_repeats:
             the number of repeats used for the cross validation; used to calculate the standard error of the
             mean for each score
+        greater_is_better:
+            if True, higher scores are better; if False, lower scores are better
+            False assumes that the scores returned from sklearn are negative and will multiple the values
+            by 1.
         return_train_score:
             if True, then return the training scores if they exist in the `cv_results_` dict.
         return_style:
@@ -72,19 +77,24 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
     # `score_names = [str_score_name]`
     for score in score_names:
         score_name = score if str_score_name is None else str_score_name
+        mean_scores = cv_results['mean_test_' + score]
+        mean_scores = mean_scores if greater_is_better else mean_scores * -1
+
         results = pd.concat([
             results,
             pd.DataFrame({
-                score_name + " Mean": cv_results['mean_test_' + score],
+                score_name + " Mean": mean_scores,
                 score_name + " St. Dev": cv_results['std_test_' + score],
             })
         ], axis=1)
 
         if return_train_score and 'mean_train_' + score in cv_results:
+            mean_training_scores = cv_results['mean_train_' + score]
+            mean_training_scores = mean_training_scores if greater_is_better else mean_training_scores * -1
             results = pd.concat([
                 results,
                 pd.DataFrame({
-                    score_name + " Training Mean": cv_results['mean_train_' + score],
+                    score_name + " Training Mean": mean_training_scores,
                     score_name + " Training St. Dev": cv_results['std_train_' + score],
                 })
             ], axis=1)
@@ -136,7 +146,7 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
         parameter_dataframe,
     ], axis=1)
 
-    results = results.sort_values(by=str(list(score_names)[0]) + ' Mean', ascending=False)
+    results = results.sort_values(by=str(list(score_names)[0]) + ' Mean', ascending=not greater_is_better)
 
     if return_style:
         results = results.style
@@ -624,6 +634,14 @@ class TwoClassEvaluator:
                 bar(subset='Lift', color=hcolor.Colors.PASTEL_BLUE.value)
 
         return gain_lift_data
+
+
+class RegressionEvaluator:
+
+    def __init__(self,
+                 actual_values: np.ndarray,
+                 predicted_values: np.ndarray):
+        pass
 
 
 class TransformerChooser(BaseEstimator, TransformerMixin):
