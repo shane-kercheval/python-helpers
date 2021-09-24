@@ -4,17 +4,17 @@ import warnings  # noqa
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import make_scorer, f1_score, precision_score, recall_score, SCORERS, roc_auc_score, fbeta_score, cohen_kappa_score, \
-    confusion_matrix
+    confusion_matrix, mean_squared_error, mean_absolute_error
 from sklearn.model_selection import train_test_split, GridSearchCV, RepeatedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
-from helpsk.sklearn import CustomOrdinalEncoder, cv_results_to_dataframe, TwoClassEvaluator
-from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe
+from helpsk.sklearn import CustomOrdinalEncoder, cv_results_to_dataframe, TwoClassEvaluator, RegressionEvaluator
+from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing
 
 
 def warn(*args, **kwargs):  # noqa
@@ -27,6 +27,10 @@ class TestSklearn(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        ####
+        # set up grid-search on classification model for credit data
+        ####
+
         credit_data = get_data_credit()
         credit_data.loc[0:46, ['duration']] = np.nan
         credit_data.loc[25:75, ['checking_status']] = np.nan
@@ -94,6 +98,48 @@ class TestSklearn(unittest.TestCase):
         predicted_scores = best_model.predict_proba(X_test)[:, 1]
         cls.credit_data__y_test = y_test
         cls.credit_data__y_scores = predicted_scores
+
+        ####
+        # set up grid-search on regression model for housing data
+        ####
+        housing_data = get_data_housing()
+        housing_data.loc[0:46, ['median_income']] = np.nan
+        housing_data.loc[25:75, ['housing_median_age']] = np.nan
+        y_full = housing_data['target']
+        X_full = housing_data.drop(columns='target')  # noqa
+        X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)  # noqa
+        del y_full, X_full
+        numeric_pipeline = Pipeline([
+            ('imputing', SimpleImputer(strategy='mean')),
+            ('scaling', StandardScaler()),
+        ])
+        random_forest_model = RandomForestRegressor(random_state=42)
+        full_pipeline = Pipeline([
+            ('preparation', numeric_pipeline),
+            ('model', random_forest_model)
+        ])
+        param_grad = [
+            {
+                'model__max_features': [2, 'auto'],
+                'model__n_estimators': [10, 50]
+            },
+        ]
+        scores = {
+            'RMSE': make_scorer(mean_squared_error, greater_is_better=False, squared=False),
+            'MAE': make_scorer(mean_absolute_error, greater_is_better=False),
+        }
+        grid_search = GridSearchCV(full_pipeline,
+                                   param_grid=param_grad,
+                                   cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),
+                                   scoring=scores,
+                                   refit='RMSE',
+                                   return_train_score=True)
+        grid_search.fit(X_train, y_train)
+        cls.housing_data__grid_search = grid_search
+        best_model = grid_search.best_estimator_
+        predicted_values = best_model.predict(X_test)
+        cls.housing_data__y_test = y_test
+        cls.housing_data__y_predictions = predicted_values
 
     def test_cv_results_to_dataframe(self):
         grid_search = self.credit_data__grid_search
@@ -178,6 +224,56 @@ class TestSklearn(unittest.TestCase):
         with open(test_file, 'w') as file:
             file.write(results.render())
 
+    def test_cv_results_to_dataframe_regression(self):
+        grid_search = self.housing_data__grid_search
+        results = cv_results_to_dataframe(searcher=grid_search,
+                                          num_folds=3,
+                                          num_repeats=1,
+                                          return_train_score=True,
+                                          return_style=False)
+
+        self.assertIsInstance(results, pd.DataFrame)
+        self.assertIsInstance(results['model | max_features'].iloc[0], str)
+        equal = results.columns == ['RMSE Mean', 'RMSE 95CI.LO', 'RMSE 95CI.HI', 'RMSE Training Mean',
+                                    'MAE Mean', 'MAE 95CI.LO', 'MAE 95CI.HI', 'MAE Training Mean',
+                                    'model | max_features', 'model | n_estimators']
+        self.assertTrue(all(equal))
+
+        results = cv_results_to_dataframe(searcher=grid_search,
+                                          num_folds=3,
+                                          num_repeats=1,
+                                          return_train_score=False,
+                                          return_style=False)
+
+        self.assertIsInstance(results, pd.DataFrame)
+        self.assertIsInstance(results['model | max_features'].iloc[0], str)
+        equal = results.columns == ['RMSE Mean', 'RMSE 95CI.LO', 'RMSE 95CI.HI',
+                                    'MAE Mean', 'MAE 95CI.LO', 'MAE 95CI.HI',
+                                    'model | max_features', 'model | n_estimators']
+        self.assertTrue(all(equal))
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = cv_results_to_dataframe(searcher=grid_search,
+                                              num_folds=3,
+                                              num_repeats=1,
+                                              greater_is_better=False,
+                                              return_train_score=True,
+                                              return_style=True)
+        with open(get_test_path() + '/test_files/sklearn/housing__grid_search__with_training.html', 'w') as file:
+            file.write(results.render())
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = cv_results_to_dataframe(searcher=grid_search,
+                                              num_folds=3,
+                                              num_repeats=1,
+                                              greater_is_better=False,
+                                              return_train_score=False,
+                                              return_style=True)
+        with open(get_test_path() + '/test_files/sklearn/housing__grid_search__without_training.html', 'w') as file:
+            file.write(results.render())
+
     def test_TwoClassEvaluator(self):
         y_true = self.credit_data__y_test
         y_score = self.credit_data__y_scores
@@ -230,6 +326,9 @@ class TestSklearn(unittest.TestCase):
                                                   return_style=True,
                                                   round_by=3).render()
             file.write(table_html)
+
+    def test_RegressionEvaluator(self):
+        evaluator = RegressionEvaluator(None, None)
 
     def test_plot_confusion_matrix(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
