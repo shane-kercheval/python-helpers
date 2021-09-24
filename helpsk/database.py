@@ -163,7 +163,8 @@ class Redshift(Database):
         with Redshift.from_config(config) as redshift:
             redshift.query("SELECT * FROM table LIMIT 100")
     """
-    def __init__(self, user: str, password: str, database: str, host: str, port: Union[str, int]):  # pylint: disable=too-many-arguments
+    def __init__(self, *,
+                 user: str, password: str, database: str, host: str, port: Union[str, int]):  # pylint: disable=too-many-arguments
         """Initialization"""
         super().__init__()
         self._connection_string = "dbname={} host={} port={} user={} password={}". \
@@ -180,7 +181,7 @@ class Redshift(Database):
         """
         self.connection_object.close()
 
-    def query(self, sql: str) -> pd.DataFrame:
+    def _query(self, sql: str) -> pd.DataFrame:
         """Wraps logic for querying redshift.
 
         Args:
@@ -190,7 +191,6 @@ class Redshift(Database):
         Returns:
             a pandas Dataframe with the results from the query
         """
-        assert self.is_connected()
         return pd.read_sql_query(sql, self.connection_object)
 
 
@@ -220,8 +220,9 @@ class Snowflake(Database):
     ```
     """
     # pylint: disable=too-many-arguments
-    def __init__(self, user: str, account: str, authenticator: str,
-                 warehouse: str, database: str, autocommit: bool = False):
+    def __init__(self, *,
+                 user: str, account: str, authenticator: str, warehouse: str, database: str,
+                 autocommit: bool = False):
         """Initialization"""
         super().__init__()
         self.user = user
@@ -249,7 +250,7 @@ class Snowflake(Database):
         """
         self.connection_object.close()
 
-    def query(self, sql: str) -> pd.DataFrame:
+    def _query(self, sql: str) -> pd.DataFrame:
         """Wraps logic for querying snowflake.
 
         Args:
@@ -259,7 +260,6 @@ class Snowflake(Database):
         Returns:
             a pandas Dataframe with the results from the query
         """
-        assert self.is_connected()
         cursor = self.connection_object.cursor()
         cursor.execute(sql)
         dataframe = cursor.fetch_pandas_all()

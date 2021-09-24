@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
 from tests.helpers import check_plot, get_test_path
+from helpsk.utility import suppress_warnings
 
 
 def plot_colors(colors, title, sort_colors=True, empty_cols=0):
@@ -60,8 +61,7 @@ def plot_colors(colors, title, sort_colors=True, empty_cols=0):
                 horizontalalignment='left',
                 verticalalignment='center')
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with suppress_warnings():
             ax.add_patch(
                 Rectangle(xy=(swatch_start_x, y-9), width=swatch_width,
                           height=18, color=colors[name], edgecolor='0.7')
@@ -72,7 +72,7 @@ def plot_colors(colors, title, sort_colors=True, empty_cols=0):
 
 class TestColors(unittest.TestCase):
 
-    def test_adsf(self):
+    def test_plot_colors(self):
         from helpsk.color import Colors
 
         color_names = [e.name for e in Colors]

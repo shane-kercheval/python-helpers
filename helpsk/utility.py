@@ -1,6 +1,8 @@
 """A collection of system and environment related helper functions.
 """
 import inspect
+import warnings
+import sys, os
 from contextlib import contextmanager, redirect_stdout
 
 
@@ -24,6 +26,36 @@ def redirect_stdout_to_file(file, mode='w'):
     with open(file, mode) as handle:
         with redirect_stdout(handle):
             yield
+
+
+@contextmanager
+def suppress_stdout():
+    """Suppress Output
+
+
+    ```
+    print("Now you see it")
+    with suppress_stdout():
+        print("Now you don't")
+    ```
+
+    code from: https://stackoverflow.com/questions/2125702/how-to-suppress-console-output-in-python
+    """
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:  
+            yield
+        finally:
+            sys.stdout = old_stdout
+
+
+@contextmanager
+def suppress_warnings():
+    """Simple Wrapper around warnings.catch_warnings()"""
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        yield
 
 
 def is_debugging():

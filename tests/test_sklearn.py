@@ -13,6 +13,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
+from helpsk.utility import suppress_warnings
 from helpsk.sklearn import CustomOrdinalEncoder, cv_results_to_dataframe, TwoClassEvaluator, RegressionEvaluator
 from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing
 
@@ -181,8 +182,7 @@ class TestSklearn(unittest.TestCase):
                                     'preparation | non_numeric_pipeline | encoder_chooser | base_transformer']
         self.assertTrue(all(equal))
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with suppress_warnings():
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
@@ -191,8 +191,7 @@ class TestSklearn(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn/credit__grid_search__with_training.html', 'w') as file:
             file.write(results.render())
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with suppress_warnings():
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
@@ -202,8 +201,7 @@ class TestSklearn(unittest.TestCase):
             file.write(results.render())
 
         grid_search = self.credit_data__grid_search__roc_auc
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with suppress_warnings():
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
@@ -213,8 +211,7 @@ class TestSklearn(unittest.TestCase):
         with open(test_file, 'w') as file:
             file.write(results.render())
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with suppress_warnings():
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
@@ -252,8 +249,7 @@ class TestSklearn(unittest.TestCase):
                                     'model | max_features', 'model | n_estimators']
         self.assertTrue(all(equal))
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with suppress_warnings():
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
@@ -263,8 +259,7 @@ class TestSklearn(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn/housing__grid_search__with_training.html', 'w') as file:
             file.write(results.render())
 
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with suppress_warnings():
             results = cv_results_to_dataframe(searcher=grid_search,
                                               num_folds=3,
                                               num_repeats=1,
@@ -331,6 +326,7 @@ class TestSklearn(unittest.TestCase):
         evaluator = RegressionEvaluator(actual_values=self.housing_data__y_test,
                                         predicted_values=self.housing_data__y_predictions)
 
+        #TODO finish test
         #evaluator.plot_residuals_vs_fits()
         #evaluator.plot_residuals_vs_actuals()
         #evaluator.plot_predictions_vs_actuals()

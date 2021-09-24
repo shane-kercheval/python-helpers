@@ -116,14 +116,14 @@ class TestDatabase(unittest.TestCase):
                     db_obj.connect()  # test that calling open again doesn't not fail
 
                     # test querying
-                    results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
+                    results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100", show_elapsed_time=False)
                     self.assertIsInstance(results, pd.DataFrame)
                     self.assertEqual(results.iloc[0, 0], 'test')
                     # test connection is still open after querying
                     self.assertTrue(db_obj.is_connected())
                     self.assertIsNotNone(db_obj.connection_object)
                     # test subsequent query
-                    results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100")
+                    results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100", show_elapsed_time=False)
                     self.assertIsInstance(results, pd.DataFrame)
                     self.assertEqual(results.iloc[0, 0], 'test')
 
@@ -146,7 +146,7 @@ class TestDatabase(unittest.TestCase):
                     self.assertIsInstance(db_object.connection_object, unittest.mock.MagicMock)
 
                     # test querying
-                    results = db_object.query("SELECT * FROM doesnt_exist LIMIT 100")
+                    results = db_object.query("SELECT * FROM doesnt_exist LIMIT 100", show_elapsed_time=False)
                     self.assertIsInstance(results, pd.DataFrame)
                     self.assertEqual(results.iloc[0, 0], 'test')
                     # test connection is still open after querying

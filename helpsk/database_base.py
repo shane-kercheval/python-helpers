@@ -3,8 +3,9 @@
 See documentation in database.py
 """
 from abc import ABCMeta, abstractmethod
-
 import pandas as pd
+import time
+from helpsk.utility import suppress_stdout, suppress_warnings
 
 
 class Configuration(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
@@ -98,8 +99,9 @@ class Database(metaclass=ABCMeta):
         self.close()
 
     @abstractmethod
-    def query(self, sql: str) -> pd.DataFrame:
-        """Queries the database and returns the results as a pandas Dataframe
+    def _query(self, sql: str) -> pd.DataFrame:
+        """
+        Method for child classes to override that contains logic to query
 
         Args:
             sql:
@@ -108,3 +110,42 @@ class Database(metaclass=ABCMeta):
         Returns:
             a pandas Dataframe with the results from the query
         """
+
+    def query(self, sql: str, *,
+              show_messages: bool = False, show_warnings: bool = False,
+              show_elapsed_time: bool = True) -> pd.DataFrame:
+        """Queries the database and returns the results as a pandas Dataframe
+
+        Args:
+            sql:
+                SQL to execute e.g. "SELECT * FROM table LIMIT 100"
+            show_messages:
+                if True, shows messages generated from the underlying query
+            show_warnings:
+                if True, shows warnings generated from the underlying query
+            show_elapsed_time:
+                if True, shows the elapsed execution time for the query
+
+        Returns:
+            a pandas Dataframe with the results from the query
+        """
+        assert self.is_connected()
+        start_time = time.time()
+        if show_messages and show_warnings:
+            with suppress_stdout(), suppress_warnings():
+                results = self._query(sql=sql)
+        elif show_messages:
+            with suppress_stdout():
+                results = self._query(sql=sql)
+        elif show_warnings:
+            with suppress_warnings():
+                results = self._query(sql=sql)
+        else:
+            results = self._query(sql=sql)
+
+        end_time = time.time()
+
+        if show_elapsed_time:
+            print(end_time - start_time)
+
+        return results

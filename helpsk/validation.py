@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 
 from helpsk.exceptions import *  # pylint: disable=wildcard-import,unused-wildcard-import
+from helpsk.utility import suppress_warnings
 
 
 def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
@@ -221,9 +222,7 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
             return series.dtype.name == 'category'
         return False
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore")
-
+    with suppress_warnings():
         # if either list-like structure is categorical, then we need to convert both to unordered categorical
         if is_categorical(iterable_a) or is_categorical(iterable_b):
             iterable_a = pd.Categorical(iterable_a, ordered=False)

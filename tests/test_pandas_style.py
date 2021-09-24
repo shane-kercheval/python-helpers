@@ -2,6 +2,7 @@ import unittest
 from enum import Enum, unique, auto
 
 import helpsk.pandas_style as pstyle
+from helpsk.utility import suppress_warnings
 from helpsk.pandas import *
 from tests.helpers import get_data_credit, get_test_path
 import warnings
@@ -38,8 +39,7 @@ class TestPandasStyle(unittest.TestCase):
             file.write(pstyle.format(self.sample_data).render())
 
     def test_background_color(self):
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
+        with suppress_warnings():
             with open(get_test_path() + '/test_files/pandas_style/background_color__default.html', 'w') as file:
                 file.write(pstyle.background_color(self.sample_data).render())
 
