@@ -14,10 +14,10 @@ class TestDocstringMarkdown(unittest.TestCase):
     @unittest.skip
     def test_execute_build(self):
 
-        with open(get_test_path() + '/test_files/execute_build__expected_documentation.md', 'r') as file:
+        with open(get_test_path() + '/test_files/docstring_markdown/execute_build__expected_documentation.md', 'r') as file:
             expected_contents_with_toc = file.read()
 
-        with open(get_test_path() + '/test_files/execute_build__expected_documentation__no_toc.md',
+        with open(get_test_path() + '/test_files/docstring_markdown/execute_build__expected_documentation__no_toc.md',
                   'r') as file:
             expected_contents_without_toc = file.read()
 
@@ -34,26 +34,26 @@ class TestDocstringMarkdown(unittest.TestCase):
 
         test_helper(lambda: build_markdown.execute_build(input_path=get_test_path() + '/../helpsk/',
                                                          output_path=get_test_path() + '/test_files'),
-                    test_file_name='/test_files/documentation.md',
+                    test_file_name='/test_files/docstring_markdown/documentation.md',
                     expected_contents=expected_contents_with_toc)
 
         test_helper(lambda: build_markdown.execute_build(input_path=get_test_path() + '/../helpsk/',
                                                          output_path=get_test_path() + '/test_files',
                                                          output_filename='another_file_name.md'),
-                    test_file_name='/test_files/another_file_name.md',
+                    test_file_name='/test_files/docstring_markdown/another_file_name.md',
                     expected_contents=expected_contents_with_toc)
 
         test_helper(lambda: build_markdown.execute_build(input_path=get_test_path() + '/../helpsk/',
                                                          output_path=get_test_path() + '/test_files',
                                                          toc_off=True),
-                    test_file_name='/test_files/documentation.md',
+                    test_file_name='/test_files/docstring_markdown/documentation.md',
                     expected_contents=expected_contents_without_toc)
 
         test_helper(lambda: build_markdown.execute_build(input_path=get_test_path() + '/../helpsk/',
                                                          output_path=get_test_path() + '/test_files',
                                                          output_filename='another_file_name.md',
                                                          toc_off=True),
-                    test_file_name='/test_files/another_file_name.md',
+                    test_file_name='/test_files/docstring_markdown/another_file_name.md',
                     expected_contents=expected_contents_without_toc)
 
     def test_is_line_docstring(self):

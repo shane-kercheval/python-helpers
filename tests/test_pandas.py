@@ -302,19 +302,19 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(pd.isna(categorical[0]))
 
     def test_numeric_summary(self):
-        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__credit.txt',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__credit.txt',
                                  numeric_summary(self.credit_data))
 
-        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__sample.txt',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__sample.txt',
                                  numeric_summary(self.sample_data))
 
     def test_numeric_summary__nan_column(self):
         test_data = self.credit_data.copy()
         test_data['all_missing'] = np.nan
-        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__credit__all_missing.txt',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__credit__all_missing.txt',
                                  numeric_summary(test_data))
 
-        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__style__credit__all_missing.html',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__credit__all_missing.html',
                                  numeric_summary(test_data, return_style=True).render())
 
     def test_numeric_summary_style(self):
@@ -322,36 +322,36 @@ class TestPandas(unittest.TestCase):
         test_data.loc[0:46, ['duration']] = np.nan
         test_data.loc[10:54, ['credit_amount']] = 0
 
-        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__style__credit.html',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__credit.html',
                                  numeric_summary(test_data, return_style=True).render())
 
-        self.helper_test_summary(get_test_path() + '/test_files/test_numeric_summary__style__sample.html',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__sample.html',
                                  numeric_summary(self.sample_data, return_style=True).render())
 
     def test_non_numeric_summary(self):
-        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__credit.txt',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__credit.txt',
                                  non_numeric_summary(self.credit_data))
 
-        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__sample.txt',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__sample.txt',
                                  non_numeric_summary(self.sample_data))
 
     def test_non_numeric_summary__nan_column(self):
         test_data = self.credit_data.copy()
         test_data['all_missing'] = None
-        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__credit__all_missing.txt',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__credit__all_missing.txt',
                                  non_numeric_summary(test_data))
 
-        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__style__credit__all_missing.html',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit__all_missing.html',
                                  non_numeric_summary(test_data, return_style=True).render())
 
     def test_non_numeric_summary_test(self):
         test_data = self.credit_data.copy()
         test_data.loc[25:75, ['checking_status']] = np.nan
 
-        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__style__credit.html',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit.html',
                                  non_numeric_summary(test_data, return_style=True).render())
 
-        self.helper_test_summary(get_test_path() + '/test_files/test_non_numeric_summary__style__sample.html',
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__sample.html',
                                  non_numeric_summary(self.sample_data, return_style=True).render())
 
     def test_convert_integer_series_to_categorical(self):

@@ -42,10 +42,10 @@ def mock_snowflake():
 class TestDatabase(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.sample_redshift_file = get_test_path() + '/test_files/sample_redshift.config'
+        self.sample_redshift_file = get_test_path() + '/test_files/database/sample_redshift.config'
         self.assertTrue(path.isfile(self.sample_redshift_file))
 
-        self.sample_snowflake_file = get_test_path() + '/test_files/sample_snowflake.config'
+        self.sample_snowflake_file = get_test_path() + '/test_files/database/sample_snowflake.config'
         self.assertTrue(path.isfile(self.sample_snowflake_file))
 
     def test_GenericConfigFile(self):

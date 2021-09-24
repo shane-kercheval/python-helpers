@@ -105,6 +105,6 @@ class TestStrings(unittest.TestCase):
         # index=False, float_format='%.9f')
 
         expected_results = pd.read_csv(get_test_path() +
-                                       '/test_files/string__format_number__expected_values.csv')
+                                       '/test_files/string/string__format_number__expected_values.csv')
 
         hv.assert_dataframes_match([results, expected_results])
