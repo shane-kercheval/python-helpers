@@ -113,6 +113,17 @@ def get_data_titanic() -> pd.DataFrame:
     return pd.read_pickle(get_test_path() + '/test_data/titanic.pkl')
 
 
+def get_data_housing() -> pd.DataFrame:
+    # https://www.openml.org/d/537
+    # save locally in case dataset changes or is removed
+    # from sklearn.datasets import fetch_openml
+    # housing = fetch_openml('houses', version=1)
+    # data = housing['data']
+    # data['target'] = housing['target']
+    # data.to_pickle(get_test_path() + '/test_data/housing.pkl')
+    return pd.read_pickle(get_test_path() + '/test_data/housing.pkl')
+
+
 def helper_test_dataframe(file_name, dataframe):
     if os.path.isfile(file_name):
         os.remove(file_name)
