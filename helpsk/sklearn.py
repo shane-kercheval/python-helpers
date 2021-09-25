@@ -18,6 +18,7 @@ import helpsk.color as hcolor
 import helpsk.pandas_style as hstyle
 # pylint: disable=too-many-locals
 from helpsk.exceptions import HelpskParamValueError
+from helpsk.plot import STANDARD_WIDTH_HEIGHT
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=Warning)
@@ -27,6 +28,7 @@ with warnings.catch_warnings():
 def cv_results_to_dataframe(searcher: BaseSearchCV,
                             num_folds: int,
                             num_repeats: int,
+                            round_by: int = 3,
                             greater_is_better: bool = True,
                             return_train_score: bool = True,
                             return_style: bool = True) -> Union[pd.DataFrame, Styler]:
@@ -52,6 +54,8 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
         num_repeats:
             the number of repeats used for the cross validation; used to calculate the standard error of the
             mean for each score
+        round_by:
+            the number of digits to round by;
         greater_is_better:
             if True, higher scores are better; if False, lower scores are better
             False assumes that the scores returned from sklearn are negative and will multiple the values
@@ -132,9 +136,14 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
         results = add_confidence_interval(score_name=score,
                                           dataframe=results)
 
+        results[f'{score} Mean'] = results[f'{score} Mean'].round(round_by)
+        results[f'{score} 95CI.LO'] = results[f'{score} 95CI.LO'].round(round_by)
+        results[f'{score} 95CI.HI'] = results[f'{score} 95CI.HI'].round(round_by)
+
         # if there are training scores, then drop the St. Dev, and don't add confidence intervals,
         # which would add too many columns (noise) and not that interesting.
         if return_train_score and score + ' Training Mean' in results.columns:
+            results[f'{score} Training Mean'] = results[f'{score} Training Mean'].round(round_by)
             results = results.drop(columns=score + ' Training St. Dev')
 
     parameter_dataframe = pd.DataFrame(cv_results["params"])
@@ -166,7 +175,7 @@ def cv_results_to_dataframe(searcher: BaseSearchCV,
                 bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value). \
                 bar(subset=[ci_high_key], color=hcolor.GRAY). \
                 pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY). \
-                pipe(hstyle.format, round_by=3, hide_index=True)
+                pipe(hstyle.format, round_by=round_by, hide_index=True)
 
     return results
 
@@ -475,8 +484,17 @@ class TwoClassEvaluator:
         axis.yaxis.set_ticklabels([self._labels[0], self._labels[1]])
         plt.tight_layout()
 
-    def plot_auc_curve(self):
-        """Plots the ROC AUC"""
+    def plot_auc_curve(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
+        """Plots the ROC AUC
+
+        Args:
+            figure_size:
+                tuple containing `(width, height)` of plot. The default height is defined by
+                `helpsk.plot.STANDARD_HEIGHT`, and the default width is
+                `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
+        """
+        plt.figure(figsize=figure_size)
+
         def get_true_pos_false_pos(threshold):
             temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
                                           predicted_scores=self._predicted_scores,
@@ -501,7 +519,9 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
-    def plot_threshold_curves(self, score_threshold_range: Tuple[float, float] = (0.3, 0.9)):
+    def plot_threshold_curves(self,
+                              score_threshold_range: Tuple[float, float] = (0.3, 0.9),
+                              figure_size: tuple = STANDARD_WIDTH_HEIGHT):
         """Plots various scores (e.g. True Positive Rate, False Positive Rate, etc.) for various score
         thresholds. (A score threshold is the value for which you would predict a positive label if the
         value of the score is above the threshold (e.g. usually 0.5).
@@ -510,7 +530,13 @@ class TwoClassEvaluator:
             score_threshold_range:
                 range of score thresholds to plot (x-axis); tuple with minimum threshold in first index and
                 maximum threshold in second index.
+            figure_size:
+                tuple containing `(width, height)` of plot. The default height is defined by
+                `helpsk.plot.STANDARD_HEIGHT`, and the default width is
+                `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
         """
+        plt.figure(figsize=figure_size)
+
         def get_threshold_scores(threshold):
             temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
                                           predicted_scores=self._predicted_scores,
@@ -543,7 +569,9 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
-    def plot_precision_recall_tradeoff(self, score_threshold_range: Tuple[float, float] = (0, 1)):
+    def plot_precision_recall_tradeoff(self,
+                                       score_threshold_range: Tuple[float, float] = (0, 1),
+                                       figure_size: tuple = STANDARD_WIDTH_HEIGHT):
         """Plots the tradeoff between precision (i.e. positive predict value) and recall (i.e. True Positive
         Rate) for various score thresholds. (A score threshold is the value for which you would predict a
         positive label if the value of the score is above the threshold (e.g. usually 0.5).
@@ -552,7 +580,13 @@ class TwoClassEvaluator:
             score_threshold_range:
                 range of score thresholds to plot (x-axis); tuple with minimum threshold in first index and
                 maximum threshold in second index.
+            figure_size:
+                tuple containing `(width, height)` of plot. The default height is defined by
+                `helpsk.plot.STANDARD_HEIGHT`, and the default width is
+                `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
         """
+        plt.figure(figsize=figure_size)
+
         def get_threshold_scores(threshold):
             temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
                                           predicted_scores=self._predicted_scores,
@@ -687,30 +721,84 @@ class RegressionEvaluator:
         return len(self._actual_values)
 
     @property
-    def all_quality_metrics(self) -> dict:
+    def all_metrics(self) -> dict:
         return {'Mean Absolute Error (MAE)': self.mean_absolute_error,
                 'Root Mean Squared Error (RMSE)': self.root_mean_squared_error,
                 'RMSE to Standard Deviation of Target': self.rmse_to_st_dev,
                 'R Squared': self.r_squared,
                 'Total Observations': self.total_observations}
 
-    def plot_residuals_vs_fits(self):
+    def all_metrics_df(self,
+                       return_style: bool = False,
+                       round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
+        """All of the metrics are returned as a DataFrame.
+
+        Args:
+            return_style:
+                if True, return styler object; else return dataframe
+            round_by:
+                the number of digits to round by; if None, then don't round
+        """
+        result = pd.DataFrame.from_dict({key: value for key, value in self.all_metrics.items()},
+                                        orient='index',
+                                        columns=['Scores'])
+
+        if round_by:
+            result['Scores'] = result['Scores'].round(round_by)
+
+        if return_style:
+            subset_scores = pd.IndexSlice[result.loc[['Mean Absolute Error (MAE)',
+                                                      'Root Mean Squared Error (RMSE)'],
+                                                     'Scores'].index, 'Scores']
+            subset_secondary = pd.IndexSlice[result.loc[['RMSE to Standard Deviation of Target',
+                                                         'R Squared'],
+                                                        'Scores'].index, 'Scores']
+            subset_total_observations = pd.IndexSlice[result.loc[['Total Observations'],
+                                                                 'Scores'].index, 'Scores']
+            result = result.style
+            if round_by:
+                result = result.format(subset=subset_scores, thousands=',', precision=round_by)
+            else:
+                result = result.format(subset=subset_scores, thousands=',')
+            result = result.format(subset=subset_secondary, precision=0)
+            result = result.format(subset=subset_total_observations, thousands=',', precision=0)
+
+        return result
+
+    def plot_residuals_vs_fits(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
+        """Plots residuals vs fitted values
+
+        Args:
+            figure_size:
+                tuple containing `(width, height)` of plot. The default height is defined by
+                `helpsk.plot.STANDARD_HEIGHT`, and the default width is
+                `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
+        """
         lowess = sm.nonparametric.lowess
         loess_points = lowess(self._residuals, self._predicted_values)
         loess_x, loess_y = zip(*loess_points)
 
+        plt.figure(figsize=figure_size)
         plt.plot(loess_x, loess_y, color='r')
         plt.scatter(x=self._predicted_values, y=self._residuals, s=8, alpha=0.5)
         plt.title('Residuals vs. Fitted Values')
         plt.xlabel('Fitted Values')
         plt.ylabel('Residuals (Actual - Predicted)')
-        return plt.gca()
 
-    def plot_predictions_vs_actuals(self):
+    def plot_predictions_vs_actuals(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
+        """Plots predictions vs actual values
+
+        Args:
+            figure_size:
+                tuple containing `(width, height)` of plot. The default height is defined by
+                `helpsk.plot.STANDARD_HEIGHT`, and the default width is
+                `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
+        """
         lowess = sm.nonparametric.lowess
         loess_points = lowess(self._predicted_values, self._actual_values)
         loess_x, loess_y = zip(*loess_points)
 
+        plt.figure(figsize=figure_size)
         plt.plot(loess_x, loess_y, color='r', alpha=0.5, label='Loess (Predictions vs Actuals)')
         plt.plot(self._actual_values, self._actual_values, color='b', alpha=0.5, label='Perfect Prediction')
         plt.scatter(x=self._actual_values, y=self._predicted_values, s=8, alpha=0.5)
@@ -725,11 +813,20 @@ class RegressionEvaluator:
                     horizontalalignment='right')
         return ax
 
-    def plot_residuals_vs_actuals(self):
+    def plot_residuals_vs_actuals(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
+        """Plots residuals vs actuals values
+
+        Args:
+            figure_size:
+                tuple containing `(width, height)` of plot. The default height is defined by
+                `helpsk.plot.STANDARD_HEIGHT`, and the default width is
+                `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
+        """
         lowess = sm.nonparametric.lowess
         loess_points = lowess(self._residuals, self._actual_values)
         loess_x, loess_y = zip(*loess_points)
 
+        plt.figure(figsize=figure_size)
         plt.plot(loess_x, loess_y, color='r')
         plt.scatter(x=self._actual_values, y=self._residuals, s=8, alpha=0.5)
         plt.title('Residuals vs. Actual Values')

@@ -326,10 +326,31 @@ class TestSklearn(unittest.TestCase):
         evaluator = RegressionEvaluator(actual_values=self.housing_data__y_test,
                                         predicted_values=self.housing_data__y_predictions)
 
-        #TODO finish test
-        #evaluator.plot_residuals_vs_fits()
-        #evaluator.plot_residuals_vs_actuals()
-        #evaluator.plot_predictions_vs_actuals()
+        self.assertEqual(evaluator.mean_absolute_error, mean_absolute_error(y_true=self.housing_data__y_test, y_pred=self.housing_data__y_predictions))
+        self.assertEqual(round(mean_squared_error(y_true=self.housing_data__y_test,
+                                                  y_pred=self.housing_data__y_predictions), 4),
+                         round(evaluator.mean_squared_error, 4))
+        self.assertEqual(np.sqrt(evaluator.mean_squared_error), evaluator.root_mean_squared_error)
+        self.assertEqual(evaluator.total_observations, len(self.housing_data__y_test))
+        self.assertIsInstance(evaluator.all_metrics, dict)
+        self.assertIsInstance(evaluator.all_metrics_df(), pd.DataFrame)
+
+        with open(get_test_path() + '/test_files/sklearn/reg_eval__all_metrics_df.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True).render()
+            file.write(table_html)
+
+        with open(get_test_path() + '/test_files/sklearn/reg_eval__all_metrics_df__round_3.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True, round_by=3).render()
+            file.write(table_html)
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn/reg_eval__plot_residuals_vs_fits.png',
+                   plot_function=lambda: evaluator.plot_residuals_vs_fits())
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn/reg_eval__plot_residuals_vs_actuals.png',
+                   plot_function=lambda: evaluator.plot_residuals_vs_actuals())
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn/reg_eval__plot_predictions_vs_actuals.png',
+                   plot_function=lambda: evaluator.plot_predictions_vs_actuals())
 
     def test_plot_confusion_matrix(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
