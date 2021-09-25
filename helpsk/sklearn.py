@@ -760,7 +760,7 @@ class RegressionEvaluator:
                 result = result.format(subset=subset_scores, thousands=',', precision=round_by)
             else:
                 result = result.format(subset=subset_scores, thousands=',')
-            result = result.format(subset=subset_secondary, precision=0)
+            result = result.format(subset=subset_secondary, precision=3)
             result = result.format(subset=subset_total_observations, thousands=',', precision=0)
 
         return result
