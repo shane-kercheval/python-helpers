@@ -5,6 +5,7 @@ from typing import List, Union, Optional, Callable
 
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_bool_dtype, is_numeric_dtype
 from pandas.io.formats.style import Styler
 
 from helpsk.exceptions import HelpskParamValueError
@@ -12,8 +13,26 @@ import helpsk.pandas_style as pstyle
 from helpsk import color
 
 
+def is_series_numeric(series: pd.Series) -> bool:
+    """Tests whether or not a pd.Series is numeric.
+
+    NOTE: `pandas.api.types.is_numeric_dtype()` returns `True` for `bool` dtypes;
+    this function will return `False` for `bool` dtypes
+
+    Args:
+        series:
+            a Pandas series
+
+    Return: True if the series is numeric (explicitly boolean type is not considered
+    """
+    return is_numeric_dtype(series) and not is_bool_dtype(series)
+
+
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
-    """Returns the column names from the dataframe that are numeric.
+    """Returns the column names from the dataframe that are numeric (and not boolean).
+
+    NOTE: `pandas.api.types.is_numeric_dtype()` returns `True` for `bool` dtypes;
+    this function treats booleans as non-numeric.
 
     Args:
         dataframe: a pandas dataframe
@@ -22,17 +41,20 @@ def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
         list of column names that correspond to numeric types. NOTE: if a column contains all `np.nan` values,
         it will count as numeric and will be returned in the list.
     """
-    return [column for column in dataframe.columns if pd.api.types.is_numeric_dtype(dataframe[column])]
+    return [column for column in dataframe.columns if is_series_numeric(dataframe[column])]
 
 
 def get_non_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
     """Returns the column names from the dataframe that are not numeric.
 
+    NOTE: `pandas.api.types.is_numeric_dtype()` returns `True` for `bool` dtypes;
+    this function treats booleans as non-numeric.
+
     Returns:
         list of column names that correspond to numeric types. NOTE: if a column contains all `np.nan` values,
         it will count as numeric and will not be returned in the list.
     """
-    return [column for column in dataframe.columns if not pd.api.types.is_numeric_dtype(dataframe[column])]
+    return [column for column in dataframe.columns if not is_series_numeric(dataframe[column])]
 
 
 def is_series_date(series: pd.Series) -> bool:

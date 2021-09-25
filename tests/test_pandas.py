@@ -40,13 +40,16 @@ class TestPandas(unittest.TestCase):
                                     'col_h': [np.nan, TestEnum.VALUE_A, TestEnum.VALUE_B, TestEnum.VALUE_B],
                                     'col_i': [None, np.nan, datetime.datetime(2021, 4, 2, 0, 0, 0),
                                               datetime.datetime(2021, 4, 2, 0, 0, 0)],
+                                    'col_j': [False, False, True, False],
+                                    'col_k': [None, None, None, None],
+                                    'col_l': [np.nan, np.nan, np.nan, np.nan]
                                     })
         sample_data.loc[0, 'col_c'] = np.nan
         sample_data['col_g'] = sample_data['col_b'].astype('category')
         cls.sample_data = sample_data
 
     def test_get_numeric_columns(self):
-        self.assertEqual(get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f'])
+        self.assertEqual(get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])
         self.assertEqual(get_numeric_columns(self.sample_data[['col_e']]), ['col_e'])
         self.assertEqual(get_numeric_columns(self.sample_data[['col_d']]), [])
         self.assertEqual(get_numeric_columns(pd.DataFrame()), [])
@@ -55,7 +58,7 @@ class TestPandas(unittest.TestCase):
         non_numeric_columns = get_non_numeric_columns(self.sample_data)
         non_numeric_columns.sort()
         self.assertEqual(non_numeric_columns,
-                         ['col_b', 'col_c', 'col_d', 'col_g', 'col_h', 'col_i'])
+                         ['col_b', 'col_c', 'col_d', 'col_g', 'col_h', 'col_i', 'col_j', 'col_k'])
         self.assertEqual(get_non_numeric_columns(self.sample_data[['col_d']]), ['col_d'])
         self.assertEqual(get_non_numeric_columns(self.sample_data[['col_e']]), [])
         self.assertEqual(get_non_numeric_columns(pd.DataFrame()), [])
