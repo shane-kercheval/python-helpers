@@ -743,8 +743,8 @@ class RegressionEvaluator:
                                         orient='index',
                                         columns=['Scores'])
 
-        if round_by:
-            result['Scores'] = result['Scores'].round(round_by)
+        if round_by is not None:
+            result.iloc[0:2] = result.iloc[0:2].round(round_by)
 
         if return_style:
             subset_scores = pd.IndexSlice[result.loc[['Mean Absolute Error (MAE)',
@@ -756,7 +756,7 @@ class RegressionEvaluator:
             subset_total_observations = pd.IndexSlice[result.loc[['Total Observations'],
                                                                  'Scores'].index, 'Scores']
             result = result.style
-            if round_by:
+            if round_by is not None:
                 result = result.format(subset=subset_scores, thousands=',', precision=round_by)
             else:
                 result = result.format(subset=subset_scores, thousands=',')

@@ -343,6 +343,10 @@ class TestSklearn(unittest.TestCase):
             table_html = evaluator.all_metrics_df(return_style=True, round_by=3).render()
             file.write(table_html)
 
+        with open(get_test_path() + '/test_files/sklearn/reg_eval__all_metrics_df__round_0.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True, round_by=0).render()
+            file.write(table_html)
+
         check_plot(file_name=get_test_path() + '/test_files/sklearn/reg_eval__plot_residuals_vs_fits.png',
                    plot_function=lambda: evaluator.plot_residuals_vs_fits())
 
