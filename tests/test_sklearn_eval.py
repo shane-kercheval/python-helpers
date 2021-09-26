@@ -67,11 +67,11 @@ class TestSklearn(unittest.TestCase):
                 'model__n_estimators': [10, 50]
             },
         ]
-        # https://github.com/scikit-learn/scikit-learn/blob/2beed55847ee70d363bdbfe14ee4401438fba057/sklearn/metrics/_scorer.py#L702
+        # https://github.com/scikit-learn/scikit-learn/blob/2beed55847ee70d363bdbfe14ee4401438fba057/sklearn_eval/metrics/_scorer.py#L702
         # https://scikit-learn.org/stable/modules/generated/sklearn.metrics.make_scorer.html
         # https://stackoverflow.com/questions/60615281/different-result-roc-auc-score-and-plot-roc-curve
         scores = {
-            # https://github.com/scikit-learn/scikit-learn/blob/2beed5584/sklearn/metrics/_scorer.py#L537
+            # https://github.com/scikit-learn/scikit-learn/blob/2beed5584/sklearn_eval/metrics/_scorer.py#L537
             'ROC/AUC': SCORERS['roc_auc'],
             'F1': make_scorer(f1_score, greater_is_better=True),
             'Pos. Pred. Val': make_scorer(precision_score, greater_is_better=True),
@@ -188,7 +188,7 @@ class TestSklearn(unittest.TestCase):
                                               num_repeats=1,
                                               return_train_score=True,
                                               return_style=True)
-        with open(get_test_path() + '/test_files/sklearn/credit__grid_search__with_training.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__with_training.html', 'w') as file:
             file.write(results.render())
 
         with suppress_warnings():
@@ -197,7 +197,7 @@ class TestSklearn(unittest.TestCase):
                                               num_repeats=1,
                                               return_train_score=False,
                                               return_style = True)
-        with open(get_test_path() + '/test_files/sklearn/credit__grid_search__without_training.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__without_training.html', 'w') as file:
             file.write(results.render())
 
         grid_search = self.credit_data__grid_search__roc_auc
@@ -207,7 +207,7 @@ class TestSklearn(unittest.TestCase):
                                               num_repeats=1,
                                               return_train_score=True,
                                               return_style=True)
-        test_file = get_test_path() + '/test_files/sklearn/credit__grid_search__default_scores__with_training.html'
+        test_file = get_test_path() + '/test_files/sklearn_eval/credit__grid_search__default_scores__with_training.html'
         with open(test_file, 'w') as file:
             file.write(results.render())
 
@@ -217,7 +217,7 @@ class TestSklearn(unittest.TestCase):
                                               num_repeats=1,
                                               return_train_score=False,
                                               return_style=True)
-        test_file = get_test_path() + '/test_files/sklearn/credit__grid_search__default_scores__without_training.html'
+        test_file = get_test_path() + '/test_files/sklearn_eval/credit__grid_search__default_scores__without_training.html'
         with open(test_file, 'w') as file:
             file.write(results.render())
 
@@ -256,7 +256,7 @@ class TestSklearn(unittest.TestCase):
                                               greater_is_better=False,
                                               return_train_score=True,
                                               return_style=True)
-        with open(get_test_path() + '/test_files/sklearn/housing__grid_search__with_training.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__with_training.html', 'w') as file:
             file.write(results.render())
 
         with suppress_warnings():
@@ -266,7 +266,7 @@ class TestSklearn(unittest.TestCase):
                                               greater_is_better=False,
                                               return_train_score=False,
                                               return_style=True)
-        with open(get_test_path() + '/test_files/sklearn/housing__grid_search__without_training.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__without_training.html', 'w') as file:
             file.write(results.render())
 
     def test_TwoClassEvaluator(self):
@@ -302,21 +302,21 @@ class TestSklearn(unittest.TestCase):
         self.assertIsInstance(evaluator.all_metrics, dict)
         self.assertIsInstance(evaluator.all_metrics_df(return_style=False), pd.DataFrame)
 
-        with open(get_test_path() + '/test_files/sklearn/all_metrics_df.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_details=False, return_style=True).render()
             file.write(table_html)
 
-        with open(get_test_path() + '/test_files/sklearn/all_metrics_df__round_3.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__round_3.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_details=False,
                                                   return_style=True,
                                                   round_by=3).render()
             file.write(table_html)
 
-        with open(get_test_path() + '/test_files/sklearn/all_metrics_df__with_details.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__with_details.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_details=True, return_style=True).render()
             file.write(table_html)
 
-        with open(get_test_path() + '/test_files/sklearn/all_metrics_df__with_details__round_3.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__with_details__round_3.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_details=True,
                                                   return_style=True,
                                                   round_by=3).render()
@@ -335,25 +335,25 @@ class TestSklearn(unittest.TestCase):
         self.assertIsInstance(evaluator.all_metrics, dict)
         self.assertIsInstance(evaluator.all_metrics_df(), pd.DataFrame)
 
-        with open(get_test_path() + '/test_files/sklearn/reg_eval__all_metrics_df.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True).render()
             file.write(table_html)
 
-        with open(get_test_path() + '/test_files/sklearn/reg_eval__all_metrics_df__round_3.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__round_3.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True, round_by=3).render()
             file.write(table_html)
 
-        with open(get_test_path() + '/test_files/sklearn/reg_eval__all_metrics_df__round_0.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__round_0.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True, round_by=0).render()
             file.write(table_html)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn/reg_eval__plot_residuals_vs_fits.png',
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/reg_eval__plot_residuals_vs_fits.png',
                    plot_function=lambda: evaluator.plot_residuals_vs_fits())
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn/reg_eval__plot_residuals_vs_actuals.png',
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/reg_eval__plot_residuals_vs_actuals.png',
                    plot_function=lambda: evaluator.plot_residuals_vs_actuals())
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn/reg_eval__plot_predictions_vs_actuals.png',
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/reg_eval__plot_predictions_vs_actuals.png',
                    plot_function=lambda: evaluator.plot_predictions_vs_actuals())
 
     def test_plot_confusion_matrix(self):
@@ -362,7 +362,7 @@ class TestSklearn(unittest.TestCase):
                                       labels=('Bad', 'Good'),
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_confusion_matrix.png',
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_confusion_matrix.png',
                    plot_function=lambda: evaluator.plot_confusion_matrix())
 
     def test_plot_auc_curve(self):
@@ -371,7 +371,7 @@ class TestSklearn(unittest.TestCase):
                                       labels=('Bad', 'Good'),
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_auc_curve.png',
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_auc_curve.png',
                    plot_function=lambda: evaluator.plot_auc_curve())
 
     def test_plot_threshold_curves(self):
@@ -380,7 +380,7 @@ class TestSklearn(unittest.TestCase):
                                       labels=('Bad', 'Good'),
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_threshold_curves.png',
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_threshold_curves.png',
                    plot_function=lambda: evaluator.plot_threshold_curves())
 
     def test_plot_precision_recall_tradeoff(self):
@@ -389,7 +389,7 @@ class TestSklearn(unittest.TestCase):
                                       labels=('Bad', 'Good'),
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn/plot_precision_recall_tradeoff.png',
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_precision_recall_tradeoff.png',
                    plot_function=lambda: evaluator.plot_precision_recall_tradeoff())
 
     def test_calculate_lift_gain(self):
@@ -398,16 +398,16 @@ class TestSklearn(unittest.TestCase):
                                       labels=('Bad', 'Good'),
                                       score_threshold=0.5)
 
-        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn/calculate_lift_gain.txt',
+        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain.txt',
                               dataframe=evaluator.calculate_lift_gain())
 
-        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn/calculate_lift_gain__10_buckets.txt',
+        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain__10_buckets.txt',
                               dataframe=evaluator.calculate_lift_gain(num_buckets=10))
 
-        with open(get_test_path() + '/test_files/sklearn/calculate_lift_gain.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain.html', 'w') as file:
             table_html = evaluator.calculate_lift_gain(return_style=True).render()
             file.write(table_html)
 
-        with open(get_test_path() + '/test_files/sklearn/calculate_lift_gain__10_buckets.html', 'w') as file:
+        with open(get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain__10_buckets.html', 'w') as file:
             table_html = evaluator.calculate_lift_gain(return_style=True, num_buckets=10).render()
             file.write(table_html)
