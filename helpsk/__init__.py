@@ -10,7 +10,8 @@ import helpsk.exceptions
 import helpsk.pandas
 import helpsk.pandas_style
 import helpsk.plot
-import helpsk.sklearn
+import helpsk.sklearn_eval
+import helpsk.sklearn_pipeline
 import helpsk.string
 import helpsk.utility
 import helpsk.validation
