@@ -680,7 +680,7 @@ class TwoClassEvaluator:
 
 class RegressionEvaluator:
     """
-    Evaluates models for regresion (i.e. numeric outcome) problems.
+    Evaluates models for regression (i.e. numeric outcome) problems.
     """
     def __init__(self,
                  actual_values: np.ndarray,
