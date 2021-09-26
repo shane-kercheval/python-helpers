@@ -24,7 +24,7 @@ warnings.warn = warn  # noqa
 
 
 # noinspection PyMethodMayBeStatic
-class TestSklearn(unittest.TestCase):
+class TestSklearnEval(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
