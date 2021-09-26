@@ -14,7 +14,8 @@ from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
 from helpsk.utility import suppress_warnings
-from helpsk.sklearn import CustomOrdinalEncoder, cv_results_to_dataframe, TwoClassEvaluator, RegressionEvaluator
+from helpsk.sklearn_eval import cv_results_to_dataframe, TwoClassEvaluator, RegressionEvaluator
+from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing
 
 
@@ -48,7 +49,7 @@ class TestSklearnEval(unittest.TestCase):
             ('scaling', StandardScaler()),
         ])
         non_numeric_pipeline = Pipeline([
-            ('encoder_chooser', hlp.sklearn.TransformerChooser()),
+            ('encoder_chooser', hlp.sklearn_pipeline.TransformerChooser()),
         ])
         transformations_pipeline = ColumnTransformer([
             ('numeric_pipeline', numeric_pipeline, numeric_columns),
@@ -196,7 +197,7 @@ class TestSklearnEval(unittest.TestCase):
                                               num_folds=3,
                                               num_repeats=1,
                                               return_train_score=False,
-                                              return_style = True)
+                                              return_style=True)
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__without_training.html', 'w') as file:
             file.write(results.render())
 
@@ -326,7 +327,9 @@ class TestSklearnEval(unittest.TestCase):
         evaluator = RegressionEvaluator(actual_values=self.housing_data__y_test,
                                         predicted_values=self.housing_data__y_predictions)
 
-        self.assertEqual(evaluator.mean_absolute_error, mean_absolute_error(y_true=self.housing_data__y_test, y_pred=self.housing_data__y_predictions))
+        self.assertEqual(evaluator.mean_absolute_error,
+                         mean_absolute_error(y_true=self.housing_data__y_test,
+                                             y_pred=self.housing_data__y_predictions))
         self.assertEqual(round(mean_squared_error(y_true=self.housing_data__y_test,
                                                   y_pred=self.housing_data__y_predictions), 4),
                          round(evaluator.mean_squared_error, 4))
