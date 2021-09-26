@@ -3,8 +3,8 @@
 See documentation in database.py
 """
 from abc import ABCMeta, abstractmethod
-import pandas as pd
 import time
+import pandas as pd
 from helpsk.utility import suppress_stdout, suppress_warnings
 
 

@@ -1,3 +1,6 @@
+"""This module contains helper functions when working with sklearn (scikit-learn) objects;
+in particular, for building pipelines"""
+
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import OrdinalEncoder
 

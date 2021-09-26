@@ -2,7 +2,8 @@
 """
 import inspect
 import warnings
-import sys, os
+import sys
+import os
 from contextlib import contextmanager, redirect_stdout
 
 
@@ -44,7 +45,7 @@ def suppress_stdout():
     with open(os.devnull, "w") as devnull:
         old_stdout = sys.stdout
         sys.stdout = devnull
-        try:  
+        try:
             yield
         finally:
             sys.stdout = old_stdout

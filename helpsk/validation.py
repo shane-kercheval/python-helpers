@@ -1,6 +1,5 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
-import warnings
 from typing import List, Union, Callable, Type, Iterable
 
 import numpy as np

@@ -1,4 +1,6 @@
-"""This module contains helper functions when working with sklearn (scikit-learn) objects"""
+"""This module contains helper functions when working with sklearn (scikit-learn) objects;
+in particular, for evaluating models"""
+
 import math
 import warnings
 from typing import Tuple, Union, Optional
@@ -23,6 +25,7 @@ with warnings.catch_warnings():
     from statsmodels import api as sm  # https://github.com/statsmodels/statsmodels/issues/3814
 
 
+# pylint: disable=too-many-arguments, too-many-statements
 def cv_results_to_dataframe(searcher: BaseSearchCV,
                             num_folds: int,
                             num_repeats: int,
@@ -683,6 +686,13 @@ class RegressionEvaluator:
     def __init__(self,
                  actual_values: np.ndarray,
                  predicted_values: np.ndarray):
+        """
+        Args:
+            actual_values:
+                the actual values
+            predicted_values:
+                the predicted values
+        """
 
         assert len(actual_values) == len(predicted_values)
 
@@ -696,30 +706,39 @@ class RegressionEvaluator:
 
     @property
     def mean_absolute_error(self) -> float:
+        """Mean Absolute Error"""
         return self._mean_absolute_error
 
     @property
     def mean_squared_error(self) -> float:
+        """Mean Squared Error"""
         return self._mean_squared_error
 
     @property
     def root_mean_squared_error(self) -> float:
+        """Root Mean Squared Error"""
         return np.sqrt(self.mean_squared_error)
 
     @property
     def rmse_to_st_dev(self) -> float:
+        """The ratio of RMSE to the standard deviation of the actual values.
+        Gives an indication of how large the errors are to the actual data.
+        """
         return self.root_mean_squared_error / self._standard_deviation
 
     @property
     def r_squared(self) -> float:
+        """R Squared"""
         return self._r_squared
 
     @property
     def total_observations(self):
+        """The total number of observations i.e. sample size."""
         return len(self._actual_values)
 
     @property
     def all_metrics(self) -> dict:
+        """Returns a dictionary of the most common error metrics for regression problems."""
         return {'Mean Absolute Error (MAE)': self.mean_absolute_error,
                 'Root Mean Squared Error (RMSE)': self.root_mean_squared_error,
                 'RMSE to Standard Deviation of Target': self.rmse_to_st_dev,
@@ -737,7 +756,7 @@ class RegressionEvaluator:
             round_by:
                 the number of digits to round by; if None, then don't round
         """
-        result = pd.DataFrame.from_dict({key: value for key, value in self.all_metrics.items()},
+        result = pd.DataFrame.from_dict({key: value for key, value in self.all_metrics.items()},  # pylint: disable=unnecessary-comprehension  # noqa
                                         orient='index',
                                         columns=['Scores'])
 
@@ -803,13 +822,14 @@ class RegressionEvaluator:
         plt.title('Predicted Values vs. Actual Values')
         plt.xlabel('Actuals')
         plt.ylabel('Predicted')
-        ax = plt.gca()
-        handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles, labels)
+        axis = plt.gca()
+        handles, labels = axis.get_legend_handles_labels()
+        axis.legend(handles, labels)
         plt.figtext(0.99, 0.01,
-                    'Note: observations above blue line mean model is over-predicting; below means under-predicting.',  # noqa
+                    'Note: observations above blue line mean model is over-predicting; below means under-'
+                    'predicting.',  # noqa
                     horizontalalignment='right')
-        return ax
+        return axis
 
     def plot_residuals_vs_actuals(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
         """Plots residuals vs actuals values
@@ -831,5 +851,6 @@ class RegressionEvaluator:
         plt.xlabel('Actual')
         plt.ylabel('Residuals (Actual - Predicted)')
         plt.figtext(0.99, 0.01,
-                    'Note: Actual > Predicted => Under-predicting (positive residual); negative residuals mean over-predicting',  # noqa
+                    'Note: Actual > Predicted => Under-predicting (positive residual); negative residuals '
+                    'mean over-predicting',  # noqa
                     horizontalalignment='right')
