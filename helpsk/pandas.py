@@ -392,6 +392,9 @@ def numeric_summary(dataframe: pd.DataFrame,
         index=columns)
 
     if return_style:
+
+        results = pstyle.html_escape_dataframe(results)
+
         columns_to_format = [x for x in results.columns
                              if x not in ['# of Non-Nulls', '# of Nulls', '% Nulls', '# of Zeros', '% Zeros']]
         results = results.style. \
@@ -470,6 +473,7 @@ def non_numeric_summary(dataframe: pd.DataFrame, return_style: bool = False) -> 
                            index=columns)
 
     if return_style:
+        results = pstyle.html_escape_dataframe(results)
         results = results.style.format({
                 '% Nulls': '{:,.1%}'.format,
                 '% Unique': '{:,.1%}'.format

@@ -243,7 +243,7 @@ def bar_inverse(
 
 def html_escape_dataframe(dataframe: pd.DataFrame):
     def __escape(value):
-        if not any_none_nan([value]):
+        if not any_none_nan([value]) and isinstance(value, str):
             return escape(value)
 
         return value
