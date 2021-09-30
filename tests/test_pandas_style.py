@@ -2,7 +2,9 @@ import unittest
 from enum import unique, auto
 
 from helpsk.pandas import *
+from helpsk.pandas_style import html_escape_dataframe
 from helpsk.utility import suppress_warnings
+from helpsk.validation import dataframes_match
 from tests.helpers import get_data_credit, get_test_path
 
 
@@ -77,3 +79,19 @@ class TestPandasStyle(unittest.TestCase):
                 bar(subset=['credit_amount'], color='grey'). \
                 render()
             file.write(table_html)
+
+    def test_html_escape_dataframe(self):
+        dataframe = pd.DataFrame({
+            'A': ['A', '<B>', 'asf'],
+            '<B>': [None, None, '<asdf>'],
+            '<C>': [np.nan, np.nan, '<asdf>']
+        }, index=['<1>', '2', '<3>'])
+        dataframe['<C>'] = dataframe['<C>'].astype('category')
+
+        expected_dataframe = pd.DataFrame({
+            'A': ['A', '&lt;B&gt;', 'asf'],
+            '&lt;B&gt;': [None, None, '&lt;asdf&gt;'],
+            '&lt;C&gt;': [np.nan, np.nan, '&lt;asdf&gt;']
+        }, index=['&lt;1&gt;', '2', '&lt;3&gt;'])
+        expected_dataframe['&lt;C&gt;'] = expected_dataframe['&lt;C&gt;'].astype('category')
+        self.assertTrue(dataframes_match([html_escape_dataframe(dataframe), expected_dataframe]))

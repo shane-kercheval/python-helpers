@@ -2,8 +2,6 @@ import os
 import unittest
 from enum import unique, auto
 
-import pandas as pd
-
 from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file

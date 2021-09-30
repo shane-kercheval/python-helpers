@@ -13,7 +13,12 @@ from seaborn import color_palette
 
 from helpsk import color
 
+
 # pylint: disable=redefined-builtin,too-many-arguments
+import helpsk.pandas as pandas
+from helpsk.validation import any_none_nan
+
+
 def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
            subset: Optional[List[str]] = None,
            round_by: int = 2,
@@ -36,7 +41,7 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
         missing_color:
             The background color for cells that have missing values.
         thousands:
-            the seperator used for thousands e.g. `'` will result in `10,000` while ` ` will result in
+            the separator used for thousands e.g. `'` will result in `10,000` while ` ` will result in
             `10 000`.
         hide_index:
             Hide the index of the dataframe.
@@ -84,27 +89,6 @@ def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler
     return styler.background_gradient(cmap=color_map, **kwargs)
 
 
-# def tuning_results(tuning_results: pd.DataFrame):
-#
-#
-#     format(styler=tuning_results,
-#            subset=,
-#            round_to=,
-#            fill_missing_value=,
-#            missing_color=,
-#            thousands=,
-#            hide_index=)
-#
-#     tuning_results.style.
-#
-#     results_mod.style.format(precision=3, na_rep='<Missing>', thousands=",").\
-#         bar(subset=['mean_score'], color='#5fba7d').\
-#         bar(subset=['mean*+2SD'], color='gray').\
-#         pipe(hlp.pandas_style.bar_inverse, subset=['mean*-2SD'], color='gray').\
-#         hide_index().\
-#         highlight_null(null_color=hlp.color.Colors.ERROR)
-
-
 # pylint: disable=too-many-arguments
 def __bar_inverse(style_object, align: str, colors: list[str], width: float = 100, min_value: float = None,
                   max_value: float = None):
@@ -129,7 +113,7 @@ def __bar_inverse(style_object, align: str, colors: list[str], width: float = 10
     zero = -width * object_min / (object_max - object_min + 1e-12)
 
     # pylint: disable=redefined-outer-name
-    def css_bar(start: float, end: float, color: str) -> str:
+    def css_bar(start: float, end: float, color: str) -> str:  # noqa
         """
         Generate CSS code to draw a bar from start to end.
         """
@@ -151,12 +135,12 @@ def __bar_inverse(style_object, align: str, colors: list[str], width: float = 10
             return ""
 
         # avoid deprecated indexing `colors[x > zero]`
-        color = colors[1] if row_item > zero else colors[0]
+        color_value = colors[1] if row_item > zero else colors[0]
 
         if align == "left":
-            return css_bar(0, row_item, color)
+            return css_bar(0, row_item, color_value)
 
-        return css_bar(min(row_item, zero), max(row_item, zero), color)
+        return css_bar(min(row_item, zero), max(row_item, zero), color_value)
 
     if style_object.ndim == 1:
         # print(css(normed[10]))
@@ -229,9 +213,9 @@ def bar_inverse(
         raise ValueError("`align` must be one of {'left', 'zero',' mid'}")
 
     if not is_list_like(color):
-        color = [color, color]
+        color = [color, color]  # noqa
     elif len(color) == 1:
-        color = [color[0], color[0]]
+        color = [color[0], color[0]]  # noqa
     elif len(color) > 2:
         raise ValueError(
             "`color` must be string or a list-like "
@@ -255,3 +239,21 @@ def bar_inverse(
     )
 
     return styler
+
+
+def html_escape_dataframe(dataframe: pd.DataFrame):
+    def __escape(value):
+        if not any_none_nan([value]):
+            return escape(value)
+
+        return value
+
+    dataframe = dataframe.copy()
+    columns_to_escape = pandas.get_string_columns(dataframe) + pandas.get_categorical_columns(dataframe)
+    for column in columns_to_escape:
+        dataframe[column] = dataframe[column].apply(__escape)
+
+    dataframe.columns = [escape(x) for x in dataframe.columns.values]
+    dataframe.index = [escape(x) for x in dataframe.index.values]
+
+    return dataframe
