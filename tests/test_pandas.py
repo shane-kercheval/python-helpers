@@ -2,6 +2,8 @@ import os
 import unittest
 from enum import unique, auto
 
+import pandas as pd
+
 from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
@@ -76,6 +78,11 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(is_series_date(self.sample_data['col_i']))
         self.assertFalse(is_series_date(pd.Series(dtype=np.float64)))
 
+    def test_is_series_date__non_numeric_index(self):
+        data = self.sample_data.copy()
+        data.index = ['A', 'B', 'C', 'D']
+        self.assertEqual(get_date_columns(data), ['col_c', 'col_d', 'col_i'])
+
     def test_is_series_string(self):
         actual = self.sample_data.apply(is_series_string)
         expected = {
@@ -94,6 +101,10 @@ class TestPandas(unittest.TestCase):
         }
         self.assertEqual(expected, actual.to_dict())
         self.assertEqual(get_string_columns(self.sample_data), ['col_b'])
+
+        data = self.sample_data.copy()
+        data.index = ['A', 'B', 'C', 'D']
+        self.assertEqual(get_string_columns(data), ['col_b'])
 
     def test_is_series_categorical(self):
         actual = self.sample_data.apply(is_series_categorical)

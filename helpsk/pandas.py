@@ -41,9 +41,10 @@ def is_series_date(series: pd.Series) -> bool:
     if pd.api.types.is_datetime64_any_dtype(series):
         return True
 
-    valid_index = series.first_valid_index()
-    if valid_index:
-        return isinstance(series.iloc[valid_index], datetime.date)
+    first_valid_index = series.first_valid_index()
+    if first_valid_index is not None:
+        first_valid_index = series.index.tolist().index(first_valid_index)
+        return isinstance(series.iloc[first_valid_index], datetime.date)
 
     return False
 
@@ -61,10 +62,12 @@ def is_series_string(series: pd.Series) -> bool:
     if first_valid_index is None:
         return False
 
+    first_valid_index = series.index.tolist().index(first_valid_index)
+
     return is_string_dtype(series) \
         and not is_series_date(series) \
-        and not isinstance(series.loc[first_valid_index], Enum) \
-        and isinstance(series.loc[first_valid_index], str) \
+        and not isinstance(series.iloc[first_valid_index], Enum) \
+        and isinstance(series.iloc[first_valid_index], str) \
         and not is_categorical_dtype(series)
 
 
@@ -107,6 +110,15 @@ def get_non_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
         it will count as numeric and will not be returned in the list.
     """
     return [column for column in dataframe.columns if not is_series_numeric(dataframe[column])]
+
+
+def get_date_columns(dataframe: pd.DataFrame) -> List[str]:
+    """Returns the column names from the dataframe that are either Date or Datetime.
+
+    Returns:
+        list of column names that correspond to Date or Datetime types.
+    """
+    return [column for column in dataframe.columns if is_series_date(dataframe[column])]
 
 
 def get_string_columns(dataframe: pd.DataFrame) -> List[str]:
