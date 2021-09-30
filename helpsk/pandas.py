@@ -6,7 +6,7 @@ from enum import Enum
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_bool_dtype, is_numeric_dtype, is_string_dtype, is_categorical  # noqa
+from pandas.api.types import is_bool_dtype, is_numeric_dtype, is_string_dtype, is_categorical_dtype  # noqa
 from pandas.io.formats.style import Styler
 
 from helpsk.exceptions import HelpskParamValueError
@@ -64,7 +64,8 @@ def is_series_string(series: pd.Series) -> bool:
     return is_string_dtype(series) \
         and not is_series_date(series) \
         and not isinstance(series.loc[first_valid_index], Enum) \
-        and not is_categorical(series)
+        and isinstance(series.loc[first_valid_index], str) \
+        and not is_categorical_dtype(series)
 
 
 def is_series_categorical(series: pd.Series) -> bool:
@@ -76,7 +77,7 @@ def is_series_categorical(series: pd.Series) -> bool:
     Returns:
         True if the series is of type categorical
     """
-    return is_categorical(series)
+    return is_categorical_dtype(series)
 
 
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
@@ -106,6 +107,24 @@ def get_non_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
         it will count as numeric and will not be returned in the list.
     """
     return [column for column in dataframe.columns if not is_series_numeric(dataframe[column])]
+
+
+def get_string_columns(dataframe: pd.DataFrame) -> List[str]:
+    """Returns the column names from the dataframe that are string.
+
+    Returns:
+        list of column names that correspond to string types.
+    """
+    return [column for column in dataframe.columns if is_series_string(dataframe[column])]
+
+
+def get_categorical_columns(dataframe: pd.DataFrame) -> List[str]:
+    """Returns the column names from the dataframe that are categorical.
+
+    Returns:
+        list of column names that correspond to categorical types.
+    """
+    return [column for column in dataframe.columns if is_series_categorical(dataframe[column])]
 
 
 def reorder_categories(categorical: Union[pd.Series, pd.Categorical],

@@ -1,11 +1,9 @@
 import unittest
-from enum import Enum, unique, auto
+from enum import unique, auto
 
-import helpsk.pandas_style as pstyle
-from helpsk.utility import suppress_warnings
 from helpsk.pandas import *
+from helpsk.utility import suppress_warnings
 from tests.helpers import get_data_credit, get_test_path
-import warnings
 
 
 @unique

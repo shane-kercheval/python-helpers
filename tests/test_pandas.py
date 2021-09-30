@@ -93,6 +93,7 @@ class TestPandas(unittest.TestCase):
             'col_g': False
         }
         self.assertEqual(expected, actual.to_dict())
+        self.assertEqual(get_string_columns(self.sample_data), ['col_b'])
 
     def test_is_series_categorical(self):
         actual = self.sample_data.apply(is_series_categorical)
@@ -111,6 +112,7 @@ class TestPandas(unittest.TestCase):
             'col_g': True
         }
         self.assertEqual(expected, actual.to_dict())
+        self.assertEqual(get_categorical_columns(self.sample_data), ['col_g'])
 
     def test_get_numeric_columns(self):
         self.assertEqual(get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])
