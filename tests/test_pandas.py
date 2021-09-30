@@ -1,8 +1,6 @@
 import os
 import unittest
-from enum import Enum, unique, auto
-
-import numpy as np
+from enum import unique, auto
 
 from helpsk import validation as hv
 from helpsk.pandas import *
@@ -48,6 +46,72 @@ class TestPandas(unittest.TestCase):
         sample_data['col_g'] = sample_data['col_b'].astype('category')
         cls.sample_data = sample_data
 
+    def test_is_series_numeric(self):
+        actual = self.sample_data.apply(is_series_numeric)
+        expected = {
+            'col_a': True,
+            'col_b': False,
+            'col_c': False,
+            'col_d': False,
+            'col_e': True,
+            'col_f': True,
+            'col_h': False,
+            'col_i': False,
+            'col_j': False,
+            'col_k': False,
+            'col_l': True,
+            'col_g': False
+        }
+        self.assertEqual(expected, actual.to_dict())
+
+    def test_is_series_date(self):
+        self.assertFalse(is_series_date(self.sample_data['col_a']))
+        self.assertFalse(is_series_date(self.sample_data['col_b']))
+        self.assertTrue(is_series_date(self.sample_data['col_c']))
+        self.assertTrue(is_series_date(self.sample_data['col_d']))
+        self.assertFalse(is_series_date(self.sample_data['col_e']))
+        self.assertFalse(is_series_date(self.sample_data['col_f']))
+        self.assertFalse(is_series_date(self.sample_data['col_g']))
+        self.assertFalse(is_series_date(self.sample_data['col_h']))
+        self.assertTrue(is_series_date(self.sample_data['col_i']))
+        self.assertFalse(is_series_date(pd.Series(dtype=np.float64)))
+
+    def test_is_series_string(self):
+        actual = self.sample_data.apply(is_series_string)
+        expected = {
+            'col_a': False,
+            'col_b': True,
+            'col_c': False,
+            'col_d': False,
+            'col_e': False,
+            'col_f': False,
+            'col_h': False,
+            'col_i': False,
+            'col_j': False,
+            'col_k': False,
+            'col_l': False,
+            'col_g': False
+        }
+        self.assertEqual(expected, actual.to_dict())
+
+    def test_is_series_categorical(self):
+        actual = self.sample_data.apply(is_series_categorical)
+        expected = {
+            'col_a': False,
+            'col_b': False,
+            'col_c': False,
+            'col_d': False,
+            'col_e': False,
+            'col_f': False,
+            'col_h': False,
+            'col_i': False,
+            'col_j': False,
+            'col_k': False,
+            'col_l': False,
+            'col_g': True
+        }
+        self.assertEqual(expected, actual.to_dict())
+
     def test_get_numeric_columns(self):
         self.assertEqual(get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])
         self.assertEqual(get_numeric_columns(self.sample_data[['col_e']]), ['col_e'])
@@ -62,18 +126,6 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(get_non_numeric_columns(self.sample_data[['col_d']]), ['col_d'])
         self.assertEqual(get_non_numeric_columns(self.sample_data[['col_e']]), [])
         self.assertEqual(get_non_numeric_columns(pd.DataFrame()), [])
-
-    def test_is_series_date(self):
-        self.assertFalse(is_series_date(self.sample_data['col_a']))
-        self.assertFalse(is_series_date(self.sample_data['col_b']))
-        self.assertTrue(is_series_date(self.sample_data['col_c']))
-        self.assertTrue(is_series_date(self.sample_data['col_d']))
-        self.assertFalse(is_series_date(self.sample_data['col_e']))
-        self.assertFalse(is_series_date(self.sample_data['col_f']))
-        self.assertFalse(is_series_date(self.sample_data['col_g']))
-        self.assertFalse(is_series_date(self.sample_data['col_h']))
-        self.assertTrue(is_series_date(self.sample_data['col_i']))
-        self.assertFalse(is_series_date(pd.Series(dtype=np.float64)))
 
     def test_reorder_categories__occurrences(self):
         categorical = self.credit_data['purpose'].copy()

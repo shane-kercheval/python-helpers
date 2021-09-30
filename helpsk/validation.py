@@ -4,6 +4,7 @@ from typing import List, Union, Callable, Type, Iterable
 
 import numpy as np
 import pandas as pd
+from pandas.core.dtypes.common import is_categorical
 
 from helpsk.exceptions import *  # pylint: disable=wildcard-import,unused-wildcard-import
 from helpsk.utility import suppress_warnings
@@ -214,12 +215,12 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
     """
     # seems to be confusion and inconsistencies across stack overflow on how to properly check for category
     # so this might be overkill but not exactly sure
-    def is_categorical(series):
-        if isinstance(series, (pd.Categorical, pd.CategoricalDtype)):
-            return True
-        if isinstance(series, pd.Series):
-            return series.dtype.name == 'category'
-        return False
+    # def is_categorical(series):
+    #     if isinstance(series, (pd.Categorical, pd.CategoricalDtype)):
+    #         return True
+    #     if isinstance(series, pd.Series):
+    #         return series.dtype.name == 'category'
+    #     return False
 
     with suppress_warnings():
         # if either list-like structure is categorical, then we need to convert both to unordered categorical

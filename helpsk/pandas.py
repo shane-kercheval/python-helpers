@@ -2,10 +2,11 @@
 import datetime
 import math
 from typing import List, Union, Optional, Callable
+from enum import Enum
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_bool_dtype, is_numeric_dtype
+from pandas.api.types import is_bool_dtype, is_numeric_dtype, is_string_dtype, is_categorical  # noqa
 from pandas.io.formats.style import Styler
 
 from helpsk.exceptions import HelpskParamValueError
@@ -23,9 +24,59 @@ def is_series_numeric(series: pd.Series) -> bool:
         series:
             a Pandas series
 
-    Return: True if the series is numeric (explicitly boolean type is not considered
+    Returns:
+        True if the series is numeric (explicitly boolean type is not considered
     """
     return is_numeric_dtype(series) and not is_bool_dtype(series)
+
+
+def is_series_date(series: pd.Series) -> bool:
+    """Returns True if the series contains Dates or DateTimes
+
+    Args:
+        series: a pandas Series
+    Returns:
+        True if the series is of type Date or DateTime
+    """
+    if pd.api.types.is_datetime64_any_dtype(series):
+        return True
+
+    valid_index = series.first_valid_index()
+    if valid_index:
+        return isinstance(series.iloc[valid_index], datetime.date)
+
+    return False
+
+
+def is_series_string(series: pd.Series) -> bool:
+    """Returns True if the series is of type string
+
+    Args:
+        series: a pandas Series
+
+    Returns:
+        True if the series is of type string
+    """
+    first_valid_index = series.first_valid_index()
+    if first_valid_index is None:
+        return False
+
+    return is_string_dtype(series) \
+        and not is_series_date(series) \
+        and not isinstance(series.loc[first_valid_index], Enum) \
+        and not is_categorical(series)
+
+
+def is_series_categorical(series: pd.Series) -> bool:
+    """Returns True if the series is of type categorical
+
+    Args:
+        series: a pandas Series
+
+    Returns:
+        True if the series is of type categorical
+    """
+    return is_categorical(series)
 
 
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
@@ -55,25 +106,6 @@ def get_non_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
         it will count as numeric and will not be returned in the list.
     """
     return [column for column in dataframe.columns if not is_series_numeric(dataframe[column])]
-
-
-def is_series_date(series: pd.Series) -> bool:
-    """Returns True if the series contains Dates or DateTimes
-
-    Args:
-        series: a pandas Series
-
-    Returns:
-        a list of columns names that are either Dates or DateTimes
-    """
-    if pd.api.types.is_datetime64_any_dtype(series):
-        return True
-
-    valid_index = series.first_valid_index()
-    if valid_index:
-        return isinstance(series.iloc[valid_index], datetime.date)
-
-    return False
 
 
 def reorder_categories(categorical: Union[pd.Series, pd.Categorical],
