@@ -15,7 +15,7 @@ from helpsk import color
 
 
 # pylint: disable=redefined-builtin,too-many-arguments
-import helpsk.pandas as pandas
+import helpsk.pandas as pandas  # pylint: disable=consider-using-from-import
 from helpsk.validation import any_none_nan
 
 
@@ -242,6 +242,16 @@ def bar_inverse(
 
 
 def html_escape_dataframe(dataframe: pd.DataFrame):
+    """HTML `escapes` all string and categorical columns in the `dataframe`.
+
+    This can be used when displaying pd.DataFrames in Jupyter notebook using `.style`;
+    e.g. `<XXX>` is displayed as blank because it is not encoded.
+
+    Args:
+        pd.DataFrame
+    Returns:
+        a copy of the `dataframe` with string values replaced after being html encoded via `html.escape()`
+    """
     def __escape(value):
         if not any_none_nan([value]) and isinstance(value, str):
             return escape(value)
