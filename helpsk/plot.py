@@ -259,6 +259,8 @@ def plot_histogram_with_categorical(dataframe: pd.DataFrame, numeric_column: str
                                         # [np.percentile(self._dataset[feature], x) for x in percentiles],
                                         right=True,
                                         include_lowest=True))
+
+    cut_dataframe[numeric_column] = [str(x) for x in cut_dataframe[numeric_column]]
     cut_dataframe[categorical_column] = dataframe[categorical_column].copy()
 
     plot_dodged_barchart(dataframe=cut_dataframe, outer_column=numeric_column,
