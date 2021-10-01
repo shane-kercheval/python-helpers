@@ -484,7 +484,9 @@ def numeric_summary(dataframe: pd.DataFrame,
     return results
 
 
-def non_numeric_summary(dataframe: pd.DataFrame, return_style: bool = False) -> Union[pd.DataFrame, None]:
+def non_numeric_summary(dataframe: pd.DataFrame,
+                        return_style: bool = False,
+                        unique_freq_value_max_chars: int = 30) -> Union[pd.DataFrame, None]:
     """Provides a summary of basic stats for the non-numeric columns of a DataFrame.
 
     Args:
@@ -493,6 +495,9 @@ def non_numeric_summary(dataframe: pd.DataFrame, return_style: bool = False) -> 
         return_style:
             If True, returns a pd.DataFrame.style object. This can be used for displaying in Jupyter Notebook.
             If False, returns a pd.DataFrame
+        unique_freq_value_max_chars:
+            the maximum number of characters to display in the `Most Freq. Value` column
+            If the value is truncated, then `[...]` is appended to the value to indicate it was shortened
 
     Returns:
         Returns a pandas DataFrame with the following attributes (returned as columns) for each of the
@@ -526,7 +531,13 @@ def non_numeric_summary(dataframe: pd.DataFrame, return_style: bool = False) -> 
         counts = series.value_counts()
         return counts.index[0] if len(counts) > 0 else None
 
-    most_frequent_value = [get_top_value(dataframe[x]) for x in non_numeric_columns]
+    def chop_string(value):
+        if isinstance(value, str) and len(value) > unique_freq_value_max_chars:
+            value = value[0:unique_freq_value_max_chars] + '[...]'
+        return value
+
+    most_frequent_value = [chop_string(get_top_value(dataframe[x])) for x in non_numeric_columns]
+
     num_unique = [len(dataframe[x].dropna().unique()) for x in non_numeric_columns]
 
     perc_unique = [np.nan if num_non_null == 0 else len(dataframe[col_name].dropna().unique()) / num_non_null

@@ -2,8 +2,6 @@ import os
 import unittest
 from enum import unique, auto
 
-import numpy as np
-
 from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
@@ -462,14 +460,17 @@ class TestPandas(unittest.TestCase):
                                  numeric_summary(self.sample_data, return_style=True).render())
 
     def test_non_numeric_summary(self):
+        credit_data = self.credit_data.copy()
+        credit_data['purpose'] = credit_data['purpose'].replace({'radio/tv': '1111111111222222222233333333334444444444'})
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__credit.txt',
-                                 non_numeric_summary(self.credit_data))
+                                 non_numeric_summary(credit_data))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__sample.txt',
                                  non_numeric_summary(self.sample_data))
 
     def test_non_numeric_summary__nan_column(self):
         test_data = self.credit_data.copy()
+        test_data['purpose'] = test_data['purpose'].replace({'radio/tv': '1111111111222222222233333333334444444444'})
         test_data['all_missing'] = None
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__credit__all_missing.txt',
                                  non_numeric_summary(test_data))
@@ -479,6 +480,7 @@ class TestPandas(unittest.TestCase):
 
     def test_non_numeric_summary_test(self):
         test_data = self.credit_data.copy()
+        test_data['purpose'] = test_data['purpose'].replace({'radio/tv': '1111111111222222222233333333334444444444'})
         test_data.loc[25:75, ['checking_status']] = np.nan
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit.html',
@@ -609,3 +611,10 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(hv.iterables_are_equal(results.index.values.tolist(), expected_indexes))  # noqa
         self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, cached_results.loc[results.index.values, 'Frequency'].values))
         self.assertTrue(hv.iterables_are_equal(results['Percent'].values, cached_results.loc[results.index.values, 'Percent'].values))
+
+    # def test_asf(self):
+    #     credit_good = self.credit_data['target'] == 'good'
+    #     checking_status = self.credit_data['checking_status']
+    #     value_frequency(series=credit_good)
+    #
+    #     pd.groupby(credit_good, checking_status).size()
