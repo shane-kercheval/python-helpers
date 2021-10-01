@@ -2,6 +2,8 @@ import os
 import unittest
 from enum import unique, auto
 
+import numpy as np
+
 from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
@@ -64,6 +66,22 @@ class TestPandas(unittest.TestCase):
         }
         self.assertEqual(expected, actual.to_dict())
 
+    def test_is_series_bool(self):
+        self.assertTrue(is_series_bool(series=pd.Series([True])))
+        self.assertTrue(is_series_bool(series=pd.Series([False])))
+        self.assertTrue(is_series_bool(series=pd.Series([True, False])))
+        self.assertTrue(is_series_bool(series=pd.Series([True, False, None])))
+        self.assertTrue(is_series_bool(series=pd.Series([True, False, np.nan])))
+        self.assertTrue(is_series_bool(series=pd.Series([None, True, False, None])))
+        self.assertTrue(is_series_bool(series=pd.Series([np.nan, True, False, np.nan])))
+
+        self.assertFalse(is_series_bool(series=pd.Series([], dtype=object)))
+        self.assertFalse(is_series_bool(series=pd.Series(['Whatever'])))
+        self.assertFalse(is_series_bool(series=pd.Series([True, False, 'Whatever'])))
+        self.assertFalse(is_series_bool(series=pd.Series([True, False, TestEnum.VALUE_A])))
+        self.assertFalse(is_series_bool(series=pd.Series([None])))
+        self.assertFalse(is_series_bool(series=pd.Series([np.nan])))
+
     def test_is_series_date(self):
         self.assertFalse(is_series_date(self.sample_data['col_a']))
         self.assertFalse(is_series_date(self.sample_data['col_b']))
@@ -122,6 +140,35 @@ class TestPandas(unittest.TestCase):
         }
         self.assertEqual(expected, actual.to_dict())
         self.assertEqual(get_categorical_columns(self.sample_data), ['col_g'])
+
+    def test_replace_all_bools_with_strings(self):
+        results = replace_all_bools_with_strings(series=pd.Series([True]))
+        self.assertEqual(results.values.tolist(), ['True'])
+        results = replace_all_bools_with_strings(series=pd.Series([False]))
+        self.assertEqual(results.values.tolist(), ['False'])
+        results = replace_all_bools_with_strings(series=pd.Series([True, False]))
+        self.assertEqual(results.values.tolist(), ['True', 'False'])
+        results = replace_all_bools_with_strings(series=pd.Series([True, False, None]))
+        self.assertEqual(results.values.tolist(), ['True', 'False', None])
+        results = replace_all_bools_with_strings(series=pd.Series([True, False, np.nan]))
+        self.assertEqual(results.values.tolist(), ['True', 'False', np.nan])
+        results = replace_all_bools_with_strings(series=pd.Series([None, True, False, None]))
+        self.assertEqual(results.values.tolist(), [None, 'True', 'False', None])
+        results = replace_all_bools_with_strings(series=pd.Series([np.nan, True, False, np.nan]))
+        self.assertEqual(results.values.tolist(), [np.nan, 'True', 'False', np.nan])
+
+        results = replace_all_bools_with_strings(series=pd.Series([], dtype=object))
+        self.assertEqual(results.values.tolist(), [])
+        results = replace_all_bools_with_strings(series=pd.Series(['Whatever']))
+        self.assertEqual(results.values.tolist(), ['Whatever'])
+        results = replace_all_bools_with_strings(series=pd.Series([True, False, 'Whatever']))
+        self.assertEqual(results.values.tolist(), ['True', 'False', 'Whatever'])
+        results = replace_all_bools_with_strings(series=pd.Series([True, False, TestEnum.VALUE_A]))
+        self.assertEqual(results.values.tolist(), ['True', 'False', TestEnum.VALUE_A])
+        results = replace_all_bools_with_strings(series=pd.Series([None]))
+        self.assertEqual(results.values.tolist(), [None])
+        results = replace_all_bools_with_strings(series=pd.Series([np.nan]))
+        self.assertEqual(len(results), 1)
 
     def test_get_numeric_columns(self):
         self.assertEqual(get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])

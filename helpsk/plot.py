@@ -160,6 +160,10 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
     """
     dataframe = dataframe[[outer_column, inner_column]].copy()
 
+    # Replace all Boolean values with string because boolean causes issues
+    dataframe[outer_column] = hpandas.replace_all_bools_with_strings(dataframe[outer_column])
+    dataframe[inner_column] = hpandas.replace_all_bools_with_strings(dataframe[inner_column])
+
     if dataframe[outer_column].dtype.name == 'category' and \
             missing_value_replacement not in dataframe[outer_column].cat.categories:
         dataframe[outer_column] = dataframe[outer_column].cat.add_categories(missing_value_replacement)

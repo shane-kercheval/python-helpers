@@ -27,7 +27,41 @@ def is_series_numeric(series: pd.Series) -> bool:
     Returns:
         True if the series is numeric (explicitly boolean type is not considered
     """
-    return is_numeric_dtype(series) and not is_bool_dtype(series)
+    return is_numeric_dtype(series) and not is_series_bool(series)
+
+
+def is_series_bool(series: pd.Series) -> bool:
+    """Tests whether or not a pd.Series is bool.
+    
+    `is_bool_dtype(np.array([True, False, np.nan]))` evaluates to False, so we must check if any of the values
+    in the series are bool
+
+    Args:
+        series:
+            a Pandas series
+
+    Returns:
+        True if the series is bool
+    """
+    # if the series is of type bool via is_bool_dtype, let's return True
+    # otherwise, we need to check the actual values since is_bool_dtype returns false if
+    # the series contains None/np.nan
+    if is_bool_dtype(series):
+        return True
+
+    def is_nan(value):
+        try:
+            if np.isnan(value):
+                return True
+        except TypeError:
+            return False
+
+    are_booleans = [isinstance(x, bool) or isinstance(x, np.bool_) for x in series.values if x is not None and not is_nan(x)]
+
+    if len(are_booleans) == 0:
+        return False
+
+    return all(are_booleans)
 
 
 def is_series_date(series: pd.Series) -> bool:
@@ -81,6 +115,15 @@ def is_series_categorical(series: pd.Series) -> bool:
         True if the series is of type categorical
     """
     return is_categorical_dtype(series)
+
+
+def replace_all_bools_with_strings(series: pd.Series,
+                                   replacements={True: 'True', False: 'False'}) -> pd.Series:  # noqa
+    series = series.copy()
+    mask = series.apply(type) != bool
+    series = series.where(mask, series.replace(replacements))
+
+    return series
 
 
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:

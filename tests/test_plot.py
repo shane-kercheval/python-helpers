@@ -82,6 +82,24 @@ class TestPlot(unittest.TestCase):
 
         self.assertTrue(hval.dataframes_match([original, test_series]))
 
+    def test_plot_dodged_barchart__boolean(self):
+        """There is a bug where using a boolean series fails"""
+        test_series = self.credit_data.copy()
+        test_series['all_paid'] = test_series['credit_history'] == 'all paid'
+        test_series.loc[0:10, 'all_paid'] = np.nan
+
+        test_series['own_telephone'] = test_series['own_telephone'] == 'yes'
+        test_series.loc[5:15, 'own_telephone'] = None
+
+        original = test_series.copy()
+
+        check_plot(file_name=get_test_path() + '/test_files/plot/plot_dodged_barchart__booleans.png',
+                   plot_function=lambda: hplot.plot_dodged_barchart(dataframe=test_series,
+                                                                    outer_column='own_telephone',
+                                                                    inner_column='all_paid'))
+
+        self.assertTrue(hval.dataframes_match([original, test_series]))
+
     def test_plot_histogram_with_categorical(self):
         test_series = self.credit_data.copy()
         test_series.loc[0:10, 'credit_history'] = np.nan
