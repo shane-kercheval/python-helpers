@@ -1,6 +1,9 @@
 import unittest
 from enum import unique, auto
 
+import numpy as np
+import pandas as pd
+
 from helpsk.pandas import *
 from helpsk.pandas_style import html_escape_dataframe
 from helpsk.utility import suppress_warnings
@@ -93,5 +96,25 @@ class TestPandasStyle(unittest.TestCase):
             '&lt;B&gt;': [None, None, '&lt;asdf&gt;'],
             '&lt;C&gt;': [np.nan, np.nan, '&lt;asdf&gt;']
         }, index=['&lt;1&gt;', '2', '&lt;3&gt;'])
+        expected_dataframe['&lt;C&gt;'] = expected_dataframe['&lt;C&gt;'].astype('category')
+        self.assertTrue(dataframes_match([html_escape_dataframe(dataframe), expected_dataframe]))
+
+        # multi-index
+        dataframe = pd.DataFrame({
+            ('A', np.nan): ['A', '<B>', 'asf'],
+            ('<B>', '<2>'): [None, None, '<asdf>'],
+            ('<C>', 3): [np.nan, np.nan, '<asdf>']
+        }, index=pd.MultiIndex.from_tuples([('<1>', '<x>'),
+                                            ('2', '<y>'),
+                                            ('<3>', 'z')]))
+        dataframe['<C>'] = dataframe['<C>'].astype('category')
+
+        expected_dataframe = pd.DataFrame({
+            ('A', np.nan): ['A', '&lt;B&gt;', 'asf'],
+            ('&lt;B&gt;', '&lt;2&gt;'): [None, None, '&lt;asdf&gt;'],
+            ('&lt;C&gt;', 3): [np.nan, np.nan, '&lt;asdf&gt;']
+        }, index=pd.MultiIndex.from_tuples([('&lt;1&gt', '&lt;x&gt;'),
+                                            ('2', '&lt;y&gt;'),
+                                            ('&lt;3&gt;', 'z')]))
         expected_dataframe['&lt;C&gt;'] = expected_dataframe['&lt;C&gt;'].astype('category')
         self.assertTrue(dataframes_match([html_escape_dataframe(dataframe), expected_dataframe]))

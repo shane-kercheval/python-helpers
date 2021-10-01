@@ -242,7 +242,7 @@ def bar_inverse(
 
 
 def html_escape_dataframe(dataframe: pd.DataFrame):
-    """HTML `escapes` all string and categorical columns in the `dataframe`.
+    """HTML `escapes` all string and categorical columns and indexes in the `dataframe`.
 
     This can be used when displaying pd.DataFrames in Jupyter notebook using `.style`;
     e.g. `<XXX>` is displayed as blank because it is not encoded.
@@ -263,7 +263,16 @@ def html_escape_dataframe(dataframe: pd.DataFrame):
     for column in columns_to_escape:
         dataframe[column] = dataframe[column].apply(__escape)
 
-    dataframe.columns = [escape(x) for x in dataframe.columns.values]
-    dataframe.index = [escape(x) for x in dataframe.index.values]
+    if isinstance(dataframe.index, pd.MultiIndex):
+        index_tuples = [tuple([__escape(x) for x in index]) for index in dataframe.index]
+        dataframe.index = pd.MultiIndex.from_tuples(index_tuples)
+    else:
+        dataframe.index = [__escape(x) for x in dataframe.index.values]
+
+    if isinstance(dataframe.columns, pd.MultiIndex):
+        index_tuples = [tuple([__escape(x) for x in columns]) for columns in dataframe.columns]
+        dataframe.columns = pd.MultiIndex.from_tuples(index_tuples)
+    else:
+        dataframe.columns = [__escape(x) for x in dataframe.columns.values]
 
     return dataframe
