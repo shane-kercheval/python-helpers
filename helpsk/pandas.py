@@ -117,13 +117,38 @@ def is_series_categorical(series: pd.Series) -> bool:
     return is_categorical_dtype(series)
 
 
+def fill_na(series: pd.Series,
+            missing_value_replacement: str = '<Missing>'):
+    """Fills missing values with `missing_value_replacement`
+
+    This is only necessary if `series` is a categorical object because series.fillna(...) will fail if
+    `missing_value_replacement` isn't already an existing category. This function adds the value to the
+    categories if it isn't already.
+
+    Args:
+        series:
+            pd.Series
+        missing_value_replacement:
+            the replacement value
+    Returns:
+        pd.Series will missing values filled with `missing_value_replacement`
+    """
+    series = series.copy()
+    if is_series_categorical(series) and missing_value_replacement not in series.cat.categories:
+        series = series.cat.add_categories(missing_value_replacement)
+
+    return series.fillna(missing_value_replacement)
+
+
 def replace_all_bools_with_strings(series: pd.Series,
                                    replacements={True: 'True', False: 'False'}) -> pd.Series:  # noqa
     series = series.copy()
-    mask = series.apply(type) != bool
-    series = series.where(mask, series.replace(replacements))
 
-    return series
+    if is_series_categorical(series):
+        series = series.cat.add_categories([replacements[True], replacements[False]])
+
+    mask = series.apply(type) != bool
+    return series.where(mask, series.replace(replacements))
 
 
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:

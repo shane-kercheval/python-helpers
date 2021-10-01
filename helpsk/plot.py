@@ -164,25 +164,21 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
     dataframe[outer_column] = hpandas.replace_all_bools_with_strings(dataframe[outer_column])
     dataframe[inner_column] = hpandas.replace_all_bools_with_strings(dataframe[inner_column])
 
-    if dataframe[outer_column].dtype.name == 'category' and \
-            missing_value_replacement not in dataframe[outer_column].cat.categories:
-        dataframe[outer_column] = dataframe[outer_column].cat.add_categories(missing_value_replacement)
+    dataframe[outer_column] = hpandas.fill_na(series=dataframe[outer_column],
+                                              missing_value_replacement=missing_value_replacement)
 
-    if dataframe[inner_column].dtype.name == 'category' and \
-            missing_value_replacement not in dataframe[inner_column].cat.categories:
-        dataframe[inner_column] = dataframe[inner_column].cat.add_categories(missing_value_replacement)
+    dataframe[inner_column] = hpandas.fill_na(series=dataframe[inner_column],
+                                              missing_value_replacement=missing_value_replacement)
 
-    dataframe = dataframe.fillna(missing_value_replacement)
+    outer_labels = dataframe[outer_column].unique().tolist()
+    if hpandas.is_series_categorical(dataframe[outer_column]):
+        categories = list(dataframe[outer_column].cat.categories)
+        outer_labels = [x for x in categories if x in outer_labels]
 
-    if dataframe[outer_column].dtype.name == 'category':
-        outer_labels = list(dataframe[outer_column].cat.categories)
-    else:
-        outer_labels = dataframe[outer_column].unique().tolist()
-
-    if dataframe[inner_column].dtype.name == 'category':
-        inner_labels = list(dataframe[inner_column].cat.categories)
-    else:
-        inner_labels = dataframe[inner_column].unique().tolist()
+    inner_labels = dataframe[inner_column].unique().tolist()
+    if hpandas.is_series_categorical(dataframe[inner_column]):
+        categories = list(dataframe[inner_column].cat.categories)
+        inner_labels = [x for x in categories if x in inner_labels]
 
     grouped_data = dataframe.groupby([outer_column, inner_column]).size()
 
@@ -204,7 +200,7 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
 
     # from matplotlib.pyplot import cm
     # colors = cm.rainbow(np.linspace(0, 1, 10)[::-1])  # noqa
-    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k'] * 100
 
     if len(inner_labels) > len(colors):
         raise NotImplementedError(
@@ -242,8 +238,10 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
     plt.tight_layout()
 
 
-def plot_histogram_with_categorical(dataframe: pd.DataFrame, numeric_column: str,
-                                    categorical_column: str) -> None:
+def plot_histogram_with_categorical(dataframe: pd.DataFrame,
+                                    numeric_column: str,
+                                    categorical_column: str,
+                                    missing_value_replacement: str = '<Missing>') -> None:
     """TBD
 
     Args:
@@ -256,11 +254,15 @@ def plot_histogram_with_categorical(dataframe: pd.DataFrame, numeric_column: str
     """
     cut_dataframe = pd.DataFrame(pd.cut(dataframe[numeric_column],
                                         bins=10,
-                                        # [np.percentile(self._dataset[feature], x) for x in percentiles],
                                         right=True,
                                         include_lowest=True))
 
+    cut_dataframe[numeric_column] = hpandas.fill_na(cut_dataframe[numeric_column], missing_value_replacement=missing_value_replacement)
+    categories = [str(x) for x in cut_dataframe[numeric_column].cat.categories]
     cut_dataframe[numeric_column] = [str(x) for x in cut_dataframe[numeric_column]]
+    cut_dataframe[numeric_column] = cut_dataframe[numeric_column].astype('category')
+    cut_dataframe[numeric_column].cat.categories = categories
+
     cut_dataframe[categorical_column] = dataframe[categorical_column].copy()
 
     plot_dodged_barchart(dataframe=cut_dataframe, outer_column=numeric_column,

@@ -148,6 +148,8 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(results.values.tolist(), ['False'])
         results = replace_all_bools_with_strings(series=pd.Series([True, False]))
         self.assertEqual(results.values.tolist(), ['True', 'False'])
+        results = replace_all_bools_with_strings(series=pd.Series([True, False]).astype('category'))
+        self.assertEqual(results.values.tolist(), ['True', 'False'])
         results = replace_all_bools_with_strings(series=pd.Series([True, False, None]))
         self.assertEqual(results.values.tolist(), ['True', 'False', None])
         results = replace_all_bools_with_strings(series=pd.Series([True, False, np.nan]))
@@ -169,6 +171,24 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(results.values.tolist(), [None])
         results = replace_all_bools_with_strings(series=pd.Series([np.nan]))
         self.assertEqual(len(results), 1)
+
+    def test_fill_na(self):
+        # test non-categorical
+        self.assertEqual(fill_na(pd.Series([], dtype=object)).values.tolist(), [])
+        self.assertEqual(fill_na(pd.Series([None])).values.tolist(), ['<Missing>'])
+        self.assertEqual(fill_na(pd.Series([np.nan])).values.tolist(), ['<Missing>'])
+        self.assertEqual(fill_na(pd.Series([True, False, np.nan])).values.tolist(), [True, False, '<Missing>'])
+        self.assertEqual(fill_na(pd.Series([0, 1, np.nan])).values.tolist(), [0, 1, '<Missing>'])
+        self.assertEqual(fill_na(pd.Series(['A', 'B', np.nan])).values.tolist(), ['A', 'B', '<Missing>'])
+        self.assertEqual(fill_na(pd.Series(['A', 'B'])).values.tolist(), ['A', 'B'])
+        # test categorical
+        self.assertEqual(fill_na(pd.Series([], dtype=object).astype('category')).values.tolist(), [])
+        self.assertEqual(fill_na(pd.Series([None]).astype('category')).values.tolist(), ['<Missing>'])
+        self.assertEqual(fill_na(pd.Series([np.nan]).astype('category')).values.tolist(), ['<Missing>'])
+        self.assertEqual(fill_na(pd.Series([True, False, np.nan]).astype('category')).values.tolist(), [True, False, '<Missing>'])
+        self.assertEqual(fill_na(pd.Series([0, 1, np.nan]).astype('category')).values.tolist(), [0, 1, '<Missing>'])
+        self.assertEqual(fill_na(pd.Series(['A', 'B', np.nan]).astype('category')).values.tolist(), ['A', 'B', '<Missing>'])
+        self.assertEqual(fill_na(pd.Series(['A', 'B']).astype('category')).values.tolist(), ['A', 'B'])
 
     def test_get_numeric_columns(self):
         self.assertEqual(get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])
