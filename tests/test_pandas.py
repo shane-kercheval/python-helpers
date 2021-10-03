@@ -611,10 +611,3 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(hv.iterables_are_equal(results.index.values.tolist(), expected_indexes))  # noqa
         self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, cached_results.loc[results.index.values, 'Frequency'].values))
         self.assertTrue(hv.iterables_are_equal(results['Percent'].values, cached_results.loc[results.index.values, 'Percent'].values))
-
-    # def test_asf(self):
-    #     credit_good = self.credit_data['target'] == 'good'
-    #     checking_status = self.credit_data['checking_status']
-    #     value_frequency(series=credit_good)
-    #
-    #     pd.groupby(credit_good, checking_status).size()
