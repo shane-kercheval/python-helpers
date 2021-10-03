@@ -132,10 +132,22 @@ def fill_na(series: pd.Series,
             the replacement value
     Returns:
         pd.Series will missing values filled with `missing_value_replacement`
+
+        NOTE: a side effect of this function is
+            - for series of type categorical: the `missing_value_replacement` will be added to the list of
+                categories if the value isn't already an existing category
+            - for non-categorical dtypes (e.g. bool, float, etc.) the series will be converted to
+                `object` so that strings and other types can coexist.
     """
     series = series.copy()
-    if is_series_categorical(series) and missing_value_replacement not in series.cat.categories:
-        series = series.cat.add_categories(missing_value_replacement)
+
+    if is_series_categorical(series):
+        if missing_value_replacement not in series.cat.categories:
+            series = series.cat.add_categories(missing_value_replacement)
+    else:
+        # if we don't do this, then if, for example, we have boolean values and we try to call `.fillna(...)`
+        # then we will get `TypeError: Need to pass bool-like values.`
+        series = series.astype(object)
 
     return series.fillna(missing_value_replacement)
 

@@ -175,18 +175,69 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(fill_na(pd.Series([], dtype=object)).values.tolist(), [])
         self.assertEqual(fill_na(pd.Series([None])).values.tolist(), ['<Missing>'])
         self.assertEqual(fill_na(pd.Series([np.nan])).values.tolist(), ['<Missing>'])
-        self.assertEqual(fill_na(pd.Series([True, False, np.nan])).values.tolist(), [True, False, '<Missing>'])
-        self.assertEqual(fill_na(pd.Series([0, 1, np.nan])).values.tolist(), [0, 1, '<Missing>'])
-        self.assertEqual(fill_na(pd.Series(['A', 'B', np.nan])).values.tolist(), ['A', 'B', '<Missing>'])
+
+        results = fill_na(pd.Series([True, False, np.nan]))
+        self.assertEqual(results.tolist(), [True, False, '<Missing>'])
+        self.assertIsInstance(results[0], bool)
+
+        results = fill_na(pd.Series([True, False, np.nan]).astype('boolean'))  # this fails if not converted to object
+        self.assertEqual(results.tolist(), [True, False, '<Missing>'])
+        self.assertIsInstance(results[0], bool)
+
+        results = fill_na(pd.Series([0, 1, np.nan]))
+        self.assertEqual(results.tolist(), [0, 1, '<Missing>'])
+        self.assertIsInstance(results[0], float)
+
+        results = fill_na(pd.Series([0, 1, np.nan]).astype('float'))  # this fails if not converted to object
+        self.assertEqual(results.tolist(), [0, 1, '<Missing>'])
+        self.assertIsInstance(results[0], float)
+
+        results = fill_na(pd.Series(['A', 'B', np.nan]))
+        self.assertEqual(results.tolist(), ['A', 'B', '<Missing>'])
+        self.assertIsInstance(results[0], str)
+
         self.assertEqual(fill_na(pd.Series(['A', 'B'])).values.tolist(), ['A', 'B'])
+
         # test categorical
-        self.assertEqual(fill_na(pd.Series([], dtype=object).astype('category')).values.tolist(), [])
-        self.assertEqual(fill_na(pd.Series([None]).astype('category')).values.tolist(), ['<Missing>'])
-        self.assertEqual(fill_na(pd.Series([np.nan]).astype('category')).values.tolist(), ['<Missing>'])
-        self.assertEqual(fill_na(pd.Series([True, False, np.nan]).astype('category')).values.tolist(), [True, False, '<Missing>'])
-        self.assertEqual(fill_na(pd.Series([0, 1, np.nan]).astype('category')).values.tolist(), [0, 1, '<Missing>'])
-        self.assertEqual(fill_na(pd.Series(['A', 'B', np.nan]).astype('category')).values.tolist(), ['A', 'B', '<Missing>'])
-        self.assertEqual(fill_na(pd.Series(['A', 'B']).astype('category')).values.tolist(), ['A', 'B'])
+        results = fill_na(pd.Series([], dtype=object).astype('category'))
+        self.assertEqual(results.tolist(), [])
+        self.assertTrue(is_series_categorical(results))
+        self.assertTrue('<Missing>' in results.cat.categories)
+
+        results = fill_na(pd.Series([None]).astype('category'))
+        self.assertEqual(results.tolist(), ['<Missing>'])
+        self.assertTrue(is_series_categorical(results))
+        self.assertTrue('<Missing>' in results.cat.categories)
+
+        results = fill_na(pd.Series([np.nan]).astype('category'))
+        self.assertEqual(results.tolist(), ['<Missing>'])
+        self.assertTrue(is_series_categorical(results))
+        self.assertTrue('<Missing>' in results.cat.categories)
+
+        results = fill_na(pd.Series([True, False, np.nan]).astype('category'))
+        self.assertEqual(results.tolist(), [True, False, '<Missing>'])
+        self.assertTrue(is_series_categorical(results))
+        self.assertTrue('<Missing>' in results.cat.categories)
+
+        results = fill_na(pd.Series([0, 1, np.nan]).astype('category'))
+        self.assertEqual(results.tolist(), [0, 1, '<Missing>'])
+        self.assertTrue(is_series_categorical(results))
+        self.assertTrue('<Missing>' in results.cat.categories)
+
+        results = fill_na(pd.Series(['A', 'B', '<Missing>', np.nan]).astype('category'))
+        self.assertEqual(results.tolist(), ['A', 'B', '<Missing>', '<Missing>'])
+        self.assertTrue(is_series_categorical(results))
+        self.assertTrue('<Missing>' in results.cat.categories)
+
+        results = fill_na(pd.Series(['A', 'B', np.nan]).astype('category'))
+        self.assertEqual(results.tolist(), ['A', 'B', '<Missing>'])
+        self.assertTrue(is_series_categorical(results))
+        self.assertTrue('<Missing>' in results.cat.categories)
+
+        results = fill_na(pd.Series(['A', 'B']).astype('category'))
+        self.assertEqual(results.tolist(), ['A', 'B'])
+        self.assertTrue(is_series_categorical(results))
+        self.assertTrue('<Missing>' in results.cat.categories)
 
     def test_get_numeric_columns(self):
         self.assertEqual(get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])
