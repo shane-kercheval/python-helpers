@@ -297,7 +297,7 @@ def assert_dataframes_match(dataframes: List[pd.DataFrame],
                             ignore_column_names: bool = True,
                             message: str = 'Dataframes do not match') -> None:
     """
-    Raises an assertion error
+    Raises an assertion error if dataframes don't match.
 
     Args:
         dataframes:
@@ -321,6 +321,38 @@ def assert_dataframes_match(dataframes: List[pd.DataFrame],
                             ignore_indexes=ignore_indexes,
                             ignore_column_names=ignore_column_names):
         raise HelpskAssertionError(message)
+
+
+def is_close(value_a: float, value_b: float, tolerance: float = 0.000001) -> bool:
+    """Tests whether or not value_a and value_b are "close" (i.e. within the `tolerance` after subtracting)
+
+    Args:
+        value_a:
+            numeric value to test
+        value_b:
+            numeric value to test
+        tolerance:
+            the maximum difference (absolute value) allowed between value_a and value_b
+    Returns:
+          True if values are within specified tolerance
+    """
+    return abs(value_a - value_b) <= tolerance
+
+
+def assert_is_close(value_a: float, value_b: float, tolerance: float = 0.000001):
+    """Raises an assert error if value_a and value_b are not "close" (see documentation of `is_close()`
+    function).
+
+    Args:
+          value_a:
+              numeric value to test
+          value_b:
+              numeric value to test
+          tolerance:
+              number of digits to round to
+    """
+    if not is_close(value_a=value_a, value_b=value_b, tolerance=tolerance):
+        raise HelpskAssertionError(f"`{value_a}` and `{value_b}` are not within a tolerance of `{tolerance}`")
 
 
 def raises_exception(function: Callable, exception_type: Type = None) -> bool:

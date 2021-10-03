@@ -591,7 +591,6 @@ class TestValidation(unittest.TestCase):
         dataframe_1 = pd.DataFrame({'col': [1.123456789, 2.123456789, 3.123456789]})
 
         # test assertion errors when passing in invalid data
-
         with self.assertRaises(HelpskParamTypeError):
             hv.assert_dataframes_match(dataframes=None)  # noqa
 
@@ -611,6 +610,41 @@ class TestValidation(unittest.TestCase):
 
         with self.assertRaises(HelpskAssertionError):
             hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_2])
+
+    def test_is_close(self):
+        with self.assertRaises(Exception):
+            hv.assert_is_close(np.nan, 1)
+        with self.assertRaises(Exception):
+            hv.assert_is_close(1, np.nan)
+        with self.assertRaises(Exception):
+            hv.assert_is_close(np.nan, np.nan)
+        with self.assertRaises(Exception):
+            hv.assert_is_close(None, 1)  # noqa
+        with self.assertRaises(Exception):
+            hv.assert_is_close(1, None)  # noqa
+        with self.assertRaises(Exception):
+            hv.assert_is_close(None, None)  # noqa
+
+        def sub_test(value, tolerance, failure_tolerance):
+            hv.assert_is_close(value, value)
+            hv.assert_is_close(value, value + tolerance)
+            hv.assert_is_close(value + tolerance, value)
+            hv.assert_is_close(-value, -value - tolerance)
+            hv.assert_is_close(-value - tolerance, -value)
+
+            with self.assertRaises(HelpskAssertionError):
+                hv.assert_is_close(value, value + failure_tolerance)
+            with self.assertRaises(HelpskAssertionError):
+                hv.assert_is_close(value + failure_tolerance, value)
+            with self.assertRaises(HelpskAssertionError):
+                hv.assert_is_close(-value, -value - failure_tolerance)
+            with self.assertRaises(HelpskAssertionError):
+                hv.assert_is_close(-value + -failure_tolerance, -value)
+
+        sub_test(value=0, tolerance=0.000001, failure_tolerance=0.0000011)
+        sub_test(value=1, tolerance=0.000001, failure_tolerance=0.0000011)
+        sub_test(value=100, tolerance=0.000001, failure_tolerance=0.0000011)
+        sub_test(value=-100, tolerance=0.000001, failure_tolerance=0.0000011)
 
     def test_raises_exception(self):
 
