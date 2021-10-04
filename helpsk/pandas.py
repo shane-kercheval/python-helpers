@@ -12,6 +12,7 @@ from pandas.io.formats.style import Styler
 from helpsk.exceptions import HelpskParamValueError
 import helpsk.pandas_style as pstyle
 from helpsk import color
+from helpsk.validation import assert_not_any_missing, assert_is_close, assert_true
 
 
 def is_series_numeric(series: pd.Series) -> bool:
@@ -627,3 +628,151 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
         else:
             results.sort_index(inplace=True)
     return results
+
+
+def count_groups(dataframe: pd.DataFrame,
+                 group_1: str,
+                 group_2: Optional[str],
+                 group_sum: Optional[str],
+                 percents_round_by: int = 1,
+                 sum_round_by: int = 1,
+                 remove_first_level_duplicates: bool = True,
+                 return_style: bool = False) -> Union[pd.DataFrame, Styler]:
+    data = dataframe[[group_1]].copy()
+    data.loc[:, group_1] = fill_na(data[group_1])
+
+    if group_2:
+        data[group_2] = dataframe[group_2].copy()
+        data.loc[:, group_2] = fill_na(data[group_2])
+
+    assert_not_any_missing(data)
+
+    if group_sum:
+        data[group_sum] = dataframe[group_sum].copy()
+
+    def count_function(x, label):
+        results = dict()
+        results[f'{label} Count'] = x.shape[0]
+        if group_sum:
+            results[f'{label} Sum'] = x[group_sum].sum()
+
+        return pd.Series(results).fillna(0)
+
+    group_1_totals = data.groupby(group_1).apply(count_function, 'Group 1')
+    group_1_totals = group_1_totals.reset_index(level=0, drop=False)
+
+    assert_not_any_missing(group_1_totals)
+    assert_true(group_1_totals['Group 1 Count'].sum() == data.shape[0])
+
+    if group_sum:
+        assert_is_close(group_1_totals['Group 1 Sum'].sum(), data[group_sum].sum())
+
+    group_1_totals['Group 1 Count Perc'] = group_1_totals['Group 1 Count'] / data.shape[0]
+    assert_is_close(group_1_totals['Group 1 Count Perc'].sum(), 1)
+
+    column_order = [group_1, 'Group 1 Count', 'Group 1 Count Perc']
+
+    if group_sum:
+        group_1_totals['Group 1 Sum Perc'] = group_1_totals['Group 1 Sum'] / data[group_sum].sum()
+        assert_is_close(group_1_totals['Group 1 Sum Perc'].sum(), 1)
+        column_order = column_order + ['Group 1 Sum', 'Group 1 Sum Perc']
+
+    group_1_totals = group_1_totals[column_order]
+    assert_not_any_missing(group_1_totals)
+
+    if group_2:
+        group_2_totals = data.groupby([group_1, group_2]).apply(count_function, 'Group 2')
+        group_2_totals = group_2_totals.reset_index(level=1, drop=False)
+        group_2_totals = group_2_totals.reset_index(level=0, drop=False)
+        assert_not_any_missing(group_2_totals[[group_1, group_2]])
+        group_2_totals['Group 2 Count'] = group_2_totals['Group 2 Count'].fillna(0)
+        assert_true(group_2_totals['Group 2 Count'].sum() == data.shape[0])
+
+        column_order = column_order + [group_2, 'Group 2 Count', 'Group 2 Count Perc']
+
+        if group_sum:
+            group_2_totals['Group 2 Sum'] = group_2_totals['Group 2 Sum'].fillna(0)
+            assert_is_close(group_2_totals['Group 2 Sum'].sum(), data[group_sum].sum())
+            column_order = column_order + ['Group 2 Sum', 'Group 2 Sum Perc']
+
+        assert_not_any_missing(group_2_totals)
+
+        final = group_1_totals.merge(group_2_totals, on=group_1, how='left')
+        final['Group 2 Count Perc'] = final['Group 2 Count'] / final['Group 1 Count']
+        if group_sum:
+            final['Group 2 Sum Perc'] = final['Group 2 Sum'] / final['Group 1 Sum']
+
+    else:
+        final = group_1_totals
+
+    assert_not_any_missing(final)
+
+    final = final[column_order]
+
+    if return_style:
+        final[group_1] = final[group_1].astype(str)
+        if group_2:
+            final[group_2] = final[group_2].astype(str)
+
+    new_columns = pd.MultiIndex.from_tuples([
+        (group_1, group_1),
+        (group_1, 'Count'),
+        (group_1, 'Count Perc'),
+        (group_1, 'Sum'),
+        (group_1, 'Sum Perc'),
+        (group_2, group_2),
+        (group_2, 'Count'),
+        (group_2, 'Count Perc'),
+        (group_2, 'Sum'),
+        (group_2, 'Sum Perc'),
+    ])
+    final.columns = new_columns
+
+    # we are finished, unless we are returning a styler object, or unless we are removing duplicates of level
+    # 1 (which we would only do if remove_first_level_duplicates is True or if there isn't is a group_2
+    # (in which case there are no duplicates))
+    if not return_style and (not remove_first_level_duplicates or not group_2):
+        return final
+
+    # else we are removing or hiding the first level duplicates
+    group_1_shifted = final[group_1].shift(1)
+    is_first_occurrence = final[group_1] != group_1_shifted
+    final[group_1] = final[group_1].where(is_first_occurrence, np.nan)
+
+    if not return_style:
+        return final
+
+    final = pstyle.html_escape_dataframe(final)
+    final = final.style
+    idx = pd.IndexSlice
+
+    final = final. \
+        format(subset=idx[:, idx[(group_1, group_1)]], na_rep=''). \
+        format(subset=idx[:, idx[(group_1, 'Count')]], precision=0, na_rep=''). \
+        format(subset=idx[:, idx[(group_1, 'Count Perc')]], precision=4, na_rep='', formatter='{:,.2%}'.format). \
+        bar(subset=idx[:, idx[(group_1, 'Count Perc')]], vmin=0, vmax=1, color=color.GRAY)
+
+    if group_sum:
+        final = final. \
+            format(subset=idx[:, idx[(group_1, 'Sum')]], precision=sum_round_by, na_rep=''). \
+            format(subset=idx[:, idx[(group_1, 'Sum Perc')]], precision=4, na_rep='',
+                   formatter='{:,.2%}'.format). \
+            bar(subset=idx[:, idx[(group_1, 'Sum Perc')]], vmin=0, vmax=1, color=color.GRAY)
+
+    if group_2:
+        final = final. \
+            format(subset=idx[:, idx[(group_2, 'Count')]], precision=0). \
+            format(subset=idx[:, idx[(group_2, 'Count Perc')]], precision=4, na_rep='', formatter='{:,.2%}'.format). \
+            bar(subset=idx[:, idx[(group_2, 'Count Perc')]], vmin=0, vmax=1, color=color.GRAY)
+
+        if group_sum:
+            final = final. \
+                format(subset=idx[:, idx[(group_2, 'Sum')]], precision=sum_round_by). \
+                format(subset=idx[:, idx[(group_2, 'Sum Perc')]], precision=4, formatter='{:,.2%}'.format). \
+                bar(subset=idx[:, idx[(group_2, 'Sum Perc')]], vmin=0, vmax=1, color=color.GRAY)
+
+    final = final.hide_index()
+
+    return final
+
+
