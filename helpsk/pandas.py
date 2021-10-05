@@ -33,7 +33,7 @@ def is_series_numeric(series: pd.Series) -> bool:
 
 def is_series_bool(series: pd.Series) -> bool:
     """Tests whether or not a pd.Series is bool.
-    
+
     `is_bool_dtype(np.array([True, False, np.nan]))` evaluates to False, so we must check if any of the values
     in the series are bool
 
@@ -50,14 +50,14 @@ def is_series_bool(series: pd.Series) -> bool:
     if is_bool_dtype(series):
         return True
 
-    def is_nan(value):
+    def is_nan(value):  # pylint: disable=inconsistent-return-statements
         try:
             if np.isnan(value):
                 return True
         except TypeError:
             return False
 
-    are_booleans = [isinstance(x, bool) or isinstance(x, np.bool_) for x in series.values if x is not None and not is_nan(x)]
+    are_booleans = [isinstance(x, (bool, np.bool_)) for x in series.values if x is not None and not is_nan(x)]
 
     if len(are_booleans) == 0:
         return False
@@ -153,8 +153,19 @@ def fill_na(series: pd.Series,
     return series.fillna(missing_value_replacement)
 
 
+# pylint: disable=dangerous-default-value
 def replace_all_bools_with_strings(series: pd.Series,
                                    replacements={True: 'True', False: 'False'}) -> pd.Series:  # noqa
+    """Replaces boolean values (True/False) with string values ('True'/'False').
+
+    Args:
+        series:
+            series to replace
+        replacements:
+
+    Returns:
+        Returns a copy of the pd.Series.
+    """
     series = series.copy()
 
     if is_series_categorical(series):
@@ -630,14 +641,36 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
     return results
 
 
+# pylint: disable=too-many-locals, too-many-branches, too-many-statements
 def count_groups(dataframe: pd.DataFrame,
                  group_1: str,
                  group_2: Optional[str],
                  group_sum: Optional[str],
-                 percents_round_by: int = 1,
                  sum_round_by: int = 1,
                  remove_first_level_duplicates: bool = True,
                  return_style: bool = False) -> Union[pd.DataFrame, Styler]:
+    """Show counts of up to 2 groups; optionally aggregate a numeric column based on groups.
+
+    Args:
+        dataframe:
+            dataframe containing a column named the same as the value in `group_1`; optionally `group_2`,
+            and `sum_by`
+        group_1:
+            name of the first column to group
+        group_2:
+            name of the second column to group
+        group_sum:
+            name of the numeric column to sum
+        sum_round_by:
+            number of digits to round the sum columns
+        remove_first_level_duplicates:
+            if True, and if group_2 is provided (which will cause duplicate values for group 1's results) then
+            replace the duplicate values with np.nan
+        return_style:
+            if True, then return Styler, else return pd.DataFrame
+    Returns:
+        either a pd.DataFrame or Styler
+    """
     data = dataframe[[group_1]].copy()
     data.loc[:, group_1] = fill_na(data[group_1])
 
@@ -650,11 +683,11 @@ def count_groups(dataframe: pd.DataFrame,
     if group_sum:
         data[group_sum] = dataframe[group_sum].copy()
 
-    def count_function(x, label):
+    def count_function(group, label):
         results = dict()
-        results[f'{label} Count'] = x.shape[0]
+        results[f'{label} Count'] = group.shape[0]
         if group_sum:
-            results[f'{label} Sum'] = x[group_sum].sum()
+            results[f'{label} Sum'] = group[group_sum].sum()
 
         return pd.Series(results).fillna(0)
 
@@ -701,7 +734,7 @@ def count_groups(dataframe: pd.DataFrame,
         final_columns = final_columns + [
             (group_2, group_2),
             (group_2, 'Count'),
-            (group_2, 'Count Perc'),   
+            (group_2, 'Count Perc'),
         ]
 
         if group_sum:
@@ -757,7 +790,8 @@ def count_groups(dataframe: pd.DataFrame,
     final = final. \
         format(subset=idx[:, idx[(group_1, group_1)]], na_rep=''). \
         format(subset=idx[:, idx[(group_1, 'Count')]], precision=0, na_rep=''). \
-        format(subset=idx[:, idx[(group_1, 'Count Perc')]], precision=4, na_rep='', formatter='{:,.2%}'.format). \
+        format(subset=idx[:, idx[(group_1, 'Count Perc')]], precision=4, na_rep='',
+               formatter='{:,.2%}'.format). \
         bar(subset=idx[:, idx[(group_1, 'Count Perc')]], vmin=0, vmax=1, color=color.GRAY)
 
     if group_sum:
@@ -770,7 +804,8 @@ def count_groups(dataframe: pd.DataFrame,
     if group_2:
         final = final. \
             format(subset=idx[:, idx[(group_2, 'Count')]], precision=0). \
-            format(subset=idx[:, idx[(group_2, 'Count Perc')]], precision=4, na_rep='', formatter='{:,.2%}'.format). \
+            format(subset=idx[:, idx[(group_2, 'Count Perc')]], precision=4, na_rep='',
+                   formatter='{:,.2%}'.format). \
             bar(subset=idx[:, idx[(group_2, 'Count Perc')]], vmin=0, vmax=1, color=color.GRAY)
 
         if group_sum:
@@ -782,5 +817,3 @@ def count_groups(dataframe: pd.DataFrame,
     final = final.hide_index()
 
     return final
-
-

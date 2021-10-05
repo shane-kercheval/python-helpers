@@ -1,9 +1,6 @@
 import unittest
 from enum import unique, auto
 
-import numpy as np
-import pandas as pd
-
 from helpsk.pandas import *
 from helpsk.pandas_style import html_escape_dataframe
 from helpsk.utility import suppress_warnings

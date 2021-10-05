@@ -264,13 +264,13 @@ def html_escape_dataframe(dataframe: pd.DataFrame):
         dataframe[column] = dataframe[column].apply(__escape)
 
     if isinstance(dataframe.index, pd.MultiIndex):
-        index_tuples = [tuple([__escape(x) for x in index]) for index in dataframe.index]
+        index_tuples = [tuple([__escape(x) for x in index]) for index in dataframe.index]  # pylint: disable=consider-using-generator
         dataframe.index = pd.MultiIndex.from_tuples(index_tuples)
     else:
         dataframe.index = [__escape(x) for x in dataframe.index.values]
 
     if isinstance(dataframe.columns, pd.MultiIndex):
-        index_tuples = [tuple([__escape(x) for x in columns]) for columns in dataframe.columns]
+        index_tuples = [tuple([__escape(x) for x in columns]) for columns in dataframe.columns]  # pylint: disable=consider-using-generator
         dataframe.columns = pd.MultiIndex.from_tuples(index_tuples)
     else:
         dataframe.columns = [__escape(x) for x in dataframe.columns.values]

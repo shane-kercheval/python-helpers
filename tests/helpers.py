@@ -71,7 +71,7 @@ def subtests_expected_vs_actual(test_case: TestCase,
 
 
 def check_plot(file_name: str, plot_function: Callable, set_size_w_h: Union[tuple, None] = (10, 6)):
-    reload(plt)  # necessary because mtplotlib throws strange errors about alpha values
+    reload(plt)  # necessary because matplotlib throws strange errors about alpha values
 
     def clear():
         plt.gcf().clear()

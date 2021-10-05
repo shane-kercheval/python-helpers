@@ -1,15 +1,14 @@
 import unittest
-import warnings
 
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
-from tests.helpers import check_plot, get_test_path
 from helpsk.utility import suppress_warnings
+from tests.helpers import check_plot, get_test_path
 
 
-def plot_colors(colors, title, sort_colors=True, empty_cols=0):
+def plot_colors(colors, title, sort_colors=True):
     """
     Code from:
         https://matplotlib.org/stable/gallery/color/named_colors.html
@@ -80,4 +79,4 @@ class TestColors(unittest.TestCase):
 
         check_plot(file_name=get_test_path() + '/test_files/color/colors.png',
                    plot_function=lambda: plot_colors(dict(zip(color_names, color_values)),
-                                                     title="Colors Enum", sort_colors=False, empty_cols=1))
+                                                     title="Colors Enum", sort_colors=False))

@@ -673,10 +673,10 @@ class TestPandas(unittest.TestCase):
 
         # change dataset so that there is an entire category missing (e.g. no target == True and checking
         # status `<Missing>`
-        indexes_to_blank = (data['target'] == True) & (data['checking_status'] == '0<=X<200')
+        indexes_to_blank = (data['target'] == True) & (data['checking_status'] == '0<=X<200')  # noqa
         data.loc[indexes_to_blank, 'checking_status'] = np.nan
         # change dataset so there is an entire category with no sum_by
-        indexes_to_blank = (data['target'] == False) & (data['checking_status'] == 'no checking')
+        indexes_to_blank = (data['target'] == False) & (data['checking_status'] == 'no checking')  # noqa
         data.loc[indexes_to_blank, 'credit_amount'] = np.nan
 
         def test_count_groups(group_1, group_2=None, group_sum=None, remove_first_level_duplicates=False):
@@ -717,7 +717,8 @@ class TestPandas(unittest.TestCase):
 
         group_2_count_sum = results_3.groupby(results_3[('target', 'target')]). \
             agg({('checking_status', 'Count'): sum})
-        self.assertTrue((results_1[('target', 'Count')].values ==
+
+        self.assertTrue((results_1[('target', 'Count')].values ==   # noqa
                          group_2_count_sum[('checking_status', 'Count')].values).all())
         self.assertEqual(len(group_2_count_sum), 3)
 
@@ -794,7 +795,7 @@ class TestPandas(unittest.TestCase):
         assert_dataframes_match([target_counts.astype(object), results_1.astype(object)])
         assert_is_close(results[('target', 'Sum')].sum(), data['credit_amount'].sum())
         assert_is_close(results[('target', 'Sum Perc')].sum(), 1)
-        self.assertTrue((results.loc[results[('target', 'target')] == True, ('target', 'Sum Perc')] == 0).all())
+        self.assertTrue((results.loc[results[('target', 'target')] == True, ('target', 'Sum Perc')] == 0).all())  # noqa
 
         results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=True)
         with open(get_test_path() + '/test_files/pandas/count_groups_group_1_na_sum.html', 'w') as file:

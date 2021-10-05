@@ -242,7 +242,7 @@ def plot_histogram_with_categorical(dataframe: pd.DataFrame,
                                     numeric_column: str,
                                     categorical_column: str,
                                     missing_value_replacement: str = '<Missing>') -> None:
-    """TBD
+    """Plots a categorical histogram within numeric histogram.
 
     Args:
         dataframe:
@@ -251,13 +251,16 @@ def plot_histogram_with_categorical(dataframe: pd.DataFrame,
             TBD
         categorical_column:
             TBD
+        missing_value_replacement:
+            the value
     """
     cut_dataframe = pd.DataFrame(pd.cut(dataframe[numeric_column],
                                         bins=10,
                                         right=True,
                                         include_lowest=True))
 
-    cut_dataframe[numeric_column] = hpandas.fill_na(cut_dataframe[numeric_column], missing_value_replacement=missing_value_replacement)
+    cut_dataframe[numeric_column] = hpandas.fill_na(cut_dataframe[numeric_column],
+                                                    missing_value_replacement=missing_value_replacement)
     categories = [str(x) for x in cut_dataframe[numeric_column].cat.categories]
     cut_dataframe[numeric_column] = [str(x) for x in cut_dataframe[numeric_column]]
     cut_dataframe[numeric_column] = cut_dataframe[numeric_column].astype('category')

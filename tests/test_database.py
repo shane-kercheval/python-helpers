@@ -85,7 +85,7 @@ class TestDatabase(unittest.TestCase):
                           'account': 'account.id',
                           'authenticator': 'externalbrowser',
                           'warehouse': 'WAREHOUSE_NAME',
-                          'database': 'DATEBASE_NAME'}
+                          'database': 'DATABASE_NAME'}
         self.assertEqual(expected_value, config_dict)
 
         # test that this can be passed into the snowflake database object, which implies that config_dict
