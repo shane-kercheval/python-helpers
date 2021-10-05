@@ -679,6 +679,27 @@ class TestPandas(unittest.TestCase):
         indexes_to_blank = (data['target'] == False) & (data['checking_status'] == 'no checking')  # noqa
         data.loc[indexes_to_blank, 'credit_amount'] = np.nan
 
+        original = self.credit_data.copy()
+        result = count_groups(dataframe=original,
+                              group_1='target',
+                              group_2='housing',
+                              group_sum='credit_amount',
+                              return_style=False)
+        assert_dataframes_match([original, self.credit_data])
+        file_name = get_test_path() + '/test_files/pandas/count_groups__credit.txt'
+        with redirect_stdout_to_file(file_name):
+            print_dataframe(result)
+
+        self.assertEqual(result[('target', 'target')].dropna().tolist(), ['good', 'bad'])
+        self.assertEqual(result[('target', 'Count')].sum(), 1000)
+        self.assertEqual(result[('target', 'Count Perc')].sum(), 1)
+        self.assertEqual(result[('target', 'Sum')].sum(), self.credit_data['credit_amount'].sum())
+        self.assertEqual(result[('target', 'Sum Perc')].sum(), 1)
+        self.assertEqual(result[('housing', 'Count')].sum(), 1000)
+        self.assertEqual(result[('housing', 'Count Perc')].sum(), 2)
+        self.assertEqual(result[('housing', 'Sum')].sum(), self.credit_data['credit_amount'].sum())
+        assert_is_close(result[('housing', 'Sum Perc')].sum(), 2)
+
         def test_count_groups(group_1, group_2=None, group_sum=None, remove_first_level_duplicates=False):
             counts = count_groups(dataframe=data,
                                   group_1=group_1,

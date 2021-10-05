@@ -644,8 +644,8 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
 # pylint: disable=too-many-locals, too-many-branches, too-many-statements
 def count_groups(dataframe: pd.DataFrame,
                  group_1: str,
-                 group_2: Optional[str],
-                 group_sum: Optional[str],
+                 group_2: Optional[str] = None,
+                 group_sum: Optional[str] = None,
                  sum_round_by: int = 1,
                  remove_first_level_duplicates: bool = True,
                  return_style: bool = False) -> Union[pd.DataFrame, Styler]:
@@ -671,16 +671,21 @@ def count_groups(dataframe: pd.DataFrame,
     Returns:
         either a pd.DataFrame or Styler
     """
+    assert group_1 in dataframe.columns
     data = dataframe[[group_1]].copy()
-    data.loc[:, group_1] = fill_na(data[group_1])
+    if data[group_1].isna().any():
+        data.loc[:, group_1] = fill_na(data[group_1])
 
     if group_2:
+        assert group_2 in dataframe.columns
         data[group_2] = dataframe[group_2].copy()
-        data.loc[:, group_2] = fill_na(data[group_2])
+        if data[group_2].isna().any():
+            data.loc[:, group_2] = fill_na(data[group_2])
 
     assert_not_any_missing(data)
 
     if group_sum:
+        assert group_sum in dataframe.columns
         data[group_sum] = dataframe[group_sum].copy()
 
     def count_function(group, label):

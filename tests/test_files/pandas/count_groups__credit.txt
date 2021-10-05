@@ -1,0 +1,8 @@
+  target                                          housing                                       
+  target  Count Count Perc        Sum  Sum Perc   housing  Count Count Perc        Sum  Sum Perc
+0   good  700.0        0.7  2089820.0  0.638843      rent  109.0   0.155714   308150.0  0.147453
+1    NaN    NaN        NaN        NaN       NaN       own  527.0   0.752857  1495403.0  0.715565
+2    NaN    NaN        NaN        NaN       NaN  for free   64.0   0.091429   286267.0  0.136982
+3    bad  300.0        0.3  1181438.0  0.361157      rent   70.0   0.233333   250787.0  0.212273
+4    NaN    NaN        NaN        NaN       NaN       own  186.0   0.620000   687047.0  0.581535
+5    NaN    NaN        NaN        NaN       NaN  for free   44.0   0.146667   243604.0  0.206193
