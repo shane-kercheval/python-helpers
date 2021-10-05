@@ -691,8 +691,7 @@ class TestPandas(unittest.TestCase):
                                           f'{group_sum}_{remove_first_level_duplicates}.txt'
             with redirect_stdout_to_file(file_name):
                 print_dataframe(counts)
-
-            return results
+            return counts
 
         results_1 = test_count_groups(group_1='target', remove_first_level_duplicates=False)
         self.assertEqual(results_1[('target', 'Count')].sum(),  data.shape[0])
