@@ -1,0 +1,5 @@
+      target                                       
+      target  Count Count Perc        Sum  Sum Perc
+0      False  296.0      0.296   960060.0  0.315149
+1       True  693.0      0.693  2035914.0  0.668309
+2  <Missing>   11.0      0.011    50394.0  0.016542

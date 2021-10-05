@@ -1,0 +1,7 @@
+  checking_status                 
+  checking_status Count Count Perc
+0              <0   269      0.269
+1        0<=X<200   103      0.103
+2           >=200    63      0.063
+3     no checking   391      0.391
+4       <Missing>   174      0.174

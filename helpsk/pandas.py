@@ -671,11 +671,20 @@ def count_groups(dataframe: pd.DataFrame,
     assert_is_close(group_1_totals['Group 1 Count Perc'].sum(), 1)
 
     column_order = [group_1, 'Group 1 Count', 'Group 1 Count Perc']
+    final_columns = [
+        (group_1, group_1),
+        (group_1, 'Count'),
+        (group_1, 'Count Perc'),
+    ]
 
     if group_sum:
         group_1_totals['Group 1 Sum Perc'] = group_1_totals['Group 1 Sum'] / data[group_sum].sum()
         assert_is_close(group_1_totals['Group 1 Sum Perc'].sum(), 1)
         column_order = column_order + ['Group 1 Sum', 'Group 1 Sum Perc']
+        final_columns = final_columns + [
+            (group_1, 'Sum'),
+            (group_1, 'Sum Perc'),
+        ]
 
     group_1_totals = group_1_totals[column_order]
     assert_not_any_missing(group_1_totals)
@@ -689,11 +698,20 @@ def count_groups(dataframe: pd.DataFrame,
         assert_true(group_2_totals['Group 2 Count'].sum() == data.shape[0])
 
         column_order = column_order + [group_2, 'Group 2 Count', 'Group 2 Count Perc']
+        final_columns = final_columns + [
+            (group_2, group_2),
+            (group_2, 'Count'),
+            (group_2, 'Count Perc'),   
+        ]
 
         if group_sum:
             group_2_totals['Group 2 Sum'] = group_2_totals['Group 2 Sum'].fillna(0)
             assert_is_close(group_2_totals['Group 2 Sum'].sum(), data[group_sum].sum())
             column_order = column_order + ['Group 2 Sum', 'Group 2 Sum Perc']
+            final_columns = final_columns + [
+                (group_2, 'Sum'),
+                (group_2, 'Sum Perc'),
+            ]
 
         assert_not_any_missing(group_2_totals)
 
@@ -714,19 +732,7 @@ def count_groups(dataframe: pd.DataFrame,
         if group_2:
             final[group_2] = final[group_2].astype(str)
 
-    new_columns = pd.MultiIndex.from_tuples([
-        (group_1, group_1),
-        (group_1, 'Count'),
-        (group_1, 'Count Perc'),
-        (group_1, 'Sum'),
-        (group_1, 'Sum Perc'),
-        (group_2, group_2),
-        (group_2, 'Count'),
-        (group_2, 'Count Perc'),
-        (group_2, 'Sum'),
-        (group_2, 'Sum Perc'),
-    ])
-    final.columns = new_columns
+    final.columns = pd.MultiIndex.from_tuples(final_columns)
 
     # we are finished, unless we are returning a styler object, or unless we are removing duplicates of level
     # 1 (which we would only do if remove_first_level_duplicates is True or if there isn't is a group_2

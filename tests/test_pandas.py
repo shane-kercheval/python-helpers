@@ -662,3 +662,56 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(hv.iterables_are_equal(results.index.values.tolist(), expected_indexes))  # noqa
         self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, cached_results.loc[results.index.values, 'Frequency'].values))
         self.assertTrue(hv.iterables_are_equal(results['Percent'].values, cached_results.loc[results.index.values, 'Percent'].values))
+
+    def test_count_groups(self):
+        data = self.credit_data.copy()
+        data.loc[:, 'target'] = data['target'] == 'good'
+        data.loc[0:10, 'target'] = np.nan
+        data.loc[:, 'target'] = data['target'].astype('boolean')
+        data.loc[9:20, 'checking_status'] = np.nan
+        data.loc[19:30, 'credit_amount'] = np.nan
+
+        # change dataset so that there is an entire category missing (e.g. no target == True and checking
+        # status `<Missing>`
+        indexes_to_blank = (data['target'] == True) & (data['checking_status'] == '0<=X<200')
+        data.loc[indexes_to_blank, 'checking_status'] = np.nan
+        # change dataset so there is an entire category with no sum_by
+        indexes_to_blank = (data['target'] == False) & (data['checking_status'] == 'no checking')
+        data.loc[indexes_to_blank, 'credit_amount'] = np.nan
+
+        def test_count_groups(group_1, group_2=None, group_sum=None, remove_first_level_duplicates=False):
+            results = count_groups(dataframe=data,
+                                   group_1=group_1,
+                                   group_2=group_2,
+                                   group_sum=group_sum,
+                                   remove_first_level_duplicates=remove_first_level_duplicates,
+                                   return_style=False)
+
+            file_name = get_test_path() + f'/test_files/pandas/count_groups_{group_1}_{group_2}_' \
+                                          f'{group_sum}_{remove_first_level_duplicates}.txt'
+            with redirect_stdout_to_file(file_name):
+                print_dataframe(results)
+
+            return results
+
+        results = test_count_groups(group_1='target', remove_first_level_duplicates=False)
+        results = test_count_groups(group_1='target', remove_first_level_duplicates=True)
+        results = test_count_groups(group_1='checking_status', remove_first_level_duplicates=False)
+        results = test_count_groups(group_1='checking_status', remove_first_level_duplicates=True)
+        results = test_count_groups(group_1='target', group_2='checking_status', remove_first_level_duplicates=False)
+        results = test_count_groups(group_1='target', group_2='checking_status', remove_first_level_duplicates=True)
+
+        results = test_count_groups(group_1='target', group_sum='credit_amount', remove_first_level_duplicates=False)
+        results = test_count_groups(group_1='target', group_sum='credit_amount', remove_first_level_duplicates=True)
+        results = test_count_groups(group_1='checking_status', group_sum='credit_amount', remove_first_level_duplicates=False)
+        results = test_count_groups(group_1='checking_status', group_sum='credit_amount', remove_first_level_duplicates=True)
+        results = test_count_groups(group_1='target', group_2='checking_status', group_sum='credit_amount', remove_first_level_duplicates=False)
+        results = test_count_groups(group_1='target', group_2='checking_status', group_sum='credit_amount', remove_first_level_duplicates=True)
+
+        results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=True)
+        with open(get_test_path() + '/test_files/pandas/count_groups.html', 'w') as file:
+            file.write(results.render())
+
+        # test all of group 1 missing group_sum
+
+
