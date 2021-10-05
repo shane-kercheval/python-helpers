@@ -719,6 +719,8 @@ def count_groups(dataframe: pd.DataFrame,
         final['Group 2 Count Perc'] = final['Group 2 Count'] / final['Group 1 Count']
         if group_sum:
             final['Group 2 Sum Perc'] = final['Group 2 Sum'] / final['Group 1 Sum']
+            # in case divide by 0 i.e. entire group is missing
+            final['Group 2 Sum Perc'] = final['Group 2 Sum Perc'].fillna(0)
 
     else:
         final = group_1_totals

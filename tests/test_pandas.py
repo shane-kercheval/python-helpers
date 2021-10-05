@@ -786,5 +786,16 @@ class TestPandas(unittest.TestCase):
             file.write(results.render())
 
         # test all of group 1 missing group_sum
+        data.loc[data['target'] == True, 'credit_amount'] = np.nan  # noqa
+        results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=False)
+        target_counts = results[[('target', 'target'),
+                                 ('target', 'Count'),
+                                 ('target', 'Count Perc')]].dropna()
+        assert_dataframes_match([target_counts.astype(object), results_1.astype(object)])
+        assert_is_close(results[('target', 'Sum')].sum(), data['credit_amount'].sum())
+        assert_is_close(results[('target', 'Sum Perc')].sum(), 1)
+        self.assertTrue((results.loc[results[('target', 'target')] == True, ('target', 'Sum Perc')] == 0).all())
 
-
+        results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=True)
+        with open(get_test_path() + '/test_files/pandas/count_groups_group_1_na_sum.html', 'w') as file:
+            file.write(results.render())
