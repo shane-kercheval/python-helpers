@@ -719,15 +719,12 @@ class TestPandas(unittest.TestCase):
             agg({('checking_status', 'Count'): sum})
         self.assertTrue((results_1[('target', 'Count')].values ==
                          group_2_count_sum[('checking_status', 'Count')].values).all())
-
         self.assertEqual(len(group_2_count_sum), 3)
-        self.assertTrue((group_2_count_sum[('checking_status', 'Count Perc')] == 1).all())
 
         group_2_count_perc_sum = results_3.groupby(results_3[('target', 'target')]).\
             agg({('checking_status', 'Count Perc'): sum})
         self.assertEqual(len(group_2_count_perc_sum), 3)
         self.assertTrue((group_2_count_perc_sum[('checking_status', 'Count Perc')] == 1).all())
-        assert_is_close(results_3[('checking_status', 'Count Perc')].sum(), 1)
 
         results = test_count_groups(group_1='target', group_2='checking_status', remove_first_level_duplicates=True)
         assert_dataframes_match([results_3[[('target', 'target'),
@@ -775,17 +772,16 @@ class TestPandas(unittest.TestCase):
                                      ('checking_status', 'Count'),
                                      ('checking_status', 'Count Perc')
                                  ]].astype(object)])
-
-        results = test_count_groups(group_1='target', group_2='checking_status', group_sum='credit_amount', remove_first_level_duplicates=True)
-        self.assertEqual(results[('checking_status', 'Sum')].sum(), data['credit_amount'].sum())
-        self.assertEqual(results[('checking_status', 'Sum Perc')].sum(), 3)
         group_2_sum_perc_sum = results.groupby(results[('target', 'target')]). \
             agg({('checking_status', 'Sum Perc'): sum})
         self.assertEqual(len(group_2_sum_perc_sum), 3)
         self.assertTrue((group_2_sum_perc_sum[('checking_status', 'Sum Perc')].values == 1).all())
 
-        results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=True)
+        results = test_count_groups(group_1='target', group_2='checking_status', group_sum='credit_amount', remove_first_level_duplicates=True)
+        self.assertEqual(results[('checking_status', 'Sum')].sum(), data['credit_amount'].sum())
+        self.assertEqual(results[('checking_status', 'Sum Perc')].sum(), 3)
 
+        results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=True)
         with open(get_test_path() + '/test_files/pandas/count_groups.html', 'w') as file:
             file.write(results.render())
 
