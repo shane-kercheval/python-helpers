@@ -153,19 +153,21 @@ def fill_na(series: pd.Series,
     return series.fillna(missing_value_replacement)
 
 
-# pylint: disable=dangerous-default-value
 def replace_all_bools_with_strings(series: pd.Series,
-                                   replacements={True: 'True', False: 'False'}) -> pd.Series:  # noqa
+                                   replacements: dict = None) -> pd.Series:
     """Replaces boolean values (True/False) with string values ('True'/'False').
 
     Args:
         series:
             series to replace
         replacements:
-
+            dictionary that contains keys `True` and `False` and corresponding replacement values
     Returns:
         Returns a copy of the pd.Series.
     """
+    if replacements is None:
+        replacements = {True: 'True', False: 'False'}
+
     series = series.copy()
 
     if is_series_categorical(series):
