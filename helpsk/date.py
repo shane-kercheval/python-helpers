@@ -49,7 +49,8 @@ def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
         date - the date rounded down to the nearest granularity
     """
     if isinstance(value, pd.Series):
-        return pd.Series([floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value])
+        return pd.Series([floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value],
+                         name=value.name)
 
     if any_none_nan(value):
         return value

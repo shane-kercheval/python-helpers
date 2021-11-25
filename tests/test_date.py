@@ -947,6 +947,7 @@ class TestDate(unittest.TestCase):
             '2021-10-01', '2021-10-01',
         ]))
 
+        # without series.name
         validation.assert_dataframes_match([
             pd.DataFrame(date_series.dt.date),
             pd.DataFrame(expected_day.dt.date),
@@ -961,4 +962,32 @@ class TestDate(unittest.TestCase):
         validation.assert_dataframes_match([
             pd.DataFrame(expected_quarter.dt.date),
             pd.DataFrame(date.floor(date_series, granularity=date.Granularity.QUARTER))
+        ])
+
+        # with series.name
+        date_series.name = 'date_day'
+        expected_day.name = 'date_day'
+        actual_values = date.floor(date_series, granularity=date.Granularity.DAY)
+        self.assertEqual(actual_values.name, 'date_day')
+        validation.assert_dataframes_match([
+            pd.DataFrame(expected_day.dt.date),
+            pd.DataFrame(actual_values)
+        ])
+
+        date_series.name = 'date_month'
+        expected_day.name = 'date_month'
+        actual_values = date.floor(date_series, granularity=date.Granularity.MONTH)
+        self.assertEqual(actual_values.name, 'date_month')
+        validation.assert_dataframes_match([
+            pd.DataFrame(expected_month.dt.date),
+            pd.DataFrame(actual_values)
+        ])
+
+        date_series.name = 'date_quarter'
+        expected_day.name = 'date_quarter'
+        actual_values = date.floor(date_series, granularity=date.Granularity.QUARTER)
+        self.assertEqual(actual_values.name, 'date_quarter')
+        validation.assert_dataframes_match([
+            pd.DataFrame(expected_quarter.dt.date),
+            pd.DataFrame(actual_values)
         ])
