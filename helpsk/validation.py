@@ -1,6 +1,6 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
-from collections import Sized
+from collections.abc import Sized
 from typing import List, Union, Callable, Type, Iterable
 
 import numpy as np
@@ -39,12 +39,12 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame, object
         if len(values) == 0:
             return True
 
-        return any([any_none_nan(x) for x in values])
+        return any((any_none_nan(x) for x in values))
 
     try:
         if not isinstance(values, str) and None in values:
             return True
-    except Exception:  # noqa
+    except Exception:  # pylint: disable=broad-except # noqa
         pass
 
     try:
