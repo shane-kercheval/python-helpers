@@ -1,9 +1,11 @@
 import datetime
 import unittest
 
+import numpy as np
+import pandas as pd
 from dateutil.parser import parse
 
-from helpsk import date
+from helpsk import date, validation
 from tests.helpers import subtests_expected_vs_actual
 
 
@@ -465,6 +467,20 @@ class TestDate(unittest.TestCase):
         subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
                                     **test_parameters)
 
+    def test_floor_missing_value(self):
+        self.assertTrue(date.floor(value=pd.NA, granularity=date.Granularity.DAY) is pd.NA)
+        self.assertTrue(date.floor(value=pd.NaT, granularity=date.Granularity.DAY) is pd.NaT)
+        self.assertTrue(date.floor(value=np.NaN, granularity=date.Granularity.DAY) is np.NaN)
+        self.assertTrue(date.floor(value=None, granularity=date.Granularity.DAY) is None)  # noqa
+        self.assertTrue(date.floor(value=pd.NA, granularity=date.Granularity.MONTH) is pd.NA)
+        self.assertTrue(date.floor(value=pd.NaT, granularity=date.Granularity.MONTH) is pd.NaT)
+        self.assertTrue(date.floor(value=np.NaN, granularity=date.Granularity.MONTH) is np.NaN)
+        self.assertTrue(date.floor(value=None, granularity=date.Granularity.MONTH) is None)  # noqa
+        self.assertTrue(date.floor(value=pd.NA, granularity=date.Granularity.QUARTER) is pd.NA)
+        self.assertTrue(date.floor(value=pd.NaT, granularity=date.Granularity.QUARTER) is pd.NaT)
+        self.assertTrue(date.floor(value=np.NaN, granularity=date.Granularity.QUARTER) is np.NaN)
+        self.assertTrue(date.floor(value=None, granularity=date.Granularity.QUARTER) is None)  # noqa
+
     def test_floor_day(self):
         # test datetime
         value = datetime.datetime(year=2021, month=2, day=13, hour=23, minute=45, second=55)
@@ -776,3 +792,173 @@ class TestDate(unittest.TestCase):
         self.assertEqual(date.floor(parse('2021-12-31'), granularity=date.Granularity.QUARTER,
                                     fiscal_start=6),
                          parse('2021-12-01').date())
+
+    def test_floor_series(self):
+        date_series = pd.Series(pd.to_datetime([
+            '2021-01-01 00:00:00', '2021-01-01 00:00:01',
+            np.NaN,
+            '2021-01-02 00:00:01', '2021-01-02 23:59:59',
+            '2021-02-01 00:00:00', '2021-02-01 00:00:01',
+            np.NaN,
+            '2021-02-02 00:00:01', '2021-02-02 23:59:59',
+            '2021-03-01 00:00:00', '2021-03-01 00:00:01',
+            np.NaN,
+            '2021-03-02 00:00:01', '2021-03-02 23:59:59',
+            '2021-04-01 00:00:00', '2021-04-01 00:00:01',
+            np.NaN,
+            '2021-04-02 00:00:01', '2021-04-02 23:59:59',
+            '2021-05-01 00:00:00', '2021-05-01 00:00:01',
+            np.NaN,
+            '2021-05-02 00:00:01', '2021-05-02 23:59:59',
+            '2021-06-01 00:00:00', '2021-06-01 00:00:01',
+            np.NaN,
+            '2021-06-02 00:00:01', '2021-06-02 23:59:59',
+            '2021-07-01 00:00:00', '2021-07-01 00:00:01',
+            np.NaN,
+            '2021-07-02 00:00:01', '2021-07-02 23:59:59',
+            '2021-08-01 00:00:00', '2021-08-01 00:00:01',
+            np.NaN,
+            '2021-08-02 00:00:01', '2021-08-02 23:59:59',
+            '2021-09-01 00:00:00', '2021-09-01 00:00:01',
+            np.NaN,
+            '2021-09-02 00:00:01', '2021-09-02 23:59:59',
+            '2021-10-01 00:00:00', '2021-10-01 00:00:01',
+            np.NaN,
+            '2021-10-02 00:00:01', '2021-10-02 23:59:59',
+            '2021-11-01 00:00:00', '2021-11-01 00:00:01',
+            np.NaN,
+            '2021-11-02 00:00:01', '2021-11-02 23:59:59',
+            '2021-12-01 00:00:00', '2021-12-01 00:00:01',
+            np.NaN,
+            '2021-12-02 00:00:01', '2021-12-02 23:59:59',
+        ]))
+        expected_day = pd.Series(pd.to_datetime([
+            '2021-01-01', '2021-01-01',
+            np.NaN,
+            '2021-01-02', '2021-01-02',
+            '2021-02-01', '2021-02-01',
+            np.NaN,
+            '2021-02-02', '2021-02-02',
+            '2021-03-01', '2021-03-01',
+            np.NaN,
+            '2021-03-02', '2021-03-02',
+            '2021-04-01', '2021-04-01',
+            np.NaN,
+            '2021-04-02', '2021-04-02',
+            '2021-05-01', '2021-05-01',
+            np.NaN,
+            '2021-05-02', '2021-05-02',
+            '2021-06-01', '2021-06-01',
+            np.NaN,
+            '2021-06-02', '2021-06-02',
+            '2021-07-01', '2021-07-01',
+            np.NaN,
+            '2021-07-02', '2021-07-02',
+            '2021-08-01', '2021-08-01',
+            np.NaN,
+            '2021-08-02', '2021-08-02',
+            '2021-09-01', '2021-09-01',
+            np.NaN,
+            '2021-09-02', '2021-09-02',
+            '2021-10-01', '2021-10-01',
+            np.NaN,
+            '2021-10-02', '2021-10-02',
+            '2021-11-01', '2021-11-01',
+            np.NaN,
+            '2021-11-02', '2021-11-02',
+            '2021-12-01', '2021-12-01',
+            np.NaN,
+            '2021-12-02', '2021-12-02',
+        ]))
+        expected_month = pd.Series(pd.to_datetime([
+            '2021-01-01', '2021-01-01',
+            np.NaN,
+            '2021-01-01', '2021-01-01',
+            '2021-02-01', '2021-02-01',
+            np.NaN,
+            '2021-02-01', '2021-02-01',
+            '2021-03-01', '2021-03-01',
+            np.NaN,
+            '2021-03-01', '2021-03-01',
+            '2021-04-01', '2021-04-01',
+            np.NaN,
+            '2021-04-01', '2021-04-01',
+            '2021-05-01', '2021-05-01',
+            np.NaN,
+            '2021-05-01', '2021-05-01',
+            '2021-06-01', '2021-06-01',
+            np.NaN,
+            '2021-06-01', '2021-06-01',
+            '2021-07-01', '2021-07-01',
+            np.NaN,
+            '2021-07-01', '2021-07-01',
+            '2021-08-01', '2021-08-01',
+            np.NaN,
+            '2021-08-01', '2021-08-01',
+            '2021-09-01', '2021-09-01',
+            np.NaN,
+            '2021-09-01', '2021-09-01',
+            '2021-10-01', '2021-10-01',
+            np.NaN,
+            '2021-10-01', '2021-10-01',
+            '2021-11-01', '2021-11-01',
+            np.NaN,
+            '2021-11-01', '2021-11-01',
+            '2021-12-01', '2021-12-01',
+            np.NaN,
+            '2021-12-01', '2021-12-01',
+        ]))
+        expected_quarter = pd.Series(pd.to_datetime([
+            '2021-01-01', '2021-01-01',
+            np.NaN,
+            '2021-01-01', '2021-01-01',
+            '2021-01-01', '2021-01-01',
+            np.NaN,
+            '2021-01-01', '2021-01-01',
+            '2021-01-01', '2021-01-01',
+            np.NaN,
+            '2021-01-01', '2021-01-01',
+            '2021-04-01', '2021-04-01',
+            np.NaN,
+            '2021-04-01', '2021-04-01',
+            '2021-04-01', '2021-04-01',
+            np.NaN,
+            '2021-04-01', '2021-04-01',
+            '2021-04-01', '2021-04-01',
+            np.NaN,
+            '2021-04-01', '2021-04-01',
+            '2021-07-01', '2021-07-01',
+            np.NaN,
+            '2021-07-01', '2021-07-01',
+            '2021-07-01', '2021-07-01',
+            np.NaN,
+            '2021-07-01', '2021-07-01',
+            '2021-07-01', '2021-07-01',
+            np.NaN,
+            '2021-07-01', '2021-07-01',
+            '2021-10-01', '2021-10-01',
+            np.NaN,
+            '2021-10-01', '2021-10-01',
+            '2021-10-01', '2021-10-01',
+            np.NaN,
+            '2021-10-01', '2021-10-01',
+            '2021-10-01', '2021-10-01',
+            np.NaN,
+            '2021-10-01', '2021-10-01',
+        ]))
+
+        validation.assert_dataframes_match([
+            pd.DataFrame(date_series.dt.date),
+            pd.DataFrame(expected_day.dt.date),
+            pd.DataFrame(date.floor(date_series, granularity=date.Granularity.DAY))
+        ])
+
+        validation.assert_dataframes_match([
+            pd.DataFrame(expected_month.dt.date),
+            pd.DataFrame(date.floor(date_series, granularity=date.Granularity.MONTH))
+        ])
+
+        validation.assert_dataframes_match([
+            pd.DataFrame(expected_quarter.dt.date),
+            pd.DataFrame(date.floor(date_series, granularity=date.Granularity.QUARTER))
+        ])

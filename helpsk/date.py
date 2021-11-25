@@ -3,8 +3,11 @@
 from typing import Union
 from enum import unique, Enum, auto
 import datetime
+
+import pandas as pd
 from dateutil import relativedelta
 import numpy as np
+from helpsk.validation import any_none_nan
 
 
 @unique
@@ -17,9 +20,9 @@ class Granularity(Enum):
     QUARTER = auto()
 
 
-def floor(value: Union[datetime.datetime, datetime.date],
+def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
           granularity: Granularity = Granularity.DAY,
-          fiscal_start: int = 1) -> datetime.date:
+          fiscal_start: int = 1) -> [datetime.date, pd.Series]:
 
     """"Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
 
@@ -32,7 +35,7 @@ def floor(value: Union[datetime.datetime, datetime.date],
 
     Args:
         value:
-            a datetime
+            a datetime or pd.Series of datetimes
 
         granularity:
             the granularity to round down to (i.e. DAY, MONTH, QUARTER)
@@ -44,6 +47,12 @@ def floor(value: Union[datetime.datetime, datetime.date],
     Returns:
         date - the date rounded down to the nearest granularity
     """
+    if isinstance(value, pd.Series):
+        return pd.Series([floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value])
+
+    if any_none_nan(value):
+        return value
+
     if granularity == Granularity.DAY:
         if isinstance(value, datetime.datetime):
             return value.date()

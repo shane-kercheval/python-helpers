@@ -13,14 +13,25 @@ from helpsk.exceptions import *
 class TestValidation(unittest.TestCase):
 
     def test_any_none_nan(self):
-        self.assertTrue(hv.any_none_nan(None))  # noqa
+        self.assertTrue(hv.any_none_nan(None))
         self.assertTrue(hv.any_none_nan(np.NaN))
+        self.assertTrue(hv.any_none_nan(pd.NaT))
+        self.assertTrue(hv.any_none_nan(pd.NA))
+
+        self.assertFalse(hv.any_none_nan(0))
+        self.assertFalse(hv.any_none_nan(1))
+        self.assertFalse(hv.any_none_nan(''))
+        self.assertFalse(hv.any_none_nan('a'))
 
         # test list
         self.assertTrue(hv.any_none_nan([1, np.nan, None]))
         self.assertTrue(hv.any_none_nan([1, np.nan]))
+        self.assertTrue(hv.any_none_nan([1, pd.NA]))
+        self.assertTrue(hv.any_none_nan([1, pd.NaT]))
         self.assertTrue(hv.any_none_nan([1, None]))
         self.assertTrue(hv.any_none_nan([np.nan]))
+        self.assertTrue(hv.any_none_nan([pd.NA]))
+        self.assertTrue(hv.any_none_nan([pd.NaT]))
         self.assertTrue(hv.any_none_nan([None]))
         self.assertTrue(hv.any_none_nan([]))
         self.assertFalse(hv.any_none_nan([1]))
@@ -29,8 +40,12 @@ class TestValidation(unittest.TestCase):
         # test numpy array
         self.assertTrue(hv.any_none_nan(np.array([1, np.nan, None])))
         self.assertTrue(hv.any_none_nan(np.array([1, np.nan])))
+        self.assertTrue(hv.any_none_nan(np.array([1, pd.NA])))
+        self.assertTrue(hv.any_none_nan(np.array([1, pd.NaT])))
         self.assertTrue(hv.any_none_nan(np.array([1, None])))
         self.assertTrue(hv.any_none_nan(np.array([np.nan])))
+        self.assertTrue(hv.any_none_nan(np.array([pd.NA])))
+        self.assertTrue(hv.any_none_nan(np.array([pd.NaT])))
         self.assertTrue(hv.any_none_nan(np.array([None])))
         self.assertTrue(hv.any_none_nan(np.array([])))
         self.assertFalse(hv.any_none_nan(np.array([1])))
@@ -39,8 +54,12 @@ class TestValidation(unittest.TestCase):
         # test pandas series
         self.assertTrue(hv.any_none_nan(pd.Series([1, np.nan, None])))
         self.assertTrue(hv.any_none_nan(pd.Series([1, np.nan])))
+        self.assertTrue(hv.any_none_nan(pd.Series([1, pd.NA])))
+        self.assertTrue(hv.any_none_nan(pd.Series([1, pd.NaT])))
         self.assertTrue(hv.any_none_nan(pd.Series([1, None])))
         self.assertTrue(hv.any_none_nan(pd.Series([np.nan])))
+        self.assertTrue(hv.any_none_nan(pd.Series([pd.NA])))
+        self.assertTrue(hv.any_none_nan(pd.Series([pd.NaT])))
         self.assertTrue(hv.any_none_nan(pd.Series([None])))
         self.assertTrue(hv.any_none_nan(pd.Series([], dtype=float)))
         self.assertFalse(hv.any_none_nan(pd.Series([1])))
@@ -49,8 +68,12 @@ class TestValidation(unittest.TestCase):
         # test pandas data.frame
         self.assertTrue(hv.any_none_nan(pd.DataFrame([[1, np.nan, None], [1, 2, 3]])))
         self.assertTrue(hv.any_none_nan(pd.DataFrame([[1, np.nan], [1, 2]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[1, pd.NA], [1, 2]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[1, pd.NaT], [1, 2]])))
         self.assertTrue(hv.any_none_nan(pd.DataFrame([[1, None], [1, 2]])))
         self.assertTrue(hv.any_none_nan(pd.DataFrame([[np.nan], [1]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[pd.NA], [1]])))
+        self.assertTrue(hv.any_none_nan(pd.DataFrame([[pd.NaT], [1]])))
         self.assertTrue(hv.any_none_nan(pd.DataFrame([[None], [1]])))
         self.assertTrue(hv.any_none_nan(pd.DataFrame([], dtype=float)))
         self.assertFalse(hv.any_none_nan(pd.DataFrame([1])))
@@ -60,9 +83,16 @@ class TestValidation(unittest.TestCase):
     def test_assert_not_none_nan(self):
 
         with self.assertRaises(HelpskAssertionError):
-            hv.assert_not_none_nan(None)  # noqa
+            hv.assert_not_none_nan(None)
         with self.assertRaises(HelpskAssertionError):
             hv.assert_not_none_nan(np.NaN)
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.NA)
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_none_nan(pd.NaT)
+
+        hv.assert_not_none_nan(0)
+        hv.assert_not_none_nan('')
 
         # test list
         with self.assertRaises(HelpskAssertionError):
@@ -130,15 +160,23 @@ class TestValidation(unittest.TestCase):
         hv.assert_not_none_nan(pd.DataFrame([[''], [1]]))
 
     def test_any_missing(self):
-        self.assertTrue(hv.any_missing(None))  # noqa
+        self.assertTrue(hv.any_missing(None))
         self.assertTrue(hv.any_missing(np.NaN))
-        self.assertTrue(hv.any_missing(''))  # noqa
+        self.assertTrue(hv.any_missing(pd.NA))
+        self.assertTrue(hv.any_missing(pd.NaT))
+        self.assertTrue(hv.any_missing(''))
+
+        self.assertFalse(hv.any_missing(0))
 
         # test list
         self.assertTrue(hv.any_missing([1, np.nan, None]))
         self.assertTrue(hv.any_missing([1, np.nan]))
+        self.assertTrue(hv.any_missing([1, pd.NA]))
+        self.assertTrue(hv.any_missing([1, pd.NaT]))
         self.assertTrue(hv.any_missing([1, None]))
         self.assertTrue(hv.any_missing([np.nan]))
+        self.assertTrue(hv.any_missing([pd.NA]))
+        self.assertTrue(hv.any_missing([pd.NaT]))
         self.assertTrue(hv.any_missing([None]))
         self.assertTrue(hv.any_missing([]))
         self.assertTrue(hv.any_missing(['']))
@@ -150,8 +188,12 @@ class TestValidation(unittest.TestCase):
         # test pandas series
         self.assertTrue(hv.any_missing(pd.Series([1, np.nan, None])))
         self.assertTrue(hv.any_missing(pd.Series([1, np.nan])))
+        self.assertTrue(hv.any_missing(pd.Series([1, pd.NA])))
+        self.assertTrue(hv.any_missing(pd.Series([1, pd.NaT])))
         self.assertTrue(hv.any_missing(pd.Series([1, None])))
         self.assertTrue(hv.any_missing(pd.Series([np.nan])))
+        self.assertTrue(hv.any_missing(pd.Series([pd.NA])))
+        self.assertTrue(hv.any_missing(pd.Series([pd.NaT])))
         self.assertTrue(hv.any_missing(pd.Series([None])))
         self.assertTrue(hv.any_missing(pd.Series([], dtype=float)))
         self.assertTrue(hv.any_missing(pd.Series([''])))
@@ -163,8 +205,12 @@ class TestValidation(unittest.TestCase):
         # test pandas data.frame
         self.assertTrue(hv.any_missing(pd.DataFrame([[1, np.nan, None], [1, 2, 3]])))
         self.assertTrue(hv.any_missing(pd.DataFrame([[1, np.nan], [1, 2]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[1, pd.NA], [1, 2]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[1, pd.NaT], [1, 2]])))
         self.assertTrue(hv.any_missing(pd.DataFrame([[1, None], [1, 2]])))
         self.assertTrue(hv.any_missing(pd.DataFrame([[np.nan], [1]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[pd.NA], [1]])))
+        self.assertTrue(hv.any_missing(pd.DataFrame([[pd.NaT], [1]])))
         self.assertTrue(hv.any_missing(pd.DataFrame([[None], [1]])))
         self.assertTrue(hv.any_missing(pd.DataFrame([], dtype=float)))
         self.assertTrue(hv.any_missing(pd.DataFrame([['abc', ''], ['abc', 'abc']])))
@@ -173,13 +219,18 @@ class TestValidation(unittest.TestCase):
         self.assertFalse(hv.any_missing(pd.DataFrame([[1], [1]])))
 
     def test_assert_not_any_missing(self):
-
         with self.assertRaises(HelpskAssertionError):
-            hv.assert_not_any_missing(None)  # noqa
+            hv.assert_not_any_missing(None)
         with self.assertRaises(HelpskAssertionError):
             hv.assert_not_any_missing(np.NaN)
         with self.assertRaises(HelpskAssertionError):
-            hv.assert_not_any_missing('')  # noqa
+            hv.assert_not_any_missing(pd.NA)
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing(pd.NaT)
+        with self.assertRaises(HelpskAssertionError):
+            hv.assert_not_any_missing('')
+
+        hv.assert_not_any_missing(0)
 
         # test list
         with self.assertRaises(HelpskAssertionError):

@@ -1,5 +1,6 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
+from collections import Sized
 from typing import List, Union, Callable, Type, Iterable
 
 import numpy as np
@@ -10,10 +11,9 @@ from helpsk.exceptions import *  # pylint: disable=wildcard-import,unused-wildca
 from helpsk.utility import suppress_warnings
 
 
-def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bool:
-    """Returns `True` if any item in `values` are `None`, `np.Nan`, or if the length of `values` is `0`.
-
-    For numeric types only.
+def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame, object]) -> bool:
+    """Can be used with a single value or a collection of values. Returns `True` if any item in `values` are
+    `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
 
     Args:
         values:
@@ -23,17 +23,29 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
         bool - True if any item in `values` are None/np.NaN
     """
     # pylint: disable=too-many-return-statements
-    if values is None or values is np.NaN or len(values) == 0:  # pylint: disable=nan-comparison
+    if values is None or values is np.NaN or values is pd.NA or values is pd.NaT:  # pylint: disable=nan-comparison
+        return True
+
+    if isinstance(values, Sized) and not isinstance(values, str) and len(values) == 0:
         return True
 
     if isinstance(values, pd.Series):
-        return values.isnull().any() or values.isna().any()  # noqa
+        return values.isnull().any() or values.isna().any()
 
     if isinstance(values, pd.DataFrame):
-        return values.isnull().any().any() or values.isna().any().any()  # noqa
+        return values.isnull().any().any() or values.isna().any().any()
 
-    if None in values:
-        return True
+    if isinstance(values, Iterable) and not isinstance(values, str):
+        if len(values) == 0:
+            return True
+
+        return any([any_none_nan(x) for x in values])
+
+    try:
+        if not isinstance(values, str) and None in values:
+            return True
+    except Exception:  # noqa
+        pass
 
     try:
         if np.isnan(values).any():
@@ -44,7 +56,7 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> bo
     return False
 
 
-def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
+def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame, object]) -> None:
     """Raises an HelpskAssertionError if any item in `values` are `None`, `np.Nan`, or if the length of
     `values` is `0`.
 
@@ -57,9 +69,8 @@ def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]
     assert_false(any_none_nan(values), message='None/NaN Values Found')
 
 
-def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
-    """Returns `True` if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '') or if the length
-    of `values` is `0`.
+def any_missing(values: Union[List, pd.Series, pd.DataFrame, object]) -> bool:
+    """Same as `any_none_nan` but checks for empty strings
 
     Args:
         values:
@@ -77,13 +88,16 @@ def any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> bool:
     if isinstance(values, pd.DataFrame):
         return values.isin(['']).any().any()  # noqa
 
-    if '' in values:
+    if isinstance(values, str) and values.strip() == '':
+        return True
+
+    if isinstance(values, Iterable) and '' in values:
         return True
 
     return False
 
 
-def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame]) -> None:
+def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame, object]) -> None:
     """Raises an HelpskAssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '')
     or if the length of `values` is `0`.
 
