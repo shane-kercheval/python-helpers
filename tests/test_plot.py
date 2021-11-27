@@ -113,3 +113,11 @@ class TestPlot(unittest.TestCase):
                                                                                categorical_column='credit_history'))
 
         self.assertTrue(hval.dataframes_match([original, test_series]))
+
+    def test_plot_histogram_with_categorical(self):
+        # bug found when no missing values are found in target because we added a <missing> category but
+        # we get an error when calling reorder_categories with extra categories
+        credit_data = self.credit_data.copy()
+        hplot.plot_histogram_with_categorical(dataframe=credit_data,
+                                              numeric_column='credit_amount',
+                                              categorical_column='target')

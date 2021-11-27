@@ -264,6 +264,9 @@ def plot_histogram_with_categorical(dataframe: pd.DataFrame,
     categories = [str(x) for x in cut_dataframe[numeric_column].cat.categories]
     cut_dataframe[numeric_column] = [str(x) for x in cut_dataframe[numeric_column]]
     cut_dataframe[numeric_column] = cut_dataframe[numeric_column].astype('category')
+    # only keep the categories that appear in the data, otherwise we get an error when calling
+    # reorder_categories with extra categories
+    categories = [x for x in categories if x in cut_dataframe[numeric_column].cat.categories]
     cut_dataframe[numeric_column] = cut_dataframe[numeric_column].cat.reorder_categories(categories)
 
     cut_dataframe[categorical_column] = dataframe[categorical_column].copy()
