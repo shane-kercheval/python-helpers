@@ -147,6 +147,10 @@ class TestSklearnEval(unittest.TestCase):
         grid_search = self.credit_data__grid_search
         cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=True)
 
+        self.assertEqual(cv_results.results.index.tolist(), [6, 7, 4, 5, 0, 1, 2, 3])
+        self.assertEqual(cv_results.results.index.tolist(),
+                         cv_results.formatted_results(return_style=False).index.tolist())
+
         self.assertEqual(cv_results.score_names, ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate'])
         self.assertEqual(cv_results.score_columns,
                          ['ROC/AUC Mean',
