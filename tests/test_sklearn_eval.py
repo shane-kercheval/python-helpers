@@ -13,9 +13,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
-from helpsk.utility import suppress_warnings
-from helpsk.sklearn_eval import cv_results_to_dataframe, TwoClassEvaluator, RegressionEvaluator
+from helpsk.sklearn_eval import SearchCVParser, TwoClassEvaluator, RegressionEvaluator
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
+from helpsk.utility import suppress_warnings
 from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing
 
 
@@ -145,15 +145,40 @@ class TestSklearnEval(unittest.TestCase):
 
     def test_cv_results_to_dataframe(self):
         grid_search = self.credit_data__grid_search
-        results = cv_results_to_dataframe(searcher=grid_search,
-                                          num_folds=3,
-                                          num_repeats=1,
-                                          return_train_score=True,
-                                          return_style=False)
+        cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=True)
 
+        self.assertEqual(cv_results.score_names, ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate'])
+        self.assertEqual(cv_results.score_columns,
+                         ['ROC/AUC Mean',
+                          'ROC/AUC 95CI.LO',
+                          'ROC/AUC 95CI.HI',
+                          'F1 Mean',
+                          'F1 95CI.LO',
+                          'F1 95CI.HI',
+                          'Pos. Pred. Val Mean',
+                          'Pos. Pred. Val 95CI.LO',
+                          'Pos. Pred. Val 95CI.HI',
+                          'True Pos. Rate Mean',
+                          'True Pos. Rate 95CI.LO',
+                          'True Pos. Rate 95CI.HI'])
+        self.assertEqual(cv_results.training_score_columns,
+                         ['ROC/AUC Training Mean',
+                          'F1 Training Mean',
+                          'Pos. Pred. Val Training Mean',
+                          'True Pos. Rate Training Mean'])
+        self.assertEqual(cv_results.parameter_columns,
+                         ['model | max_features',
+                          'model | n_estimators',
+                          'preparation | non_numeric_pipeline | encoder_chooser | base_transformer'])
+
+        self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
+        self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
+        self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
+        self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
+
+        results = cv_results.formatted_results(return_train_score=True, return_style=False)
         self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | base_transformer'].iloc[0],
-                              str)
+        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | base_transformer'].iloc[0], str)
         equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
                                     'ROC/AUC Training Mean',
                                     'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
@@ -166,11 +191,7 @@ class TestSklearnEval(unittest.TestCase):
                                     'preparation | non_numeric_pipeline | encoder_chooser | base_transformer']
         self.assertTrue(all(equal))
 
-        results = cv_results_to_dataframe(searcher=grid_search,
-                                          num_folds=3,
-                                          num_repeats=1,
-                                          return_train_score=False,
-                                          return_style=False)
+        results = cv_results.formatted_results(return_train_score=False, return_style=False)
 
         self.assertIsInstance(results, pd.DataFrame)
         self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | base_transformer'].iloc[0],
@@ -184,51 +205,67 @@ class TestSklearnEval(unittest.TestCase):
         self.assertTrue(all(equal))
 
         with suppress_warnings():
-            results = cv_results_to_dataframe(searcher=grid_search,
-                                              num_folds=3,
-                                              num_repeats=1,
-                                              return_train_score=True,
-                                              return_style=True)
+            results = cv_results.formatted_results(return_train_score=True, return_style=True)
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__with_training.html', 'w') as file:
             file.write(results.render())
 
         with suppress_warnings():
-            results = cv_results_to_dataframe(searcher=grid_search,
-                                              num_folds=3,
-                                              num_repeats=1,
-                                              return_train_score=False,
-                                              return_style=True)
+            results = cv_results.formatted_results(return_train_score=False, return_style=True)
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__without_training.html', 'w') as file:
             file.write(results.render())
 
         grid_search = self.credit_data__grid_search__roc_auc
+        cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=True)
+
+        self.assertEqual(cv_results.score_names, ['roc_auc'])
+        self.assertEqual(cv_results.score_columns,
+                         ['roc_auc Mean',
+                          'roc_auc 95CI.LO',
+                          'roc_auc 95CI.HI'])
+        self.assertEqual(cv_results.training_score_columns, ['roc_auc Training Mean'])
+        self.assertEqual(cv_results.parameter_columns,
+                         ['model | max_features',
+                          'model | n_estimators',
+                          'preparation | non_numeric_pipeline | encoder_chooser | base_transformer'])
+
+        self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
+        self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
+        self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
+        self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
+
         with suppress_warnings():
-            results = cv_results_to_dataframe(searcher=grid_search,
-                                              num_folds=3,
-                                              num_repeats=1,
-                                              return_train_score=True,
-                                              return_style=True)
+            results = cv_results.formatted_results(return_train_score=True, return_style=True)
         test_file = get_test_path() + '/test_files/sklearn_eval/credit__grid_search__default_scores__with_training.html'
         with open(test_file, 'w') as file:
             file.write(results.render())
 
         with suppress_warnings():
-            results = cv_results_to_dataframe(searcher=grid_search,
-                                              num_folds=3,
-                                              num_repeats=1,
-                                              return_train_score=False,
-                                              return_style=True)
+            results = cv_results.formatted_results(return_train_score=False, return_style=True)
         test_file = get_test_path() + '/test_files/sklearn_eval/credit__grid_search__default_scores__without_training.html'
         with open(test_file, 'w') as file:
             file.write(results.render())
 
     def test_cv_results_to_dataframe_regression(self):
         grid_search = self.housing_data__grid_search
-        results = cv_results_to_dataframe(searcher=grid_search,
-                                          num_folds=3,
-                                          num_repeats=1,
-                                          return_train_score=True,
-                                          return_style=False)
+        cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=False)
+
+        self.assertEqual(cv_results.score_names, ['RMSE', 'MAE'])
+        self.assertEqual(cv_results.score_columns,
+                         ['RMSE Mean',
+                          'RMSE 95CI.LO',
+                          'RMSE 95CI.HI',
+                          'MAE Mean',
+                          'MAE 95CI.LO',
+                          'MAE 95CI.HI'])
+        self.assertEqual(cv_results.training_score_columns, ['RMSE Training Mean', 'MAE Training Mean'])
+        self.assertEqual(cv_results.parameter_columns, ['model | max_features', 'model | n_estimators'])
+
+        self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
+        self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
+        self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
+        self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
+
+        results = cv_results.formatted_results(return_train_score=True, return_style=False)
 
         self.assertIsInstance(results, pd.DataFrame)
         self.assertIsInstance(results['model | max_features'].iloc[0], str)
@@ -237,11 +274,7 @@ class TestSklearnEval(unittest.TestCase):
                                     'model | max_features', 'model | n_estimators']
         self.assertTrue(all(equal))
 
-        results = cv_results_to_dataframe(searcher=grid_search,
-                                          num_folds=3,
-                                          num_repeats=1,
-                                          return_train_score=False,
-                                          return_style=False)
+        results = cv_results.formatted_results(return_train_score=False, return_style=False)
 
         self.assertIsInstance(results, pd.DataFrame)
         self.assertIsInstance(results['model | max_features'].iloc[0], str)
@@ -251,22 +284,12 @@ class TestSklearnEval(unittest.TestCase):
         self.assertTrue(all(equal))
 
         with suppress_warnings():
-            results = cv_results_to_dataframe(searcher=grid_search,
-                                              num_folds=3,
-                                              num_repeats=1,
-                                              greater_is_better=False,
-                                              return_train_score=True,
-                                              return_style=True)
+            results = cv_results.formatted_results(return_train_score=True, return_style=True)
         with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__with_training.html', 'w') as file:
             file.write(results.render())
 
         with suppress_warnings():
-            results = cv_results_to_dataframe(searcher=grid_search,
-                                              num_folds=3,
-                                              num_repeats=1,
-                                              greater_is_better=False,
-                                              return_train_score=False,
-                                              return_style=True)
+            results = cv_results.formatted_results(return_train_score=False, return_style=True)
         with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__without_training.html', 'w') as file:
             file.write(results.render())
 

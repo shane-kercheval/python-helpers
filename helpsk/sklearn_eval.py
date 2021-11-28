@@ -19,166 +19,266 @@ import helpsk.pandas_style as hstyle
 # pylint: disable=too-many-locals
 from helpsk.exceptions import HelpskParamValueError
 from helpsk.plot import STANDARD_WIDTH_HEIGHT
+from helpsk.validation import assert_is_close, assert_true
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=Warning)
     from statsmodels import api as sm  # https://github.com/statsmodels/statsmodels/issues/3814
 
 
-# pylint: disable=too-many-arguments, too-many-statements
-def cv_results_to_dataframe(searcher: BaseSearchCV,
-                            num_folds: int,
-                            num_repeats: int,
-                            round_by: int = 3,
-                            greater_is_better: bool = True,
-                            return_train_score: bool = True,
-                            return_style: bool = True) -> Union[pd.DataFrame, Styler]:
+class SearchCVParser:
     """
-    Args:
-        searcher:
-            A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
-            constructor (e.g. `GridSearchCV(..., scoring='auc', ...)` or a dictionary with metric names as
-            keys and callables a values.
-
-            An example of the dictionary option:
-
-                scores = {
-                    'ROC/AUC': SCORERS['roc_auc'],
-                    'F1': make_scorer(f1_score, greater_is_better=True),
-                    'Pos. Pred. Val': make_scorer(precision_score, greater_is_better=True),
-                    'True Pos. Rate': make_scorer(recall_score, greater_is_better=True),
-                }
-                grid_search = GridSearchCV(..., scoring=scores, ...)
-        num_folds:
-            the number of folds used for the cross validation; used to calculate the standard error of the
-            mean for each score
-        num_repeats:
-            the number of repeats used for the cross validation; used to calculate the standard error of the
-            mean for each score
-        round_by:
-            the number of digits to round by;
-        greater_is_better:
-            if True, higher scores are better; if False, lower scores are better
-            False assumes that the scores returned from sklearn are negative and will multiple the values
-            by 1.
-        return_train_score:
-            if True, then return the training scores if they exist in the `cv_results_` dict.
-        return_style:
-            if True, return pd.DataFrame().style object after being styled
+    This class contains the logic to parse and extract information from a BaseSearchCV object (e.g.
+    GridSearchCV, RandomizedSearchCV, BayesSearchCV)
     """
-    sample_size = num_folds * num_repeats
-    results = None
-    cv_results = searcher.cv_results_
+    def __init__(self,
+                 searcher: BaseSearchCV,
+                 higher_score_is_better: bool = True):
 
-    str_score_name = None
-    if isinstance(searcher.scoring, dict):
-        score_names = list(searcher.scoring.keys())
-    elif isinstance(searcher.scoring, str):
-        score_names = ['score']
-        str_score_name = searcher.scoring
-    else:
-        mess = 'The `searcher` does not have a string or dictionary .scoring property. Cannot extract scores.'
-        raise HelpskParamValueError(mess)
+        self.num_repeats = searcher.cv.n_repeats
+        self.num_folds = searcher.cv.cvargs['n_splits']
 
-    # extract mean and standard deviation for each score
-    # if a string was passed into the searcher `scoring` parameter (e.g. 'roc/auc') then the score name will
-    # just be 'mean_test_score' but we will convert it to `roc/auc Mean`. Same for standard deviation.
-    # In that case, then after we are done, we need to change `score_names = ['score']` to
-    # `score_names = [str_score_name]`
-    for score in score_names:
-        score_name = score if str_score_name is None else str_score_name
-        mean_scores = cv_results['mean_test_' + score]
-        mean_scores = mean_scores if greater_is_better else mean_scores * -1
+        self.results = SearchCVParser.cv_results_to_dataframe(searcher=searcher,
+                                                              higher_score_is_better=higher_score_is_better)
 
-        results = pd.concat([
-            results,
-            pd.DataFrame({
-                score_name + " Mean": mean_scores,
-                score_name + " St. Dev": cv_results['std_test_' + score],
-            })
-        ], axis=1)
+        # mean/std times per trial; i.e. to get total time, multiple by number_of_runs_per_trial
+        self.mean_fit_time = searcher.cv_results_['mean_fit_time']
+        self.std_fit_time = searcher.cv_results_['std_fit_time']
+        self.mean_score_time = searcher.cv_results_['mean_score_time']
+        self.std_score_time = searcher.cv_results_['std_score_time']
 
-        if return_train_score and 'mean_train_' + score in cv_results:
-            mean_training_scores = cv_results['mean_train_' + score]
-            mean_training_scores = mean_training_scores if greater_is_better else mean_training_scores * -1
+        assert_true(len(self.mean_fit_time) == self.number_of_trials)
+        assert_is_close(self.total_time, self.mean_time_per_trial * self.number_of_trials)
+
+    @property
+    def number_of_trials(self) -> int:
+        """"A single trial contains the cross validation runs for a single set of hyper-parameters. The
+        'number of trials' is basically the number of combinations of different hyper-parameters that were
+        cross validated."""
+        return self.results.shape[0]
+
+    @property
+    def number_of_runs_per_trial(self) -> int:
+        """This is the number of CV folds multiplied by the number of CV repeats."""
+        return self.num_folds * self.num_repeats
+
+    @property
+    def fit_time_per_trial(self) -> np.array:
+        """Average fit time for each trial multiplied by the number of runs per trial
+
+        Returns:
+            array containing the fit time for each trail
+        """
+        return self.mean_fit_time * self.number_of_runs_per_trial
+
+    @property
+    def fit_time_total(self) -> float:
+        """Total fit time across all trials."""
+        return float(np.sum(self.fit_time_per_trial))
+
+    @property
+    def score_time_per_trial(self):
+        """Average score time for each trial multiplied by the number of runs per trial
+
+        Returns:
+            array containing the score time for each trail
+        """
+        return self.mean_score_time * self.number_of_runs_per_trial
+
+    @property
+    def score_time_total(self) -> float:
+        """Total score time across all trials."""
+        return float(np.sum(self.score_time_per_trial))
+
+    @property
+    def mean_time_per_trial(self) -> float:
+        """Average time per trial"""
+        return float(np.mean(self.fit_time_per_trial + self.score_time_per_trial))
+
+    @property
+    def total_time(self) -> float:
+        """Total time it took across all trials"""
+        return self.fit_time_total + self.score_time_total
+
+    @property
+    def score_names(self):
+        def replace_type(x):
+            return x.replace(' Mean', '').replace(' 95CI.LO', '').replace(' 95CI.HI', '')
+        names = [replace_type(x) for x in self.score_columns]
+        # use .fromkeys to dedupe
+        return list(dict.fromkeys(names))
+
+    @property
+    def score_columns(self) -> list:
+        return [x for x in self.results.columns[self.results.columns.str.endswith((' Mean', ' 95CI.LO', ' 95CI.HI'))]  # noqa
+                if x not in self.training_score_columns]
+
+    @property
+    def training_score_columns(self) -> list:
+        return self.results.columns[self.results.columns.str.contains(' Training ')].tolist()
+
+    @property
+    def parameter_columns(self) -> list:
+        return [x for x in self.results.columns
+                if x not in self.score_columns + self.training_score_columns]
+
+    def formatted_results(self,
+                          round_by: int = 3,
+                          return_train_score: bool = True,
+                          return_style: bool = True) -> Union[pd.DataFrame, Styler]:
+
+        results = self.results
+        results = results.round(dict(zip(self.score_columns + self.training_score_columns,
+                                         [round_by] * len(self.score_columns + self.training_score_columns))))
+
+        if not return_train_score and len(self.training_score_columns) > 0:
+            results = results.drop(columns=self.training_score_columns)
+
+        if return_style:
+            results = results.style
+
+            # note that we are not adding styles to the training scores; training scores are secondary info
+            for score in self.score_names:
+                mean_key = score + ' Mean'
+                ci_low_key = score + ' 95CI.LO'
+                ci_high_key = score + ' 95CI.HI'
+
+                results. \
+                    bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value). \
+                    bar(subset=[ci_high_key], color=hcolor.GRAY). \
+                    pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY). \
+                    pipe(hstyle.format, round_by=round_by, hide_index=True)
+
+        return results
+
+    @staticmethod
+    def cv_results_to_dataframe(searcher: BaseSearchCV,
+                                higher_score_is_better: bool = True) -> pd.DataFrame:
+        """
+        Args:
+            searcher:
+                A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
+                constructor (e.g. `GridSearchCV(..., scoring='auc', ...)` or a dictionary with metric names as
+                keys and callables a values.
+
+                An example of the dictionary option:
+
+                    scores = {
+                        'ROC/AUC': SCORERS['roc_auc'],
+                        'F1': make_scorer(f1_score, greater_is_better=True),
+                        'Pos. Pred. Val': make_scorer(precision_score, greater_is_better=True),
+                        'True Pos. Rate': make_scorer(recall_score, greater_is_better=True),
+                    }
+                    grid_search = GridSearchCV(..., scoring=scores, ...)
+            higher_score_is_better:
+                if True, higher scores are better; if False, lower scores are better
+                False assumes that the scores returned from sklearn are negative and will multiple the values
+                by 1.
+        """
+        num_folds = searcher.cv.cvargs['n_splits']
+        num_repeats = searcher.cv.n_repeats
+        sample_size = num_folds * num_repeats
+        results = None
+        cv_results = searcher.cv_results_
+
+        str_score_name = None
+        if isinstance(searcher.scoring, dict):
+            score_names = list(searcher.scoring.keys())
+        elif isinstance(searcher.scoring, str):
+            score_names = ['score']
+            str_score_name = searcher.scoring
+        else:
+            mess = 'The `searcher` does not have a string or dictionary .scoring property. Cannot extract ' \
+                   'scores.'
+            raise HelpskParamValueError(mess)
+
+        # extract mean and standard deviation for each score
+        # if a string was passed into the searcher `scoring` parameter (e.g. 'roc/auc') then the score name
+        # will just be 'mean_test_score' but we will convert it to `roc/auc Mean`. Same for standard deviation.
+        # In that case, then after we are done, we need to change `score_names = ['score']` to
+        # `score_names = [str_score_name]`
+        for score in score_names:
+            score_name = score if str_score_name is None else str_score_name
+            mean_scores = cv_results['mean_test_' + score]
+            mean_scores = mean_scores if higher_score_is_better else mean_scores * -1
+
             results = pd.concat([
                 results,
                 pd.DataFrame({
-                    score_name + " Training Mean": mean_training_scores,
-                    score_name + " Training St. Dev": cv_results['std_train_' + score],
+                    score_name + " Mean": mean_scores,
+                    score_name + " St. Dev": cv_results['std_test_' + score],
                 })
             ], axis=1)
 
-    # see comment above
-    if str_score_name is not None:
-        score_names = [str_score_name]
+            if 'mean_train_' + score in cv_results:
+                mean_training_scores = cv_results['mean_train_' + score]
+                mean_training_scores = mean_training_scores \
+                    if higher_score_is_better else mean_training_scores * -1
+                results = pd.concat([
+                    results,
+                    pd.DataFrame({
+                        score_name + " Training Mean": mean_training_scores,
+                        score_name + " Training St. Dev": cv_results['std_train_' + score],
+                    })
+                ], axis=1)
 
-    def add_confidence_interval(score_name, dataframe):  # noqa
-        mean_column_name = score_name + ' Mean'
-        st_dev_column_name = score_name + ' St. Dev'
-        score_means = dataframe[mean_column_name]
-        score_standard_errors = dataframe[st_dev_column_name] / math.sqrt(sample_size)
+        # see comment above
+        if str_score_name is not None:
+            score_names = [str_score_name]
 
-        confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
-                                             df=sample_size - 1,  # degrees of freedom
-                                             loc=score_means,
-                                             scale=score_standard_errors)
+        def add_confidence_interval(score_name, dataframe):  # noqa
+            mean_column_name = score_name + ' Mean'
+            st_dev_column_name = score_name + ' St. Dev'
+            score_means = dataframe[mean_column_name]
+            score_standard_errors = dataframe[st_dev_column_name] / math.sqrt(sample_size)
 
-        dataframe = dataframe.drop(columns=st_dev_column_name)
+            confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
+                                                 df=sample_size - 1,  # degrees of freedom
+                                                 loc=score_means,
+                                                 scale=score_standard_errors)
 
-        insertion_index = dataframe.columns.get_loc(mean_column_name) + 1
-        dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.HI', value=confidence_intervals[1])
-        dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.LO', value=confidence_intervals[0])
+            dataframe = dataframe.drop(columns=st_dev_column_name)
 
-        return dataframe
+            insertion_index = dataframe.columns.get_loc(mean_column_name) + 1
+            dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.HI',
+                             value=confidence_intervals[1])
+            dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.LO',
+                             value=confidence_intervals[0])
 
-    # for each score, calculate the 95% confidence interval for the mean
-    for score in score_names:
-        results = add_confidence_interval(score_name=score,
-                                          dataframe=results)
+            return dataframe
 
-        results[f'{score} Mean'] = results[f'{score} Mean'].round(round_by)
-        results[f'{score} 95CI.LO'] = results[f'{score} 95CI.LO'].round(round_by)
-        results[f'{score} 95CI.HI'] = results[f'{score} 95CI.HI'].round(round_by)
-
-        # if there are training scores, then drop the St. Dev, and don't add confidence intervals,
-        # which would add too many columns (noise) and not that interesting.
-        if return_train_score and score + ' Training Mean' in results.columns:
-            results[f'{score} Training Mean'] = results[f'{score} Training Mean'].round(round_by)
-            results = results.drop(columns=score + ' Training St. Dev')
-
-    parameter_dataframe = pd.DataFrame(cv_results["params"])
-    parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
-
-    for column in parameter_dataframe.columns:
-        # this will convert objects (like Transformers) into strings, which makes further operations on the
-        # column (e.g. aggregations/group_by/etc) much easier.
-        if parameter_dataframe[column].dtype.name == 'object':
-            parameter_dataframe[column] = parameter_dataframe[column].astype(str)
-
-    results = pd.concat([
-        results,
-        parameter_dataframe,
-    ], axis=1)
-
-    results = results.sort_values(by=str(list(score_names)[0]) + ' Mean', ascending=not greater_is_better)
-
-    if return_style:
-        results = results.style
-
-        # note that we are not adding styles to the training scores; training scores are secondary info
+        # for each score, calculate the 95% confidence interval for the mean
         for score in score_names:
-            mean_key = score + ' Mean'
-            ci_low_key = score + ' 95CI.LO'
-            ci_high_key = score + ' 95CI.HI'
+            results = add_confidence_interval(score_name=score,
+                                              dataframe=results)
 
-            results. \
-                bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value). \
-                bar(subset=[ci_high_key], color=hcolor.GRAY). \
-                pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY). \
-                pipe(hstyle.format, round_by=round_by, hide_index=True)
+            results[f'{score} Mean'] = results[f'{score} Mean']
+            results[f'{score} 95CI.LO'] = results[f'{score} 95CI.LO']
+            results[f'{score} 95CI.HI'] = results[f'{score} 95CI.HI']
 
-    return results
+            # if there are training scores, then drop the St. Dev, and don't add confidence intervals,
+            # which would add too many columns (noise) and not that interesting.
+            if score + ' Training Mean' in results.columns:
+                results[f'{score} Training Mean'] = results[f'{score} Training Mean']
+                results = results.drop(columns=score + ' Training St. Dev')
+
+        parameter_dataframe = pd.DataFrame(cv_results["params"])
+        parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
+
+        for column in parameter_dataframe.columns:
+            # this will convert objects (like Transformers) into strings, which makes further operations on
+            # the column (e.g. aggregations/group_by/etc) much easier.
+            if parameter_dataframe[column].dtype.name == 'object':
+                parameter_dataframe[column] = parameter_dataframe[column].astype(str)
+
+        results = pd.concat([
+            results,
+            parameter_dataframe,
+        ], axis=1)
+
+        results = results.sort_values(by=str(list(score_names)[0]) + ' Mean',
+                                      ascending=not higher_score_is_better)
+        return results
 
 
 # pylint: disable=too-many-instance-attributes,too-many-public-methods
