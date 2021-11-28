@@ -101,24 +101,30 @@ class SearchCVParser:
         return self.fit_time_total + self.score_time_total
 
     @property
-    def score_names(self):
-        def replace_type(x):
-            return x.replace(' Mean', '').replace(' 95CI.LO', '').replace(' 95CI.HI', '')
+    def score_names(self) -> list:
+        """Returns a list of the names of the scores"""
+        def replace_type(value):
+            return value.replace(' Mean', '').replace(' 95CI.LO', '').replace(' 95CI.HI', '')
         names = [replace_type(x) for x in self.score_columns]
         # use .fromkeys to dedupe
         return list(dict.fromkeys(names))
 
     @property
     def score_columns(self) -> list:
-        return [x for x in self.results.columns[self.results.columns.str.endswith((' Mean', ' 95CI.LO', ' 95CI.HI'))]  # noqa
+        """Returns a list of the names of the score columns"""
+        return [x for x in self.results.columns[self.results.columns.str.endswith((' Mean',
+                                                                                   ' 95CI.LO',
+                                                                                   ' 95CI.HI'))]
                 if x not in self.training_score_columns]
 
     @property
     def training_score_columns(self) -> list:
+        """Returns a list of the names of the training score columns"""
         return self.results.columns[self.results.columns.str.contains(' Training ')].tolist()
 
     @property
     def parameter_columns(self) -> list:
+        """Returns a list of the names of the columns associated with the hyper-parameters"""
         return [x for x in self.results.columns
                 if x not in self.score_columns + self.training_score_columns]
 
@@ -126,6 +132,19 @@ class SearchCVParser:
                           round_by: int = 3,
                           return_train_score: bool = True,
                           return_style: bool = True) -> Union[pd.DataFrame, Styler]:
+        """
+
+        Args:
+            round_by:
+                the number of digits to round by for the score columns (does not round the parameter columns)
+            return_train_score:
+                if True, return the columns associated with the training scores, if any.
+            return_style:
+                If True, return Styler object
+
+        Returns:
+            either a DataFrame or Styler object.
+        """
 
         results = self.results
         results = results.round(dict(zip(self.score_columns + self.training_score_columns,
@@ -174,6 +193,9 @@ class SearchCVParser:
                 if True, higher scores are better; if False, lower scores are better
                 False assumes that the scores returned from sklearn are negative and will multiple the values
                 by 1.
+
+        Returns:
+            DataFrame with a row corresponding to each hyper-parameter combination a.k.a 'trial'
         """
         num_folds = searcher.cv.cvargs['n_splits']
         num_repeats = searcher.cv.n_repeats
@@ -194,8 +216,8 @@ class SearchCVParser:
 
         # extract mean and standard deviation for each score
         # if a string was passed into the searcher `scoring` parameter (e.g. 'roc/auc') then the score name
-        # will just be 'mean_test_score' but we will convert it to `roc/auc Mean`. Same for standard deviation.
-        # In that case, then after we are done, we need to change `score_names = ['score']` to
+        # will just be 'mean_test_score' but we will convert it to `roc/auc Mean`. Same for standard
+        # deviation. In that case, then after we are done, we need to change `score_names = ['score']` to
         # `score_names = [str_score_name]`
         for score in score_names:
             score_name = score if str_score_name is None else str_score_name
