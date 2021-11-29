@@ -8,29 +8,29 @@ from sklearn.preprocessing import OrdinalEncoder
 class TransformerChooser(BaseEstimator, TransformerMixin):
     """Transformer that wraps another Transformer. This allows different transformer objects to be tuned.
     """
-    def __init__(self, base_transformer=None):
+    def __init__(self, transformer=None):
         """
         Args:
-            base_transformer:
+            transformer:
                 Transformer object (e.g. StandardScaler, MinMaxScaler)
         """
-        self.base_transformer = base_transformer
+        self.transformer = transformer
 
     def fit(self, X, y=None):  # pylint: disable=invalid-name # noqa
         """fit implementation
         """
-        if self.base_transformer is None:
+        if self.transformer is None:
             return self
 
-        return self.base_transformer.fit(X, y)
+        return self.transformer.fit(X, y)
 
     def transform(self, X):  # pylint: disable=invalid-name # noqa
         """transform implementation
         """
-        if self.base_transformer is None:
+        if self.transformer is None:
             return X
 
-        return self.base_transformer.transform(X)
+        return self.transformer.transform(X)
 
 
 class CustomOrdinalEncoder(BaseEstimator, TransformerMixin):
