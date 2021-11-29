@@ -62,7 +62,7 @@ class TestSklearnEval(unittest.TestCase):
         ])
         param_grad = [
             {
-                'preparation__non_numeric_pipeline__encoder_chooser__base_transformer': [OneHotEncoder(),
+                'preparation__non_numeric_pipeline__encoder_chooser__transformer': [OneHotEncoder(),
                                                                                          CustomOrdinalEncoder()],
                 'model__max_features': [100, 'auto'],
                 'model__n_estimators': [10, 50]
@@ -173,7 +173,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(cv_results.parameter_columns,
                          ['model | max_features',
                           'model | n_estimators',
-                          'preparation | non_numeric_pipeline | encoder_chooser | base_transformer'])
+                          'preparation | non_numeric_pipeline | encoder_chooser | transformer'])
 
         self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
         self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
@@ -182,7 +182,7 @@ class TestSklearnEval(unittest.TestCase):
 
         results = cv_results.formatted_results(return_train_score=True, return_style=False)
         self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | base_transformer'].iloc[0], str)
+        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | transformer'].iloc[0], str)
         equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
                                     'ROC/AUC Training Mean',
                                     'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
@@ -192,20 +192,20 @@ class TestSklearnEval(unittest.TestCase):
                                     'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
                                     'True Pos. Rate Training Mean',
                                     'model | max_features', 'model | n_estimators',
-                                    'preparation | non_numeric_pipeline | encoder_chooser | base_transformer']
+                                    'preparation | non_numeric_pipeline | encoder_chooser | transformer']
         self.assertTrue(all(equal))
 
         results = cv_results.formatted_results(return_train_score=False, return_style=False)
 
         self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | base_transformer'].iloc[0],
+        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | transformer'].iloc[0],
                               str)
         equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
                                     'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
                                     'Pos. Pred. Val Mean', 'Pos. Pred. Val 95CI.LO', 'Pos. Pred. Val 95CI.HI',
                                     'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
                                     'model | max_features', 'model | n_estimators',
-                                    'preparation | non_numeric_pipeline | encoder_chooser | base_transformer']
+                                    'preparation | non_numeric_pipeline | encoder_chooser | transformer']
         self.assertTrue(all(equal))
 
         with suppress_warnings():
@@ -230,7 +230,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(cv_results.parameter_columns,
                          ['model | max_features',
                           'model | n_estimators',
-                          'preparation | non_numeric_pipeline | encoder_chooser | base_transformer'])
+                          'preparation | non_numeric_pipeline | encoder_chooser | transformer'])
 
         self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
         self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)

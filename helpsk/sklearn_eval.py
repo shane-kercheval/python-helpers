@@ -131,14 +131,16 @@ class SearchCVParser:
     def formatted_results(self,
                           round_by: int = 3,
                           return_train_score: bool = True,
+                          exclude_no_variance_params = True,
                           return_style: bool = True) -> Union[pd.DataFrame, Styler]:
         """
-
         Args:
             round_by:
                 the number of digits to round by for the score columns (does not round the parameter columns)
             return_train_score:
                 if True, return the columns associated with the training scores, if any.
+            exclude_no_variance_params
+                if True, exclude columns that only have 1 unique value
             return_style:
                 If True, return Styler object
 
@@ -147,6 +149,11 @@ class SearchCVParser:
         """
 
         results = self.results
+
+        if exclude_no_variance_params:
+            columns_to_drop = [x for x in self.parameter_columns if len(self.results[x].unique()) == 1]
+            results = results.drop(columns=columns_to_drop)
+
         results = results.round(dict(zip(self.score_columns + self.training_score_columns,
                                          [round_by] * len(self.score_columns + self.training_score_columns))))
 
