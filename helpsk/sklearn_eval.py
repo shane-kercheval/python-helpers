@@ -33,13 +33,17 @@ class SearchCVParser:
     """
     def __init__(self,
                  searcher: BaseSearchCV,
-                 higher_score_is_better: bool = True):
+                 higher_score_is_better: bool = True,
+                 new_param_column_names: Union[dict, None] = None):
 
         self.num_repeats = searcher.cv.n_repeats
         self.num_folds = searcher.cv.cvargs['n_splits']
 
         self.results = SearchCVParser.cv_results_to_dataframe(searcher=searcher,
                                                               higher_score_is_better=higher_score_is_better)
+
+        if new_param_column_names:
+            self.results.rename(columns=new_param_column_names, inplace=True)
 
         # mean/std times per trial; i.e. to get total time, multiple by number_of_runs_per_trial
         self.mean_fit_time = searcher.cv_results_['mean_fit_time']
@@ -131,7 +135,7 @@ class SearchCVParser:
     def formatted_results(self,
                           round_by: int = 3,
                           return_train_score: bool = True,
-                          exclude_no_variance_params = True,
+                          exclude_no_variance_params: bool = True,
                           return_style: bool = True) -> Union[pd.DataFrame, Styler]:
         """
         Args:
@@ -147,7 +151,6 @@ class SearchCVParser:
         Returns:
             either a DataFrame or Styler object.
         """
-
         results = self.results
 
         if exclude_no_variance_params:

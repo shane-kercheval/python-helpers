@@ -145,7 +145,13 @@ class TestSklearnEval(unittest.TestCase):
 
     def test_cv_results_to_dataframe(self):
         grid_search = self.credit_data__grid_search
-        cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=True)
+        new_param_column_names = {'model | max_features': 'max_features',
+                                  'model | n_estimators': 'n_estimators',
+                                  'preparation | non_numeric_pipeline | encoder_chooser | transformer':
+                                      'encoder'}
+        cv_results = SearchCVParser(searcher=grid_search,
+                                    higher_score_is_better=True,
+                                    new_param_column_names=new_param_column_names)
 
         self.assertEqual(cv_results.results.index.tolist(), [6, 7, 4, 5, 0, 1, 2, 3])
         self.assertEqual(cv_results.results.index.tolist(),
@@ -171,9 +177,9 @@ class TestSklearnEval(unittest.TestCase):
                           'Pos. Pred. Val Training Mean',
                           'True Pos. Rate Training Mean'])
         self.assertEqual(cv_results.parameter_columns,
-                         ['model | max_features',
-                          'model | n_estimators',
-                          'preparation | non_numeric_pipeline | encoder_chooser | transformer'])
+                         ['max_features',
+                          'n_estimators',
+                          'encoder'])
 
         self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
         self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
@@ -182,7 +188,7 @@ class TestSklearnEval(unittest.TestCase):
 
         results = cv_results.formatted_results(return_train_score=True, return_style=False)
         self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | transformer'].iloc[0], str)
+        self.assertIsInstance(results['encoder'].iloc[0], str)
         equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
                                     'ROC/AUC Training Mean',
                                     'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
@@ -191,21 +197,20 @@ class TestSklearnEval(unittest.TestCase):
                                     'Pos. Pred. Val Training Mean',
                                     'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
                                     'True Pos. Rate Training Mean',
-                                    'model | max_features', 'model | n_estimators',
-                                    'preparation | non_numeric_pipeline | encoder_chooser | transformer']
+                                    'max_features', 'n_estimators',
+                                    'encoder']
         self.assertTrue(all(equal))
 
         results = cv_results.formatted_results(return_train_score=False, return_style=False)
 
         self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['preparation | non_numeric_pipeline | encoder_chooser | transformer'].iloc[0],
+        self.assertIsInstance(results['encoder'].iloc[0],
                               str)
         equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
                                     'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
                                     'Pos. Pred. Val Mean', 'Pos. Pred. Val 95CI.LO', 'Pos. Pred. Val 95CI.HI',
                                     'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
-                                    'model | max_features', 'model | n_estimators',
-                                    'preparation | non_numeric_pipeline | encoder_chooser | transformer']
+                                    'max_features', 'n_estimators', 'encoder']
         self.assertTrue(all(equal))
 
         with suppress_warnings():
