@@ -36,15 +36,16 @@ class SearchCVParser:
                  higher_score_is_better: bool = True,
                  new_param_column_names: Union[dict, None] = None):
 
+        self._higher_score_is_better = higher_score_is_better
         self.num_repeats = searcher.cv.n_repeats
         self.num_folds = searcher.cv.cvargs['n_splits']
 
-        self.results, self._primary_score_standard_errors = \
+        self._results, self._primary_score_standard_errors = \
             SearchCVParser.cv_results_to_dataframe(searcher=searcher,
                                                    higher_score_is_better=higher_score_is_better)
 
         if new_param_column_names:
-            self.results.rename(columns=new_param_column_names, inplace=True)
+            self._results.rename(columns=new_param_column_names, inplace=True)
 
         # mean/std times per trial; i.e. to get total time, multiple by number_of_runs_per_trial
         self.mean_fit_time = searcher.cv_results_['mean_fit_time']
@@ -130,6 +131,22 @@ class SearchCVParser:
         return self._primary_score_standard_errors
 
     @property
+    def top_score(self):
+        """The top 'primary' score (i.e. the average cross validation score associated with the best set of
+        hyper-params."""
+        return self.results.iloc[0, 0]
+
+    @property
+    def result_indexes_within_1_standard_error(self):
+        """Returns the indexes of the `results` DataFrame where the primary scores (i.e. first scorer
+        passed to SearchCV object; i.e. first column of the results DataFrame) are within 1 standard error of
+        the highest primary score."""
+        if self._higher_score_is_better:
+            return self.results.index[self.results.iloc[:, 0] >= self.top_score - self.top_score_standard_error]
+        else:
+            return self.results.index[self.results.iloc[:, 0] <= self.top_score + self.top_score_standard_error]
+
+    @property
     def top_score_standard_error(self) -> float:
         """The standard error associated with the top 'primary' score."""
         return self.primary_score_standard_errors.iloc[0]  # index of highest score
@@ -152,6 +169,10 @@ class SearchCVParser:
         """Returns a list of the names of the columns associated with the hyper-parameters"""
         return [x for x in self.results.columns
                 if x not in self.score_columns + self.training_score_columns]
+
+    @property
+    def results(self):
+        return self._results.copy()
 
     def formatted_results(self,
                           round_by: int = 3,

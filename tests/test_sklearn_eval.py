@@ -153,6 +153,8 @@ class TestSklearnEval(unittest.TestCase):
                                     higher_score_is_better=True,
                                     new_param_column_names=new_param_column_names)
 
+        self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
+        self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [6, 7])
         self.assertEqual(cv_results.results.index.tolist(),
                          cv_results.primary_score_standard_errors.index.tolist())
         self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
@@ -231,6 +233,8 @@ class TestSklearnEval(unittest.TestCase):
         grid_search = self.credit_data__grid_search__roc_auc
         cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=True)
 
+        self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
+        self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [6, 7])
         self.assertEqual(cv_results.results.index.tolist(),
                          cv_results.primary_score_standard_errors.index.tolist())
         self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
@@ -268,6 +272,8 @@ class TestSklearnEval(unittest.TestCase):
         grid_search = self.housing_data__grid_search
         cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=False)
 
+        self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
+        self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [3])
         self.assertEqual(cv_results.results.index.tolist(),
                          cv_results.primary_score_standard_errors.index.tolist())
         self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
