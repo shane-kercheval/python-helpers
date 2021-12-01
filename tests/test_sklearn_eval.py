@@ -153,6 +153,11 @@ class TestSklearnEval(unittest.TestCase):
                                     higher_score_is_better=True,
                                     new_param_column_names=new_param_column_names)
 
+        self.assertEqual(cv_results.results.index.tolist(),
+                         cv_results.primary_score_standard_errors.index.tolist())
+        self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
+                         cv_results.top_score_standard_error)
+
         self.assertEqual(cv_results.results.index.tolist(), [6, 7, 4, 5, 0, 1, 2, 3])
         self.assertEqual(cv_results.results.index.tolist(),
                          cv_results.formatted_results(return_style=False).index.tolist())
@@ -226,6 +231,11 @@ class TestSklearnEval(unittest.TestCase):
         grid_search = self.credit_data__grid_search__roc_auc
         cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=True)
 
+        self.assertEqual(cv_results.results.index.tolist(),
+                         cv_results.primary_score_standard_errors.index.tolist())
+        self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
+                         cv_results.top_score_standard_error)
+
         self.assertEqual(cv_results.score_names, ['roc_auc'])
         self.assertEqual(cv_results.score_columns,
                          ['roc_auc Mean',
@@ -257,6 +267,11 @@ class TestSklearnEval(unittest.TestCase):
     def test_cv_results_to_dataframe_regression(self):
         grid_search = self.housing_data__grid_search
         cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=False)
+
+        self.assertEqual(cv_results.results.index.tolist(),
+                         cv_results.primary_score_standard_errors.index.tolist())
+        self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
+                         cv_results.top_score_standard_error)
 
         self.assertEqual(cv_results.score_names, ['RMSE', 'MAE'])
         self.assertEqual(cv_results.score_columns,

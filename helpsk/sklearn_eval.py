@@ -39,8 +39,9 @@ class SearchCVParser:
         self.num_repeats = searcher.cv.n_repeats
         self.num_folds = searcher.cv.cvargs['n_splits']
 
-        self.results = SearchCVParser.cv_results_to_dataframe(searcher=searcher,
-                                                              higher_score_is_better=higher_score_is_better)
+        self.results, self._primary_score_standard_errors = \
+            SearchCVParser.cv_results_to_dataframe(searcher=searcher,
+                                                   higher_score_is_better=higher_score_is_better)
 
         if new_param_column_names:
             self.results.rename(columns=new_param_column_names, inplace=True)
@@ -114,6 +115,26 @@ class SearchCVParser:
         return list(dict.fromkeys(names))
 
     @property
+    def number_of_scores(self) -> int:
+        """The number of scores passed to the SearchCV object"""
+        return len(self.score_names)
+
+    @property
+    def primary_score_name(self) -> str:
+        """The first scorer passed to the SearchCV will be treated as the primary score."""
+        return self.score_names[0]
+
+    @property
+    def primary_score_standard_errors(self) -> pd.Series:
+        """The standard errors associated with the scores. Sorted to correspond to `results` DataFrame."""
+        return self._primary_score_standard_errors
+
+    @property
+    def top_score_standard_error(self) -> float:
+        """The standard error associated with the top 'primary' score."""
+        return self.primary_score_standard_errors.iloc[0]  # index of highest score
+
+    @property
     def score_columns(self) -> list:
         """Returns a list of the names of the score columns"""
         return [x for x in self.results.columns[self.results.columns.str.endswith((' Mean',
@@ -182,7 +203,7 @@ class SearchCVParser:
 
     @staticmethod
     def cv_results_to_dataframe(searcher: BaseSearchCV,
-                                higher_score_is_better: bool = True) -> pd.DataFrame:
+                                higher_score_is_better: bool = True) -> tuple[pd.DataFrame, pd.Series]:
         """
         Args:
             searcher:
@@ -277,12 +298,16 @@ class SearchCVParser:
             dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.LO',
                              value=confidence_intervals[0])
 
-            return dataframe
+            return dataframe, score_standard_errors
 
+        primary_score_standard_errors = None
         # for each score, calculate the 95% confidence interval for the mean
         for score in score_names:
-            results = add_confidence_interval(score_name=score,
-                                              dataframe=results)
+            (results, standard_errors) = add_confidence_interval(score_name=score,
+                                                                 dataframe=results)
+
+            if score == score_names[0]:  # if score is the first/primary score (or only)
+                primary_score_standard_errors = standard_errors
 
             results[f'{score} Mean'] = results[f'{score} Mean']
             results[f'{score} 95CI.LO'] = results[f'{score} 95CI.LO']
@@ -293,6 +318,8 @@ class SearchCVParser:
             if score + ' Training Mean' in results.columns:
                 results[f'{score} Training Mean'] = results[f'{score} Training Mean']
                 results = results.drop(columns=score + ' Training St. Dev')
+
+        assert_true(primary_score_standard_errors is not None)
 
         parameter_dataframe = pd.DataFrame(cv_results["params"])
         parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
@@ -310,7 +337,10 @@ class SearchCVParser:
 
         results = results.sort_values(by=str(list(score_names)[0]) + ' Mean',
                                       ascending=not higher_score_is_better)
-        return results
+
+        primary_score_standard_errors = primary_score_standard_errors.reindex(results.index)
+
+        return results, primary_score_standard_errors
 
 
 # pylint: disable=too-many-instance-attributes,too-many-public-methods
