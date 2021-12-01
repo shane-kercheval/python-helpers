@@ -1,6 +1,6 @@
 """This module contains helper functions when working with sklearn (scikit-learn) objects;
 in particular, for evaluating models"""
-
+# pylint: disable=too-many-lines
 import math
 import warnings
 from typing import Tuple, Union, Optional
@@ -26,6 +26,8 @@ with warnings.catch_warnings():
     from statsmodels import api as sm  # https://github.com/statsmodels/statsmodels/issues/3814
 
 
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-public-methods
 class SearchCVParser:
     """
     This class contains the logic to parse and extract information from a BaseSearchCV object (e.g.
@@ -142,9 +144,10 @@ class SearchCVParser:
         passed to SearchCV object; i.e. first column of the results DataFrame) are within 1 standard error of
         the highest primary score."""
         if self._higher_score_is_better:
-            return self.results.index[self.results.iloc[:, 0] >= self.top_score - self.top_score_standard_error]
-        else:
-            return self.results.index[self.results.iloc[:, 0] <= self.top_score + self.top_score_standard_error]
+            return self.results.index[self.results.iloc[:, 0] >=
+                                      self.top_score - self.top_score_standard_error]
+
+        return self.results.index[self.results.iloc[:, 0] <= self.top_score + self.top_score_standard_error]
 
     @property
     def top_score_standard_error(self) -> float:
@@ -172,6 +175,7 @@ class SearchCVParser:
 
     @property
     def results(self):
+        """Main DataFrame summarizing the results of the SearchCV object."""
         return self._results.copy()
 
     def formatted_results(self,
@@ -222,6 +226,7 @@ class SearchCVParser:
 
         return results
 
+    # pylint: disable=too-many-statements
     @staticmethod
     def cv_results_to_dataframe(searcher: BaseSearchCV,
                                 higher_score_is_better: bool = True) -> tuple[pd.DataFrame, pd.Series]:

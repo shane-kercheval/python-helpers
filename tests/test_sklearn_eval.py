@@ -63,7 +63,7 @@ class TestSklearnEval(unittest.TestCase):
         param_grad = [
             {
                 'preparation__non_numeric_pipeline__encoder_chooser__transformer': [OneHotEncoder(),
-                                                                                         CustomOrdinalEncoder()],
+                                                                                    CustomOrdinalEncoder()],
                 'model__max_features': [100, 'auto'],
                 'model__n_estimators': [10, 50]
             },
