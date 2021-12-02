@@ -16,6 +16,7 @@ from sklearn.model_selection._search import BaseSearchCV  # noqa
 
 import helpsk.color as hcolor
 import helpsk.pandas_style as hstyle
+import helpsk.string as hstring
 # pylint: disable=too-many-locals
 from helpsk.exceptions import HelpskParamValueError
 from helpsk.plot import STANDARD_WIDTH_HEIGHT
@@ -116,6 +117,25 @@ class SearchCVParser:
         names = [replace_type(x) for x in self.score_columns]
         # use .fromkeys to dedupe
         return list(dict.fromkeys(names))
+    
+    @property
+    def trial_labels(self) -> pd.Series:
+        """A trial is a set of hyper-parameters that were cross validated. (Each row of the `results`
+         DataFrame corresponds to a single trial. The corresponding label for each trial is a single string
+         containing all of the hyper-parameter names and values in the format of
+         `{param1: value1, param2: value2}`.
+
+        Returns:
+            a pd.Series the same length as `number_of_trials` containing a str
+        """
+        def create_hyper_param_labels(data_row) -> list:
+            """Creates a list of strings that represent the name/value pair for each hyper-parameter."""
+            return [f"{x}: {data_row[x]}" for x in self.parameter_columns]
+
+        def create_trial_label(data_row) -> str:
+            return f"{{{hstring.collapse(create_hyper_param_labels(data_row), separate=', ')}}}"
+
+        return self.results.apply(create_trial_label, axis=1)
 
     @property
     def number_of_scores(self) -> int:
