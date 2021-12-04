@@ -203,7 +203,13 @@ class SearchCVParser:
                           return_train_score: bool = True,
                           exclude_no_variance_params: bool = True,
                           return_style: bool = True) -> Union[pd.DataFrame, Styler]:
-        """
+        """Returns a summary of the results, either as a Data.Frame, or Data.Frame.Styler.
+
+        If a Styler is returned, then Hyper-Parameter columns will be highlighted in blue where the primary
+        score (i.e. first column) for the iteration (i.e. the row i.e. the combination of hyper-parameters
+        that were cross validated) is within 1 standard error of the top primary score (i.e. first column
+        first row).
+
         Args:
             round_by:
                 the number of digits to round by for the score columns (does not round the parameter columns)
@@ -229,6 +235,8 @@ class SearchCVParser:
         if not return_train_score and len(self.training_score_columns) > 0:
             results = results.drop(columns=self.training_score_columns)
 
+        final_columns = results.columns  # save for style logic
+
         if return_style:
             results = results.style
 
@@ -243,6 +251,18 @@ class SearchCVParser:
                     bar(subset=[ci_high_key], color=hcolor.GRAY). \
                     pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY). \
                     pipe(hstyle.format, round_by=round_by, hide_index=True)
+
+            # highlight iterations whose primary score (i.e. first column of `results` dataframe) is within
+            # 1 standard error of the top primary score (i.e. first column first row).
+            def highlight_cols(s):
+                return 'background-color: %s' % hcolor.Colors.PASTEL_BLUE.value
+
+            # we might have removed columns (e.g. that don't have any variance) so check that the columns
+            # were in the final set
+            columns_to_highlight = [x for x in self.parameter_columns if x in final_columns]
+            results.applymap(highlight_cols,
+                             subset=pd.IndexSlice[self.result_indexes_within_1_standard_error,
+                                                  columns_to_highlight])
 
         return results
 
