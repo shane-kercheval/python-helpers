@@ -3,6 +3,7 @@ init file
 """
 # from .example_class import ExampleClass
 # https://stackoverflow.com/questions/8899198/module-has-no-attribute
+import helpsk.color
 import helpsk.database
 import helpsk.database_base
 import helpsk.date
