@@ -4,6 +4,7 @@ in particular, for evaluating models"""
 import math
 import warnings
 from typing import Tuple, Union, Optional
+import yaml
 
 import numpy as np
 import pandas as pd
@@ -27,9 +28,158 @@ with warnings.catch_warnings():
     from statsmodels import api as sm  # https://github.com/statsmodels/statsmodels/issues/3814
 
 
+class SearchCVParser:
+    """
+    This class contains the logic to parse and extract information from a BaseSearchCV object (e.g.
+    GridSearchCV, RandomizedSearchCV, BayesSearchCV)
+    """
+    def __init__(self,
+                 searcher: BaseSearchCV,
+                 higher_score_is_better: bool = True,
+                 run_name: str = "",
+                 run_description: str = "",
+                 parameter_name_mappings: Union[dict, None] = None):
+        """
+        Converts the SearchCV object (e.g. sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV)
+        to a dictionary, in a specific format with the intent to write the contents to a yaml file.
+
+        At this time, this function does not capture the individual fold scores from the individual splits.
+
+        Params:
+            searcher:
+                A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
+                    constructor (e.g. `GridSearchCV(..., scoring='auc', ...)` or a dictionary with metric names as
+                    keys and callables a values.
+
+                    An example of the dictionary option:
+
+                        scores = {
+                            'ROC/AUC': SCORERS['roc_auc'],
+                            'F1': make_scorer(f1_score, greater_is_better=True),
+                            'Pos. Pred. Val': make_scorer(precision_score, greater_is_better=True),
+                            'True Pos. Rate': make_scorer(recall_score, greater_is_better=True),
+                        }
+                        grid_search = GridSearchCV(..., scoring=scores, ...)
+            higher_score_is_better:
+                if True, higher scores are better; if False, lower scores are better
+                False assumes that the scores returned from sklearn are negative and will multiple the values
+                by 1.
+            run_name:
+                an optional string to save in the dictionary
+            run_description:
+                an optional string to save in the dictionary
+            parameter_name_mappings:
+                a dictionary containing the parameter names returned by the searchCV object as keys (which should
+                correspond to the path of the pipeline(s) corresponding to tha parameter, and the new, friendlier,
+                names that can be displayed in graphs and tables.
+
+                For example:
+
+                    {'model__max_features': 'max_features',
+                     'model__n_estimators': 'n_estimators',
+                     'prep__non_numeric__encoder__transformer': 'encoder',
+                     'prep__numeric__impute__transformer': 'imputer',
+                     'prep__numeric__scaling__transformer': 'scaler'}
+        Returns:
+            a dictionary
+        """
+        if searcher is not None:  # check for None in the case of `from_dict`
+            self._cv_dict = SearchCVParser.search_cv_to_dict(searcher=searcher,
+                                                             higher_score_is_better=higher_score_is_better,
+                                                             run_name=run_name,
+                                                             run_description=run_description,
+                                                             parameter_name_mappings=parameter_name_mappings)
+        else:
+            self._cv_dict = None
+
+    @classmethod
+    def from_dict(cls, cv_dict):
+        parser = cls(searcher=None, higher_score_is_better=None, run_name=None, run_description=None, parameter_name_mappings=None)  # noqa
+        parser._cv_dict = cv_dict
+        return parser
+
+    @classmethod
+    def from_yaml_file(cls, yaml_file_name):
+        with open(yaml_file_name, 'r') as file:
+            cv_dict = yaml.safe_load(file)
+
+        return SearchCVParser.from_dict(cv_dict=cv_dict)
+
+    def to_yaml_file(self, yaml_file_name: str):
+        with open(yaml_file_name, 'w') as file:
+            yaml.dump(self._cv_dict, file, default_flow_style=False, sort_keys=False)
+
+    @staticmethod
+    def search_cv_to_dict(searcher: BaseSearchCV,
+                          higher_score_is_better: bool = True,
+                          run_name: str = "",
+                          run_description: str = "",
+                          parameter_name_mappings: Union[dict, None] = None
+                          ) -> dict:
+
+        def string_if_not_number(obj):
+            if isinstance(obj, (int, float, complex)):
+                return obj
+
+            return str(obj)
+
+        cv_results_dict = {'name': run_name,
+                           'description': run_description,
+                           'cross_validation_type': str(type(searcher)),
+                           'higher_score_is_better': higher_score_is_better}
+
+        if isinstance(searcher.scoring, dict):
+            score_names = list(searcher.scoring.keys())
+        elif isinstance(searcher.scoring, str):
+            score_names = [searcher.scoring]
+        else:
+            mess = 'The `searcher` does not have a string or dictionary .scoring property. Cannot extract ' \
+                   'scores.'
+            raise HelpskParamValueError(mess)
+
+        cv_results_dict['score_names'] = score_names
+        cv_results_dict['parameter_names'] = [key for key, value in searcher.cv_results_['params'][0].items()]
+
+        if parameter_name_mappings:
+            for key in parameter_name_mappings.keys():
+                assert_true(key in cv_results_dict['parameter_names'])
+            cv_results_dict['parameter_names_mapping'] = [{key: value} for key, value in parameter_name_mappings.items()]
+
+        if len(score_names) == 1:
+            cv_results_dict['test_score_ranking'] = [{score_names[0]: searcher.cv_results_['rank_test_score'].tolist()}]
+            cv_results_dict['test_score_averages'] = [{score_names[0]: searcher.cv_results_['mean_test_score'].tolist()}]
+            cv_results_dict['test_score_standard_deviations'] = [{score_names[0]: searcher.cv_results_['std_test_score'].tolist()}]
+        else:
+            ranking_list = []
+            averages_list = []
+            standard_deviations_list = []
+            for score in score_names:
+                ranking_list.append({score: searcher.cv_results_['rank_test_' + score].tolist()})
+                averages_list.append({score: searcher.cv_results_['mean_test_' + score].tolist()})
+                standard_deviations_list.append({score: searcher.cv_results_['std_test_' + score].tolist()})
+
+            cv_results_dict['test_score_ranking'] = ranking_list
+            cv_results_dict['test_score_averages'] = averages_list
+            cv_results_dict['test_score_standard_deviations'] = standard_deviations_list
+
+        cv_results_dict['parameter_iterations'] = [
+            {index: [{key: string_if_not_number(value)} for key, value in searcher.cv_results_['params'][index].items()]}
+            for index in range(len(searcher.cv_results_['params']))
+        ]
+
+        cv_results_dict['times'] = [{'fit time average': searcher.cv_results_['mean_fit_time'].tolist()},
+                                    {'fit time standard deviation': searcher.cv_results_['std_fit_time'].tolist()},
+                                    {'score time average': searcher.cv_results_['mean_score_time'].tolist()},
+                                    {'score time standard deviation': searcher.cv_results_['std_score_time'].tolist()}]
+
+        return cv_results_dict
+
+
+
+
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
-class SearchCVParser:
+class SearchCVParser2:
     """
     This class contains the logic to parse and extract information from a BaseSearchCV object (e.g.
     GridSearchCV, RandomizedSearchCV, BayesSearchCV)
@@ -44,7 +194,7 @@ class SearchCVParser:
         self.num_folds = searcher.cv.cvargs['n_splits']
 
         self._results, self._primary_score_standard_errors = \
-            SearchCVParser.cv_results_to_dataframe(searcher=searcher,
+            SearchCVParser2.cv_results_to_dataframe(searcher=searcher,
                                                    higher_score_is_better=higher_score_is_better)
 
         if new_param_column_names:

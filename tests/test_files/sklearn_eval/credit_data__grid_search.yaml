@@ -1,0 +1,198 @@
+name: test name
+description: test description
+cross_validation_type: <class 'sklearn.model_selection._search.GridSearchCV'>
+higher_score_is_better: true
+score_names:
+- ROC/AUC
+- F1
+- Pos. Pred. Val
+- True Pos. Rate
+parameter_names:
+- model__max_features
+- model__n_estimators
+- preparation__non_numeric_pipeline__encoder_chooser__transformer
+parameter_names_mapping:
+- model__max_features: max_features
+- model__n_estimators: n_estimators
+- preparation__non_numeric_pipeline__encoder_chooser__transformer: encoder
+test_score_ranking:
+- ROC/AUC:
+  - 5
+  - 6
+  - 7
+  - 8
+  - 3
+  - 4
+  - 1
+  - 2
+- F1:
+  - 5
+  - 6
+  - 7
+  - 8
+  - 3
+  - 4
+  - 2
+  - 1
+- Pos. Pred. Val:
+  - 5
+  - 6
+  - 7
+  - 8
+  - 1
+  - 2
+  - 4
+  - 3
+- True Pos. Rate:
+  - 5
+  - 6
+  - 7
+  - 8
+  - 3
+  - 4
+  - 2
+  - 1
+test_score_averages:
+- ROC/AUC:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.7163279567387703
+  - 0.7072491564040325
+  - 0.7458632917328131
+  - 0.7451951355826116
+- F1:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.8058928717392303
+  - 0.802378826798729
+  - 0.813638538616564
+  - 0.8210111852296409
+- Pos. Pred. Val:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.7809448096621313
+  - 0.775329864632185
+  - 0.757893198884036
+  - 0.7646480210646794
+- True Pos. Rate:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.8337302985895985
+  - 0.8318034918927163
+  - 0.8783518934170959
+  - 0.8874380901148231
+test_score_standard_deviations:
+- ROC/AUC:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.015733457430657877
+  - 0.017956085573240643
+  - 0.021358294698372124
+  - 0.0019082263491945136
+- F1:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.013493461025657861
+  - 0.00508516388160607
+  - 0.009076970956202291
+  - 0.01206339869613357
+- Pos. Pred. Val:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.007301828322358616
+  - 0.012564173093623985
+  - 0.013933218184339203
+  - 0.01051169094814378
+- True Pos. Rate:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.03715675953632877
+  - 0.014488985186886679
+  - 0.002515848853530437
+  - 0.034475436591048673
+parameter_iterations:
+- 0:
+  - model__max_features: 100
+  - model__n_estimators: 10
+  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- 1:
+  - model__max_features: 100
+  - model__n_estimators: 10
+  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- 2:
+  - model__max_features: 100
+  - model__n_estimators: 50
+  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- 3:
+  - model__max_features: 100
+  - model__n_estimators: 50
+  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- 4:
+  - model__max_features: auto
+  - model__n_estimators: 10
+  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- 5:
+  - model__max_features: auto
+  - model__n_estimators: 10
+  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- 6:
+  - model__max_features: auto
+  - model__n_estimators: 50
+  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- 7:
+  - model__max_features: auto
+  - model__n_estimators: 50
+  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+times:
+- fit time average:
+  - 0.010489622751871744
+  - 0.01983038584391276
+  - 0.017257293065388996
+  - 0.028348604838053387
+  - 0.018707990646362305
+  - 0.02695608139038086
+  - 0.05419389406840006
+  - 0.06525937716166179
+- fit time standard deviation:
+  - 0.000942853380435086
+  - 0.00015028471166754782
+  - 0.00011120658584292939
+  - 0.00041697995549808467
+  - 0.0021543729808912266
+  - 0.00011004836196302715
+  - 0.0006186535450394686
+  - 0.0009507807969781308
+- score time average:
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.010729710261027018
+  - 0.02377661069234212
+  - 0.01566012700398763
+  - 0.029579559961954754
+- score time standard deviation:
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0
+  - 0.0002787074325452992
+  - 0.0004154079293718512
+  - 0.00018246445914169493
+  - 0.0006701305817867347

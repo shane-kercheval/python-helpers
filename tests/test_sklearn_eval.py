@@ -1,3 +1,4 @@
+import os
 import unittest
 import warnings  # noqa
 
@@ -13,7 +14,8 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
-from helpsk.sklearn_eval import SearchCVParser, TwoClassEvaluator, RegressionEvaluator
+from helpsk.exceptions import HelpskAssertionError
+from helpsk.sklearn_eval import SearchCVParser, TwoClassEvaluator, RegressionEvaluator, SearchCVParser2
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 from helpsk.utility import suppress_warnings
 from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing
@@ -143,15 +145,109 @@ class TestSklearnEval(unittest.TestCase):
         cls.housing_data__y_test = y_test
         cls.housing_data__y_predictions = predicted_values
 
+    def test_search_cv_to_dict(self):
+        new_param_column_names = {'model__max_features': 'max_features',
+                                  'model__n_estimators': 'n_estimators',
+                                  'preparation__non_numeric_pipeline__encoder_chooser__transformer':
+                                      'encoder'}
+
+        grid_search_credit = self.credit_data__grid_search
+        parser = SearchCVParser(searcher=grid_search_credit,
+                                higher_score_is_better=True,
+                                run_name="test name",
+                                run_description="test description",
+                                parameter_name_mappings=new_param_column_names)
+        yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search.yaml'
+        os.remove(yaml_file)
+        parser.to_yaml_file(yaml_file)
+        parser_from_dict = SearchCVParser.from_dict(parser._cv_dict)
+        parser_from_yaml = SearchCVParser.from_yaml_file(yaml_file)
+
+        self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
+        self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
+        del grid_search_credit, yaml_file, parser, parser_from_dict, parser_from_yaml
+
+        # the keys passed to parameter_name_mappings should match the parameters founds
+        self.assertRaises(HelpskAssertionError,
+                          lambda: SearchCVParser(searcher=self.credit_data__grid_search,
+                                                 higher_score_is_better=True,
+                                                 run_name="test name",
+                                                 run_description="test description",
+                                                 parameter_name_mappings={'this_should_fail': 'value'}))
+
+        grid_search_credit = self.credit_data__grid_search__roc_auc
+        parser = SearchCVParser(searcher=grid_search_credit,
+                                higher_score_is_better=True,
+                                run_name="test name",
+                                run_description="test description",
+                                parameter_name_mappings=new_param_column_names)
+        yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search_roc.yaml'
+        os.remove(yaml_file)
+        parser.to_yaml_file(yaml_file)
+        parser_from_dict = SearchCVParser.from_dict(parser._cv_dict)
+        parser_from_yaml = SearchCVParser.from_yaml_file(yaml_file)
+
+        self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
+        self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
+        del grid_search_credit, yaml_file, parser, parser_from_dict, parser_from_yaml
+
+        grid_search_housing = self.housing_data__grid_search
+        parser = SearchCVParser(searcher=grid_search_housing,
+                                higher_score_is_better=True,
+                                run_name="test name",
+                                run_description="test description")
+        yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search.yaml'
+        os.remove(yaml_file)
+        parser.to_yaml_file(yaml_file)
+        parser_from_dict = SearchCVParser.from_dict(parser._cv_dict)
+        parser_from_yaml = SearchCVParser.from_yaml_file(yaml_file)
+
+        self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
+        self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
+        del grid_search_housing, yaml_file, parser, parser_from_dict, parser_from_yaml
+
     def test_cv_results_to_dataframe(self):
         grid_search = self.credit_data__grid_search
         new_param_column_names = {'model | max_features': 'max_features',
                                   'model | n_estimators': 'n_estimators',
                                   'preparation | non_numeric_pipeline | encoder_chooser | transformer':
                                       'encoder'}
-        cv_results = SearchCVParser(searcher=grid_search,
-                                    higher_score_is_better=True,
-                                    new_param_column_names=new_param_column_names)
+        cv_results = SearchCVParser2(searcher=grid_search,
+                                     higher_score_is_better=True,
+                                     new_param_column_names=new_param_column_names)
+#
+#
+#         cv_results.trial_labels
+#
+#
+#
+#
+#         import plotly.graph_objects as go
+#         import plotly.io as pio
+#         pio.renderers.default = "browser"
+#
+#         data = cv_results.results[~cv_results.results.iloc[:, 0].isna()]
+#         data = data.iloc[::-1]  # reverse order to display "best" on top of y-axis
+#
+# #        cv_results.primary_score_standard_errors.loc[data.index]
+#
+#
+#         fig = go.Figure(data=go.Scatter(
+#             x=data.iloc[:, 0],
+#             y=cv_results.trial_labels.loc[data.index],
+#             error_x=dict(
+#                 type='data',
+#                 symmetric=False,
+#                 array=data.iloc[:, 2] - data.iloc[:, 0],
+#                 arrayminus=data.iloc[:, 0] - data.iloc[:, 1])
+#         ))
+#         fig.update_yaxes(type='category')
+#         fig.add_vline(x=cv_results.top_score - cv_results.top_score_standard_error, line_dash='dash')
+#         fig.update_yaxes(
+#             scaleanchor="x",
+#             scaleratio=1.618,
+#         )
+#         fig.show()
 
         self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials, ))
         self.assertFalse(cv_results.trial_labels.isna().any())
@@ -233,7 +329,7 @@ class TestSklearnEval(unittest.TestCase):
             file.write(results.render())
 
         grid_search = self.credit_data__grid_search__roc_auc
-        cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=True)
+        cv_results = SearchCVParser2(searcher=grid_search, higher_score_is_better=True)
 
         self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials,))
         self.assertFalse(cv_results.trial_labels.isna().any())
@@ -274,7 +370,7 @@ class TestSklearnEval(unittest.TestCase):
 
     def test_cv_results_to_dataframe_regression(self):
         grid_search = self.housing_data__grid_search
-        cv_results = SearchCVParser(searcher=grid_search, higher_score_is_better=False)
+        cv_results = SearchCVParser2(searcher=grid_search, higher_score_is_better=False)
 
         self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials,))
         self.assertFalse(cv_results.trial_labels.isna().any())
