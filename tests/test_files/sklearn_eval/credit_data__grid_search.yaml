@@ -2,6 +2,7 @@ name: test name
 description: test description
 cross_validation_type: <class 'sklearn.model_selection._search.GridSearchCV'>
 higher_score_is_better: true
+number_of_splits: 3
 score_names:
 - ROC/AUC
 - F1
@@ -15,8 +16,8 @@ parameter_names_mapping:
 - model__max_features: max_features
 - model__n_estimators: n_estimators
 - preparation__non_numeric_pipeline__encoder_chooser__transformer: encoder
-test_score_ranking:
-- ROC/AUC:
+test_score_rankings:
+  ROC/AUC:
   - 5
   - 6
   - 7
@@ -25,7 +26,7 @@ test_score_ranking:
   - 4
   - 1
   - 2
-- F1:
+  F1:
   - 5
   - 6
   - 7
@@ -34,7 +35,7 @@ test_score_ranking:
   - 4
   - 2
   - 1
-- Pos. Pred. Val:
+  Pos. Pred. Val:
   - 5
   - 6
   - 7
@@ -43,7 +44,7 @@ test_score_ranking:
   - 2
   - 4
   - 3
-- True Pos. Rate:
+  True Pos. Rate:
   - 5
   - 6
   - 7
@@ -53,7 +54,7 @@ test_score_ranking:
   - 2
   - 1
 test_score_averages:
-- ROC/AUC:
+  ROC/AUC:
   - .nan
   - .nan
   - .nan
@@ -62,7 +63,7 @@ test_score_averages:
   - 0.7072491564040325
   - 0.7458632917328131
   - 0.7451951355826116
-- F1:
+  F1:
   - .nan
   - .nan
   - .nan
@@ -71,7 +72,7 @@ test_score_averages:
   - 0.802378826798729
   - 0.813638538616564
   - 0.8210111852296409
-- Pos. Pred. Val:
+  Pos. Pred. Val:
   - .nan
   - .nan
   - .nan
@@ -80,7 +81,7 @@ test_score_averages:
   - 0.775329864632185
   - 0.757893198884036
   - 0.7646480210646794
-- True Pos. Rate:
+  True Pos. Rate:
   - .nan
   - .nan
   - .nan
@@ -90,7 +91,7 @@ test_score_averages:
   - 0.8783518934170959
   - 0.8874380901148231
 test_score_standard_deviations:
-- ROC/AUC:
+  ROC/AUC:
   - .nan
   - .nan
   - .nan
@@ -99,7 +100,7 @@ test_score_standard_deviations:
   - 0.017956085573240643
   - 0.021358294698372124
   - 0.0019082263491945136
-- F1:
+  F1:
   - .nan
   - .nan
   - .nan
@@ -108,7 +109,7 @@ test_score_standard_deviations:
   - 0.00508516388160607
   - 0.009076970956202291
   - 0.01206339869613357
-- Pos. Pred. Val:
+  Pos. Pred. Val:
   - .nan
   - .nan
   - .nan
@@ -117,7 +118,7 @@ test_score_standard_deviations:
   - 0.012564173093623985
   - 0.013933218184339203
   - 0.01051169094814378
-- True Pos. Rate:
+  True Pos. Rate:
   - .nan
   - .nan
   - .nan
@@ -159,40 +160,40 @@ parameter_iterations:
   - model__max_features: auto
   - model__n_estimators: 50
   - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-times:
-- fit time average:
-  - 0.010489622751871744
-  - 0.01983038584391276
-  - 0.017257293065388996
-  - 0.028348604838053387
-  - 0.018707990646362305
-  - 0.02695608139038086
-  - 0.05419389406840006
-  - 0.06525937716166179
-- fit time standard deviation:
-  - 0.000942853380435086
-  - 0.00015028471166754782
-  - 0.00011120658584292939
-  - 0.00041697995549808467
-  - 0.0021543729808912266
-  - 0.00011004836196302715
-  - 0.0006186535450394686
-  - 0.0009507807969781308
-- score time average:
+timings:
+  fit time averages:
+  - 0.026621262232462566
+  - 0.051133314768473305
+  - 0.05613271395365397
+  - 0.08238307634989421
+  - 0.039314985275268555
+  - 0.0662692387898763
+  - 0.11480172475179036
+  - 0.13340067863464355
+  fit time standard deviations:
+  - 0.0021527839864018735
+  - 0.0019816799489348483
+  - 0.0005582606314053137
+  - 0.00046215739977442487
+  - 0.005644897390758572
+  - 0.00177975198934814
+  - 0.012856830622156605
+  - 0.004168932111841227
+  score time averages:
   - 0.0
   - 0.0
   - 0.0
   - 0.0
-  - 0.010729710261027018
-  - 0.02377661069234212
-  - 0.01566012700398763
-  - 0.029579559961954754
-- score time standard deviation:
+  - 0.024985074996948242
+  - 0.0649423599243164
+  - 0.03881263732910156
+  - 0.06752220789591472
+  score time standard deviations:
   - 0.0
   - 0.0
   - 0.0
   - 0.0
-  - 0.0002787074325452992
-  - 0.0004154079293718512
-  - 0.00018246445914169493
-  - 0.0006701305817867347
+  - 0.001702974104354358
+  - 0.005686506874085631
+  - 0.005618546885076273
+  - 0.0015677235056360624

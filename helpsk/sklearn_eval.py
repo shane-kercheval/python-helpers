@@ -3,8 +3,9 @@ in particular, for evaluating models"""
 # pylint: disable=too-many-lines
 import math
 import warnings
-from typing import Tuple, Union, Optional
+from typing import Tuple, Union, Optional, List
 import yaml
+from re import match
 
 import numpy as np
 import pandas as pd
@@ -137,6 +138,19 @@ class SearchCVParser:
                    'scores.'
             raise HelpskParamValueError(mess)
 
+        # get number of splits (e.g. 5 fold 2 repeat cross validation has 10 splits)
+        # I could check the .cv param of the searcher object but not sure all types of cv objects have the
+        # same parameters e.g. searcher.cv.n_repeats
+        # if there is only 1 score, we need to look for e.g. "split0_test_score"
+        # if there are multiple scores we need to look for e.g. "split0_test_ROC/AUC" but we don't want
+        # to duplicate the counts e.g. we don't want to also capture "split0_test_True Pos. Rate"
+        if len(score_names) == 1:
+            split_score_matching_string = "split\\d_test_score"
+        else:
+            split_score_matching_string = "split\\d_test_" + score_names[0]
+
+        number_of_splits = len([x for x in searcher.cv_results_.keys() if bool(match(split_score_matching_string, x))])
+        cv_results_dict['number_of_splits'] = number_of_splits
         cv_results_dict['score_names'] = score_names
         cv_results_dict['parameter_names'] = [key for key, value in searcher.cv_results_['params'][0].items()]
 
@@ -145,37 +159,184 @@ class SearchCVParser:
                 assert_true(key in cv_results_dict['parameter_names'])
             cv_results_dict['parameter_names_mapping'] = [{key: value} for key, value in parameter_name_mappings.items()]
 
-        if len(score_names) == 1:
-            cv_results_dict['test_score_ranking'] = [{score_names[0]: searcher.cv_results_['rank_test_score'].tolist()}]
-            cv_results_dict['test_score_averages'] = [{score_names[0]: searcher.cv_results_['mean_test_score'].tolist()}]
-            cv_results_dict['test_score_standard_deviations'] = [{score_names[0]: searcher.cv_results_['std_test_score'].tolist()}]
-        else:
-            ranking_list = []
-            averages_list = []
-            standard_deviations_list = []
-            for score in score_names:
-                ranking_list.append({score: searcher.cv_results_['rank_test_' + score].tolist()})
-                averages_list.append({score: searcher.cv_results_['mean_test_' + score].tolist()})
-                standard_deviations_list.append({score: searcher.cv_results_['std_test_' + score].tolist()})
+        number_of_iterations = len(searcher.cv_results_['mean_fit_time'])
 
-            cv_results_dict['test_score_ranking'] = ranking_list
-            cv_results_dict['test_score_averages'] = averages_list
-            cv_results_dict['test_score_standard_deviations'] = standard_deviations_list
+        if len(score_names) == 1:
+            test_score_ranking = searcher.cv_results_['rank_test_score'].tolist()
+            test_score_averages = searcher.cv_results_['mean_test_score'].tolist()
+            test_score_standard_deviations = searcher.cv_results_['std_test_score'].tolist()
+
+            assert_true(len(test_score_ranking) == number_of_iterations)
+            assert_true(len(test_score_averages) == number_of_iterations)
+            assert_true(len(test_score_standard_deviations) == number_of_iterations)
+
+            cv_results_dict['test_score_ranking'] = {score_names[0]: test_score_ranking}
+            cv_results_dict['test_score_averages'] = {score_names[0]: test_score_averages}
+            cv_results_dict['test_score_standard_deviations'] = {score_names[0]:
+                                                                     test_score_standard_deviations}
+        else:
+            ranking_dict = {}
+            averages_dict = {}
+            standard_deviations_dict = {}
+            for score in score_names:
+                rankings = searcher.cv_results_['rank_test_' + score].tolist()
+                averages = searcher.cv_results_['mean_test_' + score].tolist()
+                standard_deviations = searcher.cv_results_['std_test_' + score].tolist()
+
+                assert_true(len(rankings) == number_of_iterations)
+                assert_true(len(averages) == number_of_iterations)
+                assert_true(len(standard_deviations) == number_of_iterations)
+
+                ranking_dict[score] = rankings
+                averages_dict[score] = averages
+                standard_deviations_dict[score] = standard_deviations
+
+            cv_results_dict['test_score_rankings'] = ranking_dict
+            cv_results_dict['test_score_averages'] = averages_dict
+            cv_results_dict['test_score_standard_deviations'] = standard_deviations_dict
+
+        assert_true(len(searcher.cv_results_['params']) == number_of_iterations)
 
         cv_results_dict['parameter_iterations'] = [
             {index: [{key: string_if_not_number(value)} for key, value in searcher.cv_results_['params'][index].items()]}
             for index in range(len(searcher.cv_results_['params']))
         ]
 
-        cv_results_dict['times'] = [{'fit time average': searcher.cv_results_['mean_fit_time'].tolist()},
-                                    {'fit time standard deviation': searcher.cv_results_['std_fit_time'].tolist()},
-                                    {'score time average': searcher.cv_results_['mean_score_time'].tolist()},
-                                    {'score time standard deviation': searcher.cv_results_['std_score_time'].tolist()}]
+        fit_time_averages = searcher.cv_results_['mean_fit_time'].tolist()
+        fit_time_standard_deviations = searcher.cv_results_['std_fit_time'].tolist()
+        score_time_averages = searcher.cv_results_['mean_score_time'].tolist()
+        score_time_standard_deviations = searcher.cv_results_['std_score_time'].tolist()
+
+        assert_true(len(fit_time_averages) == number_of_iterations)
+        assert_true(len(fit_time_standard_deviations) == number_of_iterations)
+        assert_true(len(score_time_averages) == number_of_iterations)
+        assert_true(len(score_time_standard_deviations) == number_of_iterations)
+
+        cv_results_dict['timings'] = {'fit time averages': fit_time_averages,
+                                      'fit time standard deviations': fit_time_standard_deviations,
+                                      'score time averages': score_time_averages,
+                                      'score time standard deviations': score_time_standard_deviations}
 
         return cv_results_dict
 
+    @property
+    def number_of_iterations(self) -> int:
+        """"A single trial contains the cross validation runs for a single set of hyper-parameters. The
+        'number of trials' is basically the number of combinations of different hyper-parameters that were
+        cross validated."""
+        return len(self._cv_dict['parameter_iterations'])
 
+    @property
+    def number_of_splits(self) -> int:
+        """This is the number of CV folds. For example, a 5-fold 2-repeat CV has 10 splits."""
+        return self._cv_dict['number_of_splits']
 
+    @property
+    def score_names(self) -> list:
+        """Returns a list of the names of the scores"""
+        return self._cv_dict['score_names']
+
+    @property
+    def number_of_scores(self) -> int:
+        """The number of scores passed to the SearchCV object"""
+        return len(self.score_names)
+
+    @property
+    def primary_score_name(self) -> str:
+        """The first scorer passed to the SearchCV will be treated as the primary score."""
+        return self.score_names[0]
+
+    @property
+    def primary_score_means(self) -> List[float]:
+        """The standard errors associated with the scores. Sorted to correspond to `results` DataFrame."""
+        pass
+
+    @property
+    def primary_score_standard_errors(self) -> List[float]:
+        """The standard errors associated with the scores. Sorted to correspond to `results` DataFrame."""
+        pass
+
+    @property
+    def fit_time_averages(self) -> List[float]:
+        """
+        Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
+        Each value is the average number of seconds that the iteration took to fit the model, per split
+        (i.e. the average fit time of all splits).
+        """
+        return self._cv_dict['timings']['fit time averages']
+
+    @property
+    def fit_time_standard_deviations(self) -> List[float]:
+        """
+        Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
+        Each value is the standard deviation of seconds that the iteration took to fit the model, per split
+        (i.e. the standard deviation of fit time across all splits).
+        """
+        return self._cv_dict['timings']['fit time standard deviations']
+
+    @property
+    def score_time_averages(self) -> List[float]:
+        """
+        Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
+        Each value is the average number of seconds that the iteration took to score the model, per split
+        (i.e. the average score time of all splits).
+        """
+        return self._cv_dict['timings']['score time averages']
+
+    @property
+    def score_time_standard_deviations(self) -> List[float]:
+        """
+        Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
+        Each value is the standard deviation of seconds that the iteration took to score the model, per split
+        (i.e. the standard deviation of score time across all splits).
+        """
+        return self._cv_dict['timings']['score time standard deviations']
+
+    @property
+    def iteration_fit_times(self) -> np.array:
+        """For each iteration, it is the amount of time it took to fit the model.
+
+        Calculated by Average fit time for each iteration multiplied by the number of splits per iteration.
+
+        self.fit_time_averages * self.number_of_splits
+
+        Returns:
+            array containing the fit time for each iteration
+        """
+        return self.fit_time_averages * self.number_of_splits
+
+    @property
+    def fit_time_total(self) -> float:
+        """Total fit time across all iterations."""
+        return float(np.sum(self.iteration_fit_times))
+
+    @property
+    def iteration_score_times(self) -> np.array:
+        """For each iteration, it is the amount of time it took to score the model.
+
+        Calculated by Average score time for each iteration multiplied by the number of splits per iteration.
+
+        self.score_time_averages * self.number_of_splits
+
+        Returns:
+            array containing the score time for each iteration
+        """
+        return self.score_time_averages * self.number_of_splits
+
+    @property
+    def score_time_total(self) -> float:
+        """Total score time across all iterations."""
+        return float(np.sum(self.iteration_score_times))
+
+    @property
+    def average_time_per_trial(self) -> float:
+        """Average time per trial"""
+        return float(np.mean(self.iteration_fit_times + self.iteration_score_times))
+
+    @property
+    def total_time(self) -> float:
+        """Total time it took across all trials"""
+        return self.fit_time_total + self.score_time_total
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods

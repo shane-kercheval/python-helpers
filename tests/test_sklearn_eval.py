@@ -151,6 +151,8 @@ class TestSklearnEval(unittest.TestCase):
                                   'preparation__non_numeric_pipeline__encoder_chooser__transformer':
                                       'encoder'}
 
+        # test grid search object that has multiple scores (classification)
+        # passing in parameter mappings
         grid_search_credit = self.credit_data__grid_search
         parser = SearchCVParser(searcher=grid_search_credit,
                                 higher_score_is_better=True,
@@ -165,7 +167,32 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
         self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
+
+        self.assertEqual(parser.number_of_iterations, 8)
+        self.assertEqual(parser.number_of_iterations, parser_from_dict.number_of_iterations)
+        self.assertEqual(parser.number_of_iterations, parser_from_yaml.number_of_iterations)
+
+        self.assertEqual(parser.number_of_splits, 3)
+        self.assertEqual(parser.number_of_splits, parser_from_dict.number_of_splits)
+        self.assertEqual(parser.number_of_splits, parser_from_yaml.number_of_splits)
+
+
+
+
         del grid_search_credit, yaml_file, parser, parser_from_dict, parser_from_yaml
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         # the keys passed to parameter_name_mappings should match the parameters founds
         self.assertRaises(HelpskAssertionError,
@@ -175,6 +202,8 @@ class TestSklearnEval(unittest.TestCase):
                                                  run_description="test description",
                                                  parameter_name_mappings={'this_should_fail': 'value'}))
 
+        # test grid search object that has one score (classification)
+        # not passing in parameter mappings
         grid_search_credit = self.credit_data__grid_search__roc_auc
         parser = SearchCVParser(searcher=grid_search_credit,
                                 higher_score_is_better=True,
@@ -191,6 +220,8 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
         del grid_search_credit, yaml_file, parser, parser_from_dict, parser_from_yaml
 
+        # test grid search object that has multiple scores (regression)
+        # not passing in parameter mappings
         grid_search_housing = self.housing_data__grid_search
         parser = SearchCVParser(searcher=grid_search_housing,
                                 higher_score_is_better=True,
