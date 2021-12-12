@@ -94,7 +94,7 @@ class TestSklearnEval(unittest.TestCase):
                                    cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),
                                    scoring='roc_auc',
                                    refit=True,
-                                   return_train_score=True)
+                                   return_train_score=False)
         grid_search.fit(X_train, y_train)
         cls.credit_data__grid_search__roc_auc = grid_search
 
@@ -397,12 +397,12 @@ class TestSklearnEval(unittest.TestCase):
                 both_nan = np.isnan(array1[index]) and np.isnan(array2[index])
                 self.assertTrue(is_close or both_nan)
 
-            assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                       grid_search_credit.cv_results_['mean_test_score'])
-            assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                       np.array(parser_from_dict.test_score_averages[parser.primary_score_name]))
-            assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                       np.array(parser_from_yaml.test_score_averages[parser.primary_score_name]))
+        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
+                                   grid_search_credit.cv_results_['mean_test_score'])
+        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
+                                   np.array(parser_from_dict.test_score_averages[parser.primary_score_name]))
+        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
+                                   np.array(parser_from_yaml.test_score_averages[parser.primary_score_name]))
 
         self.assertTrue(isinstance(parser.test_score_averages, dict))
         self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
@@ -445,25 +445,8 @@ class TestSklearnEval(unittest.TestCase):
         assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
                                    np.array(parser_from_yaml.test_score_standard_deviations[parser.primary_score_name]))
 
-        self.assertTrue(isinstance(parser.train_score_averages, dict))
-        self.assertEqual(list(parser.train_score_averages.keys()), parser.score_names)
-
-        assert_np_arrays_are_close(np.array(parser.train_score_averages[parser.primary_score_name]),
-                                   grid_search_credit.cv_results_['mean_train_score'])
-        assert_np_arrays_are_close(np.array(parser.train_score_averages[parser.primary_score_name]),
-                                   np.array(parser_from_dict.train_score_averages[parser.primary_score_name]))
-        assert_np_arrays_are_close(np.array(parser.train_score_averages[parser.primary_score_name]),
-                                   np.array(parser_from_yaml.train_score_averages[parser.primary_score_name]))
-
-        self.assertTrue(isinstance(parser.train_score_standard_deviations, dict))
-        self.assertEqual(list(parser.train_score_standard_deviations.keys()), parser.score_names)
-
-        assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[parser.primary_score_name]),
-                                   grid_search_credit.cv_results_['std_train_score'])
-        assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[parser.primary_score_name]),
-                                   np.array(parser_from_dict.train_score_standard_deviations[parser.primary_score_name]))
-        assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[parser.primary_score_name]),
-                                   np.array(parser_from_yaml.train_score_standard_deviations[parser.primary_score_name]))
+        self.assertIsNone(parser.train_score_averages)
+        self.assertIsNone(parser.train_score_standard_deviations)
 
         self.assertTrue(isinstance(parser.parameter_iterations, list))
         self.assertEqual(len(parser.parameter_iterations), parser.number_of_iterations)
