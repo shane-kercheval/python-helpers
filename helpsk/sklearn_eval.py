@@ -3,14 +3,14 @@ in particular, for evaluating models"""
 # pylint: disable=too-many-lines
 import math
 import warnings
-from typing import Tuple, Union, Optional, List
-import yaml
 from re import match
+from typing import Tuple, Union, Optional
 
 import numpy as np
 import pandas as pd
 import scipy.stats as st
 import seaborn as sns
+import yaml
 from matplotlib import pyplot as plt
 from pandas.io.formats.style import Styler
 from sklearn.metrics import confusion_matrix, roc_auc_score, r2_score
@@ -269,7 +269,7 @@ class SearchCVParser:
                                                       self.test_score_averages[score_name]})],
                                    axis=1)
 
-        result = pd.concat([result, pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)
+        result = pd.concat([result, pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)  # noqa
 
         if self.parameter_names_mapping:
             result = result.rename(columns=self.parameter_names_mapping)
