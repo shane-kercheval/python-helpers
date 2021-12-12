@@ -13,9 +13,9 @@ parameter_names:
 - model__n_estimators
 - preparation__non_numeric_pipeline__encoder_chooser__transformer
 parameter_names_mapping:
-- model__max_features: max_features
-- model__n_estimators: n_estimators
-- preparation__non_numeric_pipeline__encoder_chooser__transformer: encoder
+  model__max_features: max_features
+  model__n_estimators: n_estimators
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: encoder
 test_score_rankings:
   ROC/AUC:
   - 5
@@ -202,72 +202,64 @@ train_score_standard_deviations:
   - 0.0
   - 0.0
 parameter_iterations:
-- 0:
-  - model__max_features: 100
-  - model__n_estimators: 10
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- 1:
-  - model__max_features: 100
-  - model__n_estimators: 10
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-- 2:
-  - model__max_features: 100
-  - model__n_estimators: 50
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- 3:
-  - model__max_features: 100
-  - model__n_estimators: 50
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-- 4:
-  - model__max_features: auto
-  - model__n_estimators: 10
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- 5:
-  - model__max_features: auto
-  - model__n_estimators: 10
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-- 6:
-  - model__max_features: auto
-  - model__n_estimators: 50
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- 7:
-  - model__max_features: auto
-  - model__n_estimators: 50
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- model__max_features: 100
+  model__n_estimators: 10
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- model__max_features: 100
+  model__n_estimators: 10
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- model__max_features: 100
+  model__n_estimators: 50
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- model__max_features: 100
+  model__n_estimators: 50
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- model__max_features: auto
+  model__n_estimators: 10
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- model__max_features: auto
+  model__n_estimators: 10
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- model__max_features: auto
+  model__n_estimators: 50
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- model__max_features: auto
+  model__n_estimators: 50
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
 timings:
   fit time averages:
-  - 0.032665411631266274
-  - 0.07512601216634114
-  - 0.10278773307800293
-  - 0.08676187197367351
-  - 0.05792069435119629
-  - 0.062399069468180336
-  - 0.11614878972371419
-  - 0.12825274467468262
+  - 0.02599159876505534
+  - 0.051789045333862305
+  - 0.055814266204833984
+  - 0.08095963795979817
+  - 0.03405102094014486
+  - 0.05866360664367676
+  - 0.10867110888163249
+  - 0.13062119483947754
   fit time standard deviations:
-  - 0.003935460883347378
-  - 0.010412108501867356
-  - 0.049644246919437286
-  - 0.0007047572093876066
-  - 0.022613380490947566
-  - 0.0028487725402101685
-  - 0.009349851402687851
-  - 0.0007200193983938646
+  - 0.0017602066168922576
+  - 0.0006951752929170634
+  - 0.0006573259462678389
+  - 0.0005810213432298296
+  - 0.0008871311809021703
+  - 0.0004994988155542511
+  - 0.0021748897834702376
+  - 0.003604911406975005
   score time averages:
   - 0.0
   - 0.0
   - 0.0
   - 0.0
-  - 0.03866426150004069
-  - 0.06552457809448242
-  - 0.03300158182779948
-  - 0.0689082145690918
+  - 0.022178093592325848
+  - 0.05623928705851237
+  - 0.03435540199279785
+  - 0.06634338696797688
   score time standard deviations:
   - 0.0
   - 0.0
   - 0.0
   - 0.0
-  - 0.01922386418086464
-  - 0.010241232236304545
-  - 0.0005067574544445018
-  - 0.0038412104417808457
+  - 0.0003937129585256119
+  - 0.0006302217216509814
+  - 0.0008246846840813257
+  - 0.000850251382555323

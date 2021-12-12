@@ -157,7 +157,7 @@ class SearchCVParser:
         if parameter_name_mappings:
             for key in parameter_name_mappings.keys():
                 assert_true(key in cv_results_dict['parameter_names'])
-            cv_results_dict['parameter_names_mapping'] = [{key: value} for key, value in parameter_name_mappings.items()]
+            cv_results_dict['parameter_names_mapping'] = parameter_name_mappings
 
         number_of_iterations = len(searcher.cv_results_['mean_fit_time'])
 
@@ -228,7 +228,7 @@ class SearchCVParser:
         assert_true(len(searcher.cv_results_['params']) == number_of_iterations)
 
         cv_results_dict['parameter_iterations'] = [
-            {index: [{key: string_if_not_number(value)} for key, value in searcher.cv_results_['params'][index].items()]}
+            {key: string_if_not_number(value) for key, value in searcher.cv_results_['params'][index].items()}
             for index in range(len(searcher.cv_results_['params']))
         ]
 
@@ -248,6 +248,20 @@ class SearchCVParser:
                                       'score time standard deviations': score_time_standard_deviations}
 
         return cv_results_dict
+
+    @property
+    def to_dataframe(self):
+        self._cv_dict['parameter_iterations']
+        self._cv_dict['parameter_iterations']
+
+        result = pd.DataFrame.from_dict(self._cv_dict['parameter_iterations'])
+
+        if 'parameter_names_mapping' in self._cv_dict:
+            result = result.rename(columns=self._cv_dict['parameter_names_mapping'])
+
+        result
+
+        return None
 
     @property
     def number_of_iterations(self) -> int:
