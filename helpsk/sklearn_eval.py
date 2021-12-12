@@ -259,7 +259,7 @@ class SearchCVParser:
                                              scale=self.primary_score_standard_errors)
 
         result = pd.DataFrame({self.primary_score_name + " Mean": self.primary_score_averages,
-                               self.primary_score_name + " 95CI.LOW": confidence_intervals[0],
+                               self.primary_score_name + " 95CI.LO": confidence_intervals[0],
                                self.primary_score_name + " 95CI.HI": confidence_intervals[1]})
 
         if self.number_of_scores > 1:
