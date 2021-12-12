@@ -577,54 +577,12 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-
-        # test grid search object that has one score (classification)
-        # not passing in parameter mappings
-        grid_search_credit = self.credit_data__grid_search__roc_auc
-        parser = SearchCVParser(searcher=grid_search_credit,
-                                higher_score_is_better=True,
-                                run_name="test name",
-                                run_description="test description",
-                                parameter_name_mappings=new_param_column_names)
-        yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search_roc.yaml'
-        os.remove(yaml_file)
-        parser.to_yaml_file(yaml_file)
-        parser_from_dict = SearchCVParser.from_dict(parser._cv_dict)
-        parser_from_yaml = SearchCVParser.from_yaml_file(yaml_file)
-
-        self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
-        self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
-        del grid_search_credit, yaml_file, parser, parser_from_dict, parser_from_yaml
-
+    def test_SearchCVParser_gridsearch_regression(self):
         # test grid search object that has multiple scores (regression)
         # not passing in parameter mappings
         grid_search_housing = self.housing_data__grid_search
         parser = SearchCVParser(searcher=grid_search_housing,
-                                higher_score_is_better=True,
+                                higher_score_is_better=False,
                                 run_name="test name",
                                 run_description="test description")
         yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search.yaml'
@@ -635,10 +593,163 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
         self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
-        del grid_search_housing, yaml_file, parser, parser_from_dict, parser_from_yaml
 
+        self.assertEqual(parser.name, "test name")
+        self.assertEqual(parser.name, parser_from_dict.name)
+        self.assertEqual(parser.name, parser_from_yaml.name)
+        self.assertEqual(parser.description, "test description")
+        self.assertEqual(parser.description, parser_from_dict.description)
+        self.assertEqual(parser.description, parser_from_yaml.description)
+        self.assertEqual(parser.higher_score_is_better, False)
+        self.assertEqual(parser.higher_score_is_better, parser_from_dict.higher_score_is_better)
+        self.assertEqual(parser.higher_score_is_better, parser_from_yaml.higher_score_is_better)
+        self.assertEqual(parser.cross_validation_type,
+                         "<class 'sklearn.model_selection._search.GridSearchCV'>")
+        self.assertEqual(parser.cross_validation_type, parser_from_dict.cross_validation_type)
+        self.assertEqual(parser.cross_validation_type, parser_from_yaml.cross_validation_type)
+        self.assertEqual(parser.number_of_splits,
+                         grid_search_housing.cv.n_repeats * grid_search_housing.n_splits_)
+        self.assertEqual(parser.number_of_splits, parser_from_dict.number_of_splits)
+        self.assertEqual(parser.number_of_splits, parser_from_yaml.number_of_splits)
+        self.assertEqual(parser.score_names, ['RMSE', 'MAE'])
+        self.assertEqual(parser.score_names, parser_from_dict.score_names)
+        self.assertEqual(parser.score_names, parser_from_yaml.score_names)
 
+        self.assertEqual(parser.parameter_names_original, parser_from_dict.parameter_names_original)
+        self.assertEqual(parser.parameter_names_original, parser_from_yaml.parameter_names_original)
+        self.assertEqual(parser.parameter_names, parser.parameter_names_original)
+        self.assertEqual(parser.parameter_names, parser_from_dict.parameter_names)
+        self.assertEqual(parser.parameter_names, parser_from_yaml.parameter_names)
+        self.assertIsNone(parser.parameter_names_mapping)
+        self.assertIsNone(parser_from_dict.parameter_names_mapping)
+        self.assertIsNone(parser_from_yaml.parameter_names_mapping)
 
+        self.assertTrue(isinstance(parser.test_score_rankings, dict))
+        self.assertEqual(list(parser.test_score_rankings.keys()), parser.score_names)
+        self.assertEqual(parser.test_score_rankings, parser_from_dict.test_score_rankings)
+        self.assertEqual(parser.test_score_rankings, parser_from_yaml.test_score_rankings)
+        for score in parser.score_names:
+            self.assertTrue(all(np.array(parser.test_score_rankings[score]) == grid_search_housing.cv_results_[f'rank_test_{score}']))
+
+        def assert_np_arrays_are_close(array1, array2):
+            self.assertEqual(len(array1), len(array2))
+            for index in range(len(array1)):
+                is_close = hlp.validation.is_close(array1[index], array2[index])
+                both_nan = np.isnan(array1[index]) and np.isnan(array2[index])
+                self.assertTrue(is_close or both_nan)
+
+        self.assertTrue(isinstance(parser.test_score_averages, dict))
+        self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
+
+        assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3]))
+        assert_np_arrays_are_close(np.array([1, 2, np.nan]), np.array([1, 2, np.nan]))
+        self.assertRaises(AssertionError,
+                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001])))
+        self.assertRaises(AssertionError,
+                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
+
+        assert_np_arrays_are_close(parser.primary_score_averages,
+                                   np.array(parser.test_score_averages[parser.primary_score_name]))
+        assert_np_arrays_are_close(parser.primary_score_averages,
+                                   grid_search_housing.cv_results_['mean_test_RMSE'])
+        assert_np_arrays_are_close(parser.primary_score_averages,
+                                   parser_from_dict.primary_score_averages)
+        assert_np_arrays_are_close(parser.primary_score_averages,
+                                   parser_from_yaml.primary_score_averages)
+
+        assert_np_arrays_are_close(parser.primary_score_standard_errors,
+                                   parser_from_dict.primary_score_standard_errors)
+        assert_np_arrays_are_close(parser.primary_score_standard_errors,
+                                   parser_from_yaml.primary_score_standard_errors)
+
+        for score in parser.score_names:
+            assert_np_arrays_are_close(np.array(parser.test_score_averages[score]),
+                                       grid_search_housing.cv_results_[f'mean_test_{score}'])
+            assert_np_arrays_are_close(np.array(parser.test_score_averages[score]),
+                                       np.array(parser_from_dict.test_score_averages[score]))
+            assert_np_arrays_are_close(np.array(parser.test_score_averages[score]),
+                                       np.array(parser_from_yaml.test_score_averages[score]))
+
+        self.assertTrue(isinstance(parser.test_score_standard_deviations, dict))
+        self.assertEqual(list(parser.test_score_standard_deviations.keys()), parser.score_names)
+
+        for score in parser.score_names:
+            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
+                                       grid_search_housing.cv_results_[f'std_test_{score}'])
+            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
+                                       np.array(parser_from_dict.test_score_standard_deviations[score]))
+            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
+                                       np.array(parser_from_yaml.test_score_standard_deviations[score]))
+
+        self.assertTrue(isinstance(parser.train_score_averages, dict))
+        self.assertEqual(list(parser.train_score_averages.keys()), parser.score_names)
+
+        for score in parser.score_names:
+            assert_np_arrays_are_close(np.array(parser.train_score_averages[score]),
+                                       grid_search_housing.cv_results_[f'mean_train_{score}'])
+            assert_np_arrays_are_close(np.array(parser.train_score_averages[score]),
+                                       np.array(parser_from_dict.train_score_averages[score]))
+            assert_np_arrays_are_close(np.array(parser.train_score_averages[score]),
+                                       np.array(parser_from_yaml.train_score_averages[score]))
+
+        self.assertTrue(isinstance(parser.train_score_standard_deviations, dict))
+        self.assertEqual(list(parser.train_score_standard_deviations.keys()), parser.score_names)
+
+        for score in parser.score_names:
+            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
+                                       grid_search_housing.cv_results_[f'std_train_{score}'])
+            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
+                                       np.array(parser_from_dict.train_score_standard_deviations[score]))
+            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
+                                       np.array(parser_from_yaml.train_score_standard_deviations[score]))
+
+        self.assertTrue(isinstance(parser.parameter_iterations, list))
+        self.assertEqual(len(parser.parameter_iterations), parser.number_of_iterations)
+        self.assertEqual(parser.parameter_iterations, parser_from_dict.parameter_iterations)
+        self.assertEqual(parser.parameter_iterations, parser_from_yaml.parameter_iterations)
+
+        self.assertTrue(isinstance(parser.timings, dict))
+        self.assertEqual(list(parser.timings.keys()), ['fit time averages',
+                                                       'fit time standard deviations',
+                                                       'score time averages',
+                                                       'score time standard deviations'])
+
+        assert_np_arrays_are_close(np.array(parser.timings[list(parser.timings.keys())[0]]),
+                                   grid_search_housing.cv_results_['mean_fit_time'])
+        assert_np_arrays_are_close(np.array(parser.timings[list(parser.timings.keys())[1]]),
+                                   grid_search_housing.cv_results_['std_fit_time'])
+        assert_np_arrays_are_close(np.array(parser.timings[list(parser.timings.keys())[2]]),
+                                   grid_search_housing.cv_results_['mean_score_time'])
+        assert_np_arrays_are_close(np.array(parser.timings[list(parser.timings.keys())[3]]),
+                                   grid_search_housing.cv_results_['std_score_time'])
+
+        for timing in list(parser.timings.keys()):
+            assert_np_arrays_are_close(np.array(parser.timings[timing]),
+                                       np.array(parser_from_dict.timings[timing]))
+            assert_np_arrays_are_close(np.array(parser.timings[timing]),
+                                       np.array(parser_from_yaml.timings[timing]))
+
+        self.assertEqual(parser.number_of_iterations, 4)
+        self.assertEqual(parser.number_of_iterations, parser_from_dict.number_of_iterations)
+        self.assertEqual(parser.number_of_iterations, parser_from_yaml.number_of_iterations)
+
+        self.assertEqual(parser.number_of_scores, 2)
+        self.assertEqual(parser.number_of_scores, parser_from_dict.number_of_scores)
+        self.assertEqual(parser.number_of_scores, parser_from_yaml.number_of_scores)
+
+        self.assertEqual(parser.primary_score_name, 'RMSE')
+        self.assertEqual(parser.primary_score_name, parser_from_dict.primary_score_name)
+        self.assertEqual(parser.primary_score_name, parser_from_yaml.primary_score_name)
+
+        self.assertTrue(all(parser.primary_score_iteration_ranking == grid_search_housing.cv_results_['rank_test_RMSE']))  # noqa
+        self.assertEqual(parser.best_primary_score_index, 3)
+        self.assertEqual(parser.best_primary_score,
+                         grid_search_housing.cv_results_['mean_test_RMSE'][3])
+        self.assertEqual(parser.best_primary_score,
+                         np.nanmax(grid_search_housing.cv_results_['mean_test_RMSE']))
+
+        self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
+        self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
 
     def test_cv_results_to_dataframe(self):
         grid_search = self.credit_data__grid_search
@@ -696,7 +807,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(cv_results.results.index.tolist(),
                          cv_results.formatted_results(return_style=False).index.tolist())
 
-        self.assertEqual(cv_results.score_names, ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate'])
+        self.assertEqual(cv_results.score_names, ['RMSE', 'MAE'])
         self.assertEqual(cv_results.score_columns,
                          ['ROC/AUC Mean',
                           'ROC/AUC 95CI.LO',
