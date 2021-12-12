@@ -570,7 +570,7 @@ class TestSklearnEval(unittest.TestCase):
         assert_np_arrays_are_close(parser.primary_score_averages,
                                    np.array(parser.test_score_averages[parser.primary_score_name]))
         assert_np_arrays_are_close(parser.primary_score_averages,
-                                   grid_search_housing.cv_results_['mean_test_RMSE'])
+                                   grid_search_housing.cv_results_['mean_test_RMSE'] * -1)
         assert_np_arrays_are_close(parser.primary_score_averages,
                                    parser_from_dict.primary_score_averages)
         assert_np_arrays_are_close(parser.primary_score_averages,
@@ -583,7 +583,7 @@ class TestSklearnEval(unittest.TestCase):
 
         for score in parser.score_names:
             assert_np_arrays_are_close(np.array(parser.test_score_averages[score]),
-                                       grid_search_housing.cv_results_[f'mean_test_{score}'])
+                                       grid_search_housing.cv_results_[f'mean_test_{score}'] * -1)
             assert_np_arrays_are_close(np.array(parser.test_score_averages[score]),
                                        np.array(parser_from_dict.test_score_averages[score]))
             assert_np_arrays_are_close(np.array(parser.test_score_averages[score]),
@@ -605,7 +605,7 @@ class TestSklearnEval(unittest.TestCase):
 
         for score in parser.score_names:
             assert_np_arrays_are_close(np.array(parser.train_score_averages[score]),
-                                       grid_search_housing.cv_results_[f'mean_train_{score}'])
+                                       grid_search_housing.cv_results_[f'mean_train_{score}'] * -1)
             assert_np_arrays_are_close(np.array(parser.train_score_averages[score]),
                                        np.array(parser_from_dict.train_score_averages[score]))
             assert_np_arrays_are_close(np.array(parser.train_score_averages[score]),
@@ -663,9 +663,9 @@ class TestSklearnEval(unittest.TestCase):
         self.assertTrue(all(parser.primary_score_iteration_ranking == grid_search_housing.cv_results_['rank_test_RMSE']))  # noqa
         self.assertEqual(parser.best_primary_score_index, 3)
         self.assertEqual(parser.best_primary_score,
-                         grid_search_housing.cv_results_['mean_test_RMSE'][3])
+                         grid_search_housing.cv_results_['mean_test_RMSE'][3] * -1)
         self.assertEqual(parser.best_primary_score,
-                         np.nanmax(grid_search_housing.cv_results_['mean_test_RMSE']))
+                         np.nanmin(grid_search_housing.cv_results_['mean_test_RMSE'] * -1))
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
