@@ -161,6 +161,7 @@ class SearchCVParser:
 
         number_of_iterations = len(searcher.cv_results_['mean_fit_time'])
 
+        # convert test scores to dictionaries
         if len(score_names) == 1:
             test_score_ranking = searcher.cv_results_['rank_test_score'].tolist()
             test_score_averages = searcher.cv_results_['mean_test_score'].tolist()
@@ -194,6 +195,35 @@ class SearchCVParser:
             cv_results_dict['test_score_rankings'] = ranking_dict
             cv_results_dict['test_score_averages'] = averages_dict
             cv_results_dict['test_score_standard_deviations'] = standard_deviations_dict
+
+        # convert training scores to dictionaries, if training scores exists
+        # i.e. if return_train_score=True for the SearchCV object
+        if 'mean_train_score' in searcher.cv_results_ or 'mean_train_'+score_names[0] in searcher.cv_results_:
+            if len(score_names) == 1:
+                train_score_averages = searcher.cv_results_['mean_train_score'].tolist()
+                train_score_standard_deviations = searcher.cv_results_['std_train_score'].tolist()
+
+                assert_true(len(train_score_averages) == number_of_iterations)
+                assert_true(len(train_score_standard_deviations) == number_of_iterations)
+
+                cv_results_dict['train_score_averages'] = {score_names[0]: train_score_averages}
+                cv_results_dict['train_score_standard_deviations'] = {score_names[0]:
+                                                                          train_score_standard_deviations}
+            else:
+                averages_dict = {}
+                standard_deviations_dict = {}
+                for score in score_names:
+                    averages = searcher.cv_results_['mean_train_' + score].tolist()
+                    standard_deviations = searcher.cv_results_['std_train_' + score].tolist()
+
+                    assert_true(len(averages) == number_of_iterations)
+                    assert_true(len(standard_deviations) == number_of_iterations)
+
+                    averages_dict[score] = averages
+                    standard_deviations_dict[score] = standard_deviations
+
+                cv_results_dict['train_score_averages'] = averages_dict
+                cv_results_dict['train_score_standard_deviations'] = standard_deviations_dict
 
         assert_true(len(searcher.cv_results_['params']) == number_of_iterations)
 
@@ -245,15 +275,13 @@ class SearchCVParser:
     def primary_score_name(self) -> str:
         """The first scorer passed to the SearchCV will be treated as the primary score."""
         return self.score_names[0]
-
+    
     @property
-    def primary_score_means(self) -> List[float]:
-        """The standard errors associated with the scores. Sorted to correspond to `results` DataFrame."""
+    def primary_score_best(self):
         pass
 
     @property
-    def primary_score_standard_errors(self) -> List[float]:
-        """The standard errors associated with the scores. Sorted to correspond to `results` DataFrame."""
+    def primary_score_standard_error(self):
         pass
 
     @property
