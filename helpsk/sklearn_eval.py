@@ -274,6 +274,8 @@ class SearchCVParser:
         if 'parameter_names_mapping' in self._cv_dict:
             result = result.rename(columns=self._cv_dict['parameter_names_mapping'])
 
+        result = result.iloc[self.primary_score_best_indexes]
+
         return result
 
     @property
@@ -313,7 +315,17 @@ class SearchCVParser:
     def primary_score_name(self) -> str:
         """The first scorer passed to the SearchCV will be treated as the primary score."""
         return self.score_names[0]
-    
+
+    @property
+    def primary_score_iteration_ranking(self) -> np.array:
+        """The ranking of the corresponding index, in terms of best to worst score."""
+        return np.array(self._cv_dict['test_score_rankings'][self.primary_score_name])
+
+    @property
+    def primary_score_best_indexes(self):
+        """The indexes of best to worst primary scores."""
+        return np.argsort(self.primary_score_iteration_ranking)
+
     @property
     def primary_score_best(self):
         pass
