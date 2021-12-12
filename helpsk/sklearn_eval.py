@@ -251,17 +251,30 @@ class SearchCVParser:
 
     @property
     def to_dataframe(self):
-        self._cv_dict['parameter_iterations']
-        self._cv_dict['parameter_iterations']
 
-        result = pd.DataFrame.from_dict(self._cv_dict['parameter_iterations'])
+        confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
+                                             # number_of_splits is sample-size
+                                             df=self.number_of_splits - 1,  # degrees of freedom
+                                             loc=self.primary_score_averages,
+                                             scale=self.primary_score_standard_errors)
+
+        result = pd.DataFrame({self.primary_score_name + " Mean": self.primary_score_averages,
+                               self.primary_score_name + " 95CI.LOW": confidence_intervals[0],
+                               self.primary_score_name + " 95CI.HI": confidence_intervals[1]})
+
+        if self.number_of_scores > 1:
+            for score_name in self.score_names[1:]:
+                result = pd.concat([result,
+                                    pd.DataFrame({score_name + " Mean":
+                                                      self._cv_dict['test_score_averages'][score_name]})],
+                                   axis=1)
+
+        result = pd.concat([result, pd.DataFrame.from_dict(self._cv_dict['parameter_iterations'])], axis=1)
 
         if 'parameter_names_mapping' in self._cv_dict:
             result = result.rename(columns=self._cv_dict['parameter_names_mapping'])
 
-        result
-
-        return None
+        return result
 
     @property
     def number_of_iterations(self) -> int:
@@ -286,6 +299,17 @@ class SearchCVParser:
         return len(self.score_names)
 
     @property
+    def primary_score_averages(self) -> np.array:
+        """The mean score of each iteration, for the primary score."""
+        return np.array(self._cv_dict['test_score_averages'][self.primary_score_name])
+
+    @property
+    def primary_score_standard_errors(self) -> np.array:
+        """The standard error associated with the mean score of each iteration, for the primary score."""
+        score_standard_deviations = self._cv_dict['test_score_standard_deviations'][self.primary_score_name]
+        return np.array(score_standard_deviations) / math.sqrt(self.number_of_splits)
+
+    @property
     def primary_score_name(self) -> str:
         """The first scorer passed to the SearchCV will be treated as the primary score."""
         return self.score_names[0]
@@ -295,44 +319,45 @@ class SearchCVParser:
         pass
 
     @property
-    def primary_score_standard_error(self):
+    def primary_score_best_standard_error(self):
+        """The standard error associated with the best score of the primary scorer"""
         pass
 
     @property
-    def fit_time_averages(self) -> List[float]:
+    def fit_time_averages(self) -> np.array:
         """
         Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
         Each value is the average number of seconds that the iteration took to fit the model, per split
         (i.e. the average fit time of all splits).
         """
-        return self._cv_dict['timings']['fit time averages']
+        return np.array(self._cv_dict['timings']['fit time averages'])
 
     @property
-    def fit_time_standard_deviations(self) -> List[float]:
+    def fit_time_standard_deviations(self) -> np.array:
         """
         Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
         Each value is the standard deviation of seconds that the iteration took to fit the model, per split
         (i.e. the standard deviation of fit time across all splits).
         """
-        return self._cv_dict['timings']['fit time standard deviations']
+        return np.array(self._cv_dict['timings']['fit time standard deviations'])
 
     @property
-    def score_time_averages(self) -> List[float]:
+    def score_time_averages(self) -> np.array:
         """
         Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
         Each value is the average number of seconds that the iteration took to score the model, per split
         (i.e. the average score time of all splits).
         """
-        return self._cv_dict['timings']['score time averages']
+        return np.array(self._cv_dict['timings']['score time averages'])
 
     @property
-    def score_time_standard_deviations(self) -> List[float]:
+    def score_time_standard_deviations(self) -> np.array:
         """
         Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
         Each value is the standard deviation of seconds that the iteration took to score the model, per split
         (i.e. the standard deviation of score time across all splits).
         """
-        return self._cv_dict['timings']['score time standard deviations']
+        return np.array(self._cv_dict['timings']['score time standard deviations'])
 
     @property
     def iteration_fit_times(self) -> np.array:
