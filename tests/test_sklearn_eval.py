@@ -172,9 +172,37 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.number_of_iterations, parser_from_dict.number_of_iterations)
         self.assertEqual(parser.number_of_iterations, parser_from_yaml.number_of_iterations)
 
-        self.assertEqual(parser.number_of_splits, 3)
+        self.assertEqual(parser.number_of_splits,
+                         grid_search_credit.cv.n_repeats * grid_search_credit.n_splits_)
         self.assertEqual(parser.number_of_splits, parser_from_dict.number_of_splits)
         self.assertEqual(parser.number_of_splits, parser_from_yaml.number_of_splits)
+
+        self.assertEqual(parser.score_names, ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate'])
+        self.assertEqual(parser.score_names, parser_from_dict.score_names)
+        self.assertEqual(parser.score_names, parser_from_yaml.score_names)
+
+        self.assertEqual(parser.number_of_scores, 4)
+        self.assertEqual(parser.number_of_scores, parser_from_dict.number_of_scores)
+        self.assertEqual(parser.number_of_scores, parser_from_yaml.number_of_scores)
+
+        self.assertEqual(parser.primary_score_name, 'ROC/AUC')
+        self.assertEqual(parser.primary_score_name, parser_from_dict.primary_score_name)
+        self.assertEqual(parser.primary_score_name, parser_from_yaml.primary_score_name)
+
+        expected_values = grid_search_credit.cv_results_['mean_test_ROC/AUC']
+        for index in range(len(parser.primary_score_averages)):
+            is_close = hlp.validation.is_close(parser.primary_score_averages[index],
+                                               expected_values[index])
+            both_nan = np.isnan(parser.primary_score_averages[index]) and np.isnan(expected_values[index])
+            self.assertTrue(is_close or both_nan)
+
+        self.assertTrue(all((np.isnan(parser.primary_score_averages) & np.isnan(parser_from_dict.primary_score_averages)) |
+                            (parser.primary_score_averages == parser_from_dict.primary_score_averages)))
+
+        self.assertTrue(all((np.isnan(parser.primary_score_averages) & np.isnan(parser_from_yaml.primary_score_averages)) |
+                            (parser.primary_score_averages == parser_from_yaml.primary_score_averages)))
+
+
 
 
 
