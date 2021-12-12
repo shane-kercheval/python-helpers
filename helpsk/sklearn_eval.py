@@ -171,7 +171,7 @@ class SearchCVParser:
             assert_true(len(test_score_averages) == number_of_iterations)
             assert_true(len(test_score_standard_deviations) == number_of_iterations)
 
-            cv_results_dict['test_score_ranking'] = {score_names[0]: test_score_ranking}
+            cv_results_dict['test_score_rankings'] = {score_names[0]: test_score_ranking}
             cv_results_dict['test_score_averages'] = {score_names[0]: test_score_averages}
             cv_results_dict['test_score_standard_deviations'] = {score_names[0]:
                                                                      test_score_standard_deviations}
@@ -294,7 +294,7 @@ class SearchCVParser:
         return self._cv_dict['higher_score_is_better']
 
     @property
-    def cross_validation_type(self):
+    def cross_validation_type(self) -> str:
         return self._cv_dict['cross_validation_type']
 
     @property
@@ -308,42 +308,48 @@ class SearchCVParser:
         return self._cv_dict['score_names']
 
     @property
-    def parameter_names(self):
+    def parameter_names_original(self) -> list:
+        return self._cv_dict['parameter_names']
+
+    @property
+    def parameter_names(self) -> list:
+        """This property returns either the original parameter names if no `parameter_names_mapping` was
+        provided, or it returns the new parameter names (i.e. the values from `parameter_names_mapping`)."""
         if self.parameter_names_mapping:
             return list(self.parameter_names_mapping.values())
         else:
-            return self._cv_dict['parameter_names']
+            return self.parameter_names_original
 
     @property
-    def parameter_names_mapping(self):
+    def parameter_names_mapping(self) -> dict:
         return self._cv_dict.get('parameter_names_mapping')
 
     @property
-    def test_score_rankings(self):
+    def test_score_rankings(self) -> dict:
         return self._cv_dict['test_score_rankings']
 
     @property
-    def test_score_averages(self):
+    def test_score_averages(self) -> dict:
         return self._cv_dict['test_score_averages']
 
     @property
-    def test_score_standard_deviations(self):
+    def test_score_standard_deviations(self) -> dict:
         return self._cv_dict['test_score_standard_deviations']
 
     @property
-    def train_score_averages(self):
+    def train_score_averages(self) -> dict:
         return self._cv_dict.get('train_score_averages')
 
     @property
-    def train_score_standard_deviations(self):
+    def train_score_standard_deviations(self) -> dict:
         return self._cv_dict.get('train_score_standard_deviations')
 
     @property
-    def parameter_iterations(self):
+    def parameter_iterations(self) -> list:
         return self._cv_dict['parameter_iterations']
 
     @property
-    def timings(self):
+    def timings(self) -> dict:
         return self._cv_dict['timings']
 
     ####
