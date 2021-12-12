@@ -301,20 +301,25 @@ class SearchCVParser:
         return len(self.score_names)
 
     @property
+    def primary_score_name(self) -> str:
+        """The first scorer passed to the SearchCV will be treated as the primary score. This property returns
+        the name of the score."""
+        return self.score_names[0]
+
+    @property
     def primary_score_averages(self) -> np.array:
-        """The mean score of each iteration, for the primary score."""
+        """The first scorer passed to the SearchCV will be treated as the primary score. This property returns
+        the average score (across all splits) for each iteration. Note that the average scores are
+        the weighted averages
+        https://stackoverflow.com/questions/44947574/what-is-the-meaning-of-mean-test-score-in-cv-result"""
         return np.array(self._cv_dict['test_score_averages'][self.primary_score_name])
 
     @property
     def primary_score_standard_errors(self) -> np.array:
-        """The standard error associated with the mean score of each iteration, for the primary score."""
+        """The first scorer passed to the SearchCV will be treated as the primary score. This property returns
+        the standard error associated with the mean score of each iteration, for the primary score."""
         score_standard_deviations = self._cv_dict['test_score_standard_deviations'][self.primary_score_name]
         return np.array(score_standard_deviations) / math.sqrt(self.number_of_splits)
-
-    @property
-    def primary_score_name(self) -> str:
-        """The first scorer passed to the SearchCV will be treated as the primary score."""
-        return self.score_names[0]
 
     @property
     def primary_score_iteration_ranking(self) -> np.array:
@@ -322,18 +327,27 @@ class SearchCVParser:
         return np.array(self._cv_dict['test_score_rankings'][self.primary_score_name])
 
     @property
-    def primary_score_best_indexes(self):
+    def primary_score_best_indexes(self) -> np.array:
         """The indexes of best to worst primary scores."""
         return np.argsort(self.primary_score_iteration_ranking)
 
     @property
-    def primary_score_best(self):
-        pass
+    def best_primary_score_index(self) -> int:
+        """The index of best primary score."""
+        return self.primary_score_best_indexes[0]
 
     @property
-    def primary_score_best_standard_error(self):
+    def best_primary_score(self) -> float:
+        """
+        The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated
+        with the primary score.
+        """
+        return self.primary_score_averages[self.best_primary_score_index]
+
+    @property
+    def best_primary_score_standard_error(self) -> float:
         """The standard error associated with the best score of the primary scorer"""
-        pass
+        return self.primary_score_standard_errors[self.best_primary_score_index]
 
     @property
     def fit_time_averages(self) -> np.array:
@@ -416,6 +430,7 @@ class SearchCVParser:
     def total_time(self) -> float:
         """Total time it took across all trials"""
         return self.fit_time_total + self.score_time_total
+
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
