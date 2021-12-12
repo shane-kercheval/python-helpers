@@ -145,7 +145,6 @@ class TestSklearnEval(unittest.TestCase):
         cls.housing_data__y_test = y_test
         cls.housing_data__y_predictions = predicted_values
 
-
     def test_SearchCVParser_invalid_param_name_mapping(self):
         # the keys passed to parameter_name_mappings should match the parameters founds
         self.assertRaises(HelpskAssertionError,
@@ -334,69 +333,6 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        #
-        #
-        # # test grid search object that has one score (classification)
-        # # not passing in parameter mappings
-        # grid_search_credit = self.credit_data__grid_search__roc_auc
-        # parser = SearchCVParser(searcher=grid_search_credit,
-        #                         higher_score_is_better=True,
-        #                         run_name="test name",
-        #                         run_description="test description",
-        #                         parameter_name_mappings=new_param_column_names)
-        # yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search_roc.yaml'
-        # os.remove(yaml_file)
-        # parser.to_yaml_file(yaml_file)
-        # parser_from_dict = SearchCVParser.from_dict(parser._cv_dict)
-        # parser_from_yaml = SearchCVParser.from_yaml_file(yaml_file)
-        #
-        # self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
-        # self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
-        # del grid_search_credit, yaml_file, parser, parser_from_dict, parser_from_yaml
-        #
-        # # test grid search object that has multiple scores (regression)
-        # # not passing in parameter mappings
-        # grid_search_housing = self.housing_data__grid_search
-        # parser = SearchCVParser(searcher=grid_search_housing,
-        #                         higher_score_is_better=True,
-        #                         run_name="test name",
-        #                         run_description="test description")
-        # yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search.yaml'
-        # os.remove(yaml_file)
-        # parser.to_yaml_file(yaml_file)
-        # parser_from_dict = SearchCVParser.from_dict(parser._cv_dict)
-        # parser_from_yaml = SearchCVParser.from_yaml_file(yaml_file)
-        #
-        # self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
-        # self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
-        # del grid_search_housing, yaml_file, parser, parser_from_dict, parser_from_yaml
-
 
     def test_SearchCVParser_gridsearch_classification_single_score(self):
         # test grid search object that has one score (classification)
