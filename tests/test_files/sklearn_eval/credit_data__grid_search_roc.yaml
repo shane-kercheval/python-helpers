@@ -2,18 +2,15 @@ name: test name
 description: test description
 cross_validation_type: <class 'sklearn.model_selection._search.GridSearchCV'>
 higher_score_is_better: true
+number_of_splits: 3
 score_names:
 - roc_auc
 parameter_names:
 - model__max_features
 - model__n_estimators
 - preparation__non_numeric_pipeline__encoder_chooser__transformer
-parameter_names_mapping:
-- model__max_features: max_features
-- model__n_estimators: n_estimators
-- preparation__non_numeric_pipeline__encoder_chooser__transformer: encoder
-test_score_ranking:
-- roc_auc:
+test_score_rankings:
+  roc_auc:
   - 5
   - 6
   - 7
@@ -23,7 +20,7 @@ test_score_ranking:
   - 1
   - 2
 test_score_averages:
-- roc_auc:
+  roc_auc:
   - .nan
   - .nan
   - .nan
@@ -33,7 +30,7 @@ test_score_averages:
   - 0.7458632917328131
   - 0.7451951355826116
 test_score_standard_deviations:
-- roc_auc:
+  roc_auc:
   - .nan
   - .nan
   - .nan
@@ -42,73 +39,85 @@ test_score_standard_deviations:
   - 0.017956085573240643
   - 0.021358294698372124
   - 0.0019082263491945136
+train_score_averages:
+  roc_auc:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 0.9998943476077664
+  - 0.9992031557521965
+  - 1.0
+  - 1.0
+train_score_standard_deviations:
+  roc_auc:
+  - .nan
+  - .nan
+  - .nan
+  - .nan
+  - 7.439517969413051e-05
+  - 0.0005401862948682852
+  - 0.0
+  - 0.0
 parameter_iterations:
-- 0:
-  - model__max_features: 100
-  - model__n_estimators: 10
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- 1:
-  - model__max_features: 100
-  - model__n_estimators: 10
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-- 2:
-  - model__max_features: 100
-  - model__n_estimators: 50
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- 3:
-  - model__max_features: 100
-  - model__n_estimators: 50
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-- 4:
-  - model__max_features: auto
-  - model__n_estimators: 10
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- 5:
-  - model__max_features: auto
-  - model__n_estimators: 10
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-- 6:
-  - model__max_features: auto
-  - model__n_estimators: 50
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- 7:
-  - model__max_features: auto
-  - model__n_estimators: 50
-  - preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-times:
-- fit time average:
-  - 0.009502410888671875
-  - 0.020231326421101887
-  - 0.017414093017578125
-  - 0.027949174245198567
-  - 0.016725699106852215
-  - 0.026900688807169598
-  - 0.05444828669230143
-  - 0.06401888529459636
-- fit time standard deviation:
-  - 0.00017364894407040967
-  - 0.00017724432641649183
-  - 0.00022615616135358862
-  - 0.00019207467277952803
-  - 0.0001031118014157883
-  - 0.0001375553760056946
-  - 0.0003053995477677521
-  - 0.00020564772239374787
-- score time average:
+- model__max_features: 100
+  model__n_estimators: 10
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- model__max_features: 100
+  model__n_estimators: 10
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- model__max_features: 100
+  model__n_estimators: 50
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- model__max_features: 100
+  model__n_estimators: 50
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- model__max_features: auto
+  model__n_estimators: 10
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- model__max_features: auto
+  model__n_estimators: 10
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+- model__max_features: auto
+  model__n_estimators: 50
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
+- model__max_features: auto
+  model__n_estimators: 50
+  preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
+timings:
+  fit time averages:
+  - 0.023705085118611652
+  - 0.047780752182006836
+  - 0.05425071716308594
+  - 0.08210277557373047
+  - 0.034041404724121094
+  - 0.06022826830546061
+  - 0.09999299049377441
+  - 0.1238243579864502
+  fit time standard deviations:
+  - 0.00019826578381760974
+  - 0.0005940278203183371
+  - 0.00043288966621679006
+  - 0.0004897447644274416
+  - 7.603821014214367e-05
+  - 0.0007483434803908027
+  - 0.0012085033661971922
+  - 0.00033561839364816526
+  score time averages:
   - 0.0
   - 0.0
   - 0.0
   - 0.0
-  - 0.004828612009684245
-  - 0.011728604634602865
-  - 0.007477362950642903
-  - 0.014361937840779623
-- score time standard deviation:
+  - 0.010557254155476889
+  - 0.027637799580891926
+  - 0.014779965082804361
+  - 0.03136030832926432
+  score time standard deviations:
   - 0.0
   - 0.0
   - 0.0
   - 0.0
-  - 0.00025370502779245135
-  - 0.0002642688527282821
-  - 4.8105178657753184e-05
-  - 0.0001903215871542978
+  - 0.00031554386445372236
+  - 0.0005813574349387986
+  - 0.00013969434458572955
+  - 0.000248750101644005

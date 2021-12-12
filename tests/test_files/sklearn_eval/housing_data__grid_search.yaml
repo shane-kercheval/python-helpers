@@ -1,77 +1,96 @@
 name: test name
 description: test description
 cross_validation_type: <class 'sklearn.model_selection._search.GridSearchCV'>
-higher_score_is_better: true
+higher_score_is_better: false
+number_of_splits: 3
 score_names:
 - RMSE
 - MAE
 parameter_names:
 - model__max_features
 - model__n_estimators
-test_score_ranking:
-- RMSE:
+test_score_rankings:
+  RMSE:
   - 4
   - 3
   - 2
   - 1
-- MAE:
+  MAE:
   - 4
   - 3
   - 2
   - 1
 test_score_averages:
-- RMSE:
+  RMSE:
   - -56941.12041274917
   - -53429.20451485544
   - -53268.85481524215
   - -51036.456689161896
-- MAE:
+  MAE:
   - -39700.15648619185
   - -36989.054828003886
   - -35248.623976501935
   - -33606.206044089144
 test_score_standard_deviations:
-- RMSE:
+  RMSE:
   - 419.28835357482484
   - 449.50624922469456
   - 423.13772184103647
   - 798.658644554627
-- MAE:
+  MAE:
   - 546.8028902776367
   - 66.61721602075998
   - 57.24544841108253
   - 371.83815513366153
+train_score_averages:
+  RMSE:
+  - -24757.51417272673
+  - -20412.311312204587
+  - -22643.424892702646
+  - -19499.456661238833
+  MAE:
+  - -16183.146959786822
+  - -13919.904413759688
+  - -14126.836246366278
+  - -12649.602926356589
+train_score_standard_deviations:
+  RMSE:
+  - 380.99929520269825
+  - 142.75931607858598
+  - 290.5209995917412
+  - 103.9198346160403
+  MAE:
+  - 379.95773682562475
+  - 97.59661238268352
+  - 168.48193342617682
+  - 56.56200003302968
 parameter_iterations:
-- 0:
-  - model__max_features: 2
-  - model__n_estimators: 10
-- 1:
-  - model__max_features: 2
-  - model__n_estimators: 50
-- 2:
-  - model__max_features: auto
-  - model__n_estimators: 10
-- 3:
-  - model__max_features: auto
-  - model__n_estimators: 50
-times:
-- fit time average:
-  - 0.1547849178314209
-  - 0.7352440357208252
-  - 0.4530940055847168
-  - 2.4149954319000244
-- fit time standard deviation:
-  - 0.0015032636210949057
-  - 0.008957827578493132
-  - 0.003555497546029765
-  - 0.10511955364695189
-- score time average:
-  - 0.011223713556925455
-  - 0.04746373494466146
-  - 0.010914882024129232
-  - 0.06516011555989583
-- score time standard deviation:
-  - 0.00024561220687740944
-  - 0.0005281542636386172
-  - 8.078188477819e-05
-  - 0.008184664532877969
+- model__max_features: 2
+  model__n_estimators: 10
+- model__max_features: 2
+  model__n_estimators: 50
+- model__max_features: auto
+  model__n_estimators: 10
+- model__max_features: auto
+  model__n_estimators: 50
+timings:
+  fit time averages:
+  - 0.15530959765116373
+  - 0.753768523534139
+  - 0.45997269948323566
+  - 2.248074769973755
+  fit time standard deviations:
+  - 0.0002707624351402813
+  - 0.003949102214212021
+  - 0.005670333807239353
+  - 0.004498734217576028
+  score time averages:
+  - 0.012494087219238281
+  - 0.05191763242085775
+  - 0.012898604075113932
+  - 0.04970709482828776
+  score time standard deviations:
+  - 0.0002145822842194729
+  - 0.0010810567640857952
+  - 0.00037649010584448866
+  - 0.00045404268503192755
