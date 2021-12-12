@@ -95,18 +95,21 @@ class SearchCVParser:
 
     @classmethod
     def from_dict(cls, cv_dict):
+        """This method creates a SearchCVParser from the dictionary created by `search_cv_to_dict()`"""
         parser = cls(searcher=None, higher_score_is_better=None, run_name=None, run_description=None, parameter_name_mappings=None)  # noqa
         parser._cv_dict = cv_dict
         return parser
 
     @classmethod
     def from_yaml_file(cls, yaml_file_name):
+        """This method creates a SearchCVParser from a yaml file created by `to_yaml_file()`"""
         with open(yaml_file_name, 'r') as file:
             cv_dict = yaml.safe_load(file)
 
         return SearchCVParser.from_dict(cv_dict=cv_dict)
 
     def to_yaml_file(self, yaml_file_name: str):
+        """This method saves the self._cv_dict dictionary to a yaml file."""
         with open(yaml_file_name, 'w') as file:
             yaml.dump(self._cv_dict, file, default_flow_style=False, sort_keys=False)
 
@@ -117,7 +120,7 @@ class SearchCVParser:
                           run_description: str = "",
                           parameter_name_mappings: Union[dict, None] = None
                           ) -> dict:
-
+        """This converts a BaseSearchCV object to a dictionary."""
         def string_if_not_number(obj):
             if isinstance(obj, (int, float, complex)):
                 return obj
@@ -263,7 +266,7 @@ class SearchCVParser:
 
     @property
     def to_dataframe(self):
-
+        """This converts the parsed information into a pd.DataFrame."""
         confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
                                              # number_of_splits is sample-size
                                              df=self.number_of_splits - 1,  # degrees of freedom
@@ -295,18 +298,22 @@ class SearchCVParser:
     ####
     @property
     def name(self):
+        """the name passed to `run_name`."""
         return self._cv_dict['name']
 
     @property
     def description(self):
+        """the description passed to `run_description`."""
         return self._cv_dict['description']
 
     @property
     def higher_score_is_better(self):
+        """The value passed to `higher_score_is_better`."""
         return self._cv_dict['higher_score_is_better']
 
     @property
     def cross_validation_type(self) -> str:
+        """The string representation of the SearchCV object."""
         return self._cv_dict['cross_validation_type']
 
     @property
@@ -334,34 +341,42 @@ class SearchCVParser:
 
     @property
     def parameter_names_mapping(self) -> dict:
+        """The dictionary passed to `parameter_name_mappings`."""
         return self._cv_dict.get('parameter_names_mapping')
 
     @property
     def test_score_rankings(self) -> dict:
+        """The rankings of each of the test scores, from the searcher.cv_results_ object."""
         return self._cv_dict['test_score_rankings']
 
     @property
     def test_score_averages(self) -> dict:
+        """The test score averages, from the searcher.cv_results_ object."""
         return self._cv_dict['test_score_averages']
 
     @property
     def test_score_standard_deviations(self) -> dict:
+        """The test score standard deviations, from the searcher.cv_results_ object."""
         return self._cv_dict['test_score_standard_deviations']
 
     @property
     def train_score_averages(self) -> dict:
+        """The training score averages, from the searcher.cv_results_ object, if provided."""
         return self._cv_dict.get('train_score_averages')
 
     @property
     def train_score_standard_deviations(self) -> dict:
+        """The training score standard deviations, from the searcher.cv_results_ object, if provided."""
         return self._cv_dict.get('train_score_standard_deviations')
 
     @property
     def parameter_iterations(self) -> list:
+        """The "iterations" i.e. the hyper-parameter combinations in order of execution."""
         return self._cv_dict['parameter_iterations']
 
     @property
     def timings(self) -> dict:
+        """The timings providing by searcher.cv_results_."""
         return self._cv_dict['timings']
 
     ####
