@@ -266,24 +266,36 @@ class SearchCVParser:
             for score_name in self.score_names[1:]:
                 result = pd.concat([result,
                                     pd.DataFrame({score_name + " Mean":
-                                                      self._cv_dict['test_score_averages'][score_name]})],
+                                                      self.test_score_averages[score_name]})],
                                    axis=1)
 
-        result = pd.concat([result, pd.DataFrame.from_dict(self._cv_dict['parameter_iterations'])], axis=1)
+        result = pd.concat([result, pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)
 
-        if 'parameter_names_mapping' in self._cv_dict:
-            result = result.rename(columns=self._cv_dict['parameter_names_mapping'])
+        if self.parameter_names_mapping:
+            result = result.rename(columns=self.parameter_names_mapping)
 
         result = result.iloc[self.primary_score_best_indexes]
 
         return result
 
+    ####
+    # The following properties expose the highest levels of the underlying dictionary/yaml
+    ####
     @property
-    def number_of_iterations(self) -> int:
-        """"A single trial contains the cross validation runs for a single set of hyper-parameters. The
-        'number of trials' is basically the number of combinations of different hyper-parameters that were
-        cross validated."""
-        return len(self._cv_dict['parameter_iterations'])
+    def name(self):
+        return self._cv_dict['name']
+
+    @property
+    def description(self):
+        return self._cv_dict['description']
+
+    @property
+    def higher_score_is_better(self):
+        return self._cv_dict['higher_score_is_better']
+
+    @property
+    def cross_validation_type(self):
+        return self._cv_dict['cross_validation_type']
 
     @property
     def number_of_splits(self) -> int:
@@ -294,6 +306,55 @@ class SearchCVParser:
     def score_names(self) -> list:
         """Returns a list of the names of the scores"""
         return self._cv_dict['score_names']
+
+    @property
+    def parameter_names(self):
+        if self.parameter_names_mapping:
+            return list(self.parameter_names_mapping.values())
+        else:
+            return self._cv_dict['parameter_names']
+
+    @property
+    def parameter_names_mapping(self):
+        return self._cv_dict.get('parameter_names_mapping')
+
+    @property
+    def test_score_rankings(self):
+        return self._cv_dict['test_score_rankings']
+
+    @property
+    def test_score_averages(self):
+        return self._cv_dict['test_score_averages']
+
+    @property
+    def test_score_standard_deviations(self):
+        return self._cv_dict['test_score_standard_deviations']
+
+    @property
+    def train_score_averages(self):
+        return self._cv_dict.get('train_score_averages')
+
+    @property
+    def train_score_standard_deviations(self):
+        return self._cv_dict.get('train_score_standard_deviations')
+
+    @property
+    def parameter_iterations(self):
+        return self._cv_dict['parameter_iterations']
+
+    @property
+    def timings(self):
+        return self._cv_dict['timings']
+
+    ####
+    # The following properties are additional helpers
+    ####
+    @property
+    def number_of_iterations(self) -> int:
+        """"A single trial contains the cross validation runs for a single set of hyper-parameters. The
+        'number of trials' is basically the number of combinations of different hyper-parameters that were
+        cross validated."""
+        return len(self.parameter_iterations)
 
     @property
     def number_of_scores(self) -> int:
@@ -312,19 +373,19 @@ class SearchCVParser:
         the average score (across all splits) for each iteration. Note that the average scores are
         the weighted averages
         https://stackoverflow.com/questions/44947574/what-is-the-meaning-of-mean-test-score-in-cv-result"""
-        return np.array(self._cv_dict['test_score_averages'][self.primary_score_name])
+        return np.array(self.test_score_averages[self.primary_score_name])
 
     @property
     def primary_score_standard_errors(self) -> np.array:
         """The first scorer passed to the SearchCV will be treated as the primary score. This property returns
         the standard error associated with the mean score of each iteration, for the primary score."""
-        score_standard_deviations = self._cv_dict['test_score_standard_deviations'][self.primary_score_name]
+        score_standard_deviations = self.test_score_standard_deviations[self.primary_score_name]
         return np.array(score_standard_deviations) / math.sqrt(self.number_of_splits)
 
     @property
     def primary_score_iteration_ranking(self) -> np.array:
         """The ranking of the corresponding index, in terms of best to worst score."""
-        return np.array(self._cv_dict['test_score_rankings'][self.primary_score_name])
+        return np.array(self.test_score_rankings[self.primary_score_name])
 
     @property
     def primary_score_best_indexes(self) -> np.array:
@@ -356,7 +417,7 @@ class SearchCVParser:
         Each value is the average number of seconds that the iteration took to fit the model, per split
         (i.e. the average fit time of all splits).
         """
-        return np.array(self._cv_dict['timings']['fit time averages'])
+        return np.array(self.timings['fit time averages'])
 
     @property
     def fit_time_standard_deviations(self) -> np.array:
@@ -365,7 +426,7 @@ class SearchCVParser:
         Each value is the standard deviation of seconds that the iteration took to fit the model, per split
         (i.e. the standard deviation of fit time across all splits).
         """
-        return np.array(self._cv_dict['timings']['fit time standard deviations'])
+        return np.array(self.timings['fit time standard deviations'])
 
     @property
     def score_time_averages(self) -> np.array:
@@ -374,7 +435,7 @@ class SearchCVParser:
         Each value is the average number of seconds that the iteration took to score the model, per split
         (i.e. the average score time of all splits).
         """
-        return np.array(self._cv_dict['timings']['score time averages'])
+        return np.array(self.timings['score time averages'])
 
     @property
     def score_time_standard_deviations(self) -> np.array:
@@ -383,7 +444,7 @@ class SearchCVParser:
         Each value is the standard deviation of seconds that the iteration took to score the model, per split
         (i.e. the standard deviation of score time across all splits).
         """
-        return np.array(self._cv_dict['timings']['score time standard deviations'])
+        return np.array(self.timings['score time standard deviations'])
 
     @property
     def iteration_fit_times(self) -> np.array:
