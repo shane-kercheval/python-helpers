@@ -231,6 +231,22 @@ class TestSklearnEval(unittest.TestCase):
         self.assertRaises(AssertionError,
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
 
+        self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe.index))
+        cv_dataframe = parser.to_dataframe.sort_index()
+        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
+                                   grid_search_credit.cv_results_[f'mean_test_{parser.score_names[0]}'])
+        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[1]} Mean'],
+                                   grid_search_credit.cv_results_[f'mean_test_{parser.score_names[1]}'])
+        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[2]} Mean'],
+                                   grid_search_credit.cv_results_[f'mean_test_{parser.score_names[2]}'])
+        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[3]} Mean'],
+                                   grid_search_credit.cv_results_[f'mean_test_{parser.score_names[3]}'])
+
+        self.assertEqual(list(grid_search_credit.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())
+        self.assertEqual(list(grid_search_credit.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
+        encoder_values = [str(x) for x in list(grid_search_credit.cv_results_['param_preparation__non_numeric_pipeline__encoder_chooser__transformer'].data)]
+        self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[2]].tolist())
+
         assert_np_arrays_are_close(parser.primary_score_averages,
                                    np.array(parser.test_score_averages[parser.primary_score_name]))
         assert_np_arrays_are_close(parser.primary_score_averages,
@@ -404,6 +420,17 @@ class TestSklearnEval(unittest.TestCase):
         assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
                                    np.array(parser_from_yaml.test_score_averages[parser.primary_score_name]))
 
+        self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe.index))
+        cv_dataframe = parser.to_dataframe.sort_index()
+        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
+                                   grid_search_credit.cv_results_['mean_test_score'])
+
+        self.assertEqual(list(grid_search_credit.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())
+        self.assertEqual(list(grid_search_credit.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
+        encoder_values = [str(x) for x in
+                          list(grid_search_credit.cv_results_['param_preparation__non_numeric_pipeline__encoder_chooser__transformer'].data)]
+        self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[2]].tolist())
+
         self.assertTrue(isinstance(parser.test_score_averages, dict))
         self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
 
@@ -566,6 +593,19 @@ class TestSklearnEval(unittest.TestCase):
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001])))
         self.assertRaises(AssertionError,
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
+
+        self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe.index))
+        cv_dataframe = parser.to_dataframe.sort_index()
+        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
+                                   grid_search_housing.cv_results_[f'mean_test_{parser.score_names[0]}'] * -1)
+        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[1]} Mean'],
+                                   grid_search_housing.cv_results_[f'mean_test_{parser.score_names[1]}'] * -1)
+
+        self.assertEqual(list(grid_search_housing.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())
+        self.assertEqual(list(grid_search_housing.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
+
+        self.assertTrue(isinstance(parser.test_score_averages, dict))
+        self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
 
         assert_np_arrays_are_close(parser.primary_score_averages,
                                    np.array(parser.test_score_averages[parser.primary_score_name]))
