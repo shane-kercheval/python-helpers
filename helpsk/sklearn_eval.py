@@ -93,6 +93,8 @@ class SearchCVParser:
         else:
             self._cv_dict = None
 
+        self._cv_dataframe = None
+
     @classmethod
     def from_dict(cls, cv_dict):
         """This method creates a SearchCVParser from the dictionary created by `search_cv_to_dict()`"""
@@ -267,31 +269,31 @@ class SearchCVParser:
     @property
     def to_dataframe(self):
         """This converts the parsed information into a pd.DataFrame."""
-        confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
-                                             # number_of_splits is sample-size
-                                             df=self.number_of_splits - 1,  # degrees of freedom
-                                             loc=self.primary_score_averages,
-                                             scale=self.primary_score_standard_errors)
+        if self._cv_dataframe is None:
+            confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
+                                                 # number_of_splits is sample-size
+                                                 df=self.number_of_splits - 1,  # degrees of freedom
+                                                 loc=self.primary_score_averages,
+                                                 scale=self.primary_score_standard_errors)
 
-        result = pd.DataFrame({self.primary_score_name + " Mean": self.primary_score_averages,
-                               self.primary_score_name + " 95CI.LO": confidence_intervals[0],
-                               self.primary_score_name + " 95CI.HI": confidence_intervals[1]})
+            result = pd.DataFrame({self.primary_score_name + " Mean": self.primary_score_averages,
+                                   self.primary_score_name + " 95CI.LO": confidence_intervals[0],
+                                   self.primary_score_name + " 95CI.HI": confidence_intervals[1]})
 
-        if self.number_of_scores > 1:
-            for score_name in self.score_names[1:]:
-                result = pd.concat([result,
-                                    pd.DataFrame({score_name + " Mean":
-                                                      self.test_score_averages[score_name]})],
-                                   axis=1)
+            if self.number_of_scores > 1:
+                for score_name in self.score_names[1:]:
+                    result = pd.concat([result,
+                                        pd.DataFrame({score_name + " Mean":
+                                                          self.test_score_averages[score_name]})],
+                                       axis=1)
 
-        result = pd.concat([result, pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)  # noqa
+            result = pd.concat([result, pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)  # noqa
 
-        if self.parameter_names_mapping:
-            result = result.rename(columns=self.parameter_names_mapping)
+            if self.parameter_names_mapping:
+                result = result.rename(columns=self.parameter_names_mapping)
+            self._cv_dataframe = result.iloc[self.primary_score_best_indexes]
 
-        result = result.iloc[self.primary_score_best_indexes]
-
-        return result
+        return self._cv_dataframe.copy(deep=True)
 
     ####
     # The following properties expose the highest levels of the underlying dictionary/yaml
