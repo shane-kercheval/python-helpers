@@ -266,7 +266,6 @@ class SearchCVParser:
 
         return cv_results_dict
 
-    @property
     def to_dataframe(self):
         """This converts the parsed information into a pd.DataFrame."""
         if self._cv_dataframe is None:
