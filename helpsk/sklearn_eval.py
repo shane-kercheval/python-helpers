@@ -269,22 +269,20 @@ class SearchCVParser:
     def to_dataframe(self):
         """This converts the parsed information into a pd.DataFrame."""
         if self._cv_dataframe is None:
-            confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
-                                                 # number_of_splits is sample-size
-                                                 df=self.number_of_splits - 1,  # degrees of freedom
-                                                 loc=self.primary_score_averages,
-                                                 scale=self.primary_score_standard_errors)
+            result = None
+            for score_name in self.score_names:
+                confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
+                                                     # number_of_splits is sample-size
+                                                     df=self.number_of_splits - 1,  # degrees of freedom
+                                                     loc=self.test_score_averages[score_name],
+                                                     scale=self.score_standard_errors(score_name=score_name))
 
-            result = pd.DataFrame({self.primary_score_name + " Mean": self.primary_score_averages,
-                                   self.primary_score_name + " 95CI.LO": confidence_intervals[0],
-                                   self.primary_score_name + " 95CI.HI": confidence_intervals[1]})
-
-            if self.number_of_scores > 1:
-                for score_name in self.score_names[1:]:
-                    result = pd.concat([result,
-                                        pd.DataFrame({score_name + " Mean":
-                                                          self.test_score_averages[score_name]})],
-                                       axis=1)
+                # only give confidence intervals for the primary score
+                result = pd.concat([result,
+                                    pd.DataFrame({score_name + " Mean": self.test_score_averages[score_name],
+                                                  score_name + " 95CI.LO": confidence_intervals[0],
+                                                  score_name + " 95CI.HI": confidence_intervals[1]})],
+                                   axis=1)
 
             result = pd.concat([result, pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)  # noqa
 
@@ -293,6 +291,75 @@ class SearchCVParser:
             self._cv_dataframe = result.iloc[self.primary_score_best_indexes]
 
         return self._cv_dataframe.copy(deep=True)
+
+    def to_formatted_dataframe(self,
+                               round_by: int = 3,
+                               exclude_no_variance_params: bool = True,
+                               return_style: bool = True) -> Union[pd.DataFrame, Styler]:
+        """Returns formatted results, either as a pd.DataFrame or pd.DataFrame.Styler
+
+        The Hyper-Parameter columns will be highlighted in blue where the primary
+        score (i.e. first column) for the iteration (i.e. the row i.e. the combination of hyper-parameters
+        that were cross validated) is within 1 standard error of the top primary score (i.e. first column
+        first row).
+
+        Args:
+            round_by:
+                the number of digits to round by for the score columns (does not round the parameter columns)
+            exclude_no_variance_params:
+                if True, exclude columns that only have 1 unique value
+            return_style:
+                If True, return Styler object, else return pd.DataFrame
+
+        Returns:
+            Returns either pd.DataFrame or pd.DataFrame.Styler.
+        """
+        cv_dataframe = self.to_dataframe()
+
+        if exclude_no_variance_params:
+            columns_to_drop = [x for x in self.parameter_names if len(cv_dataframe[x].unique()) == 1]
+            cv_dataframe = cv_dataframe.drop(columns=columns_to_drop)
+
+        score_columns = list(cv_dataframe.columns[cv_dataframe.columns.str.endswith((' Mean',
+                                                                                     ' 95CI.LO',
+                                                                                     ' 95CI.HI'))])
+
+        cv_dataframe = cv_dataframe.round(dict(zip(score_columns, [round_by] * len(score_columns))))
+
+        final_columns = cv_dataframe.columns  # save for style logic
+
+        if return_style:
+            cv_dataframe = cv_dataframe.style
+
+            for score in self.score_names:
+                mean_key = score + ' Mean'
+                ci_low_key = score + ' 95CI.LO'
+                ci_high_key = score + ' 95CI.HI'
+
+                if mean_key in final_columns:
+                    cv_dataframe. \
+                        bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value)
+
+                if ci_low_key in final_columns:
+                    cv_dataframe. \
+                        bar(subset=[ci_high_key], color=hcolor.GRAY). \
+                        pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY)
+
+                cv_dataframe.pipe(hstyle.format, round_by=round_by, hide_index=True)
+
+            # highlight iterations whose primary score (i.e. first column of `results` dataframe) is within
+            # 1 standard error of the top primary score (i.e. first column first row).
+            def highlight_cols(s):
+                return 'background-color: %s' % hcolor.Colors.PASTEL_BLUE.value
+
+            # we might have removed columns (e.g. that don't have any variance) so check that the columns
+            # were in the final set
+            columns_to_highlight = [x for x in self.parameter_names if x in final_columns]
+            cv_dataframe.applymap(highlight_cols,
+                             subset=pd.IndexSlice[self.indexes_within_1_standard_error,
+                                                  columns_to_highlight])
+
+        return cv_dataframe
 
     ####
     # The following properties expose the highest levels of the underlying dictionary/yaml
@@ -409,11 +476,10 @@ class SearchCVParser:
         https://stackoverflow.com/questions/44947574/what-is-the-meaning-of-mean-test-score-in-cv-result"""
         return np.array(self.test_score_averages[self.primary_score_name])
 
-    @property
-    def primary_score_standard_errors(self) -> np.array:
+    def score_standard_errors(self, score_name: str) -> np.array:
         """The first scorer passed to the SearchCV will be treated as the primary score. This property returns
         the standard error associated with the mean score of each iteration, for the primary score."""
-        score_standard_deviations = self.test_score_standard_deviations[self.primary_score_name]
+        score_standard_deviations = self.test_score_standard_deviations[score_name]
         return np.array(score_standard_deviations) / math.sqrt(self.number_of_splits)
 
     @property
@@ -442,7 +508,21 @@ class SearchCVParser:
     @property
     def best_primary_score_standard_error(self) -> float:
         """The standard error associated with the best score of the primary scorer"""
-        return self.primary_score_standard_errors[self.best_primary_score_index]
+        return self.score_standard_errors(score_name=self.primary_score_name)[self.best_primary_score_index]
+
+    @property
+    def indexes_within_1_standard_error(self) -> list:
+        """Returns the iteration indexes where the primary scores (i.e. first scorer
+        passed to SearchCV object; i.e. first column of the to_dataframe() DataFrame) are within 1 standard
+        error of the highest primary score."""
+        cv_dataframe = self.to_dataframe()
+
+        if self.higher_score_is_better:
+            return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] >=
+                                           self.best_primary_score - self.best_primary_score_standard_error])
+
+        return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] <=
+                                       self.best_primary_score + self.best_primary_score_standard_error])
 
     @property
     def fit_time_averages(self) -> np.array:
