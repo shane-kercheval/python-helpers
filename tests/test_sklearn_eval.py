@@ -730,224 +730,224 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
 
-    def test_cv_results_to_dataframe(self):
-        grid_search = self.credit_data__grid_search
-        new_param_column_names = {'model | max_features': 'max_features',
-                                  'model | n_estimators': 'n_estimators',
-                                  'preparation | non_numeric_pipeline | encoder_chooser | transformer':
-                                      'encoder'}
-        cv_results = SearchCVParser2(searcher=grid_search,
-                                     higher_score_is_better=True,
-                                     new_param_column_names=new_param_column_names)
+#     def test_cv_results_to_dataframe(self):
+#         grid_search = self.credit_data__grid_search
+#         new_param_column_names = {'model | max_features': 'max_features',
+#                                   'model | n_estimators': 'n_estimators',
+#                                   'preparation | non_numeric_pipeline | encoder_chooser | transformer':
+#                                       'encoder'}
+#         cv_results = SearchCVParser2(searcher=grid_search,
+#                                      higher_score_is_better=True,
+#                                      new_param_column_names=new_param_column_names)
+# #
+# #
+# #         cv_results.trial_labels
+# #
+# #
+# #
+# #
+# #         import plotly.graph_objects as go
+# #         import plotly.io as pio
+# #         pio.renderers.default = "browser"
+# #
+# #         data = cv_results.results[~cv_results.results.iloc[:, 0].isna()]
+# #         data = data.iloc[::-1]  # reverse order to display "best" on top of y-axis
+# #
+# # #        cv_results.primary_score_standard_errors.loc[data.index]
+# #
+# #
+# #         fig = go.Figure(data=go.Scatter(
+# #             x=data.iloc[:, 0],
+# #             y=cv_results.trial_labels.loc[data.index],
+# #             error_x=dict(
+# #                 type='data',
+# #                 symmetric=False,
+# #                 array=data.iloc[:, 2] - data.iloc[:, 0],
+# #                 arrayminus=data.iloc[:, 0] - data.iloc[:, 1])
+# #         ))
+# #         fig.update_yaxes(type='category')
+# #         fig.add_vline(x=cv_results.top_score - cv_results.top_score_standard_error, line_dash='dash')
+# #         fig.update_yaxes(
+# #             scaleanchor="x",
+# #             scaleratio=1.618,
+# #         )
+# #         fig.show()
 #
+#         self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials, ))
+#         self.assertFalse(cv_results.trial_labels.isna().any())
+#         self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
+#         self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [6, 7])
+#         self.assertEqual(cv_results.results.index.tolist(),
+#                          cv_results.primary_score_standard_errors.index.tolist())
+#         self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
+#                          cv_results.top_score_standard_error)
 #
-#         cv_results.trial_labels
+#         self.assertEqual(cv_results.results.index.tolist(), [6, 7, 4, 5, 0, 1, 2, 3])
+#         self.assertEqual(cv_results.results.index.tolist(),
+#                          cv_results.formatted_results(return_style=False).index.tolist())
 #
+#         self.assertEqual(cv_results.score_names, ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate'])
+#         self.assertEqual(cv_results.score_columns,
+#                          ['ROC/AUC Mean',
+#                           'ROC/AUC 95CI.LO',
+#                           'ROC/AUC 95CI.HI',
+#                           'F1 Mean',
+#                           'F1 95CI.LO',
+#                           'F1 95CI.HI',
+#                           'Pos. Pred. Val Mean',
+#                           'Pos. Pred. Val 95CI.LO',
+#                           'Pos. Pred. Val 95CI.HI',
+#                           'True Pos. Rate Mean',
+#                           'True Pos. Rate 95CI.LO',
+#                           'True Pos. Rate 95CI.HI'])
+#         self.assertEqual(cv_results.training_score_columns,
+#                          ['ROC/AUC Training Mean',
+#                           'F1 Training Mean',
+#                           'Pos. Pred. Val Training Mean',
+#                           'True Pos. Rate Training Mean'])
+#         self.assertEqual(cv_results.parameter_columns,
+#                          ['max_features',
+#                           'n_estimators',
+#                           'encoder'])
 #
+#         self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
+#         self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
+#         self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
+#         self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
 #
+#         results = cv_results.formatted_results(return_train_score=True, return_style=False)
+#         self.assertIsInstance(results, pd.DataFrame)
+#         self.assertIsInstance(results['encoder'].iloc[0], str)
+#         equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
+#                                     'ROC/AUC Training Mean',
+#                                     'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
+#                                     'F1 Training Mean',
+#                                     'Pos. Pred. Val Mean', 'Pos. Pred. Val 95CI.LO', 'Pos. Pred. Val 95CI.HI',
+#                                     'Pos. Pred. Val Training Mean',
+#                                     'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
+#                                     'True Pos. Rate Training Mean',
+#                                     'max_features', 'n_estimators',
+#                                     'encoder']
+#         self.assertTrue(all(equal))
 #
-#         import plotly.graph_objects as go
-#         import plotly.io as pio
-#         pio.renderers.default = "browser"
+#         results = cv_results.formatted_results(return_train_score=False, return_style=False)
 #
-#         data = cv_results.results[~cv_results.results.iloc[:, 0].isna()]
-#         data = data.iloc[::-1]  # reverse order to display "best" on top of y-axis
+#         self.assertIsInstance(results, pd.DataFrame)
+#         self.assertIsInstance(results['encoder'].iloc[0],
+#                               str)
+#         equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
+#                                     'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
+#                                     'Pos. Pred. Val Mean', 'Pos. Pred. Val 95CI.LO', 'Pos. Pred. Val 95CI.HI',
+#                                     'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
+#                                     'max_features', 'n_estimators', 'encoder']
+#         self.assertTrue(all(equal))
 #
-# #        cv_results.primary_score_standard_errors.loc[data.index]
+#         with suppress_warnings():
+#             results = cv_results.formatted_results(return_train_score=True, return_style=True)
+#         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__with_training.html', 'w') as file:
+#             file.write(results.render())
 #
+#         with suppress_warnings():
+#             results = cv_results.formatted_results(return_train_score=False, return_style=True)
+#         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__without_training.html', 'w') as file:
+#             file.write(results.render())
 #
-#         fig = go.Figure(data=go.Scatter(
-#             x=data.iloc[:, 0],
-#             y=cv_results.trial_labels.loc[data.index],
-#             error_x=dict(
-#                 type='data',
-#                 symmetric=False,
-#                 array=data.iloc[:, 2] - data.iloc[:, 0],
-#                 arrayminus=data.iloc[:, 0] - data.iloc[:, 1])
-#         ))
-#         fig.update_yaxes(type='category')
-#         fig.add_vline(x=cv_results.top_score - cv_results.top_score_standard_error, line_dash='dash')
-#         fig.update_yaxes(
-#             scaleanchor="x",
-#             scaleratio=1.618,
-#         )
-#         fig.show()
+#         grid_search = self.credit_data__grid_search__roc_auc
+#         cv_results = SearchCVParser2(searcher=grid_search, higher_score_is_better=True)
+#
+#         self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials,))
+#         self.assertFalse(cv_results.trial_labels.isna().any())
+#         self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
+#         self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [6, 7])
+#         self.assertEqual(cv_results.results.index.tolist(),
+#                          cv_results.primary_score_standard_errors.index.tolist())
+#         self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
+#                          cv_results.top_score_standard_error)
+#
+#         self.assertEqual(cv_results.score_names, ['roc_auc'])
+#         self.assertEqual(cv_results.score_columns,
+#                          ['roc_auc Mean',
+#                           'roc_auc 95CI.LO',
+#                           'roc_auc 95CI.HI'])
+#         # self.assertEqual(cv_results.training_score_columns, ['roc_auc Training Mean'])
+#         # self.assertEqual(cv_results.parameter_columns,
+#         #                  ['model | max_features',
+#         #                   'model | n_estimators',
+#         #                   'preparation | non_numeric_pipeline | encoder_chooser | transformer'])
+#
+#         # self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
+#         # self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
+#         # self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
+#         # self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
+#
+#         # with suppress_warnings():
+#         #     results = cv_results.formatted_results(return_train_score=True, return_style=True)
+#         # test_file = get_test_path() + '/test_files/sklearn_eval/credit__grid_search__default_scores__with_training.html'
+#         # with open(test_file, 'w') as file:
+#         #     file.write(results.render())
+#
+#         # with suppress_warnings():
+#         #     results = cv_results.formatted_results(return_train_score=False, return_style=True)
+#         # test_file = get_test_path() + '/test_files/sklearn_eval/credit__grid_search__default_scores__without_training.html'
+#         # with open(test_file, 'w') as file:
+#         #     file.write(results.render())
 
-        self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials, ))
-        self.assertFalse(cv_results.trial_labels.isna().any())
-        self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
-        self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [6, 7])
-        self.assertEqual(cv_results.results.index.tolist(),
-                         cv_results.primary_score_standard_errors.index.tolist())
-        self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
-                         cv_results.top_score_standard_error)
-
-        self.assertEqual(cv_results.results.index.tolist(), [6, 7, 4, 5, 0, 1, 2, 3])
-        self.assertEqual(cv_results.results.index.tolist(),
-                         cv_results.formatted_results(return_style=False).index.tolist())
-
-        self.assertEqual(cv_results.score_names, ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate'])
-        self.assertEqual(cv_results.score_columns,
-                         ['ROC/AUC Mean',
-                          'ROC/AUC 95CI.LO',
-                          'ROC/AUC 95CI.HI',
-                          'F1 Mean',
-                          'F1 95CI.LO',
-                          'F1 95CI.HI',
-                          'Pos. Pred. Val Mean',
-                          'Pos. Pred. Val 95CI.LO',
-                          'Pos. Pred. Val 95CI.HI',
-                          'True Pos. Rate Mean',
-                          'True Pos. Rate 95CI.LO',
-                          'True Pos. Rate 95CI.HI'])
-        self.assertEqual(cv_results.training_score_columns,
-                         ['ROC/AUC Training Mean',
-                          'F1 Training Mean',
-                          'Pos. Pred. Val Training Mean',
-                          'True Pos. Rate Training Mean'])
-        self.assertEqual(cv_results.parameter_columns,
-                         ['max_features',
-                          'n_estimators',
-                          'encoder'])
-
-        self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
-        self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
-        self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
-        self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
-
-        results = cv_results.formatted_results(return_train_score=True, return_style=False)
-        self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['encoder'].iloc[0], str)
-        equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
-                                    'ROC/AUC Training Mean',
-                                    'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
-                                    'F1 Training Mean',
-                                    'Pos. Pred. Val Mean', 'Pos. Pred. Val 95CI.LO', 'Pos. Pred. Val 95CI.HI',
-                                    'Pos. Pred. Val Training Mean',
-                                    'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
-                                    'True Pos. Rate Training Mean',
-                                    'max_features', 'n_estimators',
-                                    'encoder']
-        self.assertTrue(all(equal))
-
-        results = cv_results.formatted_results(return_train_score=False, return_style=False)
-
-        self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['encoder'].iloc[0],
-                              str)
-        equal = results.columns == ['ROC/AUC Mean', 'ROC/AUC 95CI.LO', 'ROC/AUC 95CI.HI',
-                                    'F1 Mean', 'F1 95CI.LO', 'F1 95CI.HI',
-                                    'Pos. Pred. Val Mean', 'Pos. Pred. Val 95CI.LO', 'Pos. Pred. Val 95CI.HI',
-                                    'True Pos. Rate Mean', 'True Pos. Rate 95CI.LO', 'True Pos. Rate 95CI.HI',
-                                    'max_features', 'n_estimators', 'encoder']
-        self.assertTrue(all(equal))
-
-        with suppress_warnings():
-            results = cv_results.formatted_results(return_train_score=True, return_style=True)
-        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__with_training.html', 'w') as file:
-            file.write(results.render())
-
-        with suppress_warnings():
-            results = cv_results.formatted_results(return_train_score=False, return_style=True)
-        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__without_training.html', 'w') as file:
-            file.write(results.render())
-
-        grid_search = self.credit_data__grid_search__roc_auc
-        cv_results = SearchCVParser2(searcher=grid_search, higher_score_is_better=True)
-
-        self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials,))
-        self.assertFalse(cv_results.trial_labels.isna().any())
-        self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
-        self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [6, 7])
-        self.assertEqual(cv_results.results.index.tolist(),
-                         cv_results.primary_score_standard_errors.index.tolist())
-        self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
-                         cv_results.top_score_standard_error)
-
-        self.assertEqual(cv_results.score_names, ['roc_auc'])
-        self.assertEqual(cv_results.score_columns,
-                         ['roc_auc Mean',
-                          'roc_auc 95CI.LO',
-                          'roc_auc 95CI.HI'])
-        # self.assertEqual(cv_results.training_score_columns, ['roc_auc Training Mean'])
-        # self.assertEqual(cv_results.parameter_columns,
-        #                  ['model | max_features',
-        #                   'model | n_estimators',
-        #                   'preparation | non_numeric_pipeline | encoder_chooser | transformer'])
-
-        # self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
-        # self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
-        # self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
-        # self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
-
-        # with suppress_warnings():
-        #     results = cv_results.formatted_results(return_train_score=True, return_style=True)
-        # test_file = get_test_path() + '/test_files/sklearn_eval/credit__grid_search__default_scores__with_training.html'
-        # with open(test_file, 'w') as file:
-        #     file.write(results.render())
-
-        # with suppress_warnings():
-        #     results = cv_results.formatted_results(return_train_score=False, return_style=True)
-        # test_file = get_test_path() + '/test_files/sklearn_eval/credit__grid_search__default_scores__without_training.html'
-        # with open(test_file, 'w') as file:
-        #     file.write(results.render())
-
-    def test_cv_results_to_dataframe_regression(self):
-        grid_search = self.housing_data__grid_search
-        cv_results = SearchCVParser2(searcher=grid_search, higher_score_is_better=False)
-
-        self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials,))
-        self.assertFalse(cv_results.trial_labels.isna().any())
-        self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
-        self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [3])
-        self.assertEqual(cv_results.results.index.tolist(),
-                         cv_results.primary_score_standard_errors.index.tolist())
-        self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
-                         cv_results.top_score_standard_error)
-
-        self.assertEqual(cv_results.score_names, ['RMSE', 'MAE'])
-        self.assertEqual(cv_results.score_columns,
-                         ['RMSE Mean',
-                          'RMSE 95CI.LO',
-                          'RMSE 95CI.HI',
-                          'MAE Mean',
-                          'MAE 95CI.LO',
-                          'MAE 95CI.HI'])
-        self.assertEqual(cv_results.training_score_columns, ['RMSE Training Mean', 'MAE Training Mean'])
-        self.assertEqual(cv_results.parameter_columns, ['model | max_features', 'model | n_estimators'])
-
-        self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
-        self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
-        self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
-        self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
-
-        results = cv_results.formatted_results(return_train_score=True, return_style=False)
-
-        self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['model | max_features'].iloc[0], str)
-        equal = results.columns == ['RMSE Mean', 'RMSE 95CI.LO', 'RMSE 95CI.HI', 'RMSE Training Mean',
-                                    'MAE Mean', 'MAE 95CI.LO', 'MAE 95CI.HI', 'MAE Training Mean',
-                                    'model | max_features', 'model | n_estimators']
-        self.assertTrue(all(equal))
-
-        results = cv_results.formatted_results(return_train_score=False, return_style=False)
-
-        self.assertIsInstance(results, pd.DataFrame)
-        self.assertIsInstance(results['model | max_features'].iloc[0], str)
-        equal = results.columns == ['RMSE Mean', 'RMSE 95CI.LO', 'RMSE 95CI.HI',
-                                    'MAE Mean', 'MAE 95CI.LO', 'MAE 95CI.HI',
-                                    'model | max_features', 'model | n_estimators']
-        self.assertTrue(all(equal))
-
-        with suppress_warnings():
-            results = cv_results.formatted_results(return_train_score=True, return_style=True)
-        with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__with_training.html', 'w') as file:
-            file.write(results.render())
-
-        with suppress_warnings():
-            results = cv_results.formatted_results(return_train_score=False, return_style=True)
-        with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__without_training.html', 'w') as file:
-            file.write(results.render())
+    # def test_cv_results_to_dataframe_regression(self):
+    #     grid_search = self.housing_data__grid_search
+    #     cv_results = SearchCVParser2(searcher=grid_search, higher_score_is_better=False)
+    #
+    #     self.assertEqual(cv_results.trial_labels.shape, (cv_results.number_of_trials,))
+    #     self.assertFalse(cv_results.trial_labels.isna().any())
+    #     self.assertEqual(cv_results.top_score, cv_results.results.iloc[0, 0])
+    #     self.assertEqual(cv_results.result_indexes_within_1_standard_error.tolist(), [3])
+    #     self.assertEqual(cv_results.results.index.tolist(),
+    #                      cv_results.primary_score_standard_errors.index.tolist())
+    #     self.assertEqual(cv_results.primary_score_standard_errors.iloc[0],
+    #                      cv_results.top_score_standard_error)
+    #
+    #     self.assertEqual(cv_results.score_names, ['RMSE', 'MAE'])
+    #     self.assertEqual(cv_results.score_columns,
+    #                      ['RMSE Mean',
+    #                       'RMSE 95CI.LO',
+    #                       'RMSE 95CI.HI',
+    #                       'MAE Mean',
+    #                       'MAE 95CI.LO',
+    #                       'MAE 95CI.HI'])
+    #     self.assertEqual(cv_results.training_score_columns, ['RMSE Training Mean', 'MAE Training Mean'])
+    #     self.assertEqual(cv_results.parameter_columns, ['model | max_features', 'model | n_estimators'])
+    #
+    #     self.assertEqual(cv_results.results.shape[0], cv_results.number_of_trials)
+    #     self.assertEqual(cv_results.formatted_results(return_style=False).shape[0], cv_results.number_of_trials)
+    #     self.assertEqual(len(cv_results.fit_time_per_trial), cv_results.number_of_trials)
+    #     self.assertEqual(len(cv_results.score_time_per_trial), cv_results.number_of_trials)
+    #
+    #     results = cv_results.formatted_results(return_train_score=True, return_style=False)
+    #
+    #     self.assertIsInstance(results, pd.DataFrame)
+    #     self.assertIsInstance(results['model | max_features'].iloc[0], str)
+    #     equal = results.columns == ['RMSE Mean', 'RMSE 95CI.LO', 'RMSE 95CI.HI', 'RMSE Training Mean',
+    #                                 'MAE Mean', 'MAE 95CI.LO', 'MAE 95CI.HI', 'MAE Training Mean',
+    #                                 'model | max_features', 'model | n_estimators']
+    #     self.assertTrue(all(equal))
+    #
+    #     results = cv_results.formatted_results(return_train_score=False, return_style=False)
+    #
+    #     self.assertIsInstance(results, pd.DataFrame)
+    #     self.assertIsInstance(results['model | max_features'].iloc[0], str)
+    #     equal = results.columns == ['RMSE Mean', 'RMSE 95CI.LO', 'RMSE 95CI.HI',
+    #                                 'MAE Mean', 'MAE 95CI.LO', 'MAE 95CI.HI',
+    #                                 'model | max_features', 'model | n_estimators']
+    #     self.assertTrue(all(equal))
+    #
+    #     with suppress_warnings():
+    #         results = cv_results.formatted_results(return_train_score=True, return_style=True)
+    #     with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__with_training.html', 'w') as file:
+    #         file.write(results.render())
+    #
+    #     with suppress_warnings():
+    #         results = cv_results.formatted_results(return_train_score=False, return_style=True)
+    #     with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__without_training.html', 'w') as file:
+    #         file.write(results.render())
 
     def test_TwoClassEvaluator(self):
         y_true = self.credit_data__y_test
