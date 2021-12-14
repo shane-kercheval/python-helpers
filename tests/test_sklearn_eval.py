@@ -247,6 +247,12 @@ class TestSklearnEval(unittest.TestCase):
         encoder_values = [str(x) for x in list(grid_search_credit.cv_results_['param_preparation__non_numeric_pipeline__encoder_chooser__transformer'].data)]
         self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[2]].tolist())
 
+        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores.html', 'w') as file:
+            file.write(parser.to_formatted_dataframe().render())
+
+        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__primary_score_only.html', 'w') as file:
+            file.write(parser.to_formatted_dataframe(primary_score_only=True).render())
+
         assert_np_arrays_are_close(parser.primary_score_averages,
                                    np.array(parser.test_score_averages[parser.primary_score_name]))
         assert_np_arrays_are_close(parser.primary_score_averages,
@@ -435,6 +441,12 @@ class TestSklearnEval(unittest.TestCase):
                           list(grid_search_credit.cv_results_['param_preparation__non_numeric_pipeline__encoder_chooser__transformer'].data)]
         self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[2]].tolist())
 
+        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__single_score_all_scores.html', 'w') as file:
+            file.write(parser.to_formatted_dataframe().render())
+
+        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__single_score_primary_score_only.html', 'w') as file:
+            file.write(parser.to_formatted_dataframe(primary_score_only=True).render())
+
         self.assertTrue(isinstance(parser.test_score_averages, dict))
         self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
 
@@ -596,10 +608,6 @@ class TestSklearnEval(unittest.TestCase):
         self.assertRaises(AssertionError,
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__temp.html', 'w') as file:
-            file.write(parser.to_formatted_dataframe().render())
-
-        parser.to_formatted_dataframe()
         self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe().index))
         cv_dataframe = parser.to_dataframe().sort_index()
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
@@ -609,6 +617,12 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertEqual(list(grid_search_housing.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())
         self.assertEqual(list(grid_search_housing.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
+
+        with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__all_scores.html', 'w') as file:
+            file.write(parser.to_formatted_dataframe().render())
+
+        with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__primary_score_only.html', 'w') as file:
+            file.write(parser.to_formatted_dataframe(primary_score_only=True).render())
 
         self.assertTrue(isinstance(parser.test_score_averages, dict))
         self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)

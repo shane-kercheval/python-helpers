@@ -294,6 +294,7 @@ class SearchCVParser:
 
     def to_formatted_dataframe(self,
                                round_by: int = 3,
+                               primary_score_only: bool = False,
                                exclude_no_variance_params: bool = True,
                                return_style: bool = True) -> Union[pd.DataFrame, Styler]:
         """Returns formatted results, either as a pd.DataFrame or pd.DataFrame.Styler
@@ -306,6 +307,8 @@ class SearchCVParser:
         Args:
             round_by:
                 the number of digits to round by for the score columns (does not round the parameter columns)
+            primary_score_only:
+                if True, then only include the primary score.
             exclude_no_variance_params:
                 if True, exclude columns that only have 1 unique value
             return_style:
@@ -323,6 +326,9 @@ class SearchCVParser:
         score_columns = list(cv_dataframe.columns[cv_dataframe.columns.str.endswith((' Mean',
                                                                                      ' 95CI.LO',
                                                                                      ' 95CI.HI'))])
+        if primary_score_only:
+            columns_to_drop = [x for x in score_columns if not x.startswith(self.primary_score_name)]
+            cv_dataframe = cv_dataframe.drop(columns=columns_to_drop)
 
         cv_dataframe = cv_dataframe.round(dict(zip(score_columns, [round_by] * len(score_columns))))
 
