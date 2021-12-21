@@ -22,7 +22,7 @@ import helpsk.string as hstring
 # pylint: disable=too-many-locals
 from helpsk.exceptions import HelpskParamValueError
 from helpsk.plot import STANDARD_WIDTH_HEIGHT
-from helpsk.validation import assert_is_close, assert_true
+from helpsk.validation import assert_true
 
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=Warning)
@@ -475,7 +475,7 @@ class SearchCVParser:
 
         def create_trial_label(iteration) -> str:
             return f"{{{hstring.collapse(create_hyper_param_labels(iteration), separate=', ')}}}"
-        #create_trial_label(iteration=self.parameter_iterations[0])
+        # create_trial_label(iteration=self.parameter_iterations[0])
 
         labels = [create_trial_label(x) for x in self.parameter_iterations]
 
@@ -552,16 +552,20 @@ class SearchCVParser:
         """The index of best primary score."""
         return self.primary_score_best_indexes[0]
 
-    @property
-    def best_primary_score(self) -> float:
+    def best_primary_score_params(self) -> dict:
         """
         The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated
         with the primary score.
         """
-        return self.primary_score_averages[self.best_primary_score_index]
+        best_params = self.parameter_iterations[self.best_primary_score_index]
+
+        if self.parameter_names_mapping:
+            best_params = {self.parameter_names_mapping[key]: value for key, value in best_params.items()}
+
+        return best_params
 
     @property
-    def best_primary_score_params(self) -> float:
+    def best_primary_score(self) -> float:
         """
         The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated
         with the primary score.

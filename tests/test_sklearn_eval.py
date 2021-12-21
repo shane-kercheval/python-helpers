@@ -378,6 +378,9 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.best_primary_score,
                          np.nanmax(grid_search_credit.cv_results_['mean_test_ROC/AUC']))
 
+        self.assertTrue(all([parser.to_dataframe().loc[parser.best_primary_score_index, key] == value
+                             for key, value in parser.best_primary_score_params().items()]))
+
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
 
@@ -438,23 +441,23 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.test_score_rankings, parser_from_yaml.test_score_rankings)
 
         self.assertEqual(parser.iteration_labels(order_from_best_to_worst=True),
-                         ['{max_features: auto, n_estimators: 50, encoder: OneHotEncoder()}',
-                          '{max_features: auto, n_estimators: 50, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: auto, n_estimators: 10, encoder: OneHotEncoder()}',
-                          '{max_features: auto, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: 100, n_estimators: 10, encoder: OneHotEncoder()}',
-                          '{max_features: 100, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: 100, n_estimators: 50, encoder: OneHotEncoder()}',
-                          '{max_features: 100, n_estimators: 50, encoder: CustomOrdinalEncoder()}'])
+                         ['{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
+                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
+                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
+                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
+                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
+                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
+                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
+                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])
         self.assertEqual(parser.iteration_labels(order_from_best_to_worst=False),
-                         ['{max_features: 100, n_estimators: 10, encoder: OneHotEncoder()}',
-                          '{max_features: 100, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: 100, n_estimators: 50, encoder: OneHotEncoder()}',
-                          '{max_features: 100, n_estimators: 50, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: auto, n_estimators: 10, encoder: OneHotEncoder()}',
-                          '{max_features: auto, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: auto, n_estimators: 50, encoder: OneHotEncoder()}',
-                          '{max_features: auto, n_estimators: 50, encoder: CustomOrdinalEncoder()}'])
+                         ['{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
+                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
+                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
+                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
+                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
+                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
+                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
+                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])
 
         def assert_np_arrays_are_close(array1, array2):
             self.assertEqual(len(array1), len(array2))
@@ -573,6 +576,16 @@ class TestSklearnEval(unittest.TestCase):
                          grid_search_credit.cv_results_['mean_test_score'][6])
         self.assertEqual(parser.best_primary_score,
                          np.nanmax(grid_search_credit.cv_results_['mean_test_score']))
+
+        self.assertTrue(all([parser.to_dataframe().loc[parser.best_primary_score_index, key] == value
+                             for key, value in parser.best_primary_score_params().items()]))
+
+        self.assertEqual(parser.best_primary_score_params()['model__max_features'],
+                         grid_search_credit.best_params_['model__max_features'])
+        self.assertEqual(parser.best_primary_score_params()['model__n_estimators'],
+                         grid_search_credit.best_params_['model__n_estimators'])
+        self.assertEqual(parser.best_primary_score_params()['preparation__non_numeric_pipeline__encoder_chooser__transformer'],
+                         str(grid_search_credit.best_params_['preparation__non_numeric_pipeline__encoder_chooser__transformer']))
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
@@ -777,6 +790,9 @@ class TestSklearnEval(unittest.TestCase):
                          grid_search_housing.cv_results_['mean_test_RMSE'][3] * -1)
         self.assertEqual(parser.best_primary_score,
                          np.nanmin(grid_search_housing.cv_results_['mean_test_RMSE'] * -1))
+
+        self.assertTrue(all([parser.to_dataframe().loc[parser.best_primary_score_index, key] == value
+                             for key, value in parser.best_primary_score_params().items()]))
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
