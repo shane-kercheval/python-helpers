@@ -4,7 +4,7 @@ in particular, for evaluating models"""
 import math
 import warnings
 from re import match
-from typing import Tuple, Union, Optional
+from typing import Tuple, Union, Optional, List
 
 import numpy as np
 import pandas as pd
@@ -29,6 +29,8 @@ with warnings.catch_warnings():
     from statsmodels import api as sm  # https://github.com/statsmodels/statsmodels/issues/3814
 
 
+# pylint: disable=too-many-instance-attributes
+# pylint: disable=too-many-public-methods
 class SearchCVParser:
     """
     This class contains the logic to parse and extract information from a BaseSearchCV object (e.g.
@@ -355,7 +357,7 @@ class SearchCVParser:
 
             # highlight iterations whose primary score (i.e. first column of `results` dataframe) is within
             # 1 standard error of the top primary score (i.e. first column first row).
-            def highlight_cols(s):
+            def highlight_cols(s):  # noqa
                 return 'background-color: %s' % hcolor.Colors.PASTEL_BLUE.value
 
             # we might have removed columns (e.g. that don't have any variance) so check that the columns
@@ -448,6 +450,40 @@ class SearchCVParser:
         """The "iterations" i.e. the hyper-parameter combinations in order of execution."""
         return self._cv_dict['parameter_iterations']
 
+    def iteration_labels(self, order_from_best_to_worst=True) -> List[str]:
+        """A trial is a set of hyper-parameters that were cross validated. (Each row of the `results`
+         DataFrame corresponds to a single trial. The corresponding label for each trial is a single string
+         containing all of the hyper-parameter names and values in the format of
+         `{param1: value1, param2: value2}`.
+
+         Note: you'll need to
+
+        Params:
+            order_from_best_to_worst: if True, returns the labels in order from the best score to the worst
+            score, which should match the ordered of .to_dataframe() or .to_formatted_dataframe()`. If False,
+            returns the labels in order that they were ran by the cross validation object.
+
+        Returns:
+            a pd.Series the same length as `number_of_trials` containing a str
+        """
+        def create_hyper_param_labels(iteration) -> list:
+            """Creates a list of strings that represent the name/value pair for each hyper-parameter."""
+#            iteration
+            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping  else x}: {iteration[x]}"
+                    for x in self.parameter_names_original]
+        # create_hyper_param_labels(iteration=self.parameter_iterations[0])
+
+        def create_trial_label(iteration) -> str:
+            return f"{{{hstring.collapse(create_hyper_param_labels(iteration), separate=', ')}}}"
+        #create_trial_label(iteration=self.parameter_iterations[0])
+
+        labels = [create_trial_label(x) for x in self.parameter_iterations]
+
+        if order_from_best_to_worst:
+            labels = [x for _, x in sorted(zip(self.primary_score_iteration_ranking, labels))]
+
+        return labels
+
     @property
     def timings(self) -> dict:
         """The timings providing by searcher.cv_results_."""
@@ -490,12 +526,25 @@ class SearchCVParser:
 
     @property
     def primary_score_iteration_ranking(self) -> np.array:
-        """The ranking of the corresponding index, in terms of best to worst score."""
+        """The ranking of the corresponding index, in terms of best to worst score.
+
+        e.g. [5, 6, 7, 8, 3, 4, 1, 2]
+            This means that the 6th index/iteration had the highest ranking (1); and that the 3rd index had
+            the worst ranking (8)
+
+        This differs from `primary_score_best_indexes` which returns the order of indexes from best to worst.
+        So in the example above, the first value returned in the `primary_score_best_indexes` array would be
+        6 because the best score is at index 6. The last value in the array 3, because the worst score is at
+        index 3.
+
+        Note that `primary_score_iteration_ranking` starts at 1 while primary_score_best_indexes starts at 0.
+        """
         return np.array(self.test_score_rankings[self.primary_score_name])
 
     @property
     def primary_score_best_indexes(self) -> np.array:
-        """The indexes of best to worst primary scores."""
+        """The indexes of best to worst primary scores. See documentation for
+        `primary_score_iteration_ranking` to understand the differences between the two properties."""
         return np.argsort(self.primary_score_iteration_ranking)
 
     @property
@@ -505,6 +554,14 @@ class SearchCVParser:
 
     @property
     def best_primary_score(self) -> float:
+        """
+        The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated
+        with the primary score.
+        """
+        return self.primary_score_averages[self.best_primary_score_index]
+
+    @property
+    def best_primary_score_params(self) -> float:
         """
         The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated
         with the primary score.
@@ -615,384 +672,6 @@ class SearchCVParser:
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
-class SearchCVParser2:
-    """
-    This class contains the logic to parse and extract information from a BaseSearchCV object (e.g.
-    GridSearchCV, RandomizedSearchCV, BayesSearchCV)
-    """
-    def __init__(self,
-                 searcher: BaseSearchCV,
-                 higher_score_is_better: bool = True,
-                 new_param_column_names: Union[dict, None] = None):
-
-        self._higher_score_is_better = higher_score_is_better
-        self.num_repeats = searcher.cv.n_repeats
-        self.num_folds = searcher.cv.cvargs['n_splits']
-
-        self._results, self._primary_score_standard_errors = \
-            SearchCVParser2.cv_results_to_dataframe(searcher=searcher,
-                                                   higher_score_is_better=higher_score_is_better)
-
-        if new_param_column_names:
-            self._results.rename(columns=new_param_column_names, inplace=True)
-
-        # mean/std times per trial; i.e. to get total time, multiple by number_of_runs_per_trial
-        self.mean_fit_time = searcher.cv_results_['mean_fit_time']
-        self.std_fit_time = searcher.cv_results_['std_fit_time']
-        self.mean_score_time = searcher.cv_results_['mean_score_time']
-        self.std_score_time = searcher.cv_results_['std_score_time']
-
-        assert_true(len(self.mean_fit_time) == self.number_of_trials)
-        assert_is_close(self.total_time, self.mean_time_per_trial * self.number_of_trials)
-
-    @property
-    def number_of_trials(self) -> int:
-        """"A single trial contains the cross validation runs for a single set of hyper-parameters. The
-        'number of trials' is basically the number of combinations of different hyper-parameters that were
-        cross validated."""
-        return self.results.shape[0]
-
-    @property
-    def number_of_runs_per_trial(self) -> int:
-        """This is the number of CV folds multiplied by the number of CV repeats."""
-        return self.num_folds * self.num_repeats
-
-    @property
-    def fit_time_per_trial(self) -> np.array:
-        """Average fit time for each trial multiplied by the number of runs per trial
-
-        Returns:
-            array containing the fit time for each trail
-        """
-        return self.mean_fit_time * self.number_of_runs_per_trial
-
-    @property
-    def fit_time_total(self) -> float:
-        """Total fit time across all trials."""
-        return float(np.sum(self.fit_time_per_trial))
-
-    @property
-    def score_time_per_trial(self):
-        """Average score time for each trial multiplied by the number of runs per trial
-
-        Returns:
-            array containing the score time for each trail
-        """
-        return self.mean_score_time * self.number_of_runs_per_trial
-
-    @property
-    def score_time_total(self) -> float:
-        """Total score time across all trials."""
-        return float(np.sum(self.score_time_per_trial))
-
-    @property
-    def mean_time_per_trial(self) -> float:
-        """Average time per trial"""
-        return float(np.mean(self.fit_time_per_trial + self.score_time_per_trial))
-
-    @property
-    def total_time(self) -> float:
-        """Total time it took across all trials"""
-        return self.fit_time_total + self.score_time_total
-
-    @property
-    def score_names(self) -> list:
-        """Returns a list of the names of the scores"""
-        def replace_type(value):
-            return value.replace(' Mean', '').replace(' 95CI.LO', '').replace(' 95CI.HI', '')
-        names = [replace_type(x) for x in self.score_columns]
-        # use .fromkeys to dedupe
-        return list(dict.fromkeys(names))
-    
-    @property
-    def trial_labels(self) -> pd.Series:
-        """A trial is a set of hyper-parameters that were cross validated. (Each row of the `results`
-         DataFrame corresponds to a single trial. The corresponding label for each trial is a single string
-         containing all of the hyper-parameter names and values in the format of
-         `{param1: value1, param2: value2}`.
-
-        Returns:
-            a pd.Series the same length as `number_of_trials` containing a str
-        """
-        def create_hyper_param_labels(data_row) -> list:
-            """Creates a list of strings that represent the name/value pair for each hyper-parameter."""
-            return [f"{x}: {data_row[x]}" for x in self.parameter_columns]
-
-        def create_trial_label(data_row) -> str:
-            return f"{{{hstring.collapse(create_hyper_param_labels(data_row), separate=', ')}}}"
-
-        return self.results.apply(create_trial_label, axis=1)
-
-    @property
-    def number_of_scores(self) -> int:
-        """The number of scores passed to the SearchCV object"""
-        return len(self.score_names)
-
-    @property
-    def primary_score_name(self) -> str:
-        """The first scorer passed to the SearchCV will be treated as the primary score."""
-        return self.score_names[0]
-
-    @property
-    def primary_score_standard_errors(self) -> pd.Series:
-        """The standard errors associated with the scores. Sorted to correspond to `results` DataFrame."""
-        return self._primary_score_standard_errors
-
-    @property
-    def top_score(self):
-        """The top 'primary' score (i.e. the average cross validation score associated with the best set of
-        hyper-params."""
-        return self.results.iloc[0, 0]
-
-    @property
-    def result_indexes_within_1_standard_error(self):
-        """Returns the indexes of the `results` DataFrame where the primary scores (i.e. first scorer
-        passed to SearchCV object; i.e. first column of the results DataFrame) are within 1 standard error of
-        the highest primary score."""
-        if self._higher_score_is_better:
-            return self.results.index[self.results.iloc[:, 0] >=
-                                      self.top_score - self.top_score_standard_error]
-
-        return self.results.index[self.results.iloc[:, 0] <= self.top_score + self.top_score_standard_error]
-
-    @property
-    def top_score_standard_error(self) -> float:
-        """The standard error associated with the top 'primary' score."""
-        return self.primary_score_standard_errors.iloc[0]  # index of highest score
-
-    @property
-    def score_columns(self) -> list:
-        """Returns a list of the names of the score columns"""
-        return [x for x in self.results.columns[self.results.columns.str.endswith((' Mean',
-                                                                                   ' 95CI.LO',
-                                                                                   ' 95CI.HI'))]
-                if x not in self.training_score_columns]
-
-    @property
-    def training_score_columns(self) -> list:
-        """Returns a list of the names of the training score columns"""
-        return self.results.columns[self.results.columns.str.contains(' Training ')].tolist()
-
-    @property
-    def parameter_columns(self) -> list:
-        """Returns a list of the names of the columns associated with the hyper-parameters"""
-        return [x for x in self.results.columns
-                if x not in self.score_columns + self.training_score_columns]
-
-    @property
-    def results(self):
-        """Main DataFrame summarizing the results of the SearchCV object."""
-        return self._results.copy()
-
-    def formatted_results(self,
-                          round_by: int = 3,
-                          return_train_score: bool = True,
-                          exclude_no_variance_params: bool = True,
-                          return_style: bool = True) -> Union[pd.DataFrame, Styler]:
-        """Returns a summary of the results, either as a Data.Frame, or Data.Frame.Styler.
-
-        If a Styler is returned, then Hyper-Parameter columns will be highlighted in blue where the primary
-        score (i.e. first column) for the iteration (i.e. the row i.e. the combination of hyper-parameters
-        that were cross validated) is within 1 standard error of the top primary score (i.e. first column
-        first row).
-
-        Args:
-            round_by:
-                the number of digits to round by for the score columns (does not round the parameter columns)
-            return_train_score:
-                if True, return the columns associated with the training scores, if any.
-            exclude_no_variance_params
-                if True, exclude columns that only have 1 unique value
-            return_style:
-                If True, return Styler object
-
-        Returns:
-            either a DataFrame or Styler object.
-        """
-        results = self.results
-
-        if exclude_no_variance_params:
-            columns_to_drop = [x for x in self.parameter_columns if len(self.results[x].unique()) == 1]
-            results = results.drop(columns=columns_to_drop)
-
-        results = results.round(dict(zip(self.score_columns + self.training_score_columns,
-                                         [round_by] * len(self.score_columns + self.training_score_columns))))
-
-        if not return_train_score and len(self.training_score_columns) > 0:
-            results = results.drop(columns=self.training_score_columns)
-
-        final_columns = results.columns  # save for style logic
-
-        if return_style:
-            results = results.style
-
-            # note that we are not adding styles to the training scores; training scores are secondary info
-            for score in self.score_names:
-                mean_key = score + ' Mean'
-                ci_low_key = score + ' 95CI.LO'
-                ci_high_key = score + ' 95CI.HI'
-
-                results. \
-                    bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value). \
-                    bar(subset=[ci_high_key], color=hcolor.GRAY). \
-                    pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY). \
-                    pipe(hstyle.format, round_by=round_by, hide_index=True)
-
-            # highlight iterations whose primary score (i.e. first column of `results` dataframe) is within
-            # 1 standard error of the top primary score (i.e. first column first row).
-            def highlight_cols(s):
-                return 'background-color: %s' % hcolor.Colors.PASTEL_BLUE.value
-
-            # we might have removed columns (e.g. that don't have any variance) so check that the columns
-            # were in the final set
-            columns_to_highlight = [x for x in self.parameter_columns if x in final_columns]
-            results.applymap(highlight_cols,
-                             subset=pd.IndexSlice[self.result_indexes_within_1_standard_error,
-                                                  columns_to_highlight])
-
-        return results
-
-    # pylint: disable=too-many-statements
-    @staticmethod
-    def cv_results_to_dataframe(searcher: BaseSearchCV,
-                                higher_score_is_better: bool = True) -> tuple[pd.DataFrame, pd.Series]:
-        """
-        Args:
-            searcher:
-                A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
-                constructor (e.g. `GridSearchCV(..., scoring='auc', ...)` or a dictionary with metric names as
-                keys and callables a values.
-
-                An example of the dictionary option:
-
-                    scores = {
-                        'ROC/AUC': SCORERS['roc_auc'],
-                        'F1': make_scorer(f1_score, greater_is_better=True),
-                        'Pos. Pred. Val': make_scorer(precision_score, greater_is_better=True),
-                        'True Pos. Rate': make_scorer(recall_score, greater_is_better=True),
-                    }
-                    grid_search = GridSearchCV(..., scoring=scores, ...)
-            higher_score_is_better:
-                if True, higher scores are better; if False, lower scores are better
-                False assumes that the scores returned from sklearn are negative and will multiple the values
-                by 1.
-
-        Returns:
-            DataFrame with a row corresponding to each hyper-parameter combination a.k.a 'trial'
-        """
-        num_folds = searcher.cv.cvargs['n_splits']
-        num_repeats = searcher.cv.n_repeats
-        sample_size = num_folds * num_repeats
-        results = None
-        cv_results = searcher.cv_results_
-
-        str_score_name = None
-        if isinstance(searcher.scoring, dict):
-            score_names = list(searcher.scoring.keys())
-        elif isinstance(searcher.scoring, str):
-            score_names = ['score']
-            str_score_name = searcher.scoring
-        else:
-            mess = 'The `searcher` does not have a string or dictionary .scoring property. Cannot extract ' \
-                   'scores.'
-            raise HelpskParamValueError(mess)
-
-        # extract mean and standard deviation for each score
-        # if a string was passed into the searcher `scoring` parameter (e.g. 'roc/auc') then the score name
-        # will just be 'mean_test_score' but we will convert it to `roc/auc Mean`. Same for standard
-        # deviation. In that case, then after we are done, we need to change `score_names = ['score']` to
-        # `score_names = [str_score_name]`
-        for score in score_names:
-            score_name = score if str_score_name is None else str_score_name
-            mean_scores = cv_results['mean_test_' + score]
-            mean_scores = mean_scores if higher_score_is_better else mean_scores * -1
-
-            results = pd.concat([
-                results,
-                pd.DataFrame({
-                    score_name + " Mean": mean_scores,
-                    score_name + " St. Dev": cv_results['std_test_' + score],
-                })
-            ], axis=1)
-
-            if 'mean_train_' + score in cv_results:
-                mean_training_scores = cv_results['mean_train_' + score]
-                mean_training_scores = mean_training_scores \
-                    if higher_score_is_better else mean_training_scores * -1
-                results = pd.concat([
-                    results,
-                    pd.DataFrame({
-                        score_name + " Training Mean": mean_training_scores,
-                        score_name + " Training St. Dev": cv_results['std_train_' + score],
-                    })
-                ], axis=1)
-
-        # see comment above
-        if str_score_name is not None:
-            score_names = [str_score_name]
-
-        def add_confidence_interval(score_name, dataframe):  # noqa
-            mean_column_name = score_name + ' Mean'
-            st_dev_column_name = score_name + ' St. Dev'
-            score_means = dataframe[mean_column_name]
-            score_standard_errors = dataframe[st_dev_column_name] / math.sqrt(sample_size)
-
-            confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
-                                                 df=sample_size - 1,  # degrees of freedom
-                                                 loc=score_means,
-                                                 scale=score_standard_errors)
-
-            dataframe = dataframe.drop(columns=st_dev_column_name)
-
-            insertion_index = dataframe.columns.get_loc(mean_column_name) + 1
-            dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.HI',
-                             value=confidence_intervals[1])
-            dataframe.insert(loc=insertion_index, column=score_name + ' 95CI.LO',
-                             value=confidence_intervals[0])
-
-            return dataframe, score_standard_errors
-
-        primary_score_standard_errors = None
-        # for each score, calculate the 95% confidence interval for the mean
-        for score in score_names:
-            (results, standard_errors) = add_confidence_interval(score_name=score,
-                                                                 dataframe=results)
-
-            if score == score_names[0]:  # if score is the first/primary score (or only)
-                primary_score_standard_errors = standard_errors
-
-            results[f'{score} Mean'] = results[f'{score} Mean']
-            results[f'{score} 95CI.LO'] = results[f'{score} 95CI.LO']
-            results[f'{score} 95CI.HI'] = results[f'{score} 95CI.HI']
-
-            # if there are training scores, then drop the St. Dev, and don't add confidence intervals,
-            # which would add too many columns (noise) and not that interesting.
-            if score + ' Training Mean' in results.columns:
-                results[f'{score} Training Mean'] = results[f'{score} Training Mean']
-                results = results.drop(columns=score + ' Training St. Dev')
-
-        assert_true(primary_score_standard_errors is not None)
-
-        parameter_dataframe = pd.DataFrame(cv_results["params"])
-        parameter_dataframe.columns = [x.replace('__', ' | ') for x in parameter_dataframe.columns]
-
-        for column in parameter_dataframe.columns:
-            # this will convert objects (like Transformers) into strings, which makes further operations on
-            # the column (e.g. aggregations/group_by/etc) much easier.
-            if parameter_dataframe[column].dtype.name == 'object':
-                parameter_dataframe[column] = parameter_dataframe[column].astype(str)
-
-        results = pd.concat([
-            results,
-            parameter_dataframe,
-        ], axis=1)
-
-        results = results.sort_values(by=str(list(score_names)[0]) + ' Mean',
-                                      ascending=not higher_score_is_better)
-
-        primary_score_standard_errors = primary_score_standard_errors.reindex(results.index)
-
-        return results, primary_score_standard_errors
 
 
 # pylint: disable=too-many-instance-attributes,too-many-public-methods
