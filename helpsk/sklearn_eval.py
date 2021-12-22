@@ -280,10 +280,20 @@ class SearchCVParser:
 
         return cv_results_dict
 
-    def to_dataframe(self):
-        """This function converts the score information from the SearchCV object into a pd.DataFrame."""
+    def to_dataframe(self, sort_by_score: bool = True):
+        """This function converts the score information from the SearchCV object into a pd.DataFrame.
+
+        Params:
+            sort_by_score:
+                if True, sorts the dataframe starting with the best (primary) score to the worst score. 
+                Secondary scores are not considered.
+
+        Returns:
+            a DataFrame containing score information for each cross-validation iteration. A single row
+            corresponds to one iteration (i.e. one set of hyper-parameters that were cross-validated).
+        """
         if self._cv_dataframe is None:
-            result = None
+
             for score_name in self.score_names:
                 confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
                                                      # number_of_splits is sample-size
@@ -292,20 +302,27 @@ class SearchCVParser:
                                                      scale=self.score_standard_errors(score_name=score_name))
 
                 # only give confidence intervals for the primary score
-                result = pd.concat([result,
-                                    pd.DataFrame({score_name + " Mean": self.test_score_averages[score_name],
-                                                  score_name + " 95CI.LO": confidence_intervals[0],
-                                                  score_name + " 95CI.HI": confidence_intervals[1]})],
-                                   axis=1)
+                self._cv_dataframe = pd.concat([
+                        self._cv_dataframe,
+                        pd.DataFrame({score_name + " Mean": self.test_score_averages[score_name],
+                                      score_name + " 95CI.LO": confidence_intervals[0],
+                                      score_name + " 95CI.HI": confidence_intervals[1]})
+                    ],
+                    axis=1
+                )
 
-            result = pd.concat([result, pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)  # noqa
+            self._cv_dataframe = pd.concat([self._cv_dataframe,
+                                            pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)  # noqa
 
             if self.parameter_names_mapping:
-                result = result.rename(columns=self.parameter_names_mapping)
+                self._cv_dataframe = self._cv_dataframe.rename(columns=self.parameter_names_mapping)
 
-            self._cv_dataframe = result.iloc[self.primary_score_best_indexes]
+        copy = self._cv_dataframe.copy(deep=True)
 
-        return self._cv_dataframe.copy(deep=True)
+        if sort_by_score:
+            copy = copy.iloc[self.primary_score_best_indexes]
+
+        return copy
 
     def to_formatted_dataframe(self,
                                round_by: int = 3,

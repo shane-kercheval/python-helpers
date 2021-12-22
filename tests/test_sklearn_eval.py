@@ -251,6 +251,8 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe().index))
         cv_dataframe = parser.to_dataframe().sort_index()
+        hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
+
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
                                    grid_search_credit.cv_results_[f'mean_test_{parser.score_names[0]}'])
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[1]} Mean'],
@@ -475,6 +477,7 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe().index))
         cv_dataframe = parser.to_dataframe().sort_index()
+        hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
                                    grid_search_credit.cv_results_['mean_test_score'])
 
@@ -674,6 +677,7 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe().index))
         cv_dataframe = parser.to_dataframe().sort_index()
+        hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
                                    grid_search_housing.cv_results_[f'mean_test_{parser.score_names[0]}'] * -1)
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[1]} Mean'],
