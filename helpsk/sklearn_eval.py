@@ -328,7 +328,8 @@ class SearchCVParser:
                                round_by: int = 3,
                                primary_score_only: bool = False,
                                exclude_no_variance_params: bool = True,
-                               return_style: bool = True) -> Union[pd.DataFrame, Styler]:
+                               return_style: bool = True,
+                               sort_by_score: bool = True) -> Union[pd.DataFrame, Styler]:
         """This function converts the score information from the SearchCV object into a pd.DataFrame or a
         Styler object, formatted accordingly.
 
@@ -346,11 +347,14 @@ class SearchCVParser:
                 if True, exclude columns that only have 1 unique value
             return_style:
                 If True, return Styler object, else return pd.DataFrame
+            sort_by_score:
+                if True, sorts the dataframe starting with the best (primary) score to the worst score.
+                Secondary scores are not considered.
 
         Returns:
             Returns either pd.DataFrame or pd.DataFrame.Styler.
         """
-        cv_dataframe = self.to_dataframe()
+        cv_dataframe = self.to_dataframe(sort_by_score=sort_by_score)
 
         if exclude_no_variance_params:
             columns_to_drop = [x for x in self.parameter_names if len(cv_dataframe[x].unique()) == 1]
@@ -609,7 +613,7 @@ class SearchCVParser:
         """Returns the iteration indexes where the primary scores (i.e. first scorer
         passed to SearchCV object; i.e. first column of the to_dataframe() DataFrame) are within 1 standard
         error of the highest primary score."""
-        cv_dataframe = self.to_dataframe()
+        cv_dataframe = self.to_dataframe(sort_by_score=True)
 
         if self.higher_score_is_better:
             return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] >=
