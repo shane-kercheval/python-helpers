@@ -37,6 +37,7 @@ class SearchCVParser:
     GridSearchCV, RandomizedSearchCV, BayesSearchCV)
     """
 
+    # pylint: disable=too-many-arguments
     def __init__(self,
                  searcher: BaseSearchCV,
                  higher_score_is_better: bool = True,
@@ -45,7 +46,7 @@ class SearchCVParser:
                  parameter_name_mappings: Union[dict, None] = None):
         """
         This object encapsulates the results from a SearchCV object (e.g.
-        sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV). The results can then be 
+        sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV). The results can then be
         converted to a dictionary, in a specific format with the intent to write the contents to a
         yaml file.
 
@@ -54,7 +55,7 @@ class SearchCVParser:
         Params:
             searcher:
                 A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
-                constructor (e.g. `GridSearchCV(..., scoring='auc', ...)` or a dictionary with metric 
+                constructor (e.g. `GridSearchCV(..., scoring='auc', ...)` or a dictionary with metric
                 names as keys and callables as values.
 
                 An example of the dictionary option:
@@ -125,6 +126,8 @@ class SearchCVParser:
         with open(yaml_file_name, 'w') as file:
             yaml.dump(self._cv_dict, file, default_flow_style=False, sort_keys=False)
 
+    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-statements
     @staticmethod
     def __search_cv_to_dict(searcher: BaseSearchCV,
                             higher_score_is_better: bool = True,
@@ -132,7 +135,7 @@ class SearchCVParser:
                             run_description: str = "",
                             parameter_name_mappings: Union[dict, None] = None) -> dict:
         """This extracts the information from a BaseSearchCV object and converts it to a dictionary."""
-        
+
         def string_if_not_number(obj):
             if isinstance(obj, (int, float, complex)):
                 return obj
@@ -249,7 +252,7 @@ class SearchCVParser:
                 cv_results_dict['train_score_averages'] = averages_dict
                 cv_results_dict['train_score_standard_deviations'] = standard_deviations_dict
 
-                # if higher_score_is_better is False, sklearn will return negative numbers; I want actual 
+                # if higher_score_is_better is False, sklearn will return negative numbers; I want actual
                 # values
                 if not higher_score_is_better:
                     averages = cv_results_dict['train_score_averages']
@@ -285,7 +288,7 @@ class SearchCVParser:
 
         Params:
             sort_by_score:
-                if True, sorts the dataframe starting with the best (primary) score to the worst score. 
+                if True, sorts the dataframe starting with the best (primary) score to the worst score.
                 Secondary scores are not considered.
 
         Returns:
@@ -312,7 +315,8 @@ class SearchCVParser:
                 )
 
             self._cv_dataframe = pd.concat([self._cv_dataframe,
-                                            pd.DataFrame.from_dict(self.parameter_iterations)], axis=1)  # noqa
+                                            pd.DataFrame.from_dict(self.parameter_iterations)],  # noqa
+                                           axis=1)
 
             if self.parameter_names_mapping:
                 self._cv_dataframe = self._cv_dataframe.rename(columns=self.parameter_names_mapping)
@@ -392,7 +396,8 @@ class SearchCVParser:
 
             # highlight iterations whose primary score (i.e. first column of `results` dataframe) is within
             # 1 standard error of the top primary score (i.e. first column first row).
-            def highlight_cols(s):  # noqa
+            # pylint: disable=invalid-name, unused-argument
+            def highlight_cols(s):   # noqa
                 return 'background-color: %s' % hcolor.Colors.PASTEL_BLUE.value
 
             # we might have removed columns (e.g. that don't have any variance) so check that the columns
@@ -439,6 +444,7 @@ class SearchCVParser:
 
     @property
     def parameter_names_original(self) -> list:
+        """Returns the original parameter names (i.e. the path genearted by the scikit-learn pipelines."""
         return self._cv_dict['parameter_names']
 
     @property
@@ -447,8 +453,8 @@ class SearchCVParser:
         provided, or it returns the new parameter names (i.e. the values from `parameter_names_mapping`)."""
         if self.parameter_names_mapping:
             return list(self.parameter_names_mapping.values())
-        else:
-            return self.parameter_names_original
+
+        return self.parameter_names_original
 
     @property
     def parameter_names_mapping(self) -> dict:
@@ -486,7 +492,7 @@ class SearchCVParser:
         return self._cv_dict['parameter_iterations']
 
     def iteration_labels(self, order_from_best_to_worst=True) -> List[str]:
-        """An iteration is a set of hyper-parameters that were cross validated. The corresponding label for 
+        """An iteration is a set of hyper-parameters that were cross validated. The corresponding label for
         each iteration is a single string containing all of the hyper-parameter names and values in the format
         of `{param1: value1, param2: value2}`.
 
@@ -500,7 +506,7 @@ class SearchCVParser:
         """
         def create_hyper_param_labels(iteration) -> list:
             """Creates a list of strings that represent the name/value pair for each hyper-parameter."""
-            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping  else x}: {iteration[x]}"  # noqa
+            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping  else x}: {iteration[x]}"  # pylint: disable=line-too-long  # noqa
                     for x in self.parameter_names_original]
         # create_hyper_param_labels(iteration=self.parameter_iterations[0])
 
