@@ -149,7 +149,6 @@ class TestSklearnEval(unittest.TestCase):
         self.assertRaises(HelpskAssertionError,
                           lambda: SearchCVParser(searcher=self.credit_data__grid_search,
                                                  higher_score_is_better=True,
-                                                 run_name="test name",
                                                  run_description="test description",
                                                  parameter_name_mappings={'this_should_fail': 'value'}))
 
@@ -164,7 +163,6 @@ class TestSklearnEval(unittest.TestCase):
         grid_search_credit = self.credit_data__grid_search
         parser = SearchCVParser(searcher=grid_search_credit,
                                 higher_score_is_better=True,
-                                run_name="test name",
                                 run_description="test description",
                                 parameter_name_mappings=new_param_column_names)
         yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search.yaml'
@@ -176,9 +174,6 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
         self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
 
-        self.assertEqual(parser.name, "test name")
-        self.assertEqual(parser.name, parser_from_dict.name)
-        self.assertEqual(parser.name, parser_from_yaml.name)
         self.assertEqual(parser.description, "test description")
         self.assertEqual(parser.description, parser_from_dict.description)
         self.assertEqual(parser.description, parser_from_yaml.description)
@@ -392,7 +387,6 @@ class TestSklearnEval(unittest.TestCase):
         grid_search_credit = self.credit_data__grid_search__roc_auc
         parser = SearchCVParser(searcher=grid_search_credit,
                                 higher_score_is_better=True,
-                                run_name="test name",
                                 run_description="test description",
                                 parameter_name_mappings=None)
         yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search_roc.yaml'
@@ -404,9 +398,6 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
         self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
 
-        self.assertEqual(parser.name, "test name")
-        self.assertEqual(parser.name, parser_from_dict.name)
-        self.assertEqual(parser.name, parser_from_yaml.name)
         self.assertEqual(parser.description, "test description")
         self.assertEqual(parser.description, parser_from_dict.description)
         self.assertEqual(parser.description, parser_from_yaml.description)
@@ -443,23 +434,23 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.test_score_rankings, parser_from_yaml.test_score_rankings)
 
         self.assertEqual(parser.iteration_labels(order_from_best_to_worst=True),
-                         ['{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
-                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
-                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
-                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
-                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
-                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
-                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
-                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])
+                         ['{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])  # noqa
         self.assertEqual(parser.iteration_labels(order_from_best_to_worst=False),
-                         ['{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
-                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
-                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
-                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
-                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
-                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',
-                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',
-                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])
+                         ['{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])  # noqa
 
         def assert_np_arrays_are_close(array1, array2):
             self.assertEqual(len(array1), len(array2))
@@ -599,7 +590,6 @@ class TestSklearnEval(unittest.TestCase):
         grid_search_housing = self.housing_data__grid_search
         parser = SearchCVParser(searcher=grid_search_housing,
                                 higher_score_is_better=False,
-                                run_name="test name",
                                 run_description="test description")
         yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search.yaml'
         os.remove(yaml_file)
@@ -610,9 +600,6 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
         self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
 
-        self.assertEqual(parser.name, "test name")
-        self.assertEqual(parser.name, parser_from_dict.name)
-        self.assertEqual(parser.name, parser_from_yaml.name)
         self.assertEqual(parser.description, "test description")
         self.assertEqual(parser.description, parser_from_dict.description)
         self.assertEqual(parser.description, parser_from_yaml.description)
