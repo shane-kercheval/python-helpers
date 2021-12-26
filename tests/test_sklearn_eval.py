@@ -289,6 +289,9 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(len(parser.score_standard_errors(score_name=parser.score_names[3])),
                          parser.number_of_iterations)
 
+        self.assertEqual(parser.numeric_parameters, ['n_estimators'])
+        self.assertEqual(parser.non_numeric_parameters, ['max_features', 'encoder'])
+
         for score in parser.score_names:
             assert_np_arrays_are_close(np.array(parser.test_score_averages[score]),
                                        grid_search_credit.cv_results_[f'mean_test_{score}'])
@@ -506,6 +509,9 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(len(parser.score_standard_errors(score_name=parser.score_names[0])),
                          parser.number_of_iterations)
 
+        self.assertEqual(parser.numeric_parameters, ['n_estimators'])
+        self.assertEqual(parser.non_numeric_parameters, ['max_features', 'encoder'])
+
         assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
                                    grid_search_credit.cv_results_['mean_test_score'])
         assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
@@ -695,6 +701,9 @@ class TestSklearnEval(unittest.TestCase):
                          parser.number_of_iterations)
         self.assertEqual(len(parser.score_standard_errors(score_name=parser.score_names[1])),
                          parser.number_of_iterations)
+
+        self.assertEqual(parser.numeric_parameters, ['model__n_estimators'])
+        self.assertEqual(parser.non_numeric_parameters, ['model__max_features'])
 
         for score in parser.score_names:
             assert_np_arrays_are_close(np.array(parser.test_score_averages[score]),

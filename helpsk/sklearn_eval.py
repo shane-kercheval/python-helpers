@@ -20,6 +20,7 @@ import helpsk.color as hcolor
 import helpsk.pandas_style as hstyle
 import helpsk.string as hstring
 # pylint: disable=too-many-locals
+from helpsk.pandas import get_numeric_columns, get_non_numeric_columns
 from helpsk.exceptions import HelpskParamValueError
 from helpsk.plot import STANDARD_WIDTH_HEIGHT
 from helpsk.validation import assert_true
@@ -527,6 +528,15 @@ class SearchCVParser:
         'number of trials' is basically the number of combinations of different hyper-parameters that were
         cross validated."""
         return len(self.parameter_iterations)
+
+    @property
+    def numeric_parameters(self) -> List[str]:
+        return [x for x in get_numeric_columns(dataframe=self.to_dataframe()) if x in self.parameter_names]
+
+    @property
+    def non_numeric_parameters(self) -> List[str]:
+        return [x for x in get_non_numeric_columns(dataframe=self.to_dataframe())
+                if x in self.parameter_names]
 
     @property
     def number_of_scores(self) -> int:
