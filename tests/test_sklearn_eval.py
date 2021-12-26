@@ -509,8 +509,9 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(len(parser.score_standard_errors(score_name=parser.score_names[0])),
                          parser.number_of_iterations)
 
-        self.assertEqual(parser.numeric_parameters, ['n_estimators'])
-        self.assertEqual(parser.non_numeric_parameters, ['max_features', 'encoder'])
+        self.assertEqual(parser.numeric_parameters, ['model__n_estimators'])
+        self.assertEqual(parser.non_numeric_parameters, ['model__max_features',
+                                                         'preparation__non_numeric_pipeline__encoder_chooser__transformer'])
 
         assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
                                    grid_search_credit.cv_results_['mean_test_score'])
