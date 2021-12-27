@@ -591,6 +591,7 @@ class SearchCVParser:
         """The index of best primary score."""
         return self.primary_score_best_indexes[0]
 
+    @property
     def best_primary_score_params(self) -> dict:
         """
         The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated

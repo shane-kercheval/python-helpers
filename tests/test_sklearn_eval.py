@@ -379,7 +379,7 @@ class TestSklearnEval(unittest.TestCase):
                          np.nanmax(grid_search_credit.cv_results_['mean_test_ROC/AUC']))
 
         self.assertTrue(all([parser.to_dataframe().loc[parser.best_primary_score_index, key] == value
-                             for key, value in parser.best_primary_score_params().items()]))
+                             for key, value in parser.best_primary_score_params.items()]))
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
@@ -579,13 +579,13 @@ class TestSklearnEval(unittest.TestCase):
                          np.nanmax(grid_search_credit.cv_results_['mean_test_score']))
 
         self.assertTrue(all([parser.to_dataframe().loc[parser.best_primary_score_index, key] == value
-                             for key, value in parser.best_primary_score_params().items()]))
+                             for key, value in parser.best_primary_score_params.items()]))
 
-        self.assertEqual(parser.best_primary_score_params()['model__max_features'],
+        self.assertEqual(parser.best_primary_score_params['model__max_features'],
                          grid_search_credit.best_params_['model__max_features'])
-        self.assertEqual(parser.best_primary_score_params()['model__n_estimators'],
+        self.assertEqual(parser.best_primary_score_params['model__n_estimators'],
                          grid_search_credit.best_params_['model__n_estimators'])
-        self.assertEqual(parser.best_primary_score_params()['preparation__non_numeric_pipeline__encoder_chooser__transformer'],
+        self.assertEqual(parser.best_primary_score_params['preparation__non_numeric_pipeline__encoder_chooser__transformer'],
                          str(grid_search_credit.best_params_['preparation__non_numeric_pipeline__encoder_chooser__transformer']))
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
@@ -793,7 +793,7 @@ class TestSklearnEval(unittest.TestCase):
                          np.nanmin(grid_search_housing.cv_results_['mean_test_RMSE'] * -1))
 
         self.assertTrue(all([parser.to_dataframe().loc[parser.best_primary_score_index, key] == value
-                             for key, value in parser.best_primary_score_params().items()]))
+                             for key, value in parser.best_primary_score_params.items()]))
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
