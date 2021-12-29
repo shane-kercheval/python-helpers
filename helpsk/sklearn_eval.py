@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 import scipy.stats as st
 import seaborn as sns
+from plotly.graph_objs import _figure  # noqa
+import plotly.express as px
 import yaml
 from matplotlib import pyplot as plt
 from pandas.io.formats.style import Styler
@@ -22,7 +24,7 @@ import helpsk.string as hstring
 # pylint: disable=too-many-locals
 from helpsk.pandas import get_numeric_columns, get_non_numeric_columns
 from helpsk.exceptions import HelpskParamValueError
-from helpsk.plot import STANDARD_WIDTH_HEIGHT
+from helpsk.plot import STANDARD_WIDTH_HEIGHT, GOLDEN_RATIO
 from helpsk.validation import assert_true
 
 with warnings.catch_warnings():
@@ -1022,7 +1024,10 @@ class TwoClassEvaluator:
         axis.yaxis.set_ticklabels([self._labels[0], self._labels[1]])
         plt.tight_layout()
 
-    def plot_auc_curve(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
+    def plot_auc_curve(self,
+                       figure_size: tuple = STANDARD_WIDTH_HEIGHT,
+                       return_plotly: bool = False) -> Union[None,
+                                                            _figure.Figure]:
         """Plots the ROC AUC
 
         Args:
@@ -1030,6 +1035,9 @@ class TwoClassEvaluator:
                 tuple containing `(width, height)` of plot. The default height is defined by
                 `helpsk.plot.STANDARD_HEIGHT`, and the default width is
                 `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
+            return_plotly:
+                If True, return plotly object. Otherwise, use matplotlib and end function with call:
+                `plt.tight_layout()`
         """
         plt.figure(figsize=figure_size)
 
@@ -1045,6 +1053,34 @@ class TwoClassEvaluator:
         auc_curve = pd.DataFrame(auc_curve,
                                  columns=['threshold', 'True Positive Rate', 'False Positive Rate'])
 
+        if return_plotly:
+            fig = px.line(
+                data_frame=auc_curve,
+                x='False Positive Rate',
+                y='True Positive Rate',
+                color_discrete_sequence=[hcolor.Colors.DOVE_GRAY.value],
+                height=550,
+                width=550 * GOLDEN_RATIO,
+                title=f"AUC: {self.auc:.3f}<br><sub>The threshold of 0.5 is indicated with a large point.</sub>"
+            )
+            fig.add_trace(
+                px.scatter(
+                    data_frame=auc_curve,
+                    x='False Positive Rate',
+                    y='True Positive Rate',
+                    color='threshold',
+                ).data[0]
+            )
+            fig.add_trace(
+                px.scatter(
+                    data_frame=auc_curve.query('threshold == 0.5'),
+                    x='False Positive Rate',
+                    y='True Positive Rate',
+                    size=[2],
+                ).data[0]
+            )
+            return fig
+
         axis = sns.lineplot(data=auc_curve, x='False Positive Rate', y='True Positive Rate', ci=None)
         axis.set_title(f"AUC: {round(self.auc, 3)}")
         for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],  # pylint: disable=invalid-name
@@ -1059,7 +1095,9 @@ class TwoClassEvaluator:
 
     def plot_threshold_curves(self,
                               score_threshold_range: Tuple[float, float] = (0.3, 0.9),
-                              figure_size: tuple = STANDARD_WIDTH_HEIGHT):
+                              figure_size: tuple = STANDARD_WIDTH_HEIGHT,
+                              return_plotly: bool = False) -> Union[None,
+                                                                    _figure.Figure]:
         """Plots various scores (e.g. True Positive Rate, False Positive Rate, etc.) for various score
         thresholds. (A score threshold is the value for which you would predict a positive label if the
         value of the score is above the threshold (e.g. usually 0.5).
@@ -1072,6 +1110,9 @@ class TwoClassEvaluator:
                 tuple containing `(width, height)` of plot. The default height is defined by
                 `helpsk.plot.STANDARD_HEIGHT`, and the default width is
                 `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
+            return_plotly:
+                If True, return plotly object. Otherwise, use matplotlib and end function with call:
+                `plt.tight_layout()`
         """
         plt.figure(figsize=figure_size)
 
@@ -1099,6 +1140,29 @@ class TwoClassEvaluator:
                                                  'False Neg. Rate',
                                                  'True Neg. Rate (Specificity)'])
 
+        if return_plotly:
+            custom_colors = [
+                hcolor.Colors.PASTEL_BLUE.value,
+                hcolor.Colors.CUSTOM_GREEN.value,
+                hcolor.Colors.YELLOW_PEPPER.value,
+                hcolor.Colors.CRAIL.value,
+                hcolor.Colors.CADMIUM_ORANGE.value,
+            ]
+            fig = px.line(
+                data_frame=pd.melt(frame=threshold_curves, id_vars=['Score Threshold']),
+                x='Score Threshold',
+                y='value',
+                color='variable',
+                color_discrete_sequence=custom_colors,
+                labels={
+                    'variable': 'Rate Type',
+                    'value': 'Rate'
+                },
+                title="Tradeoffs Across Various Score Thresholds<br><sub>Black line is default threshold of 0.5.</sub>"
+            )
+            fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
+            return fig
+
         axis = sns.lineplot(x='Score Threshold', y='value', hue='variable',
                             data=pd.melt(frame=threshold_curves, id_vars=['Score Threshold']))
         axis.set_xticks(np.arange(score_threshold_range[0], score_threshold_range[1] + 0.1, 0.1))
@@ -1109,7 +1173,9 @@ class TwoClassEvaluator:
 
     def plot_precision_recall_tradeoff(self,
                                        score_threshold_range: Tuple[float, float] = (0, 1),
-                                       figure_size: tuple = STANDARD_WIDTH_HEIGHT):
+                                       figure_size: tuple = STANDARD_WIDTH_HEIGHT,
+                                       return_plotly: bool = False) -> Union[None,
+                                                                             _figure.Figure]:
         """Plots the tradeoff between precision (i.e. positive predict value) and recall (i.e. True Positive
         Rate) for various score thresholds. (A score threshold is the value for which you would predict a
         positive label if the value of the score is above the threshold (e.g. usually 0.5).
@@ -1122,6 +1188,9 @@ class TwoClassEvaluator:
                 tuple containing `(width, height)` of plot. The default height is defined by
                 `helpsk.plot.STANDARD_HEIGHT`, and the default width is
                 `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
+            return_plotly:
+                If True, return plotly object. Otherwise, use matplotlib and end function with call:
+                `plt.tight_layout()`
         """
         plt.figure(figsize=figure_size)
 
@@ -1143,6 +1212,32 @@ class TwoClassEvaluator:
                                                  'True Pos. Rate (Recall)',
                                                  'Pos. Predictive Value (Precision)'])
 
+        if return_plotly:
+            custom_colors = [
+                hcolor.Colors.PASTEL_BLUE.value,
+                #     hcolor.Colors.CUSTOM_GREEN.value,
+                hcolor.Colors.YELLOW_PEPPER.value,
+                #     hcolor.Colors.CRAIL.value,
+                #     hcolor.Colors.CADMIUM_ORANGE.value,
+            ]
+
+            fig = px.line(
+                data_frame=pd.melt(frame=threshold_curves[['Score Threshold',
+                                                           'True Pos. Rate (Recall)',
+                                                           'Pos. Predictive Value (Precision)']],
+                                   id_vars=['Score Threshold']),
+                x='Score Threshold',
+                y='value',
+                color='variable',
+                color_discrete_sequence=custom_colors,
+                labels={
+                    'variable': 'Rate',
+                    'value': 'Value'
+                },
+                title="Precision Recall Tradeoff<br><sub>Black line is default threshold of 0.5.</sub>"
+            )
+            fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
+            return fig
         axis = sns.lineplot(x='Score Threshold', y='value', hue='variable',
                             data=pd.melt(frame=threshold_curves, id_vars=['Score Threshold']))
         axis.set_xticks(np.arange(score_threshold_range[0], score_threshold_range[1] + 0.1, 0.1))
