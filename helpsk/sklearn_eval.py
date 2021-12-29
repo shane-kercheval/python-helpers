@@ -1162,7 +1162,7 @@ class TwoClassEvaluator:
                 width=550 * GOLDEN_RATIO,
                 title="Tradeoffs Across Various Score Thresholds<br><sub>Black line is default threshold of 0.5.</sub>"
             )
-            fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
+            fig = fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
             return fig
 
         axis = sns.lineplot(x='Score Threshold', y='value', hue='variable',
@@ -1240,7 +1240,7 @@ class TwoClassEvaluator:
                 width=550 * GOLDEN_RATIO,
                 title="Precision Recall Tradeoff<br><sub>Black line is default threshold of 0.5.</sub>"
             )
-            fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
+            fig = fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
             return fig
         axis = sns.lineplot(x='Score Threshold', y='value', hue='variable',
                             data=pd.melt(frame=threshold_curves, id_vars=['Score Threshold']))
