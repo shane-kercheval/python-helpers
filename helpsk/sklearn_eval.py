@@ -1158,6 +1158,8 @@ class TwoClassEvaluator:
                     'variable': 'Rate Type',
                     'value': 'Rate'
                 },
+                height=550,
+                width=550 * GOLDEN_RATIO,
                 title="Tradeoffs Across Various Score Thresholds<br><sub>Black line is default threshold of 0.5.</sub>"
             )
             fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
@@ -1234,6 +1236,8 @@ class TwoClassEvaluator:
                     'variable': 'Rate',
                     'value': 'Value'
                 },
+                height=550,
+                width=550 * GOLDEN_RATIO,
                 title="Precision Recall Tradeoff<br><sub>Black line is default threshold of 0.5.</sub>"
             )
             fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
