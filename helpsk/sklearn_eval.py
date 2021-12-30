@@ -15,7 +15,7 @@ import plotly.express as px
 import yaml
 from matplotlib import pyplot as plt
 from pandas.io.formats.style import Styler
-from sklearn.dummy import DummyClassifier
+from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.metrics import confusion_matrix, roc_auc_score, r2_score
 from sklearn.model_selection._search import BaseSearchCV  # noqa
 
@@ -1462,19 +1462,56 @@ class RegressionEvaluator:
                 'Total Observations': self.total_observations}
 
     def all_metrics_df(self,
+                       dummy_regressor_strategy: Union[str, list, None] = 'mean',
+                       dummy_regressor_constant: Union[int] = 1,
                        return_style: bool = False,
                        round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
         """All of the metrics are returned as a DataFrame.
 
         Args:
+            dummy_regressor_strategy:
+                if not None, then returns column(s) corresponding to the scores from predictions of
+                sklearn.dummy.DummyRegressor, based on the strategy (or strategies) provided. Valid values
+                correspond to values of `strategy` parameter listed
+                https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyRegressor.html
+
+                If a list is passed in (e.g. ['prior', 'uniform'], then one score column per value is
+                added.
+
+                If None is passed, then no additional columns are added.
+            dummy_regressor_constant:
+                The explicit constant as predicted by the “constant” strategy for the
+                DummyRegressor.
+                This parameter is useful only for the “constant” dummy_regressor_strategy.
             return_style:
                 if True, return styler object; else return dataframe
             round_by:
                 the number of digits to round by; if None, then don't round
         """
-        result = pd.DataFrame.from_dict({key: value for key, value in self.all_metrics.items()},  # pylint: disable=unnecessary-comprehension  # noqa
-                                        orient='index',
-                                        columns=['Scores'])
+        result = pd.DataFrame.from_dict(self.all_metrics, orient='index', columns=['Score'])
+
+        if dummy_regressor_strategy:
+            if isinstance(dummy_regressor_strategy, str):
+                dummy_regressor_strategy = [dummy_regressor_strategy]
+
+            score_columns = ['Score']
+            for strategy in dummy_regressor_strategy:
+                dummy = DummyRegressor(strategy=strategy, constant=dummy_regressor_constant)
+                # https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html
+                # "All strategies make predictions that ignore the input feature values passed as the X
+                # argument to fit and predict. The predictions, however, typically depend on values observed
+                # in the y parameter passed to fit."
+                _ = dummy.fit(X=self._actual_values, y=self._actual_values)
+                dummy_predictions = dummy.predict(X=self._actual_values)
+                dummy_evaluator = RegressionEvaluator(actual_values=self._actual_values,
+                                                      predicted_values=dummy_predictions)
+
+                dummy_scores = dummy_evaluator.all_metrics_df(dummy_regressor_strategy=None,
+                                                              return_style=False)
+                column_name = f"Dummy ({strategy})"
+                score_columns = score_columns + [column_name]
+                dummy_scores = dummy_scores.rename(columns={'Score': column_name})
+                result = pd.concat([result, dummy_scores], axis=1)
 
         if round_by is not None:
             result.iloc[0:2] = result.iloc[0:2].round(round_by)
@@ -1482,12 +1519,13 @@ class RegressionEvaluator:
         if return_style:
             subset_scores = pd.IndexSlice[result.loc[['Mean Absolute Error (MAE)',
                                                       'Root Mean Squared Error (RMSE)'],
-                                                     'Scores'].index, 'Scores']
+                                                     score_columns].index,
+                                          score_columns]
             subset_secondary = pd.IndexSlice[result.loc[['RMSE to Standard Deviation of Target',
                                                          'R Squared'],
-                                                        'Scores'].index, 'Scores']
+                                                        score_columns].index, score_columns]
             subset_total_observations = pd.IndexSlice[result.loc[['Total Observations'],
-                                                                 'Scores'].index, 'Scores']
+                                                                 score_columns].index, score_columns]
             result = result.style
             if round_by is not None:
                 result = result.format(subset=subset_scores, thousands=',', precision=round_by)
