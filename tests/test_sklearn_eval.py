@@ -894,7 +894,18 @@ class TestSklearnEval(unittest.TestCase):
         self.assertIsInstance(evaluator.all_metrics_df(), pd.DataFrame)
 
         with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_style=True).render()
+            table_html = evaluator.all_metrics_df(return_style=True,
+                                                  dummy_regressor_strategy=None).render()
+            file.write(table_html)
+
+        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__dummy.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True,
+                                                  dummy_regressor_strategy='mean').render()
+            file.write(table_html)
+
+        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__dummies.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True,
+                                                  dummy_regressor_strategy=['mean', 'median']).render()
             file.write(table_html)
 
         with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__round_3.html', 'w') as file:
