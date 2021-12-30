@@ -15,6 +15,7 @@ import plotly.express as px
 import yaml
 from matplotlib import pyplot as plt
 from pandas.io.formats.style import Styler
+from sklearn.dummy import DummyClassifier
 from sklearn.metrics import confusion_matrix, roc_auc_score, r2_score
 from sklearn.model_selection._search import BaseSearchCV  # noqa
 
@@ -726,7 +727,8 @@ class TwoClassEvaluator:
     def __init__(self,
                  actual_values: np.ndarray,
                  predicted_scores: np.ndarray,
-                 labels: Tuple[str, str],
+                 positive_class: str = 'Positive Class',
+                 negative_class: str = 'Negative Class',
                  score_threshold: float = 0.5
                  ):
         """
@@ -734,14 +736,16 @@ class TwoClassEvaluator:
             actual_values:
                 array of 0's and 1's
             predicted_scores:
-                array of values from `predict_proba()`; NOT the actual labels
-            labels:
-                tuple containing the label of the negative class (i.e. 0) in the first index and the positive
-                class (i.e. 1) in the second index
+                array of decimal/float values from `predict_proba()`; NOT the actual class
+            positive_class:
+                string of the name/label of the positive class (i.e. value of 1). In other words, not
+                'positive' in the sense of 'good' but 'positive' as in 'True/False Positive'.
+            negative_class:
+                string of the name/label of the negative class (i.e. value of 0). In other words, not
+                'negative' in the sense of 'good' but 'negative' as in 'True/False Negative'.
             score_threshold:
                 the score/probability threshold for turning scores into 0's and 1's and corresponding labels
         """
-
         assert len(actual_values) == len(predicted_scores)
 
         if not all(np.unique(actual_values) == [0, 1]):
@@ -752,11 +756,8 @@ class TwoClassEvaluator:
             message = "Values of `predicted_scores` should be between 0 and 1."
             raise HelpskParamValueError(message)
 
-        if not any(np.logical_and(predicted_scores > 0, predicted_scores < 1)):
-            message = "Values of `predicted_scores` should not all be 0's and 1's."
-            raise HelpskParamValueError(message)
-
-        self._labels = labels
+        self._positive_class = positive_class
+        self._negative_class = negative_class
         self._actual_values = actual_values
         self._predicted_scores = predicted_scores
         self.score_threshold = score_threshold
@@ -898,38 +899,37 @@ class TwoClassEvaluator:
     @property
     def all_metrics(self) -> dict:
         """All of the metrics are returned as a dictionary."""
-
         auc_message = 'Area under the ROC curve (true pos. rate vs false pos. rate); ' \
                       'ranges from 0.5 (purely random classifier) to 1.0 (perfect classifier)'
 
         tpr_message = f'{self.true_positive_rate:.1%} of positive instances were correctly identified.; ' \
-                      f'i.e. {self._true_positives} "{self._labels[1]}" labels were correctly identified ' \
+                      f'i.e. {self._true_positives} "{self._positive_class}" labels were correctly identified ' \
                       f'out of {self._actual_positives} instances; a.k.a Sensitivity/Recall'
 
         tnr_message = f'{self.true_negative_rate:.1%} of negative instances were correctly identified.; ' \
-                      f'i.e. {self._true_negatives} "{self._labels[0]}" labels were correctly identified ' \
+                      f'i.e. {self._true_negatives} "{self._negative_class}" labels were correctly identified ' \
                       f'out of {self._actual_negatives} instances'
 
         fpr_message = f'{self.false_positive_rate:.1%} of negative instances were incorrectly identified ' \
                       f'as positive; ' \
-                      f'i.e. {self._false_positives} "{self._labels[0]}" labels were incorrectly ' \
-                      f'identified as "{self._labels[1]}", out of {self._actual_negatives} instances'
+                      f'i.e. {self._false_positives} "{self._negative_class}" labels were incorrectly ' \
+                      f'identified as "{self._positive_class}", out of {self._actual_negatives} instances'
 
         fnr_message = f'{self.false_negative_rate:.1%} of positive instances were incorrectly identified ' \
                       f'as negative; ' \
-                      f'i.e. {self._false_negatives} "{self._labels[1]}" labels were incorrectly ' \
-                      f'identified as "{self._labels[0]}", out of {self._actual_positives} instances'
+                      f'i.e. {self._false_negatives} "{self._positive_class}" labels were incorrectly ' \
+                      f'identified as "{self._negative_class}", out of {self._actual_positives} instances'
 
         ppv_message = f'When the model claims an instance is positive, it is correct ' \
                       f'{self.positive_predictive_value:.1%} of the time; ' \
                       f'i.e. out of the {self._true_positives + self._false_positives} times the model ' \
-                      f'predicted "{self._labels[1]}", it was correct {self._true_positives} ' \
+                      f'predicted "{self._positive_class}", it was correct {self._true_positives} ' \
                       f'times; a.k.a precision'
 
         npv_message = f'When the model claims an instance is negative, it is correct ' \
                       f'{self.negative_predictive_value:.1%} of the time; ' \
                       f'i.e. out of the {self._true_negatives + self._false_negatives} times the model ' \
-                      f'predicted "{self._labels[0]}", it was correct {self._true_negatives} times'
+                      f'predicted "{self._negative_class}", it was correct {self._true_negatives} times'
 
         f1_message = 'The F1 score can be interpreted as a weighted average of the precision and recall, ' \
                      'where an F1 score reaches its best value at 1 and worst score at 0.'
@@ -938,7 +938,7 @@ class TwoClassEvaluator:
         error_message = f'{self.error_rate:.1%} of instances were incorrectly identified'
         prevalence_message = f'{self.prevalence:.1%} of the data are positive; i.e. out of ' \
                              f'{self.sample_size} total observations; {self._actual_positives} are labeled ' \
-                             f'as "{self._labels[1]}"'
+                             f'as "{self._positive_class}"'
         total_obs_message = f'There are {self.sample_size} total observations; i.e. sample size'
 
         return {'AUC': (self.auc, auc_message),
@@ -955,41 +955,82 @@ class TwoClassEvaluator:
                 'Total Observations': (self.sample_size, total_obs_message)}
 
     def all_metrics_df(self,
-                       return_details: bool = True,
+                       return_explanations: bool = True,
+                       dummy_classifier_strategy: Union[str, list, None] = 'prior',
                        return_style: bool = False,
                        round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
         """All of the metrics are returned as a DataFrame.
 
         Args:
-            return_details:
+            return_explanations:
                 if True, then return descriptions of score and more information in an additional column
+            dummy_classifier_strategy:
+                if not None, then uses returns column(s) corresponding to the scores from predictions of
+                sklearn.dummy.DummyClassifier, based on the strategy (or strategies) provided. Valid values
+                correspond to values of `strategy` parameter listed
+                https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html
+
+                If a list is passed in (e.g. ['prior', 'uniform'], then one score column per value is
+                added.
+
+                If None is passed, then no additional columns are added.
             return_style:
                 if True, return styler object; else return dataframe
             round_by:
                 the number of digits to round by; if None, then don't round
         """
-        if return_details:
-            result = pd.DataFrame.from_dict(self.all_metrics,
-                                            orient='index',
-                                            columns=['Scores', 'Details'])
-        else:
-            result = pd.DataFrame.from_dict({key: value[0] for key, value in self.all_metrics.items()},
-                                            orient='index',
-                                            columns=['Scores'])
+        result = pd.DataFrame.from_dict({key: value[0] for key, value in self.all_metrics.items()},
+                                        orient='index',
+                                        columns=['Score'])
+
+        score_columns = ['Score']
+
+        if dummy_classifier_strategy:
+            if isinstance(dummy_classifier_strategy, str):
+                dummy_classifier_strategy = [dummy_classifier_strategy]
+
+            for strategy in dummy_classifier_strategy:
+                dummy = DummyClassifier(strategy=strategy)
+                # https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html
+                # "All strategies make predictions that ignore the input feature values passed as the X
+                # argument to fit and predict. The predictions, however, typically depend on values observed
+                # in the y parameter passed to fit."
+                _ = dummy.fit(X=self._actual_values, y=self._actual_values)
+                dummy_probabilities = dummy.predict_proba(X=self._actual_values)
+                dummy_probabilities = dummy_probabilities[:, 1]
+                dummy_evaluator = TwoClassEvaluator(actual_values=self._actual_values,
+                                                    predicted_scores=dummy_probabilities,
+                                                    score_threshold=self.score_threshold)
+
+                dummy_scores = dummy_evaluator.all_metrics_df(return_explanations=False,
+                                                              dummy_classifier_strategy=None,
+                                                              return_style=False)
+                column_name = f"Dummy ({strategy})"
+                score_columns = score_columns + [column_name]
+                dummy_scores = dummy_scores.rename(columns={'Score': column_name})
+                result = pd.concat([result, dummy_scores], axis=1)
+
+        if return_explanations:
+            explanations = pd.DataFrame.from_dict({key: value[1] for key, value in self.all_metrics.items()},
+                                                  orient='index',
+                                                  columns=['Explanation'])
+            result = pd.concat([result, explanations], axis=1)
 
         if round_by:
-            result['Scores'] = result['Scores'].round(round_by)
+            for column in score_columns:
+                result[column] = result[column].round(round_by)
 
         if return_style:
             subset_scores = [x for x in result.index.values if x != 'Total Observations']
 
-            subset_scores = pd.IndexSlice[result.loc[subset_scores, :].index, 'Scores']
+            subset_scores = pd.IndexSlice[result.loc[subset_scores, :].index, score_columns]
             subset_negative_bad = pd.IndexSlice[result.loc[['False Positive Rate',
-                                                            'False Negative Rate'], 'Scores'].index, 'Scores']
+                                                            'False Negative Rate'], score_columns].index,
+                                                score_columns]
             subset_secondary = pd.IndexSlice[result.loc[['Accuracy', 'Error Rate', '% Positive'],
-                                                        'Scores'].index, 'Scores']
+                                                        score_columns].index, score_columns]
             subset_total_observations = pd.IndexSlice[result.loc[['Total Observations'],
-                                                                 'Scores'].index, 'Scores']
+                                                                 score_columns].index, score_columns]
 
             result = result.style
 
@@ -1020,9 +1061,70 @@ class TwoClassEvaluator:
         axis.set_xlabel('Predicted')
         axis.set_ylabel('Actual')
         # axis.set_title('Confusion Matrix');
-        axis.xaxis.set_ticklabels([self._labels[0], self._labels[1]])
-        axis.yaxis.set_ticklabels([self._labels[0], self._labels[1]])
+        axis.xaxis.set_ticklabels([self._negative_class, self._positive_class])
+        axis.yaxis.set_ticklabels([self._negative_class, self._positive_class])
         plt.tight_layout()
+
+    def _get_auc_curve_dataframe(self) -> pd.DataFrame:
+        """
+        Returns a dataframe containing the AUC line (i.e. a column of score thresholds, and the corresponding
+        True Positive and False Positive Rate (as columns) for the corresponding score threshold.
+
+        (A score threshold is the value for which you would predict a positive label if the value of the score
+        is above the threshold (e.g. usually 0.5).
+        """
+        def get_true_pos_false_pos(threshold):
+            temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
+                                          predicted_scores=self._predicted_scores,
+                                          score_threshold=threshold)
+
+            return threshold, temp_eval.true_positive_rate, temp_eval.false_positive_rate
+
+        auc_curve = [get_true_pos_false_pos(threshold=x) for x in np.arange(0.0, 1.01, 0.01)]
+        auc_curve = pd.DataFrame(auc_curve,
+                                 columns=['threshold', 'True Positive Rate', 'False Positive Rate'])
+        return auc_curve
+
+    def _get_threshold_curve_dataframe(self, score_threshold_range: Tuple[float, float] = (0.1, 0.9)) \
+            -> pd.DataFrame:
+        """
+        Returns a dataframe containing various score thresholds from 0 to 1 (i.e. cutoff point where score
+        will be labeled as a 'positive' event, and various rates (e.g. True Positive Rate, False Positive
+        Rate, etc.) for the corresponding score threshold.
+
+        (A score threshold is the value for which you would predict a positive label if the value of the score
+        is above the threshold (e.g. usually 0.5).
+
+        Args:
+            score_threshold_range:
+                range of score thresholds to plot (x-axis); tuple with minimum threshold in first index and
+                maximum threshold in second index.
+        """
+        def get_threshold_scores(threshold):
+            temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
+                                          predicted_scores=self._predicted_scores,
+                                          score_threshold=threshold)
+
+            return threshold,\
+                temp_eval.true_positive_rate,\
+                temp_eval.false_positive_rate,\
+                temp_eval.positive_predictive_value,\
+                temp_eval.false_negative_rate,\
+                temp_eval.true_negative_rate
+
+        threshold_curves = [get_threshold_scores(threshold=x)
+                            for x in np.arange(score_threshold_range[0],
+                                               score_threshold_range[1] + 0.025,
+                                               0.025)]
+
+        threshold_curves = pd.DataFrame(threshold_curves,
+                                        columns=['Score Threshold',
+                                                 'True Pos. Rate (Recall)',
+                                                 'False Pos. Rate',
+                                                 'Pos. Predictive Value (Precision)',
+                                                 'False Neg. Rate',
+                                                 'True Neg. Rate (Specificity)'])
+        return threshold_curves
 
     def plot_auc_curve(self,
                        figure_size: tuple = STANDARD_WIDTH_HEIGHT,
@@ -1040,18 +1142,7 @@ class TwoClassEvaluator:
                 `plt.tight_layout()`
         """
         plt.figure(figsize=figure_size)
-
-        def get_true_pos_false_pos(threshold):
-            temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
-                                          predicted_scores=self._predicted_scores,
-                                          labels=('x', 'y'),
-                                          score_threshold=threshold)
-
-            return threshold, temp_eval.true_positive_rate, temp_eval.false_positive_rate
-
-        auc_curve = [get_true_pos_false_pos(threshold=x) for x in np.arange(0.0, 1.01, 0.01)]
-        auc_curve = pd.DataFrame(auc_curve,
-                                 columns=['threshold', 'True Positive Rate', 'False Positive Rate'])
+        auc_curve = self._get_auc_curve_dataframe()
 
         if return_plotly:
             fig = px.line(
@@ -1061,7 +1152,7 @@ class TwoClassEvaluator:
                 color_discrete_sequence=[hcolor.Colors.DOVE_GRAY.value],
                 height=550,
                 width=550 * GOLDEN_RATIO,
-                title=f"AUC: {self.auc:.3f}<br><sub>The threshold of 0.5 is indicated with a large point.</sub>"
+                title=f"AUC: {self.auc:.3f}<br><sub>The threshold of 0.5 is indicated with a large point.</sub>"  # pylint: disable=line-too-long  # noqa
             )
             fig.add_trace(
                 px.scatter(
@@ -1094,7 +1185,7 @@ class TwoClassEvaluator:
         plt.tight_layout()
 
     def plot_threshold_curves(self,
-                              score_threshold_range: Tuple[float, float] = (0.3, 0.9),
+                              score_threshold_range: Tuple[float, float] = (0.1, 0.9),
                               figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                               return_plotly: bool = False) -> Union[None,
                                                                     _figure.Figure]:
@@ -1116,29 +1207,7 @@ class TwoClassEvaluator:
         """
         plt.figure(figsize=figure_size)
 
-        def get_threshold_scores(threshold):
-            temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
-                                          predicted_scores=self._predicted_scores,
-                                          labels=('x', 'y'),
-                                          score_threshold=threshold)
-
-            return threshold,\
-                temp_eval.true_positive_rate,\
-                temp_eval.false_positive_rate,\
-                temp_eval.positive_predictive_value,\
-                temp_eval.false_negative_rate,\
-                temp_eval.true_negative_rate
-
-        threshold_curves = [get_threshold_scores(threshold=x) for x in np.arange(score_threshold_range[0],
-                                                                                 score_threshold_range[1],
-                                                                                 0.025)]
-        threshold_curves = pd.DataFrame(threshold_curves,
-                                        columns=['Score Threshold',
-                                                 'True Pos. Rate (Recall)',
-                                                 'False Pos. Rate',
-                                                 'Pos. Predictive Value (Precision)',
-                                                 'False Neg. Rate',
-                                                 'True Neg. Rate (Specificity)'])
+        threshold_curves = self._get_threshold_curve_dataframe()
 
         if return_plotly:
             custom_colors = [
@@ -1160,7 +1229,7 @@ class TwoClassEvaluator:
                 },
                 height=550,
                 width=550 * GOLDEN_RATIO,
-                title="Tradeoffs Across Various Score Thresholds<br><sub>Black line is default threshold of 0.5.</sub>"
+                title="Tradeoffs Across Various Score Thresholds<br><sub>Black line is default threshold of 0.5.</sub>"  # pylint: disable=line-too-long  # noqa
             )
             fig = fig.add_vline(x=0.5, line_color=hcolor.Colors.BLACK_SHADOW.value)
             return fig
@@ -1196,23 +1265,10 @@ class TwoClassEvaluator:
         """
         plt.figure(figsize=figure_size)
 
-        def get_threshold_scores(threshold):
-            temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
-                                          predicted_scores=self._predicted_scores,
-                                          labels=('x', 'y'),
-                                          score_threshold=threshold)
-
-            return threshold,\
-                temp_eval.true_positive_rate,\
-                temp_eval.positive_predictive_value
-
-        threshold_curves = [get_threshold_scores(threshold=x) for x in np.arange(score_threshold_range[0],
-                                                                                 score_threshold_range[1],
-                                                                                 0.025)]
-        threshold_curves = pd.DataFrame(threshold_curves,
-                                        columns=['Score Threshold',
+        threshold_curves = self._get_threshold_curve_dataframe()
+        threshold_curves = threshold_curves[['Score Threshold',
                                                  'True Pos. Rate (Recall)',
-                                                 'Pos. Predictive Value (Precision)'])
+                                                 'Pos. Predictive Value (Precision)']]
 
         if return_plotly:
             custom_colors = [
@@ -1313,6 +1369,25 @@ class TwoClassEvaluator:
                 bar(subset='Lift', color=hcolor.Colors.PASTEL_BLUE.value)
 
         return gain_lift_data
+
+    def plot_predicted_scores_histogram(self):
+        sns.histplot(self._predicted_scores)
+        plt.tight_layout()
+
+    def plot_actual_vs_predict_histogram(self):
+        actual_categories = pd.Series(self._actual_values).\
+            replace({0: self._negative_class, 1: self._positive_class})
+        axes = sns.displot(
+            pd.DataFrame({
+                'Predicted Score': self._predicted_scores,
+                'Actual Value': actual_categories
+            }),
+            x='Predicted Score',
+            col='Actual Value'
+        )
+        for axis in axes.axes.flat:
+            axis.axvline(x=0.5, ymin=0, ymax=100, color='red')
+        plt.tight_layout()
 
 
 class RegressionEvaluator:

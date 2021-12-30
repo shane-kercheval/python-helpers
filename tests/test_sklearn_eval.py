@@ -805,7 +805,8 @@ class TestSklearnEval(unittest.TestCase):
         y_pred = [1 if x > score_threshold else 0 for x in y_score]
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Bad', 'Good'),
+                                      positive_class='Defaulted',
+                                      negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
         con_matrix = confusion_matrix(y_true=y_true, y_pred=y_pred)
@@ -828,25 +829,51 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(evaluator.fbeta_score(beta=2), fbeta_score(y_true=y_true, y_pred=y_pred, beta=2))
         self.assertEqual(round(evaluator.kappa, 9), round(cohen_kappa_score(y1=y_true, y2=y_pred), 9))
 
+        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/get_auc_curve_dataframe.txt',
+                              dataframe=evaluator._get_auc_curve_dataframe())
+
+        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/get_threshold_curve_dataframe.txt',
+                              dataframe=evaluator._get_threshold_curve_dataframe())
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_predicted_scores_histogram.png',
+                   plot_function=lambda: evaluator.plot_predicted_scores_histogram())
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_actual_vs_predict_histogram.png',
+                   plot_function=lambda: evaluator.plot_actual_vs_predict_histogram())
+
         self.assertIsInstance(evaluator.all_metrics, dict)
         self.assertIsInstance(evaluator.all_metrics_df(return_style=False), pd.DataFrame)
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_details=False, return_style=True).render()
+            table_html = evaluator.all_metrics_df(return_explanations=False,
+                                                  dummy_classifier_strategy=None,
+                                                  return_style=True).render()
+            file.write(table_html)
+
+        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__dummy.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_explanations=False,
+                                                  dummy_classifier_strategy='prior',
+                                                  return_style=True).render()
+            file.write(table_html)
+
+        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__dummies.html', 'w') as file:
+            table_html = evaluator.all_metrics_df(return_explanations=False,
+                                                  dummy_classifier_strategy=['prior', 'uniform'],
+                                                  return_style=True).render()
             file.write(table_html)
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__round_3.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_details=False,
+            table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   return_style=True,
                                                   round_by=3).render()
             file.write(table_html)
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__with_details.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_details=True, return_style=True).render()
+            table_html = evaluator.all_metrics_df(return_explanations=True, return_style=True).render()
             file.write(table_html)
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__with_details__round_3.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_details=True,
+            table_html = evaluator.all_metrics_df(return_explanations=True,
                                                   return_style=True,
                                                   round_by=3).render()
             file.write(table_html)
@@ -890,7 +917,8 @@ class TestSklearnEval(unittest.TestCase):
     def test_plot_confusion_matrix(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Bad', 'Good'),
+                                      positive_class='Defaulted',
+                                      negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_confusion_matrix.png',
@@ -899,7 +927,7 @@ class TestSklearnEval(unittest.TestCase):
     def test_plot_auc_curve(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Bad', 'Good'),
+                                      labels=('Not Defaulted', 'Defaulted'),
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_auc_curve.png',
@@ -908,7 +936,7 @@ class TestSklearnEval(unittest.TestCase):
     def test_plot_threshold_curves(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Bad', 'Good'),
+                                      labels=('Not Defaulted', 'Defaulted'),
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_threshold_curves.png',
@@ -917,7 +945,7 @@ class TestSklearnEval(unittest.TestCase):
     def test_plot_precision_recall_tradeoff(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Bad', 'Good'),
+                                      labels=('Not Defaulted', 'Defaulted'),
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_precision_recall_tradeoff.png',
@@ -926,7 +954,7 @@ class TestSklearnEval(unittest.TestCase):
     def test_calculate_lift_gain(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Bad', 'Good'),
+                                      labels=('Not Defaulted', 'Defaulted'),
                                       score_threshold=0.5)
 
         helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain.txt',

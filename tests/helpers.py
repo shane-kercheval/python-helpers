@@ -127,6 +127,9 @@ def get_data_housing() -> pd.DataFrame:
 def helper_test_dataframe(file_name, dataframe):
     if os.path.isfile(file_name):
         os.remove(file_name)
+
+    pd.set_option('display.max_rows', None)
+
     with redirect_stdout_to_file(file_name):
         print_dataframe(dataframe)
     assert os.path.isfile(file_name)
