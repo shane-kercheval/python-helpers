@@ -927,7 +927,8 @@ class TestSklearnEval(unittest.TestCase):
     def test_plot_auc_curve(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Not Defaulted', 'Defaulted'),
+                                      positive_class='Defaulted',
+                                      negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_auc_curve.png',
@@ -936,7 +937,8 @@ class TestSklearnEval(unittest.TestCase):
     def test_plot_threshold_curves(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Not Defaulted', 'Defaulted'),
+                                      positive_class='Defaulted',
+                                      negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_threshold_curves.png',
@@ -945,7 +947,8 @@ class TestSklearnEval(unittest.TestCase):
     def test_plot_precision_recall_tradeoff(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Not Defaulted', 'Defaulted'),
+                                      positive_class='Defaulted',
+                                      negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_precision_recall_tradeoff.png',
@@ -954,7 +957,8 @@ class TestSklearnEval(unittest.TestCase):
     def test_calculate_lift_gain(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
-                                      labels=('Not Defaulted', 'Defaulted'),
+                                      positive_class='Defaulted',
+                                      negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
         helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain.txt',
