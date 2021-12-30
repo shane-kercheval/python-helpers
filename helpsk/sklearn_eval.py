@@ -1212,7 +1212,7 @@ class TwoClassEvaluator:
         """
         plt.figure(figsize=figure_size)
 
-        threshold_curves = self._get_threshold_curve_dataframe()
+        threshold_curves = self._get_threshold_curve_dataframe(score_threshold_range=score_threshold_range)
 
         if return_plotly:
             custom_colors = [
@@ -1248,7 +1248,7 @@ class TwoClassEvaluator:
         plt.tight_layout()
 
     def plot_precision_recall_tradeoff(self,
-                                       score_threshold_range: Tuple[float, float] = (0, 1),
+                                       score_threshold_range: Tuple[float, float] = (0.1, 0.9),
                                        figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                                        return_plotly: bool = False) -> Union[None,
                                                                              _figure.Figure]:
@@ -1270,7 +1270,7 @@ class TwoClassEvaluator:
         """
         plt.figure(figsize=figure_size)
 
-        threshold_curves = self._get_threshold_curve_dataframe()
+        threshold_curves = self._get_threshold_curve_dataframe(score_threshold_range=score_threshold_range)
         threshold_curves = threshold_curves[['Score Threshold',
                                                  'True Pos. Rate (Recall)',
                                                  'Pos. Predictive Value (Precision)']]
