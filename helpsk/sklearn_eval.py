@@ -736,8 +736,8 @@ class TwoClassEvaluator:
             predicted_scores:
                 array of values from `predict_proba()`; NOT the actual labels
             labels:
-                tuple containing the label of the negative class in the first index and the positive class
-                in the second index
+                tuple containing the label of the negative class (i.e. 0) in the first index and the positive
+                class (i.e. 1) in the second index
             score_threshold:
                 the score/probability threshold for turning scores into 0's and 1's and corresponding labels
         """
