@@ -1490,11 +1490,12 @@ class RegressionEvaluator:
         """
         result = pd.DataFrame.from_dict(self.all_metrics, orient='index', columns=['Score'])
 
+        score_columns = ['Score']
+
         if dummy_regressor_strategy:
             if isinstance(dummy_regressor_strategy, str):
                 dummy_regressor_strategy = [dummy_regressor_strategy]
 
-            score_columns = ['Score']
             for strategy in dummy_regressor_strategy:
                 dummy = DummyRegressor(strategy=strategy, constant=dummy_regressor_constant)
                 # https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html
