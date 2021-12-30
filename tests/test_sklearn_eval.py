@@ -858,7 +858,7 @@ class TestSklearnEval(unittest.TestCase):
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__dummies.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=False,
-                                                  dummy_classifier_strategy=['prior', 'uniform'],
+                                                  dummy_classifier_strategy=['prior', 'constant'],
                                                   return_style=True).render()
             file.write(table_html)
 

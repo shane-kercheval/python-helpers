@@ -957,6 +957,7 @@ class TwoClassEvaluator:
     def all_metrics_df(self,
                        return_explanations: bool = True,
                        dummy_classifier_strategy: Union[str, list, None] = 'prior',
+                       dummy_classifier_constant: Union[int] = 1,
                        return_style: bool = False,
                        round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
         """All of the metrics are returned as a DataFrame.
@@ -965,7 +966,7 @@ class TwoClassEvaluator:
             return_explanations:
                 if True, then return descriptions of score and more information in an additional column
             dummy_classifier_strategy:
-                if not None, then uses returns column(s) corresponding to the scores from predictions of
+                if not None, then returns column(s) corresponding to the scores from predictions of
                 sklearn.dummy.DummyClassifier, based on the strategy (or strategies) provided. Valid values
                 correspond to values of `strategy` parameter listed
                 https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html
@@ -974,6 +975,10 @@ class TwoClassEvaluator:
                 added.
 
                 If None is passed, then no additional columns are added.
+            dummy_classifier_constant:
+                The explicit constant as predicted by the “constant” strategy for the
+                DummyClassifier.
+                This parameter is useful only for the “constant” dummy_classifier_strategy.
             return_style:
                 if True, return styler object; else return dataframe
             round_by:
@@ -990,7 +995,7 @@ class TwoClassEvaluator:
                 dummy_classifier_strategy = [dummy_classifier_strategy]
 
             for strategy in dummy_classifier_strategy:
-                dummy = DummyClassifier(strategy=strategy)
+                dummy = DummyClassifier(strategy=strategy, constant=dummy_classifier_constant)
                 # https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html
                 # "All strategies make predictions that ignore the input feature values passed as the X
                 # argument to fit and predict. The predictions, however, typically depend on values observed
