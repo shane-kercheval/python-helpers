@@ -4,7 +4,7 @@ in particular, for evaluating models"""
 import math
 import warnings
 from re import match
-from typing import Tuple, Union, Optional, List
+from typing import Tuple, Union, Optional, List, Dict
 
 import numpy as np
 import pandas as pd
@@ -1609,3 +1609,224 @@ class RegressionEvaluator:
                     'Note: Actual > Predicted => Under-predicting (positive residual); negative residuals '
                     'mean over-predicting',  # noqa
                     horizontalalignment='right')
+
+
+class TwoClassModelComparison:
+    """This class compares multiple models trained on Two Class (i.e. 0's/1's) prediction scenarios."""
+    def __init__(self,
+                 actual_values: np.ndarray,
+                 predicted_scores: Dict[str, np.ndarray],
+                 positive_class: str = 'Positive Class',
+                 negative_class: str = 'Negative Class',
+                 score_threshold: float = 0.5
+                 ):
+        """
+        Args:
+            actual_values:
+                array of 0's and 1's
+            predicted_scores:
+                dictionary per model with key as the name of the model and value that is an array of
+                decimal/float values from `predict_proba()`; NOT the actual class
+            positive_class:
+                string of the name/label of the positive class (i.e. value of 1). In other words, not
+                'positive' in the sense of 'good' but 'positive' as in 'True/False Positive'.
+            negative_class:
+                string of the name/label of the negative class (i.e. value of 0). In other words, not
+                'negative' in the sense of 'good' but 'negative' as in 'True/False Negative'.
+            score_threshold:
+                the score/probability threshold for turning scores into 0's and 1's and corresponding labels
+        """
+        assert isinstance(predicted_scores, dict)
+
+        for values in predicted_scores.values():
+            assert len(actual_values) == len(values)
+
+        self._positive_class = positive_class
+        self._negative_class = negative_class
+        self._actual_values = actual_values
+        self._predicted_scores = predicted_scores
+        self.score_threshold = score_threshold
+
+        self._evaluators = {key: TwoClassEvaluator(actual_values=actual_values,
+                                                   predicted_scores=value,
+                                                   positive_class=positive_class,
+                                                   negative_class=negative_class,
+                                                   score_threshold=score_threshold)
+                            for key, value in predicted_scores.items()}
+
+    def all_metrics_df(self,
+                       dummy_classifier_strategy: Union[str, list, None] = 'prior',
+                       dummy_classifier_constant: Union[int] = 1,
+                       return_style: bool = False,
+                       round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
+        """All of the metrics are returned as a DataFrame.
+
+        Args:
+            dummy_classifier_strategy:
+                if not None, then returns column(s) corresponding to the scores from predictions of
+                sklearn.dummy.DummyClassifier, based on the strategy (or strategies) provided. Valid values
+                correspond to values of `strategy` parameter listed
+                https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html
+
+                If a list is passed in (e.g. ['prior', 'uniform'], then one score column per value is
+                added.
+
+                If None is passed, then no additional columns are added.
+            dummy_classifier_constant:
+                The explicit constant as predicted by the “constant” strategy for the
+                DummyClassifier.
+                This parameter is useful only for the “constant” dummy_classifier_strategy.
+            return_style:
+                if True, return styler object; else return dataframe
+            round_by:
+                the number of digits to round by; if None, then don't round
+        """
+
+        result = None
+        last_key = list(self._evaluators.keys())[-1]
+
+        for key, value in self._evaluators.items():
+            dummy_strategy = dummy_classifier_strategy if key == last_key else None
+
+            scores = value.all_metrics_df(
+                return_explanations=False,
+                dummy_classifier_strategy=dummy_strategy,
+                dummy_classifier_constant=dummy_classifier_constant
+            )
+            scores = scores.rename(columns={'Score': key})
+            result = pd.concat([result, scores], axis=1)
+
+        result = result.loc[[
+            'AUC', 'F1 Score',
+            'True Positive Rate', 'True Negative Rate',
+            'False Positive Rate', 'False Negative Rate',
+            'Positive Predictive Value', 'Negative Predictive Value'
+        ]]
+
+        result = result.transpose()
+
+        if round_by:
+            for column in result.columns:
+                result[column] = result[column].round(round_by)
+
+        if return_style:
+            positive_scores = [x for x in result.columns if not x.startswith('False')]
+            negative_scores = [x for x in result.columns if x.startswith('False')]
+
+            result = result.style
+
+            if round_by:
+                result = result.format(precision=round_by)
+
+            result = result. \
+                bar(subset=positive_scores, color=hcolor.Colors.PIGMENT_GREEN.value, vmin=0, vmax=1). \
+                bar(subset=negative_scores, color=hcolor.Colors.POPPY.value, vmin=0, vmax=1)
+
+        return result
+
+    def plot_metrics_comparison(self,
+                                dummy_classifier_strategy: Union[str, list, None] = 'prior',
+                                dummy_classifier_constant: Union[int] = 1,
+                                ) -> _figure.Figure:
+        """
+        Returns a Plotly object of a bar-chart of the metrics across all of the models.
+
+        Args:
+            dummy_classifier_strategy:
+                if not None, then returns column(s) corresponding to the scores from predictions of
+                sklearn.dummy.DummyClassifier, based on the strategy (or strategies) provided. Valid values
+                correspond to values of `strategy` parameter listed
+                https://scikit-learn.org/stable/modules/generated/sklearn.dummy.DummyClassifier.html
+
+                If a list is passed in (e.g. ['prior', 'uniform'], then one score column per value is
+                added.
+
+                If None is passed, then no additional columns are added.
+            dummy_classifier_constant:
+                The explicit constant as predicted by the “constant” strategy for the
+                DummyClassifier.
+                This parameter is useful only for the “constant” dummy_classifier_strategy.
+        """
+        score_df = self.all_metrics_df(
+            dummy_classifier_strategy=dummy_classifier_strategy,
+            dummy_classifier_constant=dummy_classifier_constant
+        ).transpose()
+
+        score_df = score_df.reset_index()
+
+        colors = [e.value for e in hcolor.Colors]
+        fig = px.bar(
+            data_frame=score_df.melt(id_vars='index'),
+            y='variable',
+            x='value',
+            facet_col='index',
+            facet_col_wrap=2,
+            color='variable',
+            color_discrete_sequence=colors,
+            barmode='group',
+            height=1000,
+            labels={'index': 'Score'},
+            title="Model Comparison"
+        )
+        fig.update_layout(showlegend=False)
+        fig.update_yaxes(title=None)
+        return fig
+
+    def plot_roc_curves(self) -> _figure.Figure:
+        """Returns a plotly object representing the ROC curves across all models."""
+        result = None
+
+        for key, value in self._evaluators.items():
+            auc_df = value._get_auc_curve_dataframe()  # noqa
+            auc_df['Model'] = key
+            result = pd.concat([result, auc_df], axis=0)
+
+        colors = [e.value for e in hcolor.Colors]
+        fig = px.line(
+            data_frame=result,
+            x='False Positive Rate',
+            y='True Positive Rate',
+            color='Model',
+            color_discrete_sequence=colors,
+            height=550,
+            width=550 * GOLDEN_RATIO,
+            custom_data=['threshold', 'Model'],
+            title="ROC Curve of Models",
+        )
+        for index in range(len(self._evaluators)):
+            scatter_1 = px.scatter(
+                data_frame=result,
+                x='False Positive Rate',
+                y='True Positive Rate',
+                color='Model',
+                color_discrete_sequence=colors,
+                custom_data=['threshold', 'Model'],
+            )
+            scatter_1.data[index]['showlegend'] = False
+            fig.add_trace(
+                scatter_1.data[index]
+            )
+            query = f"threshold == 0.5 & Model == '{list(self._evaluators.keys())[index]}'"
+            scatter_2 = px.scatter(
+                data_frame=result.query(query),
+                x='False Positive Rate',
+                y='True Positive Rate',
+                color='Model',
+                color_discrete_sequence=[colors[index]] + colors,
+                custom_data=['threshold', 'Model'],
+                size=[2],
+            )
+            scatter_2.data[0]['showlegend'] = False
+            fig.add_trace(
+                scatter_2.data[0],
+            )
+
+        fig.update_traces(
+            hovertemplate="<br>".join([
+                "Model: %{customdata[1]}<br><br>"
+                "False Positive Rate: %{x}",
+                "True Positive Rate: %{y}",
+                "Threshold: %{customdata[0]}",
+            ])
+        )
+        return fig
