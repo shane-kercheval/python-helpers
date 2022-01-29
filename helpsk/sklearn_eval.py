@@ -56,7 +56,7 @@ class MLExperimentResults:
         those combinations is a Trial. The collection of 30 combinations is the experiment.
     """
 
-    def __init__(self, cv_dict: dict):
+    def __init__(self, experiment_dict: dict):
         """This method creates a MLExperimentResults object from a dictionary.
 
         Params:
@@ -212,8 +212,9 @@ class MLExperimentResults:
 
 
         """
-        self._cv_dict = cv_dict
-        self._cv_dataframe = None
+        self._dict = experiment_dict
+        self._dataframe = None
+        self._labeled_dataframe = None
 
     # pylint: disable=too-many-branches
     # pylint: disable=too-many-statements
@@ -409,7 +410,7 @@ class MLExperimentResults:
                                       'score time averages': score_time_averages,
                                       'score time standard deviations': score_time_standard_deviations}
 
-        return MLExperimentResults(cv_dict=cv_results_dict)
+        return MLExperimentResults(experiment_dict=cv_results_dict)
 
     @classmethod
     def from_yaml_file(cls, yaml_file_name):
@@ -417,12 +418,12 @@ class MLExperimentResults:
         with open(yaml_file_name, 'r') as file:
             cv_dict = yaml.safe_load(file)
 
-        return MLExperimentResults(cv_dict=cv_dict)
+        return MLExperimentResults(experiment_dict=cv_dict)
 
     def to_yaml_file(self, yaml_file_name: str):
         """This method saves the self._cv_dict dictionary to a yaml file."""
         with open(yaml_file_name, 'w') as file:
-            yaml.dump(self._cv_dict, file, default_flow_style=False, sort_keys=False)
+            yaml.dump(self._dict, file, default_flow_style=False, sort_keys=False)
 
     def to_dataframe(self, sort_by_score: bool = True) -> pd.DataFrame:
         """This function converts the score information from the SearchCV object into a pd.DataFrame.
@@ -430,13 +431,14 @@ class MLExperimentResults:
         Params:
             sort_by_score:
                 if True, sorts the dataframe starting with the best (primary) score to the worst score.
-                Secondary scores are not considered.
+                Secondary scores are not considered. If False, leave the results in the order that the trials
+                were executed.
 
         Returns:
             a DataFrame containing score information for each cross-validation trial. A single row
             corresponds to one trial (i.e. one set of hyper-parameters that were cross-validated).
         """
-        if self._cv_dataframe is None:
+        if self._dataframe is None:
             for score_name in self.score_names:
                 confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
                                                      # number_of_splits is sample-size
@@ -445,8 +447,8 @@ class MLExperimentResults:
                                                      scale=self.score_standard_errors(score_name=score_name))
 
                 # only give confidence intervals for the primary score
-                self._cv_dataframe = pd.concat([
-                        self._cv_dataframe,
+                self._dataframe = pd.concat([
+                        self._dataframe,
                         pd.DataFrame({score_name + " Mean": self.test_score_averages[score_name],
                                       score_name + " 95CI.LO": confidence_intervals[0],
                                       score_name + " 95CI.HI": confidence_intervals[1]})
@@ -454,14 +456,14 @@ class MLExperimentResults:
                     axis=1
                 )
 
-            self._cv_dataframe = pd.concat([self._cv_dataframe,
-                                            pd.DataFrame.from_dict(self.parameter_trials)],  # noqa
-                                           axis=1)
+            self._dataframe = pd.concat([self._dataframe,
+                                         pd.DataFrame.from_dict(self.parameter_trials)],  # noqa
+                                        axis=1)
 
             if self.parameter_names_mapping:
-                self._cv_dataframe = self._cv_dataframe.rename(columns=self.parameter_names_mapping)
+                self._dataframe = self._dataframe.rename(columns=self.parameter_names_mapping)
 
-        copy = self._cv_dataframe.copy(deep=True)
+        copy = self._dataframe.copy(deep=True)
 
         if sort_by_score:
             copy = copy.iloc[self.primary_score_best_indexes]
@@ -554,39 +556,60 @@ class MLExperimentResults:
 
         return cv_dataframe
 
+    def to_labeled_dataframe(self) -> pd.DataFrame:
+        """Returns a pd.DataFrame similar to `to_dataframe()` with additional columns 'Trial Index' and
+        'labels' (which are the labels corresponding to the `trial_label` property and collapse all the
+        name/values for the hyper-parameters into a single string)
+
+        This function is mainly used internally to generate graphs, but is useful for users creating custom
+        graphs that are not yet implemented by the class.
+        """
+        if self._labeled_dataframe is None:
+            labeled_dataframe = self.to_dataframe(sort_by_score=False)  # leave original trial order
+            columns = labeled_dataframe.columns.to_list()  # cache columns to move Iteration column to front
+            labeled_dataframe['Trial Index'] = np.arange(1, self.number_of_trials + 1)
+            labeled_dataframe = labeled_dataframe[['Trial Index'] + columns]
+            # create the labels that will be used in the plotly hover text
+            labeled_dataframe['label'] = [x.replace('{', '<br>').replace(', ', '<br>').replace('}', '')
+                                          for x in self.trial_labels(order_from_best_to_worst=False)]
+
+            self._labeled_dataframe = labeled_dataframe
+
+        return self._labeled_dataframe.copy(deep=True)
+
     ####
     # The following properties expose the highest levels of the underlying dictionary/yaml
     ####
     @property
     def description(self):
         """the description passed to `description`."""
-        return self._cv_dict['description']
+        return self._dict['description']
 
     @property
     def higher_score_is_better(self):
         """The value passed to `higher_score_is_better`."""
-        return self._cv_dict['higher_score_is_better']
+        return self._dict['higher_score_is_better']
 
     @property
     def cross_validation_type(self) -> str:
         """The string representation of the SearchCV object."""
-        return self._cv_dict['cross_validation_type']
+        return self._dict['cross_validation_type']
 
     @property
     def number_of_splits(self) -> int:
         """This is the number of times the model is trained in a single trial i.e. single cross-validation
         session. For example, a 5-fold 2-repeat CV has 10 splits."""
-        return self._cv_dict['number_of_splits']
+        return self._dict['number_of_splits']
 
     @property
     def score_names(self) -> list:
         """Returns a list of the names of the scores"""
-        return self._cv_dict['score_names']
+        return self._dict['score_names']
 
     @property
     def parameter_names_original(self) -> list:
         """Returns the original parameter names (i.e. the path generated by the scikit-learn pipelines."""
-        return self._cv_dict['parameter_names']
+        return self._dict['parameter_names']
 
     @property
     def parameter_names(self) -> list:
@@ -600,37 +623,37 @@ class MLExperimentResults:
     @property
     def parameter_names_mapping(self) -> dict:
         """The dictionary passed to `parameter_name_mappings`."""
-        return self._cv_dict.get('parameter_names_mapping')
+        return self._dict.get('parameter_names_mapping')
 
     @property
     def test_score_rankings(self) -> dict:
         """The rankings of each of the test scores, from the searcher.cv_results_ object."""
-        return self._cv_dict['test_score_rankings']
+        return self._dict['test_score_rankings']
 
     @property
     def test_score_averages(self) -> dict:
         """The test score averages, from the searcher.cv_results_ object."""
-        return self._cv_dict['test_score_averages']
+        return self._dict['test_score_averages']
 
     @property
     def test_score_standard_deviations(self) -> dict:
         """The test score standard deviations, from the searcher.cv_results_ object."""
-        return self._cv_dict['test_score_standard_deviations']
+        return self._dict['test_score_standard_deviations']
 
     @property
     def train_score_averages(self) -> dict:
         """The training score averages, from the searcher.cv_results_ object, if provided."""
-        return self._cv_dict.get('train_score_averages')
+        return self._dict.get('train_score_averages')
 
     @property
     def train_score_standard_deviations(self) -> dict:
         """The training score standard deviations, from the searcher.cv_results_ object, if provided."""
-        return self._cv_dict.get('train_score_standard_deviations')
+        return self._dict.get('train_score_standard_deviations')
 
     @property
     def parameter_trials(self) -> list:
         """The "trials" i.e. the hyper-parameter combinations in order of execution."""
-        return self._cv_dict['parameter_trials']
+        return self._dict['parameter_trials']
 
     def trial_labels(self, order_from_best_to_worst=True) -> List[str]:
         """An trial is a set of hyper-parameters that were cross validated. The corresponding label for
@@ -639,8 +662,9 @@ class MLExperimentResults:
 
         Params:
             order_from_best_to_worst: if True, returns the labels in order from the best score to the worst
-            score, which should match the ordered of .to_dataframe() or .to_formatted_dataframe()`. If False,
-            returns the labels in order that they were ran by the cross validation object.
+            score, which should match the ordered of .to_dataframe() or .to_formatted_dataframe()` using the
+            default values for those functions. If False, returns the labels in order that they were ran by
+            the cross validation object.
 
         Returns:
             a pd.Series the same length as `number_of_trials` containing a str
@@ -665,7 +689,7 @@ class MLExperimentResults:
     @property
     def timings(self) -> dict:
         """The timings providing by searcher.cv_results_."""
-        return self._cv_dict['timings']
+        return self._dict['timings']
 
     ####
     # The following properties are additional helpers

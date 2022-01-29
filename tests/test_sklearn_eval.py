@@ -167,14 +167,15 @@ class TestSklearnEval(unittest.TestCase):
                                                             higher_score_is_better=True,
                                                             description="test description",
                                                             parameter_name_mappings=new_param_column_names)
+
         yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search.yaml'
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)
-        parser_from_dict = MLExperimentResults(parser._cv_dict)
+        parser_from_dict = MLExperimentResults(parser._dict)
         parser_from_yaml = MLExperimentResults.from_yaml_file(yaml_file)
 
-        self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
-        self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
+        self.assertEqual(str(parser._dict), str(parser_from_dict._dict))
+        self.assertEqual(str(parser._dict), str(parser_from_yaml._dict))
 
         self.assertEqual(parser.description, "test description")
         self.assertEqual(parser.description, parser_from_dict.description)
@@ -249,6 +250,13 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe().index))
         cv_dataframe = parser.to_dataframe().sort_index()
         hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
+
+        labeled_dataframe = parser.to_labeled_dataframe()
+        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
+        self.assertIsNotNone(labeled_dataframe['label'])
+        hlp.validation.assert_dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
+                                                           labeled_dataframe.drop(columns=['Trial Index',
+                                                                                           'label'])])
 
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
                                    grid_search_credit.cv_results_[f'mean_test_{parser.score_names[0]}'])
@@ -397,11 +405,11 @@ class TestSklearnEval(unittest.TestCase):
         yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search_roc.yaml'
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)
-        parser_from_dict = MLExperimentResults(parser._cv_dict)
+        parser_from_dict = MLExperimentResults(parser._dict)
         parser_from_yaml = MLExperimentResults.from_yaml_file(yaml_file)
 
-        self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
-        self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
+        self.assertEqual(str(parser._dict), str(parser_from_dict._dict))
+        self.assertEqual(str(parser._dict), str(parser_from_yaml._dict))
 
         self.assertEqual(parser.description, "test description")
         self.assertEqual(parser.description, parser_from_dict.description)
@@ -476,6 +484,13 @@ class TestSklearnEval(unittest.TestCase):
         hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
                                    grid_search_credit.cv_results_['mean_test_score'])
+
+        labeled_dataframe = parser.to_labeled_dataframe()
+        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
+        self.assertIsNotNone(labeled_dataframe['label'])
+        hlp.validation.assert_dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
+                                                           labeled_dataframe.drop(columns=['Trial Index',
+                                                                                           'label'])])
 
         self.assertEqual(list(grid_search_credit.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())
         self.assertEqual(list(grid_search_credit.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
@@ -603,11 +618,11 @@ class TestSklearnEval(unittest.TestCase):
         yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search.yaml'
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)
-        parser_from_dict = MLExperimentResults(parser._cv_dict)
+        parser_from_dict = MLExperimentResults(parser._dict)
         parser_from_yaml = MLExperimentResults.from_yaml_file(yaml_file)
 
-        self.assertEqual(str(parser._cv_dict), str(parser_from_dict._cv_dict))
-        self.assertEqual(str(parser._cv_dict), str(parser_from_yaml._cv_dict))
+        self.assertEqual(str(parser._dict), str(parser_from_dict._dict))
+        self.assertEqual(str(parser._dict), str(parser_from_yaml._dict))
 
         self.assertEqual(parser.description, "test description")
         self.assertEqual(parser.description, parser_from_dict.description)
@@ -678,6 +693,13 @@ class TestSklearnEval(unittest.TestCase):
                                    grid_search_housing.cv_results_[f'mean_test_{parser.score_names[0]}'] * -1)
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[1]} Mean'],
                                    grid_search_housing.cv_results_[f'mean_test_{parser.score_names[1]}'] * -1)
+
+        labeled_dataframe = parser.to_labeled_dataframe()
+        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
+        self.assertIsNotNone(labeled_dataframe['label'])
+        hlp.validation.assert_dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
+                                                           labeled_dataframe.drop(columns=['Trial Index',
+                                                                                           'label'])])
 
         self.assertEqual(list(grid_search_housing.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())
         self.assertEqual(list(grid_search_housing.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
