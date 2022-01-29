@@ -1526,7 +1526,6 @@ class TwoClassEvaluator:
 
         return gain_lift_data
 
-
     # pylint: disable=inconsistent-return-statements
     def plot_predicted_scores_histogram(self):
         """Return a histogram of the predicted scores"""
