@@ -148,10 +148,10 @@ class TestSklearnEval(unittest.TestCase):
         # the keys passed to parameter_name_mappings should match the parameters founds
         self.assertRaises(HelpskAssertionError,
                           lambda: MLExperimentResults.
-                                from_sklearn_searchCV(searcher=self.credit_data__grid_search,
-                                                      higher_score_is_better=True,
-                                                      description="test description",
-                                                      parameter_name_mappings={'this_should_fail': 'value'}))
+                          from_sklearn_search_cv(searcher=self.credit_data__grid_search,
+                                                 higher_score_is_better=True,
+                                                 description="test description",
+                                                 parameter_name_mappings={'this_should_fail': 'value'}))
 
     def test_MLExperimentResults_gridsearch_classification(self):
         new_param_column_names = {'model__max_features': 'max_features',
@@ -163,10 +163,10 @@ class TestSklearnEval(unittest.TestCase):
         # passing in parameter mappings
         grid_search_credit = self.credit_data__grid_search
 
-        parser = MLExperimentResults.from_sklearn_searchCV(searcher=grid_search_credit,
-                                                           higher_score_is_better=True,
-                                                           description="test description",
-                                                           parameter_name_mappings=new_param_column_names)
+        parser = MLExperimentResults.from_sklearn_search_cv(searcher=grid_search_credit,
+                                                            higher_score_is_better=True,
+                                                            description="test description",
+                                                            parameter_name_mappings=new_param_column_names)
         yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search.yaml'
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)
@@ -390,10 +390,10 @@ class TestSklearnEval(unittest.TestCase):
         # test grid search object that has one score (classification)
         # not passing in parameter mappings
         grid_search_credit = self.credit_data__grid_search__roc_auc
-        parser = MLExperimentResults.from_sklearn_searchCV(searcher=grid_search_credit,
-                                                           higher_score_is_better=True,
-                                                           description="test description",
-                                                           parameter_name_mappings=None)
+        parser = MLExperimentResults.from_sklearn_search_cv(searcher=grid_search_credit,
+                                                            higher_score_is_better=True,
+                                                            description="test description",
+                                                            parameter_name_mappings=None)
         yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search_roc.yaml'
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)
@@ -597,9 +597,9 @@ class TestSklearnEval(unittest.TestCase):
         # test grid search object that has multiple scores (regression)
         # not passing in parameter mappings
         grid_search_housing = self.housing_data__grid_search
-        parser = MLExperimentResults.from_sklearn_searchCV(searcher=grid_search_housing,
-                                                           higher_score_is_better=False,
-                                                           description="test description")
+        parser = MLExperimentResults.from_sklearn_search_cv(searcher=grid_search_housing,
+                                                            higher_score_is_better=False,
+                                                            description="test description")
         yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search.yaml'
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)

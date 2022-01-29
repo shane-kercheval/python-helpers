@@ -48,7 +48,7 @@ class MLExperimentResults:
         other sources into a dictionary (see __init__ function documentation for details on expected format)
         so that it can be used with this class.
 
-    Trial: A single training iteration on a sepcific set of hyper-parameters (e.g. a given set of model
+    Trial: A single training iteration on a specific set of hyper-parameters (e.g. a given set of model
         parameters, transformations, etc.)
 
     Experiment: a collection of trials. An experiment can be a single run using, for example, GridSearchCV or
@@ -59,7 +59,6 @@ class MLExperimentResults:
     def __init__(self, cv_dict: dict):
         """This method creates a MLExperimentResults object from a dictionary.
 
-        
         Params:
             cv_dict:
                 a dictionary with the following format, as an example:
@@ -87,7 +86,7 @@ class MLExperimentResults:
                 standard deviations
             - `parameter_trials`: A list of dictionary. Each item in the list (i.e. the dictionary)
                 corresponds to a single trial and a single set of hyper-parameters. The dictionary has an item
-                for each of the hyper-parmaeters, the name of the hyper-parameter as the key and the
+                for each of the hyper-parameters, the name of the hyper-parameter as the key and the
                 corresponding value
             - `timings`: (optional) A list of timings for fitting/scoring
 
@@ -103,7 +102,7 @@ class MLExperimentResults:
                                     'preparation__non_numeric_pipeline__encoder_chooser__transformer'],
                 'parameter_names_mapping': {
                     'model__max_features': 'max_features',
-                    'model__n_estimators': 'n_estimators', 
+                    'model__n_estimators': 'n_estimators',
                     'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'encoder'
                 },
                 'test_score_rankings': {
@@ -216,19 +215,14 @@ class MLExperimentResults:
         self._cv_dict = cv_dict
         self._cv_dataframe = None
 
-
-
-
-
-
     # pylint: disable=too-many-branches
     # pylint: disable=too-many-statements
     @classmethod
-    def from_sklearn_searchCV(cls,
-                              searcher: BaseSearchCV,
-                              higher_score_is_better: bool = True,
-                              description: str = "",
-                              parameter_name_mappings: Union[dict, None] = None):
+    def from_sklearn_search_cv(cls,
+                               searcher: BaseSearchCV,
+                               higher_score_is_better: bool = True,
+                               description: str = "",
+                               parameter_name_mappings: Union[dict, None] = None):
         """
         This function extracts the results from a SearchCV object (e.g.
         sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV), which are converted to
@@ -474,6 +468,7 @@ class MLExperimentResults:
 
         return copy
 
+    # pylint: disable=too-many-arguments
     def to_formatted_dataframe(self,
                                round_by: int = 3,
                                num_rows: int = 50,
@@ -684,10 +679,12 @@ class MLExperimentResults:
 
     @property
     def numeric_parameters(self) -> List[str]:
+        """Returns a list of parameters names corresponding to numeric columns."""
         return [x for x in get_numeric_columns(dataframe=self.to_dataframe()) if x in self.parameter_names]
 
     @property
     def non_numeric_parameters(self) -> List[str]:
+        """Returns a list of parameters names corresponding to non-numeric columns."""
         return [x for x in get_non_numeric_columns(dataframe=self.to_dataframe())
                 if x in self.parameter_names]
 
@@ -869,11 +866,10 @@ class MLExperimentResults:
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
-
-
 # pylint: disable=too-many-instance-attributes,too-many-public-methods
 class TwoClassEvaluator:
     """This class calculates various metrics for Two Class (i.e. 0's/1's) prediction scenarios."""
+    # pylint: disable=too-many-arguments
     def __init__(self,
                  actual_values: np.ndarray,
                  predicted_scores: np.ndarray,
@@ -1053,12 +1049,12 @@ class TwoClassEvaluator:
                       'ranges from 0.5 (purely random classifier) to 1.0 (perfect classifier)'
 
         tpr_message = f'{self.true_positive_rate:.1%} of positive instances were correctly identified.; ' \
-                      f'i.e. {self._true_positives} "{self._positive_class}" labels were correctly identified ' \
-                      f'out of {self._actual_positives} instances; a.k.a Sensitivity/Recall'
+                      f'i.e. {self._true_positives} "{self._positive_class}" labels were correctly ' \
+                      f'identified out of {self._actual_positives} instances; a.k.a Sensitivity/Recall'
 
         tnr_message = f'{self.true_negative_rate:.1%} of negative instances were correctly identified.; ' \
-                      f'i.e. {self._true_negatives} "{self._negative_class}" labels were correctly identified ' \
-                      f'out of {self._actual_negatives} instances'
+                      f'i.e. {self._true_negatives} "{self._negative_class}" labels were correctly ' \
+                      f'identified out of {self._actual_negatives} instances'
 
         fpr_message = f'{self.false_positive_rate:.1%} of negative instances were incorrectly identified ' \
                       f'as positive; ' \
@@ -1104,6 +1100,7 @@ class TwoClassEvaluator:
                 '% Positive': (self.prevalence, prevalence_message),
                 'Total Observations': (self.sample_size, total_obs_message)}
 
+    # pylint: disable=too-many-arguments
     def all_metrics_df(self,
                        return_explanations: bool = True,
                        dummy_classifier_strategy: Union[str, list, None] = 'prior',
@@ -1281,6 +1278,7 @@ class TwoClassEvaluator:
                                                  'True Neg. Rate (Specificity)'])
         return threshold_curves
 
+    # pylint: disable=inconsistent-return-statements
     def plot_auc_curve(self,
                        figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                        return_plotly: bool = False) -> Union[None,
@@ -1339,6 +1337,7 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
+    # pylint: disable=inconsistent-return-statements
     def plot_threshold_curves(self,
                               score_threshold_range: Tuple[float, float] = (0.1, 0.9),
                               figure_size: tuple = STANDARD_WIDTH_HEIGHT,
@@ -1397,6 +1396,7 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
+    # pylint: disable=inconsistent-return-statements
     def plot_precision_recall_tradeoff(self,
                                        score_threshold_range: Tuple[float, float] = (0.1, 0.9),
                                        figure_size: tuple = STANDARD_WIDTH_HEIGHT,
@@ -1461,6 +1461,7 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
+    # pylint: disable=inconsistent-return-statements
     def calculate_lift_gain(self,
                             num_buckets: int = 20,
                             return_style: bool = False,
@@ -1525,11 +1526,16 @@ class TwoClassEvaluator:
 
         return gain_lift_data
 
+
+    # pylint: disable=inconsistent-return-statements
     def plot_predicted_scores_histogram(self):
+        """Return a histogram of the predicted scores"""
         sns.histplot(self._predicted_scores)
         plt.tight_layout()
 
+    # pylint: disable=inconsistent-return-statements
     def plot_actual_vs_predict_histogram(self):
+        """Return a histogram of the actual vs predicted scores"""
         actual_categories = pd.Series(self._actual_values).\
             replace({0: self._negative_class, 1: self._positive_class})
         axes = sns.displot(
@@ -1763,6 +1769,8 @@ class RegressionEvaluator:
 
 class TwoClassModelComparison:
     """This class compares multiple models trained on Two Class (i.e. 0's/1's) prediction scenarios."""
+
+    # pylint: disable=too-many-arguments
     def __init__(self,
                  actual_values: np.ndarray,
                  predicted_scores: Dict[str, np.ndarray],
@@ -1927,7 +1935,7 @@ class TwoClassModelComparison:
         result = None
 
         for key, value in self._evaluators.items():
-            auc_df = value._get_auc_curve_dataframe()  # noqa
+            auc_df = value._get_auc_curve_dataframe()  # pylint: disable=protected-access # noqa
             auc_df['Model'] = key
             result = pd.concat([result, auc_df], axis=0)
 
