@@ -43,10 +43,10 @@ class MLExperimentResults:
 
     The results can be saved/loaded to/from a standardized YAML file via `to_yaml_file()`/`from_yaml_file()`
 
-    A MLExperimentResults object can be instantiated via `from_sklearn_searchCV()`, `__init__()`, or 
+    A MLExperimentResults object can be instantiated via `from_sklearn_searchCV()`, `__init__()`, or
         `from_yaml_file()`. The `__init__()` function allows people to transform experiment results from
-        other sources into a dictionary (see __init__ function documentation for details on expected format) so that
-        it can be used with this class.
+        other sources into a dictionary (see __init__ function documentation for details on expected format)
+        so that it can be used with this class.
 
     Trial: A single training iteration on a sepcific set of hyper-parameters (e.g. a given set of model
         parameters, transformations, etc.)
@@ -62,10 +62,154 @@ class MLExperimentResults:
         
         Params:
             cv_dict:
-                a dictionary with the following format
-                
+                a dictionary with the following format, as an example:
 
-                TBD show example format
+
+            - `description`: any text to provide context into the ML experiment
+            - `cross_validation_type`: any text
+            - `higher_score_is_better`: boolean indicating whether or not a higher score/metric is better
+                e.g. True for AUC, False for RMSE
+            - `number_of_splits`: This is the number of times the model is trained in a single trial i.e.
+                single cross-validation session. For example, a 5-fold 2-repeat CV has 10 splits.
+            - `score_names`: the names of the score(s)
+            - `parameter_names`: the names of the parameters
+            - `parameter_names_mapping`: a mapping between actual parameters and friendlier names
+            - `test_score_rankings`: for each score, a list of rankings. For example, if a list with the
+                values of `[5, 6, 7, 8, 3, 4, 1, 2]` means that the first trial (index 0) ranked 5. The
+                seventh trial (index 6) was the best score (highest or lowest score depending on the value of
+                `higher_score_is_better`)
+            - `test_score_averages`: for each score, the average score value among all splits (i.e. across the
+                cross-validation run) for a single trial
+            - `test_score_standard_deviations`: for each score, the standard deviation score among all splits
+                (i.e. across the cross-validation run) for a single trial
+            - `train_score_averages`: (optional) same as test_score_xxx above, but for training scores
+            - `train_score_standard_deviations`: (optional) same as test_score_xxx above, but for training
+                standard deviations
+            - `parameter_trials`: A list of dictionary. Each item in the list (i.e. the dictionary)
+                corresponds to a single trial and a single set of hyper-parameters. The dictionary has an item
+                for each of the hyper-parmaeters, the name of the hyper-parameter as the key and the
+                corresponding value
+            - `timings`: (optional) A list of timings for fitting/scoring
+
+
+            ```
+            {
+                'description': 'test description',
+                'cross_validation_type': "<class 'sklearn.model_selection._search.GridSearchCV'>",
+                'higher_score_is_better': True,
+                'number_of_splits': 3,
+                'score_names': ['ROC/AUC', 'F1', 'Pos. Pred. Val', 'True Pos. Rate'],
+                'parameter_names': ['model__max_features', 'model__n_estimators',
+                                    'preparation__non_numeric_pipeline__encoder_chooser__transformer'],
+                'parameter_names_mapping': {
+                    'model__max_features': 'max_features',
+                    'model__n_estimators': 'n_estimators', 
+                    'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'encoder'
+                },
+                'test_score_rankings': {
+                    'ROC/AUC': [5, 6, 7, 8, 3, 4, 1, 2],
+                    'F1': [5, 6, 7, 8, 3, 4, 2, 1],
+                    'Pos. Pred. Val': [5, 6, 7, 8, 1, 4, 3, 2],
+                    'True Pos. Rate': [5, 6, 7, 8, 3, 4, 2, 1]
+                },
+                'test_score_averages': {
+                    'ROC/AUC': [nan, nan, nan, nan, 0.7163279567387703, 0.7072491564040325,
+                                0.7458632917328131, 0.7451951355826116],
+                    'F1': [nan, nan, nan, nan, 0.4039887486499992, 0.3854065126792399, 0.4137381215646683,
+                           0.4308356053261986],
+                    'Pos. Pred. Val': [nan, nan, nan, nan, 0.6297753300113645, 0.5468751302897644,
+                                       0.6015296073435609, 0.6113328664799252],
+                    'True Pos. Rate': [nan, nan, nan, nan, 0.2993876710919008, 0.29902233199547185,
+                                       0.31574945970978696, 0.3363795410106]
+                },
+                'test_score_standard_deviations': {
+                    'ROC/AUC': [nan, nan, nan, nan, 0.015733457430657828, 0.01795608557324064,
+                                0.021358294698372086, 0.0019082263491945234],
+                    'F1': [nan, nan, nan, nan, 0.05090125909373751, 0.07559891495722325, 0.04259039056830544,
+                           0.041365868651721927],
+                    'Pos. Pred. Val': [nan, nan, nan, nan, 0.026117735279684196, 0.06663645906293561,
+                                       0.041309705841820844, 0.06827042947757211],
+                    'True Pos. Rate': [nan, nan, nan, nan, 0.0497780260716827, 0.07150204558331273,
+                                       0.038463218144256496, 0.0460214315468713]
+                },
+                'train_score_averages': {
+                    'ROC/AUC': [nan, nan, nan, nan, 0.9998943476077663, 0.9992031557521965, 1.0, 1.0],
+                    'F1': [nan, nan, nan, nan, 0.9765745804947125, 0.9658091912335657, 1.0, 1.0],
+                    'Pos. Pred. Val': [nan, nan, nan, nan, 1.0, 0.9956132756132755, 1.0, 1.0],
+                    'True Pos. Rate': [nan, nan, nan, nan, 0.9543319834542148, 0.9377688364562852, 1.0, 1.0]
+                },
+                'train_score_standard_deviations': {
+                    'ROC/AUC': [nan, nan, nan, nan, 7.439517969409452e-05, 0.0005401862948682569,
+                                6.409875621278546e-17, 0.0],
+                    'F1': [nan, nan, nan, nan, 0.007673191451896241, 0.005478380082149172, 0.0, 0.0],
+                    'Pos. Pred. Val': [nan, nan, nan, nan, 0.0, 0.0031026880007722375, 0.0, 0.0],
+                    'True Pos. Rate': [nan, nan, nan, nan, 0.014730511057304973, 0.00871005201368303, 0.0,
+                                       0.0]
+                },
+                'parameter_trials': [
+                    {
+                        'model__max_features': 100,
+                        'model__n_estimators': 10,
+                        'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'OneHotEncoder()'
+                    },
+                    {
+                        'model__max_features': 100,
+                        'model__n_estimators': 10,
+                        'preparation__non_numeric_pipeline__encoder_chooser__transformer':
+                            'CustomOrdinalEncoder()'
+                    },
+                    {
+                        'model__max_features': 100,
+                        'model__n_estimators': 50,
+                        'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'OneHotEncoder()'
+                    },
+                    {
+                        'model__max_features': 100,
+                        'model__n_estimators': 50,
+                        'preparation__non_numeric_pipeline__encoder_chooser__transformer':
+                            'CustomOrdinalEncoder()'
+                    },
+                    {
+                        'model__max_features': 'auto',
+                        'model__n_estimators': 10,
+                        'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'OneHotEncoder()'
+                    },
+                    {
+                        'model__max_features': 'auto',
+                        'model__n_estimators': 10,
+                        'preparation__non_numeric_pipeline__encoder_chooser__transformer':
+                            'CustomOrdinalEncoder()'
+                    },
+                    {
+                        'model__max_features': 'auto',
+                        'model__n_estimators': 50,
+                        'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'OneHotEncoder()'
+                    },
+                    {
+                        'model__max_features': 'auto',
+                        'model__n_estimators': 50,
+                        'preparation__non_numeric_pipeline__encoder_chooser__transformer':
+                            'CustomOrdinalEncoder()'
+                    }
+                ],
+                'timings': {
+                    'fit time averages': [0.02420210838317871, 0.047980546951293945, 0.053688764572143555,
+                                          0.07731231053670247, 0.03327099482218424, 0.05605125427246094,
+                                          0.09772396087646484, 0.12112665176391602],
+                    'fit time standard deviations': [0.0015644331364039865, 0.0007074507470172489,
+                                                     0.00019471963214876084, 0.0006047002838356386,
+                                                     0.0014654790113907423, 0.000618793945947827,
+                                                     0.00044132423197131406, 0.0007073387039515561],
+                    'score time averages': [0.0, 0.0, 0.0, 0.0, 0.020992437998453777, 0.05231904983520508,
+                                            0.03004598617553711, 0.06252868970235188],
+                    'score time standard deviations': [0.0, 0.0, 0.0, 0.0, 0.0003703884785102133,
+                                                       0.0004282967971518099, 0.00014070830842031841,
+                                                       0.0004855695604911932]
+                }
+            }
+
+
+            ```
 
 
         """
@@ -435,7 +579,8 @@ class MLExperimentResults:
 
     @property
     def number_of_splits(self) -> int:
-        """This is the number of CV folds. For example, a 5-fold 2-repeat CV has 10 splits."""
+        """This is the number of times the model is trained in a single trial i.e. single cross-validation
+        session. For example, a 5-fold 2-repeat CV has 10 splits."""
         return self._cv_dict['number_of_splits']
 
     @property
