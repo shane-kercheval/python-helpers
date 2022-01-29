@@ -35,25 +35,60 @@ with warnings.catch_warnings():
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
-class SearchCVParser:
+class MLExperimentResults:
     """
-    This class contains the logic to parse and extract information from a BaseSearchCV object (e.g.
-    GridSearchCV, RandomizedSearchCV, BayesSearchCV)
+    This class contains the logic to explore the results of a machine learning experiment. There are also
+        functions that parse the information from a BaseSearchCV object (e.g. GridSearchCV,
+        RandomizedSearchCV, BayesSearchCV).
+
+    The results can be saved/loaded to/from a standardized YAML file via `to_yaml_file()`/`from_yaml_file()`
+
+    A MLExperimentResults object can be instantiated via `from_sklearn_searchCV()`, `__init__()`, or 
+        `from_yaml_file()`. The `__init__()` function allows people to transform experiment results from
+        other sources into a dictionary (see __init__ function documentation for details on expected format) so that
+        it can be used with this class.
+
+    Trial: A single training iteration on a sepcific set of hyper-parameters (e.g. a given set of model
+        parameters, transformations, etc.)
+
+    Experiment: a collection of trials. An experiment can be a single run using, for example, GridSearchCV or
+        BayesSearchCV. If a GridSearchCV experiment has 30 combinations of hyper-parameters to try, each of
+        those combinations is a Trial. The collection of 30 combinations is the experiment.
     """
 
-    # pylint: disable=too-many-arguments
-    def __init__(self,
-                 searcher: BaseSearchCV,
-                 higher_score_is_better: bool = True,
-                 run_description: str = "",
-                 parameter_name_mappings: Union[dict, None] = None):
+    def __init__(self, cv_dict: dict):
+        """This method creates a MLExperimentResults object from a dictionary.
+
+        
+        Params:
+            cv_dict:
+                a dictionary with the following format
+                
+
+                TBD show example format
+
+
         """
-        This object encapsulates the results from a SearchCV object (e.g.
-        sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV). The results can then be
-        converted to a dictionary, in a specific format with the intent to write the contents to a
-        yaml file.
+        self._cv_dict = cv_dict
+        self._cv_dataframe = None
 
-        At this time, this function does not capture the individual fold scores from the individual splits.
+
+
+
+
+
+    # pylint: disable=too-many-branches
+    # pylint: disable=too-many-statements
+    @classmethod
+    def from_sklearn_searchCV(cls,
+                              searcher: BaseSearchCV,
+                              higher_score_is_better: bool = True,
+                              description: str = "",
+                              parameter_name_mappings: Union[dict, None] = None):
+        """
+        This function extracts the results from a SearchCV object (e.g.
+        sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV), which are converted to
+        a dictionary with the hierarchy expected by the MLExperimentResults class.
 
         Params:
             searcher:
@@ -76,8 +111,8 @@ class SearchCVParser:
                 A value of False assumes that the scores returned from sklearn are negative and will multiple
                 the values by -1.
 
-            run_description:
-                An optional string to save in the dictionary
+            description:
+                An optional string to save in the dictionary; the intent
 
             parameter_name_mappings:
                 A dictionary containing the parameter names returned by the searchCV object as keys (which
@@ -92,48 +127,6 @@ class SearchCVParser:
                      'prep__numeric__impute__transformer': 'imputer',
                      'prep__numeric__scaling__transformer': 'scaler'}
         """
-        if searcher is not None:  # check for None in the case that __init__ is being called from `from_dict`
-            self._cv_dict = SearchCVParser.\
-                __search_cv_to_dict(searcher=searcher,
-                                    higher_score_is_better=higher_score_is_better,
-                                    run_description=run_description,
-                                    parameter_name_mappings=parameter_name_mappings)
-        else:
-            self._cv_dict = None
-
-        self._cv_dataframe = None
-
-    @classmethod
-    def from_dict(cls, cv_dict):
-        """This method creates a SearchCVParser from the dictionary previously created by
-        `__search_cv_to_dict()`"""
-        parser = cls(searcher=None, higher_score_is_better=None, run_description=None,  # noqa
-                     parameter_name_mappings=None)
-        parser._cv_dict = cv_dict
-        return parser
-
-    @classmethod
-    def from_yaml_file(cls, yaml_file_name):
-        """This method creates a SearchCVParser from a yaml file created by `to_yaml_file()`"""
-        with open(yaml_file_name, 'r') as file:
-            cv_dict = yaml.safe_load(file)
-
-        return SearchCVParser.from_dict(cv_dict=cv_dict)
-
-    def to_yaml_file(self, yaml_file_name: str):
-        """This method saves the self._cv_dict dictionary to a yaml file."""
-        with open(yaml_file_name, 'w') as file:
-            yaml.dump(self._cv_dict, file, default_flow_style=False, sort_keys=False)
-
-    # pylint: disable=too-many-branches
-    # pylint: disable=too-many-statements
-    @staticmethod
-    def __search_cv_to_dict(searcher: BaseSearchCV,
-                            higher_score_is_better: bool = True,
-                            run_description: str = "",
-                            parameter_name_mappings: Union[dict, None] = None) -> dict:
-        """This extracts the information from a BaseSearchCV object and converts it to a dictionary."""
-
         def string_if_not_number(obj):
             if isinstance(obj, (int, float, complex)):
                 return obj
@@ -141,7 +134,7 @@ class SearchCVParser:
             return str(obj)
 
         cv_results_dict = {
-            'description': run_description,
+            'description': description,
             'cross_validation_type': str(type(searcher)),
             'higher_score_is_better': higher_score_is_better
         }
@@ -177,7 +170,7 @@ class SearchCVParser:
                 assert_true(key in cv_results_dict['parameter_names'])
             cv_results_dict['parameter_names_mapping'] = parameter_name_mappings
 
-        number_of_iterations = len(searcher.cv_results_['mean_fit_time'])
+        number_of_trials = len(searcher.cv_results_['mean_fit_time'])
 
         # convert test scores to dictionaries
         if len(score_names) == 1:
@@ -185,9 +178,9 @@ class SearchCVParser:
             test_score_averages = searcher.cv_results_['mean_test_score'].tolist()
             test_score_standard_deviations = searcher.cv_results_['std_test_score'].tolist()
 
-            assert_true(len(test_score_ranking) == number_of_iterations)
-            assert_true(len(test_score_averages) == number_of_iterations)
-            assert_true(len(test_score_standard_deviations) == number_of_iterations)
+            assert_true(len(test_score_ranking) == number_of_trials)
+            assert_true(len(test_score_averages) == number_of_trials)
+            assert_true(len(test_score_standard_deviations) == number_of_trials)
 
             cv_results_dict['test_score_rankings'] = {score_names[0]: test_score_ranking}
             cv_results_dict['test_score_averages'] = {score_names[0]: test_score_averages}
@@ -202,9 +195,9 @@ class SearchCVParser:
                 averages = searcher.cv_results_['mean_test_' + score].tolist()
                 standard_deviations = searcher.cv_results_['std_test_' + score].tolist()
 
-                assert_true(len(rankings) == number_of_iterations)
-                assert_true(len(averages) == number_of_iterations)
-                assert_true(len(standard_deviations) == number_of_iterations)
+                assert_true(len(rankings) == number_of_trials)
+                assert_true(len(averages) == number_of_trials)
+                assert_true(len(standard_deviations) == number_of_trials)
 
                 ranking_dict[score] = rankings
                 averages_dict[score] = averages
@@ -227,8 +220,8 @@ class SearchCVParser:
                 train_score_averages = searcher.cv_results_['mean_train_score'].tolist()
                 train_score_standard_deviations = searcher.cv_results_['std_train_score'].tolist()
 
-                assert_true(len(train_score_averages) == number_of_iterations)
-                assert_true(len(train_score_standard_deviations) == number_of_iterations)
+                assert_true(len(train_score_averages) == number_of_trials)
+                assert_true(len(train_score_standard_deviations) == number_of_trials)
 
                 cv_results_dict['train_score_averages'] = {score_names[0]: train_score_averages}
                 cv_results_dict['train_score_standard_deviations'] = {score_names[0]:
@@ -240,8 +233,8 @@ class SearchCVParser:
                     averages = searcher.cv_results_['mean_train_' + score].tolist()
                     standard_deviations = searcher.cv_results_['std_train_' + score].tolist()
 
-                    assert_true(len(averages) == number_of_iterations)
-                    assert_true(len(standard_deviations) == number_of_iterations)
+                    assert_true(len(averages) == number_of_trials)
+                    assert_true(len(standard_deviations) == number_of_trials)
 
                     averages_dict[score] = averages
                     standard_deviations_dict[score] = standard_deviations
@@ -256,9 +249,9 @@ class SearchCVParser:
                     for key in averages.keys():
                         cv_results_dict['train_score_averages'][key] = [-1 * x for x in averages[key]]
 
-        assert_true(len(searcher.cv_results_['params']) == number_of_iterations)
+        assert_true(len(searcher.cv_results_['params']) == number_of_trials)
 
-        cv_results_dict['parameter_iterations'] = [
+        cv_results_dict['parameter_trials'] = [
             {key: string_if_not_number(value) for key, value in searcher.cv_results_['params'][index].items()}
             for index in range(len(searcher.cv_results_['params']))
         ]
@@ -268,19 +261,32 @@ class SearchCVParser:
         score_time_averages = searcher.cv_results_['mean_score_time'].tolist()
         score_time_standard_deviations = searcher.cv_results_['std_score_time'].tolist()
 
-        assert_true(len(fit_time_averages) == number_of_iterations)
-        assert_true(len(fit_time_standard_deviations) == number_of_iterations)
-        assert_true(len(score_time_averages) == number_of_iterations)
-        assert_true(len(score_time_standard_deviations) == number_of_iterations)
+        assert_true(len(fit_time_averages) == number_of_trials)
+        assert_true(len(fit_time_standard_deviations) == number_of_trials)
+        assert_true(len(score_time_averages) == number_of_trials)
+        assert_true(len(score_time_standard_deviations) == number_of_trials)
 
         cv_results_dict['timings'] = {'fit time averages': fit_time_averages,
                                       'fit time standard deviations': fit_time_standard_deviations,
                                       'score time averages': score_time_averages,
                                       'score time standard deviations': score_time_standard_deviations}
 
-        return cv_results_dict
+        return MLExperimentResults(cv_dict=cv_results_dict)
 
-    def to_dataframe(self, sort_by_score: bool = True):
+    @classmethod
+    def from_yaml_file(cls, yaml_file_name):
+        """This method creates a MLExperimentResults object from a yaml file created by `to_yaml_file()`"""
+        with open(yaml_file_name, 'r') as file:
+            cv_dict = yaml.safe_load(file)
+
+        return MLExperimentResults(cv_dict=cv_dict)
+
+    def to_yaml_file(self, yaml_file_name: str):
+        """This method saves the self._cv_dict dictionary to a yaml file."""
+        with open(yaml_file_name, 'w') as file:
+            yaml.dump(self._cv_dict, file, default_flow_style=False, sort_keys=False)
+
+    def to_dataframe(self, sort_by_score: bool = True) -> pd.DataFrame:
         """This function converts the score information from the SearchCV object into a pd.DataFrame.
 
         Params:
@@ -289,11 +295,10 @@ class SearchCVParser:
                 Secondary scores are not considered.
 
         Returns:
-            a DataFrame containing score information for each cross-validation iteration. A single row
-            corresponds to one iteration (i.e. one set of hyper-parameters that were cross-validated).
+            a DataFrame containing score information for each cross-validation trial. A single row
+            corresponds to one trial (i.e. one set of hyper-parameters that were cross-validated).
         """
         if self._cv_dataframe is None:
-
             for score_name in self.score_names:
                 confidence_intervals = st.t.interval(alpha=0.95,  # confidence interval
                                                      # number_of_splits is sample-size
@@ -312,7 +317,7 @@ class SearchCVParser:
                 )
 
             self._cv_dataframe = pd.concat([self._cv_dataframe,
-                                            pd.DataFrame.from_dict(self.parameter_iterations)],  # noqa
+                                            pd.DataFrame.from_dict(self.parameter_trials)],  # noqa
                                            axis=1)
 
             if self.parameter_names_mapping:
@@ -336,7 +341,7 @@ class SearchCVParser:
         Styler object, formatted accordingly.
 
         The Hyper-Parameter columns will be highlighted in blue where the primary
-        score (i.e. first column) for the iteration (i.e. the row i.e. the combination of hyper-parameters
+        score (i.e. first column) for the trial (i.e. the row i.e. the combination of hyper-parameters
         that were cross validated) is within 1 standard error of the top primary score (i.e. first column
         first row).
 
@@ -395,7 +400,7 @@ class SearchCVParser:
 
                 cv_dataframe.pipe(hstyle.format, round_by=round_by, hide_index=True)
 
-            # highlight iterations whose primary score (i.e. first column of `results` dataframe) is within
+            # highlight trials whose primary score (i.e. first column of `results` dataframe) is within
             # 1 standard error of the top primary score (i.e. first column first row).
             # pylint: disable=invalid-name, unused-argument
             def highlight_cols(s):   # noqa
@@ -415,7 +420,7 @@ class SearchCVParser:
     ####
     @property
     def description(self):
-        """the description passed to `run_description`."""
+        """the description passed to `description`."""
         return self._cv_dict['description']
 
     @property
@@ -483,13 +488,13 @@ class SearchCVParser:
         return self._cv_dict.get('train_score_standard_deviations')
 
     @property
-    def parameter_iterations(self) -> list:
-        """The "iterations" i.e. the hyper-parameter combinations in order of execution."""
-        return self._cv_dict['parameter_iterations']
+    def parameter_trials(self) -> list:
+        """The "trials" i.e. the hyper-parameter combinations in order of execution."""
+        return self._cv_dict['parameter_trials']
 
-    def iteration_labels(self, order_from_best_to_worst=True) -> List[str]:
-        """An iteration is a set of hyper-parameters that were cross validated. The corresponding label for
-        each iteration is a single string containing all of the hyper-parameter names and values in the format
+    def trial_labels(self, order_from_best_to_worst=True) -> List[str]:
+        """An trial is a set of hyper-parameters that were cross validated. The corresponding label for
+        each trial is a single string containing all of the hyper-parameter names and values in the format
         of `{param1: value1, param2: value2}`.
 
         Params:
@@ -500,20 +505,20 @@ class SearchCVParser:
         Returns:
             a pd.Series the same length as `number_of_trials` containing a str
         """
-        def create_hyper_param_labels(iteration) -> list:
+        def create_hyper_param_labels(trial) -> list:
             """Creates a list of strings that represent the name/value pair for each hyper-parameter."""
-            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping  else x}: {iteration[x]}"  # pylint: disable=line-too-long  # noqa
+            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping  else x}: {trial[x]}"  # pylint: disable=line-too-long  # noqa
                     for x in self.parameter_names_original]
-        # create_hyper_param_labels(iteration=self.parameter_iterations[0])
+        # create_hyper_param_labels(trial=self.parameter_trials[0])
 
-        def create_trial_label(iteration) -> str:
-            return f"{{{hstring.collapse(create_hyper_param_labels(iteration), separate=', ')}}}"
-        # create_trial_label(iteration=self.parameter_iterations[0])
+        def create_trial_label(trial) -> str:
+            return f"{{{hstring.collapse(create_hyper_param_labels(trial), separate=', ')}}}"
+        # create_trial_label(trial=self.parameter_trials[0])
 
-        labels = [create_trial_label(x) for x in self.parameter_iterations]
+        labels = [create_trial_label(x) for x in self.parameter_trials]
 
         if order_from_best_to_worst:
-            labels = [x for _, x in sorted(zip(self.primary_score_iteration_ranking, labels))]
+            labels = [x for _, x in sorted(zip(self.primary_score_trial_ranking, labels))]
 
         return labels
 
@@ -526,11 +531,11 @@ class SearchCVParser:
     # The following properties are additional helpers
     ####
     @property
-    def number_of_iterations(self) -> int:
-        """"A single trial contains the cross validation runs for a single set of hyper-parameters. The
+    def number_of_trials(self) -> int:
+        """"A single trial contains the cross validation results for a single set of hyper-parameters. The
         'number of trials' is basically the number of combinations of different hyper-parameters that were
         cross validated."""
-        return len(self.parameter_iterations)
+        return len(self.parameter_trials)
 
     @property
     def numeric_parameters(self) -> List[str]:
@@ -555,23 +560,23 @@ class SearchCVParser:
     @property
     def primary_score_averages(self) -> np.array:
         """The first scorer passed to the SearchCV will be treated as the primary score. This property returns
-        the average score (across all splits) for each iteration. Note that the average scores are
+        the average score (across all splits) for each trial. Note that the average scores are
         the weighted averages
         https://stackoverflow.com/questions/44947574/what-is-the-meaning-of-mean-test-score-in-cv-result"""
         return np.array(self.test_score_averages[self.primary_score_name])
 
     def score_standard_errors(self, score_name: str) -> np.array:
         """The first scorer passed to the SearchCV will be treated as the primary score. This property returns
-        the standard error associated with the mean score of each iteration, for the primary score."""
+        the standard error associated with the mean score of each trial, for the primary score."""
         score_standard_deviations = self.test_score_standard_deviations[score_name]
         return np.array(score_standard_deviations) / math.sqrt(self.number_of_splits)
 
     @property
-    def primary_score_iteration_ranking(self) -> np.array:
+    def primary_score_trial_ranking(self) -> np.array:
         """The ranking of the corresponding index, in terms of best to worst score.
 
         e.g. [5, 6, 7, 8, 3, 4, 1, 2]
-            This means that the 6th index/iteration had the highest ranking (1); and that the 3rd index had
+            This means that the 6th index/trial had the highest ranking (1); and that the 3rd index had
             the worst ranking (8)
 
         This differs from `primary_score_best_indexes` which returns the order of indexes from best to worst.
@@ -579,15 +584,15 @@ class SearchCVParser:
         6 because the best score is at index 6. The last value in the array 3, because the worst score is at
         index 3.
 
-        Note that `primary_score_iteration_ranking` starts at 1 while primary_score_best_indexes starts at 0.
+        Note that `primary_score_trial_ranking` starts at 1 while primary_score_best_indexes starts at 0.
         """
         return np.array(self.test_score_rankings[self.primary_score_name])
 
     @property
     def primary_score_best_indexes(self) -> np.array:
         """The indexes of best to worst primary scores. See documentation for
-        `primary_score_iteration_ranking` to understand the differences between the two properties."""
-        return np.argsort(self.primary_score_iteration_ranking)
+        `primary_score_trial_ranking` to understand the differences between the two properties."""
+        return np.argsort(self.primary_score_trial_ranking)
 
     @property
     def best_primary_score_index(self) -> int:
@@ -600,7 +605,7 @@ class SearchCVParser:
         The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated
         with the primary score.
         """
-        best_params = self.parameter_iterations[self.best_primary_score_index]
+        best_params = self.parameter_trials[self.best_primary_score_index]
 
         if self.parameter_names_mapping:
             best_params = {self.parameter_names_mapping[key]: value for key, value in best_params.items()}
@@ -622,7 +627,7 @@ class SearchCVParser:
 
     @property
     def indexes_within_1_standard_error(self) -> list:
-        """Returns the iteration indexes where the primary scores (i.e. first scorer
+        """Returns the trial indexes where the primary scores (i.e. first scorer
         passed to SearchCV object; i.e. first column of the to_dataframe() DataFrame) are within 1 standard
         error of the highest primary score."""
         cv_dataframe = self.to_dataframe(sort_by_score=True)
@@ -637,8 +642,8 @@ class SearchCVParser:
     @property
     def fit_time_averages(self) -> np.array:
         """
-        Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
-        Each value is the average number of seconds that the iteration took to fit the model, per split
+        Returns a list of floats; one value for each trial (i.e. a single set of hyper-params).
+        Each value is the average number of seconds that the trial took to fit the model, per split
         (i.e. the average fit time of all splits).
         """
         return np.array(self.timings['fit time averages'])
@@ -646,8 +651,8 @@ class SearchCVParser:
     @property
     def fit_time_standard_deviations(self) -> np.array:
         """
-        Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
-        Each value is the standard deviation of seconds that the iteration took to fit the model, per split
+        Returns a list of floats; one value for each trial (i.e. a single set of hyper-params).
+        Each value is the standard deviation of seconds that the trial took to fit the model, per split
         (i.e. the standard deviation of fit time across all splits).
         """
         return np.array(self.timings['fit time standard deviations'])
@@ -655,8 +660,8 @@ class SearchCVParser:
     @property
     def score_time_averages(self) -> np.array:
         """
-        Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
-        Each value is the average number of seconds that the iteration took to score the model, per split
+        Returns a list of floats; one value for each trial (i.e. a single set of hyper-params).
+        Each value is the average number of seconds that the trial took to score the model, per split
         (i.e. the average score time of all splits).
         """
         return np.array(self.timings['score time averages'])
@@ -664,52 +669,52 @@ class SearchCVParser:
     @property
     def score_time_standard_deviations(self) -> np.array:
         """
-        Returns a list of floats; one value for each iteration (i.e. a single set of hyper-params).
-        Each value is the standard deviation of seconds that the iteration took to score the model, per split
+        Returns a list of floats; one value for each trial (i.e. a single set of hyper-params).
+        Each value is the standard deviation of seconds that the trial took to score the model, per split
         (i.e. the standard deviation of score time across all splits).
         """
         return np.array(self.timings['score time standard deviations'])
 
     @property
-    def iteration_fit_times(self) -> np.array:
-        """For each iteration, it is the amount of time it took to fit the model.
+    def trial_fit_times(self) -> np.array:
+        """For each trial, it is the amount of time it took to fit the model.
 
-        Calculated by Average fit time for each iteration multiplied by the number of splits per iteration.
+        Calculated by Average fit time for each trial multiplied by the number of splits per trial.
 
         self.fit_time_averages * self.number_of_splits
 
         Returns:
-            array containing the fit time for each iteration
+            array containing the fit time for each trial
         """
         return self.fit_time_averages * self.number_of_splits
 
     @property
     def fit_time_total(self) -> float:
-        """Total fit time across all iterations."""
-        return float(np.sum(self.iteration_fit_times))
+        """Total fit time across all trials."""
+        return float(np.sum(self.trial_fit_times))
 
     @property
-    def iteration_score_times(self) -> np.array:
-        """For each iteration, it is the amount of time it took to score the model.
+    def trial_score_times(self) -> np.array:
+        """For each trial, it is the amount of time it took to score the model.
 
-        Calculated by Average score time for each iteration multiplied by the number of splits per iteration.
+        Calculated by Average score time for each trial multiplied by the number of splits per trial.
 
         self.score_time_averages * self.number_of_splits
 
         Returns:
-            array containing the score time for each iteration
+            array containing the score time for each trial
         """
         return self.score_time_averages * self.number_of_splits
 
     @property
     def score_time_total(self) -> float:
-        """Total score time across all iterations."""
-        return float(np.sum(self.iteration_score_times))
+        """Total score time across all trials."""
+        return float(np.sum(self.trial_score_times))
 
     @property
     def average_time_per_trial(self) -> float:
         """Average time per trial"""
-        return float(np.mean(self.iteration_fit_times + self.iteration_score_times))
+        return float(np.mean(self.trial_fit_times + self.trial_score_times))
 
     @property
     def total_time(self) -> float:
