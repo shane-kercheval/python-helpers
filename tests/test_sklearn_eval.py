@@ -4,6 +4,7 @@ import warnings  # noqa
 
 import numpy as np
 import pandas as pd
+import plotly
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.impute import SimpleImputer
@@ -66,7 +67,8 @@ class TestSklearnEval(unittest.TestCase):
                 'preparation__non_numeric_pipeline__encoder_chooser__transformer': [OneHotEncoder(),
                                                                                     CustomOrdinalEncoder()],
                 'model__max_features': [100, 'auto'],
-                'model__n_estimators': [10, 50]
+                'model__n_estimators': [10, 50],
+                'model__min_samples_split': [2],  # test zero-variance params
             },
         ]
         # https://github.com/scikit-learn/scikit-learn/blob/2beed55847ee70d363bdbfe14ee4401438fba057/sklearn_eval/metrics/_scorer.py#L702
@@ -155,6 +157,7 @@ class TestSklearnEval(unittest.TestCase):
 
     def test_MLExperimentResults_gridsearch_classification(self):
         new_param_column_names = {'model__max_features': 'max_features',
+                                  'model__min_samples_split': 'min_samples_split',
                                   'model__n_estimators': 'n_estimators',
                                   'preparation__non_numeric_pipeline__encoder_chooser__transformer':
                                       'encoder'}
@@ -212,23 +215,23 @@ class TestSklearnEval(unittest.TestCase):
             self.assertTrue(all(np.array(parser.test_score_rankings[score]) == grid_search_credit.cv_results_[f'rank_test_{score}']))
 
         self.assertEqual(parser.trial_labels(order_from_best_to_worst=True),
-                         ['{max_features: auto, n_estimators: 50, encoder: OneHotEncoder()}',
-                          '{max_features: auto, n_estimators: 50, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: auto, n_estimators: 10, encoder: OneHotEncoder()}',
-                          '{max_features: auto, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: 100, n_estimators: 10, encoder: OneHotEncoder()}',
-                          '{max_features: 100, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: 100, n_estimators: 50, encoder: OneHotEncoder()}',
-                          '{max_features: 100, n_estimators: 50, encoder: CustomOrdinalEncoder()}'])
+                         ['{max_features: auto, min_samples_split: 2, n_estimators: 50, encoder: OneHotEncoder()}',
+                          '{max_features: auto, min_samples_split: 2, n_estimators: 50, encoder: CustomOrdinalEncoder()}',
+                          '{max_features: auto, min_samples_split: 2, n_estimators: 10, encoder: OneHotEncoder()}',
+                          '{max_features: auto, min_samples_split: 2, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
+                          '{max_features: 100, min_samples_split: 2, n_estimators: 10, encoder: OneHotEncoder()}',
+                          '{max_features: 100, min_samples_split: 2, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
+                          '{max_features: 100, min_samples_split: 2, n_estimators: 50, encoder: OneHotEncoder()}',
+                          '{max_features: 100, min_samples_split: 2, n_estimators: 50, encoder: CustomOrdinalEncoder()}'])
         self.assertEqual(parser.trial_labels(order_from_best_to_worst=False),
-                         ['{max_features: 100, n_estimators: 10, encoder: OneHotEncoder()}',
-                          '{max_features: 100, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: 100, n_estimators: 50, encoder: OneHotEncoder()}',
-                          '{max_features: 100, n_estimators: 50, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: auto, n_estimators: 10, encoder: OneHotEncoder()}',
-                          '{max_features: auto, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
-                          '{max_features: auto, n_estimators: 50, encoder: OneHotEncoder()}',
-                          '{max_features: auto, n_estimators: 50, encoder: CustomOrdinalEncoder()}'])
+                         ['{max_features: 100, min_samples_split: 2, n_estimators: 10, encoder: OneHotEncoder()}',
+                          '{max_features: 100, min_samples_split: 2, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
+                          '{max_features: 100, min_samples_split: 2, n_estimators: 50, encoder: OneHotEncoder()}',
+                          '{max_features: 100, min_samples_split: 2, n_estimators: 50, encoder: CustomOrdinalEncoder()}',
+                          '{max_features: auto, min_samples_split: 2, n_estimators: 10, encoder: OneHotEncoder()}',
+                          '{max_features: auto, min_samples_split: 2, n_estimators: 10, encoder: CustomOrdinalEncoder()}',
+                          '{max_features: auto, min_samples_split: 2, n_estimators: 50, encoder: OneHotEncoder()}',
+                          '{max_features: auto, min_samples_split: 2, n_estimators: 50, encoder: CustomOrdinalEncoder()}'])
 
         def assert_np_arrays_are_close(array1, array2):
             self.assertEqual(len(array1), len(array2))
@@ -247,8 +250,13 @@ class TestSklearnEval(unittest.TestCase):
         self.assertRaises(AssertionError,
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
 
+        cv_dataframe = parser.to_dataframe(exclude_zero_variance_params=False)
+        self.assertTrue('min_samples_split' in cv_dataframe.columns)
+        self.assertTrue(all(cv_dataframe['min_samples_split'] == [2, 2, 2, 2, 2, 2, 2, 2]))
+
         self.assertEqual(list(parser.primary_score_best_indexes), list(parser.to_dataframe().index))
         cv_dataframe = parser.to_dataframe().sort_index()
+        self.assertFalse('min_samples_split' in cv_dataframe.columns)
         hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
 
         labeled_dataframe = parser.to_labeled_dataframe()
@@ -270,13 +278,16 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(list(grid_search_credit.cv_results_['param_model__max_features'].data),
                          cv_dataframe[parser.parameter_names[0]].tolist())
         self.assertEqual(list(grid_search_credit.cv_results_['param_model__n_estimators'].data),
-                         cv_dataframe[parser.parameter_names[1]].tolist())
+                         cv_dataframe[parser.parameter_names[2]].tolist())
         encoder_param_name = 'param_preparation__non_numeric_pipeline__encoder_chooser__transformer'
         encoder_values = [str(x) for x in list(grid_search_credit.cv_results_[encoder_param_name].data)]
-        self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[2]].tolist())
+        self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[3]].tolist())
 
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores.html', 'w') as file:
             file.write(parser.to_formatted_dataframe().render())
+
+        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores_2.html', 'w') as file:
+            file.write(parser.to_formatted_dataframe(exclude_zero_variance_params=False).render())
 
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__primary_score_only.html', 'w') as file:
             file.write(parser.to_formatted_dataframe(primary_score_only=True).render())
@@ -388,7 +399,17 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.best_primary_score,
                          np.nanmax(grid_search_credit.cv_results_['mean_test_ROC/AUC']))
 
-        self.assertTrue(all([parser.to_dataframe().loc[parser.best_primary_score_index, key] == value
+        self.assertEqual(parser.parameter_names_original,
+                         ['model__max_features',
+                          'model__min_samples_split',
+                          'model__n_estimators',
+                          'preparation__non_numeric_pipeline__encoder_chooser__transformer'])
+        self.assertEqual(parser.parameter_names,
+                         ['max_features', 'min_samples_split', 'n_estimators', 'encoder'])
+        self.assertEqual(list(parser.best_primary_score_params.keys()),
+                         ['max_features', 'min_samples_split', 'n_estimators', 'encoder'])
+
+        self.assertTrue(all([parser.to_dataframe(exclude_zero_variance_params=False).loc[parser.best_primary_score_index, key] == value
                              for key, value in parser.best_primary_score_params.items()]))
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
@@ -821,6 +842,38 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertEqual(parser.best_primary_score, parser_from_dict.best_primary_score)
         self.assertEqual(parser.best_primary_score, parser_from_yaml.best_primary_score)
+
+    def test_MLExperimentResults_plots(self):
+        new_param_column_names = {'model__max_features': 'max_features',
+                                  'model__n_estimators': 'n_estimators',
+                                  'preparation__non_numeric_pipeline__encoder_chooser__transformer':
+                                      'encoder'}
+        parser = MLExperimentResults.from_sklearn_search_cv(searcher= self.credit_data__grid_search,
+                                                            higher_score_is_better=True,
+                                                            description="test description",
+                                                            parameter_name_mappings=new_param_column_names)
+        _ = parser.plot_performance_across_trials()
+        _ = parser.plot_parameter_values_across_trials()
+        _ = parser.plot_parallel_coordinates()
+        _ = parser.plot_scatter()
+
+        parser = MLExperimentResults.from_sklearn_search_cv(searcher=self.credit_data__grid_search__roc_auc,
+                                                            higher_score_is_better=True,
+                                                            description="test description",
+                                                            parameter_name_mappings=None)
+        _ = parser.plot_performance_across_trials()
+        _ = parser.plot_parameter_values_across_trials()
+        _ = parser.plot_parallel_coordinates()
+        _ = parser.plot_scatter()
+
+        parser = MLExperimentResults.from_sklearn_search_cv(searcher=self.housing_data__grid_search,
+                                                            higher_score_is_better=False,
+                                                            description="test description")
+        _ = parser.plot_performance_across_trials()
+        _ = parser.plot_parameter_values_across_trials()
+        _ = parser.plot_parallel_coordinates()
+        _ = parser.plot_scatter()
+        # plotly.offline.plot(_, filename=get_test_path() + '/test_files/sklearn_eval/temp.html', auto_open=True)
 
     def test_TwoClassEvaluator(self):
         y_true = self.credit_data__y_test

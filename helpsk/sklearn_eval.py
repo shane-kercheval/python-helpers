@@ -8,6 +8,7 @@ from typing import Tuple, Union, Optional, List, Dict
 
 import numpy as np
 import pandas as pd
+import plotly
 import scipy.stats as st
 import seaborn as sns
 from plotly.graph_objs import _figure  # noqa
@@ -59,10 +60,9 @@ class MLExperimentResults:
     def __init__(self, experiment_dict: dict):
         """This method creates a MLExperimentResults object from a dictionary.
 
-        Params:
-            cv_dict:
+        Args:
+            experiment_dict:
                 a dictionary with the following format, as an example:
-
 
             - `description`: any text to provide context into the ML experiment
             - `cross_validation_type`: any text
@@ -89,7 +89,6 @@ class MLExperimentResults:
                 for each of the hyper-parameters, the name of the hyper-parameter as the key and the
                 corresponding value
             - `timings`: (optional) A list of timings for fitting/scoring
-
 
             ```
             {
@@ -229,7 +228,7 @@ class MLExperimentResults:
         sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV), which are converted to
         a dictionary with the hierarchy expected by the MLExperimentResults class.
 
-        Params:
+        Args:
             searcher:
                 A `BaseSearchCV` object that has either used a string passed to the `scoring` parameter of the
                 constructor (e.g. `GridSearchCV(..., scoring='auc', ...)` or a dictionary with metric
@@ -425,14 +424,19 @@ class MLExperimentResults:
         with open(yaml_file_name, 'w') as file:
             yaml.dump(self._dict, file, default_flow_style=False, sort_keys=False)
 
-    def to_dataframe(self, sort_by_score: bool = True) -> pd.DataFrame:
+    def to_dataframe(self,
+                     sort_by_score: bool = True,
+                     exclude_zero_variance_params: bool = True) -> pd.DataFrame:
         """This function converts the score information from the SearchCV object into a pd.DataFrame.
 
-        Params:
+        Args:
             sort_by_score:
                 if True, sorts the dataframe starting with the best (primary) score to the worst score.
                 Secondary scores are not considered. If False, leave the results in the order that the trials
                 were executed.
+
+            exclude_zero_variance_params:
+                if True, exclude columns that only have 1 unique value
 
         Returns:
             a DataFrame containing score information for each cross-validation trial. A single row
@@ -465,6 +469,10 @@ class MLExperimentResults:
 
         copy = self._dataframe.copy(deep=True)
 
+        if exclude_zero_variance_params:
+            zero_variance_columns = [x for x in self.parameter_names if len(copy[x].unique()) == 1]
+            copy = copy.drop(columns=zero_variance_columns)
+
         if sort_by_score:
             copy = copy.iloc[self.primary_score_best_indexes]
 
@@ -475,7 +483,7 @@ class MLExperimentResults:
                                round_by: int = 3,
                                num_rows: int = 50,
                                primary_score_only: bool = False,
-                               exclude_no_variance_params: bool = True,
+                               exclude_zero_variance_params: bool = True,
                                return_style: bool = True,
                                sort_by_score: bool = True) -> Union[pd.DataFrame, Styler]:
         """This function converts the score information from the SearchCV object into a pd.DataFrame or a
@@ -493,7 +501,7 @@ class MLExperimentResults:
                 the number of rows to return in the resulting DataFrame.
             primary_score_only:
                 if True, then only include the primary score.
-            exclude_no_variance_params:
+            exclude_zero_variance_params:
                 if True, exclude columns that only have 1 unique value
             return_style:
                 If True, return Styler object, else return pd.DataFrame
@@ -504,12 +512,9 @@ class MLExperimentResults:
         Returns:
             Returns either pd.DataFrame or pd.DataFrame.Styler.
         """
-        cv_dataframe = self.to_dataframe(sort_by_score=sort_by_score)
+        cv_dataframe = self.to_dataframe(sort_by_score=sort_by_score,
+                                         exclude_zero_variance_params=exclude_zero_variance_params)
         cv_dataframe = cv_dataframe.head(num_rows)
-
-        if exclude_no_variance_params:
-            columns_to_drop = [x for x in self.parameter_names if len(cv_dataframe[x].unique()) == 1]
-            cv_dataframe = cv_dataframe.drop(columns=columns_to_drop)
 
         score_columns = list(cv_dataframe.columns[cv_dataframe.columns.str.endswith((' Mean',
                                                                                      ' 95CI.LO',
@@ -660,7 +665,7 @@ class MLExperimentResults:
         each trial is a single string containing all of the hyper-parameter names and values in the format
         of `{param1: value1, param2: value2}`.
 
-        Params:
+        Args:
             order_from_best_to_worst: if True, returns the labels in order from the best score to the worst
             score, which should match the ordered of .to_dataframe() or .to_formatted_dataframe()` using the
             default values for those functions. If False, returns the labels in order that they were ran by
@@ -888,17 +893,35 @@ class MLExperimentResults:
         return self.fit_time_total + self.score_time_total
 
     def plot_performance_across_trials(self,
-                                       size=None,
-                                       color=None,
-                                       color_continuous_scale=px.colors.diverging.balance,
-                                       height=600,
-                                       width=600 * GOLDEN_RATIO):
+                                       size: str = None,
+                                       color: str = None,
+                                       color_continuous_scale: List[str] = px.colors.diverging.balance,
+                                       height: float = 600,
+                                       width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        """
+        Returns a Plotly Figure (scatter-plot) of the primary score (y-axis) in order of trial execution
+        (x-axis). Especially useful for e.g. BayesSearchCV.
+
+        Args:
+            size:
+                The name of a hyper-parameter, the values of which will be used to determine the size of the
+                corresponding points in the plot. This value is passed to plotly.
+            color:
+                The name of a hyper-parameter, the values of which will be used to determine the color of the
+                corresponding points in the plot. This value is passed to plotly.
+            color_continuous_scale:
+                A list of strings that should contain valid CSS-colors. This value is passed to plotly.
+            height:
+                The height of the plot. This value is passed to plotly.
+            width:
+                The width of the plot. This value is passed to plotly.
+        """
         score_column = self.primary_score_name + " Mean"
 
         title = f"Performance Over Time (Across Trials)<br>" \
                 f"<sup>This graph shows the average CV score across all trials, in order of execution.</sup>"
         if size is not None:
-            title = title + f"<br><sup>Size of point corresponds to '{size}'</sup>"
+            title = title + f"<br><sup>The size of point corresponds to the value of '{size}'.</sup>"
 
         fig = px.scatter(
             data_frame=self.to_labeled_dataframe(),
@@ -926,9 +949,23 @@ class MLExperimentResults:
         return fig
 
     def plot_parameter_values_across_trials(self,
-                                            color_continuous_scale=px.colors.diverging.RdYlGn,
-                                            height=600,
-                                            width=600 * GOLDEN_RATIO):
+                                            height: float = 600,
+                                            width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        """
+        Returns a Plotly Figure (scatter-plot per numeric parameter) of the parameter's values (y-axis) in
+        order of trial execution (x-axis). Especially useful for e.g. BayesSearchCV.
+
+        Args:
+            height:
+                The height of the plot. This value is passed to plotly.
+            width:
+                The width of the plot. This value is passed to plotly.
+        """
+        if self.higher_score_is_better:
+            color_continuous_scale = px.colors.diverging.RdYlGn
+        else:
+            color_continuous_scale = px.colors.diverging.RdYlGn_r  # noqa
+
         score_column = self.primary_score_name + " Mean"
         labeled_long = pd.melt(self.to_labeled_dataframe(),
                                id_vars=['Trial Index', score_column, 'label'],
@@ -949,7 +986,7 @@ class MLExperimentResults:
             },
             title="Parameter Values Evaluated Over Time (Across Trials)<br>"
                   "<sup>This graph shows the parameter values evaluated across all trials.<br>"
-                  "The color is the average CV score is shown.</sup>",
+                  "The color corresponds to the average CV score associated with that trial/point.</sup>",
             custom_data=['label', score_column],
             height=height,
             width=width,
@@ -963,6 +1000,85 @@ class MLExperimentResults:
             ])
         )
         fig.update_yaxes(matches=None, showticklabels=True)
+        return fig
+
+    def plot_parallel_coordinates(self,
+                                  include_all_scores: bool = True,
+                                  height: float = 600,
+                                  width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        """
+        Returns a Plotly Figure (parallel-coordinates) of the numeric parameters' values (y-axis), along with
+        the corresponding score averages.
+
+        Args:
+            include_all_scores:
+                Only applicable if the results have multiple scores.
+                If True, includes all of the scores. If False, includes only the primary score.
+            height:
+                The height of the plot. This value is passed to plotly.
+            width:
+                The width of the plot. This value is passed to plotly.
+        """
+        if self.higher_score_is_better:
+            color_continuous_scale = px.colors.diverging.RdYlGn
+        else:
+            color_continuous_scale = px.colors.diverging.RdYlGn_r  # noqa
+
+        primary_score_column = self.primary_score_name + " Mean"
+
+        if include_all_scores:
+            score_columns = [score + " Mean" for score in self.score_names]
+        else:
+            score_columns = [primary_score_column]
+
+        fig = px.parallel_coordinates(
+            # NOTE: sort_by_score=False because there is a weird bug in plotly such that if the index is
+            # not 0-x than the order seems to get messed up
+            # https://github.com/plotly/plotly.py/issues/3576
+            self.to_dataframe(sort_by_score=False)[self.numeric_parameters + score_columns].dropna(axis=0),
+            color=primary_score_column,
+            color_continuous_scale=color_continuous_scale,
+            height=height,
+            width=width,
+            title=f"Parallel Coordinates of Hyper-Parameters and Score Averages<br>"
+        )
+        # plotly.offline.plot(fig, filename='temp.html', auto_open=True)
+        return fig
+
+    def plot_scatter(self,
+                     include_all_scores: bool = True,
+                     height: float = 600,
+                     width: float = 600 * GOLDEN_RATIO
+                     ):
+        """
+        Returns a Plotly Figure (scatter-matrix) of the all parameters and scores.
+
+        Args:
+            include_all_scores:
+                Only applicable if the results have multiple scores.
+                If True, includes all of the scores. If False, includes only the primary score.
+            height:
+                The height of the plot. This value is passed to plotly.
+            width:
+                The width of the plot. This value is passed to plotly.
+        """
+        if self.higher_score_is_better:
+            color_continuous_scale = px.colors.diverging.RdYlGn
+        else:
+            color_continuous_scale = px.colors.diverging.RdYlGn_r  # noqa
+
+        primary_score_column = self.primary_score_name + " Mean"
+
+        if include_all_scores:
+            score_columns = [score + " Mean" for score in self.score_names]
+        else:
+            score_columns = [primary_score_column]
+
+        fig = px.scatter_matrix(self.to_dataframe()[score_columns + self.parameter_names],
+                                color=primary_score_column,
+                                color_continuous_scale=color_continuous_scale,
+                                height=height,
+                                width=width)
         return fig
 
 

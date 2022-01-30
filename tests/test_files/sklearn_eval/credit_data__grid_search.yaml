@@ -9,10 +9,12 @@ score_names:
 - True Pos. Rate
 parameter_names:
 - model__max_features
+- model__min_samples_split
 - model__n_estimators
 - preparation__non_numeric_pipeline__encoder_chooser__transformer
 parameter_names_mapping:
   model__max_features: max_features
+  model__min_samples_split: min_samples_split
   model__n_estimators: n_estimators
   preparation__non_numeric_pipeline__encoder_chooser__transformer: encoder
 test_score_rankings:
@@ -202,63 +204,71 @@ train_score_standard_deviations:
   - 0.0
 parameter_trials:
 - model__max_features: 100
+  model__min_samples_split: 2
   model__n_estimators: 10
   preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
 - model__max_features: 100
+  model__min_samples_split: 2
   model__n_estimators: 10
   preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
 - model__max_features: 100
+  model__min_samples_split: 2
   model__n_estimators: 50
   preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
 - model__max_features: 100
+  model__min_samples_split: 2
   model__n_estimators: 50
   preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
 - model__max_features: auto
+  model__min_samples_split: 2
   model__n_estimators: 10
   preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
 - model__max_features: auto
+  model__min_samples_split: 2
   model__n_estimators: 10
   preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
 - model__max_features: auto
+  model__min_samples_split: 2
   model__n_estimators: 50
   preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
 - model__max_features: auto
+  model__min_samples_split: 2
   model__n_estimators: 50
   preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
 timings:
   fit time averages:
-  - 0.010010798772176107
-  - 0.018862326939900715
-  - 0.016089359919230144
-  - 0.02609403928120931
-  - 0.017361958821614582
-  - 0.025690317153930664
-  - 0.051972389221191406
-  - 0.061177333196004234
+  - 0.025992870330810547
+  - 0.0492711067199707
+  - 0.055496613184611
+  - 0.08655524253845215
+  - 0.0350954532623291
+  - 0.057417710622151695
+  - 0.10764606793721516
+  - 0.1242055892944336
   fit time standard deviations:
-  - 0.000948867951510581
-  - 0.000149914717491459
-  - 3.689167469563963e-05
-  - 7.9428421948123e-05
-  - 0.002286663815688742
-  - 0.00016848317482036013
-  - 8.573681501558606e-05
-  - 9.12185730865216e-05
+  - 0.001156600301184602
+  - 0.0006167369296456982
+  - 0.0002582180958866888
+  - 0.0006013887366353045
+  - 0.0018250052849635384
+  - 0.0002839447722451487
+  - 0.008698253385289983
+  - 0.0009467158570967521
   score time averages:
   - 0.0
   - 0.0
   - 0.0
   - 0.0
-  - 0.009493430455525717
-  - 0.022210995356241863
-  - 0.014384031295776367
-  - 0.027113040288289387
+  - 0.02252499262491862
+  - 0.05374677975972494
+  - 0.03233647346496582
+  - 0.06455302238464355
   score time standard deviations:
   - 0.0
   - 0.0
   - 0.0
   - 0.0
-  - 0.00030266530948606257
-  - 5.83063292951367e-05
-  - 5.560931282497274e-05
-  - 0.00011739370802106665
+  - 0.0010359532871951405
+  - 0.0005106222582345106
+  - 0.001066942312469724
+  - 0.0003193902010313426
