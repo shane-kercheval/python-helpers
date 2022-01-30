@@ -892,6 +892,7 @@ class MLExperimentResults:
         """Total time it took across all trials"""
         return self.fit_time_total + self.score_time_total
 
+    # pylint: disable=dangerous-default-value
     def plot_performance_across_trials(self,
                                        size: str = None,
                                        color: str = None,
@@ -918,8 +919,8 @@ class MLExperimentResults:
         """
         score_column = self.primary_score_name + " Mean"
 
-        title = f"Performance Over Time (Across Trials)<br>" \
-                f"<sup>This graph shows the average CV score across all trials, in order of execution.</sup>"
+        title = "Performance Over Time (Across Trials)<br>" \
+                "<sup>This graph shows the average CV score across all trials, in order of execution.</sup>"
         if size is not None:
             title = title + f"<br><sup>The size of point corresponds to the value of '{size}'.</sup>"
 
@@ -961,10 +962,9 @@ class MLExperimentResults:
             width:
                 The width of the plot. This value is passed to plotly.
         """
-        if self.higher_score_is_better:
-            color_continuous_scale = px.colors.diverging.RdYlGn
-        else:
-            color_continuous_scale = px.colors.diverging.RdYlGn_r  # noqa
+        color_continuous_scale = px.colors.diverging.RdYlGn
+        if not self.higher_score_is_better:
+            color_continuous_scale = color_continuous_scale.reverse()
 
         score_column = self.primary_score_name + " Mean"
         labeled_long = pd.melt(self.to_labeled_dataframe(),
@@ -1019,10 +1019,9 @@ class MLExperimentResults:
             width:
                 The width of the plot. This value is passed to plotly.
         """
-        if self.higher_score_is_better:
-            color_continuous_scale = px.colors.diverging.RdYlGn
-        else:
-            color_continuous_scale = px.colors.diverging.RdYlGn_r  # noqa
+        color_continuous_scale = px.colors.diverging.RdYlGn
+        if not self.higher_score_is_better:
+            color_continuous_scale = color_continuous_scale.reverse()
 
         primary_score_column = self.primary_score_name + " Mean"
 
@@ -1062,10 +1061,9 @@ class MLExperimentResults:
             width:
                 The width of the plot. This value is passed to plotly.
         """
-        if self.higher_score_is_better:
-            color_continuous_scale = px.colors.diverging.RdYlGn
-        else:
-            color_continuous_scale = px.colors.diverging.RdYlGn_r  # noqa
+        color_continuous_scale = px.colors.diverging.RdYlGn
+        if not self.higher_score_is_better:
+            color_continuous_scale = color_continuous_scale.reverse()
 
         primary_score_column = self.primary_score_name + " Mean"
 
