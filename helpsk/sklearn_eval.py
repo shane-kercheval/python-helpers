@@ -887,6 +887,84 @@ class MLExperimentResults:
         """Total time it took across all trials"""
         return self.fit_time_total + self.score_time_total
 
+    def plot_performance_across_trials(self,
+                                       size=None,
+                                       color=None,
+                                       color_continuous_scale=px.colors.diverging.balance,
+                                       height=600,
+                                       width=600 * GOLDEN_RATIO):
+        score_column = self.primary_score_name + " Mean"
+
+        title = f"Performance Over Time (Across Trials)<br>" \
+                f"<sup>This graph shows the average CV score across all trials, in order of execution.</sup>"
+        if size is not None:
+            title = title + f"<br><sup>Size of point corresponds to '{size}'</sup>"
+
+        fig = px.scatter(
+            data_frame=self.to_labeled_dataframe(),
+            x='Trial Index',
+            y=score_column,
+            size=size,
+            color=color,
+            color_continuous_scale=color_continuous_scale,
+            trendline='lowess',
+            labels={
+                score_column: f"Average Cross Validation Score ({self.primary_score_name})",
+            },
+            title=title,
+            custom_data=['label'],
+            height=height,
+            width=width,
+        )
+        fig.update_traces(
+            hovertemplate="<br>".join([
+                "Trial Index: %{x}",
+                score_column + ": " + "%{y}",
+                "<br>Parameters: %{customdata[0]}",
+            ])
+        )
+        return fig
+
+    def plot_parameter_values_across_trials(self,
+                                            color_continuous_scale=px.colors.diverging.RdYlGn,
+                                            height=600,
+                                            width=600 * GOLDEN_RATIO):
+        score_column = self.primary_score_name + " Mean"
+        labeled_long = pd.melt(self.to_labeled_dataframe(),
+                               id_vars=['Trial Index', score_column, 'label'],
+                               value_vars=self.numeric_parameters,
+                               var_name='parameter')
+
+        fig = px.scatter(
+            data_frame=labeled_long,
+            x='Trial Index',
+            y='value',
+            color=score_column,
+            color_continuous_scale=color_continuous_scale,
+            facet_col='parameter',
+            facet_col_wrap=3,
+            trendline='lowess',
+            labels={
+                'value': 'Parameter Value',
+            },
+            title="Parameter Values Evaluated Over Time (Across Trials)<br>"
+                  "<sup>This graph shows the parameter values evaluated across all trials.<br>"
+                  "The color is the average CV score is shown.</sup>",
+            custom_data=['label', score_column],
+            height=height,
+            width=width,
+        )
+        fig.update_traces(
+            hovertemplate="<br>".join([
+                "Trial Index: %{x}",
+                "Parameter Value: %{y}",
+                score_column + ": %{customdata[1]}",
+                "<br>Parameters: %{customdata[0]}",
+            ])
+        )
+        fig.update_yaxes(matches=None, showticklabels=True)
+        return fig
+
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
