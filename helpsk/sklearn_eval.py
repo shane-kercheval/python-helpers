@@ -676,7 +676,7 @@ class MLExperimentResults:
         """
         def create_hyper_param_labels(trial) -> list:
             """Creates a list of strings that represent the name/value pair for each hyper-parameter."""
-            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping  else x}: {trial[x]}"  # pylint: disable=line-too-long  # noqa
+            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping and x in self.parameter_names_mapping else x}: {trial[x]}"  # pylint: disable=line-too-long  # noqa
                     for x in self.parameter_names_original]
         # create_hyper_param_labels(trial=self.parameter_trials[0])
 
