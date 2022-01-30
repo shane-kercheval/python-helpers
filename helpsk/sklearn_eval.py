@@ -1039,7 +1039,7 @@ class MLExperimentResults:
             color_continuous_scale=color_continuous_scale,
             height=height,
             width=width,
-            title=f"Parallel Coordinates of Hyper-Parameters and Score Averages<br>"
+            title="Parallel Coordinates of Hyper-Parameters and Score Averages<br>"
         )
         # plotly.offline.plot(fig, filename='temp.html', auto_open=True)
         return fig
