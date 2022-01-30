@@ -1030,11 +1030,13 @@ class MLExperimentResults:
         else:
             score_columns = [primary_score_column]
 
+        # NOTE: sort_by_score=False because there is a weird bug in plotly such that if the index is
+        # not 0-x than the order seems to get messed up
+        # https://github.com/plotly/plotly.py/issues/3576
+        df = self.to_dataframe(sort_by_score=False)
+        numeric_columns = [x for x in self.numeric_parameters if x in df.columns]
         fig = px.parallel_coordinates(
-            # NOTE: sort_by_score=False because there is a weird bug in plotly such that if the index is
-            # not 0-x than the order seems to get messed up
-            # https://github.com/plotly/plotly.py/issues/3576
-            self.to_dataframe(sort_by_score=False)[self.numeric_parameters + score_columns].dropna(axis=0),
+            df[numeric_columns + score_columns].dropna(axis=0),
             color=primary_score_column,
             color_continuous_scale=color_continuous_scale,
             height=height,
@@ -1072,7 +1074,9 @@ class MLExperimentResults:
         else:
             score_columns = [primary_score_column]
 
-        fig = px.scatter_matrix(self.to_dataframe()[score_columns + self.parameter_names],
+        df = self.to_dataframe()
+        columns = [x for x in self.parameter_names if x in df.columns]
+        fig = px.scatter_matrix(df[score_columns + columns],
                                 color=primary_score_column,
                                 color_continuous_scale=color_continuous_scale,
                                 height=height,
