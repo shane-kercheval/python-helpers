@@ -90,6 +90,14 @@ class TestSklearnEval(unittest.TestCase):
         grid_search.fit(X_train, y_train)
         cls.credit_data__grid_search = grid_search
 
+        param_grad = [
+            {
+                'preparation__non_numeric_pipeline__encoder_chooser__transformer': [OneHotEncoder(),
+                                                                                    CustomOrdinalEncoder()],
+                'model__max_features': [100, 'auto'],
+                'model__n_estimators': [10, 50],
+            },
+        ]
         grid_search = GridSearchCV(full_pipeline,
                                    param_grid=param_grad,
                                    cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),
