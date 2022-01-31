@@ -1049,8 +1049,7 @@ class MLExperimentResults:
     def plot_scatter(self,
                      include_all_scores: bool = True,
                      height: float = 600,
-                     width: float = 600 * GOLDEN_RATIO
-                     ):
+                     width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
         Returns a Plotly Figure (scatter-matrix) of the all parameters and scores.
 
@@ -1081,6 +1080,129 @@ class MLExperimentResults:
                                 color_continuous_scale=color_continuous_scale,
                                 height=height,
                                 width=width)
+        return fig
+
+    def plot_performance_numeric_params(self,
+                                        height: float = 600,
+                                        width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        """
+        Returns a Plotly Figure (scatter-matrix) of the each of the numeric parameters' values (x-axis) vs the
+        primary score (y-axis).
+
+        Args:
+            height:
+                The height of the plot. This value is passed to plotly.
+            width:
+                The width of the plot. This value is passed to plotly.
+        """
+        color_continuous_scale = px.colors.diverging.RdYlGn
+        if not self.higher_score_is_better:
+            color_continuous_scale = color_continuous_scale.reverse()
+
+        primary_score_column = self.primary_score_name + " Mean"
+
+        df = self.to_labeled_dataframe()
+        columns = [x for x in self.numeric_parameters if x in df.columns]
+        labeled_long = pd.melt(df,
+                               id_vars=[primary_score_column, 'label'],
+                               value_vars=columns,
+                               var_name='parameter')
+
+        fig = px.scatter(
+            data_frame=labeled_long,
+            x='value',
+            y=primary_score_column,
+            color=primary_score_column,
+            color_continuous_scale=color_continuous_scale,
+            facet_col='parameter',
+            facet_col_wrap=2,
+            trendline='lowess',
+            labels={
+                'value': 'Parameter Value',
+            },
+            title="Variable Performance<br><sup>Numeric Parameters</sup>",
+            custom_data=['label', primary_score_column],
+            height=height,
+            width=width
+        )
+        fig.update_traces(
+            hovertemplate="<br>".join([
+                "Parameter Value: %{x}",
+                primary_score_column + ": %{customdata[1]}",
+                "<br>Parameters: %{customdata[0]}",
+            ])
+        )
+        fig.update_xaxes(matches=None, showticklabels=True)
+        return fig
+
+    def plot_performance_non_numeric_params(self,
+                                            height: float = 600,
+                                            width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        """
+        Returns a Plotly Figure (box-plot) of the each of the non-numeric parameters' values (x-axis) vs
+        the primary score (y-axis).
+
+        Args:
+            height:
+                The height of the plot. This value is passed to plotly.
+            width:
+                The width of the plot. This value is passed to plotly.
+        """
+        color_continuous_scale = px.colors.diverging.RdYlGn
+        if not self.higher_score_is_better:
+            color_continuous_scale = color_continuous_scale.reverse()
+
+        primary_score_column = self.primary_score_name + " Mean"
+
+        df = self.to_labeled_dataframe()
+        columns = [x for x in self.non_numeric_parameters if x in df.columns]
+        labeled_long = pd.melt(df,
+                               id_vars=[primary_score_column, 'label'],
+                               value_vars=columns,
+                               var_name='parameter')
+
+        scatter = px.scatter(
+            data_frame=labeled_long,
+            x='value',
+            y=primary_score_column,
+            color=primary_score_column,
+            color_continuous_scale=color_continuous_scale,
+            facet_col='parameter',
+            facet_col_wrap=2,
+            labels={
+                'value': 'Parameter Value',
+            },
+            title="Variable Performance<br><sup>Non-Numeric Parameters</sup>",
+            custom_data=['label', primary_score_column],
+            height=height,
+            width=width,
+        )
+        scatter.update_traces(
+            hovertemplate="<br>".join([
+                "Parameter Value: %{x}",
+                primary_score_column + ": %{customdata[1]}",
+                "<br>Parameters: %{customdata[0]}",
+            ])
+        )
+        scatter.update_xaxes(matches=None, showticklabels=True)
+        fig = px.box(
+            data_frame=labeled_long,
+            x='value',
+            y=primary_score_column,
+            facet_col='parameter',
+            facet_col_wrap=2,
+            labels={
+                'value': 'Parameter Value',
+            },
+            title="Variable Performance<br><sup>Non-Numeric Parameters</sup>",
+            custom_data=['label', primary_score_column],
+            height=height,
+            width=width
+        )
+        for x in range(len(scatter.data)):
+            fig.add_trace(scatter.data[x])
+
+        fig.update_xaxes(matches=None, showticklabels=True)
         return fig
 
 
