@@ -923,7 +923,7 @@ class MLExperimentResults:
         title = "Performance Over Time (Across Trials)<br>" \
                 "<sup>This graph shows the average CV score across all trials, in order of execution.</sup>"
         if size is not None:
-            title = title + f"<br><sup>The size of point corresponds to the value of '{size}'.</sup>"
+            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
 
         fig = px.scatter(
             data_frame=self.to_labeled_dataframe(),
@@ -1234,9 +1234,9 @@ class MLExperimentResults:
             color_continuous_scale = color_continuous_scale.reverse()
 
         primary_score_column = self.primary_score_name + " Mean"
-        title = f"Primary Score ({primary_score_column}) vs <b>{parameter}</b>"
+        title = f"Primary Score ({self.primary_score_name}) vs <b>{parameter}</b>"
         if size:
-            title = title + f"<br><sup>Size of point corresponds to '{size}'</sup>"
+            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
 
         fig = px.scatter(
             data_frame=self.to_labeled_dataframe(),
@@ -1297,7 +1297,7 @@ class MLExperimentResults:
 
         scaled_size = None
         if size:
-            title = title + f"<br><sup>Size of point corresponds to '{size}'</sup>"
+            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
             if size in self.numeric_parameters:
                 # need to do this or else the points are all the same size
                 # but only if size has numeric values
