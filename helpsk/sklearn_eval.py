@@ -1205,6 +1205,81 @@ class MLExperimentResults:
         fig.update_xaxes(matches=None, showticklabels=True)
         return fig
 
+    def plot_score_vs_parameter(self,
+                                parameter,
+                                size=None,
+                                color=None,
+                                height: float = 600,
+                                width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        primary_score_column = self.primary_score_name + " Mean"
+        title = f"Primary Score ({primary_score_column}) vs <b>{parameter}</b>"
+        if size:
+            title = title + f"<br><sup>Size of point corresponds to '{size}'</sup>"
+
+        fig = px.scatter(
+            data_frame=self.to_labeled_dataframe(),
+            x=parameter,
+            y=primary_score_column,
+            size=size,
+            color=color,
+            trendline='lowess',
+            labels={
+                primary_score_column: f"Average Cross Validation Score ({self.primary_score_name})",
+            },
+            title=title,
+            custom_data=['label'],
+            height=height,
+            width=width,
+        )
+        fig.update_traces(
+            hovertemplate="<br>".join([
+                "Parameter Value: %{x}",
+                primary_score_column + ": " + "%{y}",
+                "<br>Parameters: %{customdata[0]}",
+            ])
+        )
+        return fig
+
+    def plot_parameter_vs_parameter(self,
+                                parameter_1,
+                                parameter_2,
+                                size=None,
+                                height: float = 600,
+                                width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        primary_score_column = self.primary_score_name + " Mean"
+        title = f"<b>{parameter_1}</b> vs <b>{parameter_2}</b>"
+
+        if size:
+            title = title + f"<br><sup>Size of point corresponds to '{size}'</sup>"
+            # need to do this or else the points are all the same size
+            from sklearn.preprocessing import MinMaxScaler
+            scaled_size = MinMaxScaler().fit_transform(self._labeled_dataframe[[size]]).reshape(1, -1)
+            scaled_size = scaled_size.tolist()[0]
+        else:
+            scaled_size = None
+
+        fig = px.scatter(
+            data_frame=self._labeled_dataframe,
+            x=parameter_2,
+            y=parameter_1,
+            size=scaled_size,
+            color=primary_score_column,
+            trendline='lowess',
+            title=title,
+            custom_data=['label', primary_score_column],
+            height=height,
+            width=width,
+        )
+        fig.update_traces(
+            hovertemplate="<br>".join([
+                parameter_2 + ": %{x}",
+                parameter_1 + ": %{y}",
+                primary_score_column + ": " + "%{customdata[1]}",
+                "<br>Parameters: %{customdata[0]}",
+            ])
+        )
+        return fig
+
 
 # pylint: disable=too-many-instance-attributes
 # pylint: disable=too-many-public-methods
