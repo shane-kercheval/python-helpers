@@ -1301,7 +1301,7 @@ class MLExperimentResults:
             if size in self.numeric_parameters:
                 # need to do this or else the points are all the same size
                 # but only if size has numeric values
-                scaled_size = MinMaxScaler().fit_transform(self._labeled_dataframe[[size]]).reshape(1, -1)
+                scaled_size = MinMaxScaler(feature_range=(0.1, 0.9)).fit_transform(self._labeled_dataframe[[size]]).reshape(1, -1)
                 scaled_size = scaled_size.tolist()[0]
 
         fig = px.scatter(
