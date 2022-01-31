@@ -1212,6 +1212,23 @@ class MLExperimentResults:
                                 color=None,
                                 height: float = 600,
                                 width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        """
+        Returns a Plotly Figure (scatter-plot) of the primary score (y-axis) vs a given parameter (x-axis).
+
+        Args:
+            parameter:
+                The name of a hyper-parameter to plot against the score, on the x-axis.
+            size:
+                The name of a hyper-parameter, the values of which will be used to determine the size of the
+                corresponding points in the plot. This value is passed to plotly.
+            color:
+                The name of a hyper-parameter, the values of which will be used to determine the color of the
+                corresponding points in the plot. This value is passed to plotly.
+            height:
+                The height of the plot. This value is passed to plotly.
+            width:
+                The width of the plot. This value is passed to plotly.
+        """
         color_continuous_scale = px.colors.diverging.RdYlGn
         if not self.higher_score_is_better:
             color_continuous_scale = color_continuous_scale.reverse()
@@ -1252,6 +1269,25 @@ class MLExperimentResults:
                                     size=None,
                                     height: float = 600,
                                     width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        """
+        Returns a Plotly Figure (scatter-plot) between two hyper-parameters.
+
+        Args:
+            parameter_x:
+                The name of a hyper-parameter to plot against another parameter, on the x-axis.
+            parameter_y:
+                The name of a hyper-parameter to plot against another parameter, on the y-axis.
+            size:
+                The name of a hyper-parameter, the values of which will be used to determine the size of the
+                corresponding points in the plot. This value is passed to plotly.
+            color:
+                The name of a hyper-parameter, the values of which will be used to determine the color of the
+                corresponding points in the plot. This value is passed to plotly.
+            height:
+                The height of the plot. This value is passed to plotly.
+            width:
+                The width of the plot. This value is passed to plotly.
+        """
         color_continuous_scale = px.colors.diverging.RdYlGn
         if not self.higher_score_is_better:
             color_continuous_scale = color_continuous_scale.reverse()
