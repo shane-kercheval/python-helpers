@@ -19,6 +19,7 @@ from pandas.io.formats.style import Styler
 from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.metrics import confusion_matrix, roc_auc_score, r2_score
 from sklearn.model_selection._search import BaseSearchCV  # noqa
+from sklearn.preprocessing import MinMaxScaler
 
 import helpsk.color as hcolor
 import helpsk.pandas_style as hstyle
@@ -1211,6 +1212,10 @@ class MLExperimentResults:
                                 color=None,
                                 height: float = 600,
                                 width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        color_continuous_scale = px.colors.diverging.RdYlGn
+        if not self.higher_score_is_better:
+            color_continuous_scale = color_continuous_scale.reverse()
+
         primary_score_column = self.primary_score_name + " Mean"
         title = f"Primary Score ({primary_score_column}) vs <b>{parameter}</b>"
         if size:
@@ -1222,6 +1227,7 @@ class MLExperimentResults:
             y=primary_score_column,
             size=size,
             color=color,
+            color_continuous_scale=color_continuous_scale,
             trendline='lowess',
             labels={
                 primary_score_column: f"Average Cross Validation Score ({self.primary_score_name})",
@@ -1241,29 +1247,34 @@ class MLExperimentResults:
         return fig
 
     def plot_parameter_vs_parameter(self,
-                                parameter_1,
-                                parameter_2,
-                                size=None,
-                                height: float = 600,
-                                width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
-        primary_score_column = self.primary_score_name + " Mean"
-        title = f"<b>{parameter_1}</b> vs <b>{parameter_2}</b>"
+                                    parameter_x,
+                                    parameter_y,
+                                    size=None,
+                                    height: float = 600,
+                                    width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+        color_continuous_scale = px.colors.diverging.RdYlGn
+        if not self.higher_score_is_better:
+            color_continuous_scale = color_continuous_scale.reverse()
 
+        primary_score_column = self.primary_score_name + " Mean"
+        title = f"<b>{parameter_y}</b> vs <b>{parameter_x}</b>"
+
+        scaled_size = None
         if size:
             title = title + f"<br><sup>Size of point corresponds to '{size}'</sup>"
-            # need to do this or else the points are all the same size
-            from sklearn.preprocessing import MinMaxScaler
-            scaled_size = MinMaxScaler().fit_transform(self._labeled_dataframe[[size]]).reshape(1, -1)
-            scaled_size = scaled_size.tolist()[0]
-        else:
-            scaled_size = None
+            if size in self.numeric_parameters:
+                # need to do this or else the points are all the same size
+                # but only if size has numeric values
+                scaled_size = MinMaxScaler().fit_transform(self._labeled_dataframe[[size]]).reshape(1, -1)
+                scaled_size = scaled_size.tolist()[0]
 
         fig = px.scatter(
             data_frame=self._labeled_dataframe,
-            x=parameter_2,
-            y=parameter_1,
+            x=parameter_x,
+            y=parameter_y,
             size=scaled_size,
             color=primary_score_column,
+            color_continuous_scale=color_continuous_scale,
             trendline='lowess',
             title=title,
             custom_data=['label', primary_score_column],
@@ -1272,8 +1283,8 @@ class MLExperimentResults:
         )
         fig.update_traces(
             hovertemplate="<br>".join([
-                parameter_2 + ": %{x}",
-                parameter_1 + ": %{y}",
+                parameter_x + ": %{x}",
+                parameter_y + ": %{y}",
                 primary_score_column + ": " + "%{customdata[1]}",
                 "<br>Parameters: %{customdata[0]}",
             ])
