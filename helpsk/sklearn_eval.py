@@ -1034,6 +1034,7 @@ class MLExperimentResults:
         # NOTE: sort_by_score=False because there is a weird bug in plotly such that if the index is
         # not 0-x than the order seems to get messed up
         # https://github.com/plotly/plotly.py/issues/3576
+        # https://github.com/plotly/plotly.py/issues/3577
         df = self.to_dataframe(sort_by_score=False)
         numeric_columns = [x for x in self.numeric_parameters if x in df.columns]
         fig = px.parallel_coordinates(
@@ -1047,10 +1048,10 @@ class MLExperimentResults:
         # plotly.offline.plot(fig, filename='temp.html', auto_open=True)
         return fig
 
-    def plot_scatter(self,
-                     include_all_scores: bool = True,
-                     height: float = 600,
-                     width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
+    def plot_scatter_matrix(self,
+                            include_all_scores: bool = True,
+                            height: float = 600,
+                            width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
         Returns a Plotly Figure (scatter-matrix) of the all parameters and scores.
 
@@ -1074,7 +1075,11 @@ class MLExperimentResults:
         else:
             score_columns = [primary_score_column]
 
-        df = self.to_dataframe()
+        # NOTE: sort_by_score=False because there is a weird bug in plotly such that if the index is
+        # not 0-x than the order seems to get messed up
+        # https://github.com/plotly/plotly.py/issues/3576
+        # https://github.com/plotly/plotly.py/issues/3577
+        df = self.to_dataframe(sort_by_score=False)
         columns = [x for x in self.parameter_names if x in df.columns]
         fig = px.scatter_matrix(df[score_columns + columns],
                                 color=primary_score_column,
@@ -1149,9 +1154,9 @@ class MLExperimentResults:
             width:
                 The width of the plot. This value is passed to plotly.
         """
-        color_continuous_scale = px.colors.diverging.RdYlGn
-        if not self.higher_score_is_better:
-            color_continuous_scale = color_continuous_scale.reverse()
+        # color_continuous_scale = px.colors.diverging.RdYlGn
+        # if not self.higher_score_is_better:
+        #     color_continuous_scale = color_continuous_scale.reverse()
 
         primary_score_column = self.primary_score_name + " Mean"
 
@@ -1166,8 +1171,8 @@ class MLExperimentResults:
             data_frame=labeled_long,
             x='value',
             y=primary_score_column,
-            color=primary_score_column,
-            color_continuous_scale=color_continuous_scale,
+            #color=primary_score_column,
+            #color_continuous_scale=color_continuous_scale,
             facet_col='parameter',
             facet_col_wrap=2,
             labels={
@@ -1229,7 +1234,7 @@ class MLExperimentResults:
             width:
                 The width of the plot. This value is passed to plotly.
         """
-        color_continuous_scale = px.colors.diverging.RdYlGn
+        color_continuous_scale = px.colors.diverging.balance
         if not self.higher_score_is_better:
             color_continuous_scale = color_continuous_scale.reverse()
 
