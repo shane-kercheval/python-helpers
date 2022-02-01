@@ -206,11 +206,7 @@ class MLExperimentResults:
                                                        0.0004855695604911932]
                 }
             }
-
-
             ```
-
-
         """
         self._dict = experiment_dict
         self._dataframe = None
