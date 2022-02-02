@@ -25,7 +25,7 @@ class ClassifierSearchSpace:
                      ClassifierSearchSpaceModels.LogisticRegression,
                      ClassifierSearchSpaceModels.XGBoost
                  ],
-                 iterations=[7, 6]):  # noqa
+                 iterations=[50, 50]):  # noqa
         assert len(models) == len(iterations)
 
         self._numeric_column_names = hlp.pandas.get_numeric_columns(data)
