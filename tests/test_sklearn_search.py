@@ -139,28 +139,40 @@ class TestSklearnEval(unittest.TestCase):
         xgboost_space = ClassifierSearchSpace._search_space_xgboost(
             eval_metric='logloss',
             use_label_encoder=False,
-            max_depth=(3, 10),
-            n_estimators=(50, 1000),
-            learning_rate=(0.01, 0.3),
-            colsample_bytree=(0.01, 1),
-            subsample=(0.1, 1),
-            imputer_strategies=None,
-            random_state=None
+            max_depth=(2, 30),
+            n_estimators=(10, 10000),
+            learning_rate=(0.01111, 0.3333),
+            colsample_bytree=(0.01234, 1123),
+            subsample=(0.1111, 0.999),
+            imputer_strategies=['median'],
+            random_state=42
         )
         self.assertEqual(list(xgboost_space.keys()),
                          ['model',
-                          'model__C',
+                          'model__max_depth',
+                          'model__n_estimators',
+                          'model__learning_rate',
+                          'model__colsample_bytree',
+                          'model__subsample',
                           'prep__numeric__imputer__transformer',
                           'prep__numeric__scaler__transformer',
                           'prep__non_numeric__encoder__transformer'])
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/xgboost_space_modified.txt'):
             print(xgboost_space)
+        del xgboost_space
+
+        pipeline = self.search_space.pipeline()
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/pipeline_default.txt'):
+            print(pipeline)
+        del pipeline
+
+        search_spaces = self.search_space.search_spaces()
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/search_spaces_default.txt'):
+            print(search_spaces)
+        del search_spaces
 
 
 
-        self.search_space
-
-        self.search_space.pipeline()
         self.search_space.search_spaces()
 
         self.search_space.param_name_mappings()
