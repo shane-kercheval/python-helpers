@@ -1,4 +1,5 @@
 from enum import unique, Enum, auto
+from collections import OrderedDict
 
 from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyClassifier
@@ -186,9 +187,23 @@ class ClassifierSearchSpace:
         return search_spaces
     
     def param_name_mappings(self):
-        temp = self._models
+        mappings = {}
+        for space in self.search_spaces():
+            params = list(space[0].keys())
+            for param in params:
+                if param not in mappings:
+                    if param == 'model':
+                        mappings[param] = param
+                    elif param.startswith('model__'):
+                        mappings[param] = param.removeprefix('model__')
+                    elif param.endswith('__transformer'):
+                        mappings[param] = param.removesuffix('__transformer').removeprefix('prep__numeric__').removeprefix('prep__non_numeric__')
+                    else:
+                        mappings[param] = param
 
-        return temp
+        ordered_mappings = OrderedDict({key:value for key, value in mappings.items() if not key.startswith('prep__')})
+        ordered_mappings.update({key: value for key, value in mappings.items() if key.startswith('prep__')})
+        return ordered_mappings
 
     def __str__(self):
         return 'asdf'

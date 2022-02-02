@@ -1,4 +1,5 @@
 import unittest
+from collections import OrderedDict
 
 import numpy as np
 
@@ -171,8 +172,15 @@ class TestSklearnEval(unittest.TestCase):
             print(search_spaces)
         del search_spaces
 
-
-
-        self.search_space.search_spaces()
-
-        self.search_space.param_name_mappings()
+        mappings = self.search_space.param_name_mappings()
+        self.assertEqual(mappings,
+                         OrderedDict([('model', 'model'),
+                                      ('model__C', 'C'),
+                                      ('model__max_depth', 'max_depth'),
+                                      ('model__n_estimators', 'n_estimators'),
+                                      ('model__learning_rate', 'learning_rate'),
+                                      ('model__colsample_bytree', 'colsample_bytree'),
+                                      ('model__subsample', 'subsample'),
+                                      ('prep__numeric__imputer__transformer', 'imputer'),
+                                      ('prep__numeric__scaler__transformer', 'scaler'),
+                                      ('prep__non_numeric__encoder__transformer', 'encoder')]))
