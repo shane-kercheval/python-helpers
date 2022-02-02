@@ -204,6 +204,3 @@ class ClassifierSearchSpace:
         ordered_mappings = OrderedDict({key:value for key, value in mappings.items() if not key.startswith('prep__')})
         ordered_mappings.update({key: value for key, value in mappings.items() if key.startswith('prep__')})
         return ordered_mappings
-
-    def __str__(self):
-        return 'asdf'
