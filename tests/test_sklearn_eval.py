@@ -15,8 +15,10 @@ from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
 from helpsk.exceptions import HelpskAssertionError
+from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults, TwoClassEvaluator, RegressionEvaluator
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
+from helpsk.utility import redirect_stdout_to_file
 from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing
 
 
@@ -266,11 +268,17 @@ class TestSklearnEval(unittest.TestCase):
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
 
         cv_dataframe = parser.to_dataframe(exclude_zero_variance_params=False)
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores__dataframe__no_exclude.txt'):
+            print_dataframe(cv_dataframe)
         # ensure the hyper-param columns (last 4 columns) are in the same order as the mapping.
         self.assertEqual(list(cv_dataframe.columns[-4:]), list(new_param_column_names.values()))
 
         self.assertTrue('min_samples_split' in cv_dataframe.columns)
         self.assertTrue(all(cv_dataframe['min_samples_split'] == [2, 2, 2, 2, 2, 2, 2, 2]))
+        del cv_dataframe
+
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores__dataframe__exclude.txt'):
+            print_dataframe(parser.to_dataframe(exclude_zero_variance_params=True))
 
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
         cv_dataframe = parser.to_dataframe().sort_index()
@@ -524,6 +532,8 @@ class TestSklearnEval(unittest.TestCase):
                                    np.array(parser_from_yaml.test_score_averages[parser.primary_score_name]))
 
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__single_score__dataframe.txt'):
+            print_dataframe(parser.to_dataframe())
         cv_dataframe = parser.to_dataframe().sort_index()
         hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
@@ -731,6 +741,8 @@ class TestSklearnEval(unittest.TestCase):
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
 
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__dataframe.txt'):
+            print_dataframe(parser.to_dataframe())
         cv_dataframe = parser.to_dataframe().sort_index()
         hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
