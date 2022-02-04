@@ -232,8 +232,8 @@ class TestSklearnEval(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__logistic.html', 'w') as file:
             file.write(results.to_formatted_dataframe(query="model == 'LogisticRegression(...)'").render())
 
-        pd.set_option('display.max_columns', 500)
-        pd.set_option('display.width', 10000)
+        # pd.set_option('display.max_columns', 500)
+        # pd.set_option('display.width', 10000)
 
         def label_column_formatter(label_column):
             return [str(x).replace('<br>', '; ').replace('; model', '\nmodel').replace('; ', '\n       ') for x in label_column]
@@ -260,12 +260,15 @@ class TestSklearnEval(unittest.TestCase):
                 file.write(x)
 
 
+        cv_results = self.bayes_search.cv_results_
+
+
         results.trial_labels(order_from_best_to_worst=False)
         results.trials
         results.parameter_names
         results.trial_labels()
         results.trial_labels()
-        labels = results.trial_labels()
+
 
         def to_string(obj):
             return str(obj).\
@@ -274,7 +277,13 @@ class TestSklearnEval(unittest.TestCase):
                 replace('}', '\n}').\
                 replace(', ({', ',\n({')
 
-        with open(get_test_path() + '/test_files/sklearn_search/labels_default.txt', 'w') as file:
+        labels = results.trial_labels(order_from_best_to_worst=True)
+        with open(get_test_path() + '/test_files/sklearn_search/trial_labels_sorted.txt', 'w') as file:
+            file.write(to_string(labels))
+        del labels
+
+        labels = results.trial_labels(order_from_best_to_worst=False)
+        with open(get_test_path() + '/test_files/sklearn_search/trial_labels_not_sorted.txt', 'w') as file:
             file.write(to_string(labels))
         del labels
 

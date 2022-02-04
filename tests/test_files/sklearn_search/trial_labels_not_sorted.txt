@@ -1,0 +1,21 @@
+["{
+model: XGBClassifier(...), max_depth: 10, n_estimators: 871, learning_rate: 0.09798893186641074, colsample_bytree: 0.8844821246070537, subsample: 0.15608164675966435, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(...), max_depth: 6, n_estimators: 229, learning_rate: 0.04040915598028404, colsample_bytree: 0.9195352964526833, subsample: 0.5082988094256691, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(...), max_depth: 9, n_estimators: 547, learning_rate: 0.18343365247851712, colsample_bytree: 0.1801528457825951, subsample: 0.18590953529349413, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: XGBClassifier(...), max_depth: 8, n_estimators: 909, learning_rate: 0.16271986876703082, colsample_bytree: 0.44364889457651413, subsample: 0.7453280360438532, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(...), max_depth: 4, n_estimators: 810, learning_rate: 0.05744608180517957, colsample_bytree: 0.9399760402267441, subsample: 0.43532180018493205, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(...), C: 1.5955669452672732, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(...), C: 22.91257035436645, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(...), C: 0.402690660245868, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(...), C: 3.4885114865499216, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(...), C: 0.0007376531147826206, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}"]
