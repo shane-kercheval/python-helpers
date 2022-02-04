@@ -63,7 +63,7 @@ train_score_standard_deviations:
   - 97.59661238268352
   - 168.48193342617682
   - 56.56200003302968
-parameter_trials:
+trials:
 - model__max_features: 2
   model__n_estimators: 10
 - model__max_features: 2

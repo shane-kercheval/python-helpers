@@ -38,7 +38,7 @@ test_score_standard_deviations:
   - 0.01795608557324064
   - 0.021358294698372086
   - 0.0019082263491945234
-parameter_trials:
+trials:
 - model__max_features: 100
   model__n_estimators: 10
   preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()

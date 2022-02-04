@@ -202,7 +202,7 @@ train_score_standard_deviations:
   - 0.00871005201368303
   - 0.0
   - 0.0
-parameter_trials:
+trials:
 - model__max_features: 100
   model__min_samples_split: 2
   model__n_estimators: 10
