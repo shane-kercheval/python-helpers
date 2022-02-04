@@ -5,6 +5,7 @@ import math
 import warnings
 from re import match
 from typing import Tuple, Union, Optional, List, Dict
+import re
 
 import numpy as np
 import pandas as pd
@@ -85,7 +86,7 @@ class MLExperimentResults:
             - `train_score_averages`: (optional) same as test_score_xxx above, but for training scores
             - `train_score_standard_deviations`: (optional) same as test_score_xxx above, but for training
                 standard deviations
-            - `parameter_trials`: A list of dictionary. Each item in the list (i.e. the dictionary)
+            - `trials`: A list of dictionary. Each item in the list (i.e. the dictionary)
                 corresponds to a single trial and a single set of hyper-parameters. The dictionary has an item
                 for each of the hyper-parameters, the name of the hyper-parameter as the key and the
                 corresponding value
@@ -145,7 +146,7 @@ class MLExperimentResults:
                     'True Pos. Rate': [nan, nan, nan, nan, 0.014730511057304973, 0.00871005201368303, 0.0,
                                        0.0]
                 },
-                'parameter_trials': [
+                'trials': [
                     {
                         'model__max_features': 100,
                         'model__n_estimators': 10,
@@ -265,8 +266,14 @@ class MLExperimentResults:
         def string_if_not_number(obj):
             if isinstance(obj, (int, float, complex)):
                 return obj
-
-            return str(obj)
+            # convert to a string, but convert e.g. `XGBoostClassifier(parameter=x, etc)` to
+            # `XGBoostClassifier(...)`
+            string_value = str(obj)
+            string_value = string_value.replace('\n', '')
+            string_value = re.sub(r'Classifier\(.+\)', 'Classifier(...)', string_value)
+            string_value = re.sub(r'Regressor\(.+\)', 'Regressor(...)', string_value)
+            string_value = re.sub(r'Regression\(.+\)', 'Regression(...)', string_value)
+            return string_value
 
         cv_results_dict = {
             'description': description,
@@ -298,12 +305,30 @@ class MLExperimentResults:
                                 if bool(match(split_score_matching_string, x))])
         cv_results_dict['number_of_splits'] = number_of_splits
         cv_results_dict['score_names'] = score_names
-        cv_results_dict['parameter_names'] = [key for key, value in searcher.cv_results_['params'][0].items()]
 
+        parameter_names = []
+        # If there are multiple search spaces, then there might be different, but overlapping, parameters
+        # in each search space. We have to collect all of the parameters and then get the unique list (via
+        # `set()`).
+        # Note that i'm doing this with nested loops (rather than simply using `set()`) so that I can retain
+        # the exact order (set() does not retain order)
+        for params in searcher.cv_results_['params']:
+            for key in params.keys():
+                if key not in parameter_names:
+                    parameter_names += [key]
+
+        # if we pass in parameter mappings, make sure each parameter is accounted for i.e. the keys of the
+        # mappings should be identical (in any order, (via `set()`)) to the parameter names
         if parameter_name_mappings:
-            for key in parameter_name_mappings.keys():
-                assert_true(key in cv_results_dict['parameter_names'])
+            param_mapping_keys = list(parameter_name_mappings.keys())
+            assert_true(set(param_mapping_keys) == set(parameter_names))  # ensure equal, unordered
+            # use the keys from the mappings as parameter names (rather than just passing param names
+            # directly) so that the order of the param names is retained; which will be used to determine
+            # order in e.g. to_data_frame()
+            cv_results_dict['parameter_names'] = param_mapping_keys
             cv_results_dict['parameter_names_mapping'] = parameter_name_mappings
+        else:
+            cv_results_dict['parameter_names'] = parameter_names
 
         number_of_trials = len(searcher.cv_results_['mean_fit_time'])
 
@@ -386,7 +411,7 @@ class MLExperimentResults:
 
         assert_true(len(searcher.cv_results_['params']) == number_of_trials)
 
-        cv_results_dict['parameter_trials'] = [
+        cv_results_dict['trials'] = [
             {key: string_if_not_number(value) for key, value in searcher.cv_results_['params'][index].items()}
             for index in range(len(searcher.cv_results_['params']))
         ]
@@ -458,7 +483,7 @@ class MLExperimentResults:
                 )
 
             self._dataframe = pd.concat([self._dataframe,
-                                         pd.DataFrame.from_dict(self.parameter_trials)],  # noqa
+                                         pd.DataFrame.from_dict(self.trials)[self.parameter_names_original]],  # noqa
                                         axis=1)
 
             if self.parameter_names_mapping:
@@ -471,7 +496,7 @@ class MLExperimentResults:
             copy = copy.drop(columns=zero_variance_columns)
 
         if sort_by_score:
-            copy = copy.iloc[self.primary_score_best_indexes]
+            copy = copy.iloc[self.best_trial_indexes]
 
         return copy
 
@@ -624,7 +649,8 @@ class MLExperimentResults:
 
     @property
     def parameter_names_mapping(self) -> dict:
-        """The dictionary passed to `parameter_name_mappings`."""
+        """The dictionary passed to `parameter_name_mappings` which is used to convert the original names
+        to more friendly names, specified as the the values."""
         return self._dict.get('parameter_names_mapping')
 
     @property
@@ -653,14 +679,14 @@ class MLExperimentResults:
         return self._dict.get('train_score_standard_deviations')
 
     @property
-    def parameter_trials(self) -> list:
+    def trials(self) -> list:
         """The "trials" i.e. the hyper-parameter combinations in order of execution."""
-        return self._dict['parameter_trials']
+        return self._dict['trials']
 
     def trial_labels(self, order_from_best_to_worst=True) -> List[str]:
         """An trial is a set of hyper-parameters that were cross validated. The corresponding label for
         each trial is a single string containing all of the hyper-parameter names and values in the format
-        of `{param1: value1, param2: value2}`.
+        of `{param1: value1, param2: value2}`, excluding hyper-parameters that only have a single value.
 
         Args:
             order_from_best_to_worst: if True, returns the labels in order from the best score to the worst
@@ -674,17 +700,21 @@ class MLExperimentResults:
         def create_hyper_param_labels(trial) -> list:
             """Creates a list of strings that represent the name/value pair for each hyper-parameter."""
             return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping and x in self.parameter_names_mapping else x}: {trial[x]}"  # pylint: disable=line-too-long  # noqa
-                    for x in self.parameter_names_original]
-        # create_hyper_param_labels(trial=self.parameter_trials[0])
+                    # for parameter spaces that have multiple models (and different parameters per model),
+                    # we need to make sure that the parameter name is actually in the trial
+                    # e.g. the parameter name could correspond to the logistic regression space but we could
+                    # be iterating over the xgboost space
+                    for x in self.parameter_names_original if x in trial]
+        # create_hyper_param_labels(trial=self.trials[0])
 
         def create_trial_label(trial) -> str:
             return f"{{{hstring.collapse(create_hyper_param_labels(trial), separate=', ')}}}"
-        # create_trial_label(trial=self.parameter_trials[0])
+        # create_trial_label(trial=self.trials[0])
 
-        labels = [create_trial_label(x) for x in self.parameter_trials]
+        labels = [create_trial_label(x) for x in self.trials]
 
         if order_from_best_to_worst:
-            labels = [x for _, x in sorted(zip(self.primary_score_trial_ranking, labels))]
+            labels = [x for _, x in sorted(zip(self.trial_rankings, labels))]
 
         return labels
 
@@ -701,7 +731,7 @@ class MLExperimentResults:
         """"A single trial contains the cross validation results for a single set of hyper-parameters. The
         'number of trials' is basically the number of combinations of different hyper-parameters that were
         cross validated."""
-        return len(self.parameter_trials)
+        return len(self.trials)
 
     @property
     def numeric_parameters(self) -> List[str]:
@@ -740,58 +770,61 @@ class MLExperimentResults:
         return np.array(score_standard_deviations) / math.sqrt(self.number_of_splits)
 
     @property
-    def primary_score_trial_ranking(self) -> np.array:
-        """The ranking of the corresponding index, in terms of best to worst score.
+    def trial_rankings(self) -> np.array:
+        """The ranking of the corresponding index, in terms of best to worst "primary" (i.e. first) score.
 
-        e.g. [5, 6, 7, 8, 3, 4, 1, 2]
+        For example, assume this property returned the following list :
+            [5, 6, 7, 8, 3, 4, 1, 2]
             This means that the 6th index/trial had the highest ranking (1); and that the 3rd index had
             the worst ranking (8)
 
-        This differs from `primary_score_best_indexes` which returns the order of indexes from best to worst.
-        So in the example above, the first value returned in the `primary_score_best_indexes` array would be
-        6 because the best score is at index 6. The last value in the array 3, because the worst score is at
-        index 3.
+        This differs from `best_trial_indexes` which returns the order of indexes (of the trials) from best to
+        worst.
+        So in the example above, the first value returned in the `best_trial_indexes` array would be
+        6 because the best score (across trials) is at index 6 (i.e. the 7th trial).
+        The last value in the array returned by `best_trial_indexes` would be 3, because the worst score is at
+        index 3 (i.e. the 4th trial).
 
-        Note that `primary_score_trial_ranking` starts at 1 while primary_score_best_indexes starts at 0.
+        Note that `trial_rankings` starts at 1 while best_trial_indexes starts at 0.
         """
         return np.array(self.test_score_rankings[self.primary_score_name])
 
     @property
-    def primary_score_best_indexes(self) -> np.array:
-        """The indexes of best to worst primary scores. See documentation for
-        `primary_score_trial_ranking` to understand the differences between the two properties."""
-        return np.argsort(self.primary_score_trial_ranking)
+    def best_trial_indexes(self) -> np.array:
+        """The indexes of best to worst "primary" (i.e. first) scores. See documentation for
+        `trial_rankings` to understand the differences between the two properties."""
+        return np.argsort(self.trial_rankings)
 
     @property
-    def best_primary_score_index(self) -> int:
-        """The index of best primary score."""
-        return self.primary_score_best_indexes[0]
+    def best_score_index(self) -> int:
+        """The index of best "primary" (i.e. first) score."""
+        return self.best_trial_indexes[0]
 
     @property
-    def best_primary_score_params(self) -> dict:
+    def best_params(self) -> dict:
         """
-        The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated
-        with the primary score.
+        The *best* score. "Best" could be the highest or lowest depending on `higher_score_is_better`)
+        associated with the "primary" (i.e. first) score.
         """
-        best_params = self.parameter_trials[self.best_primary_score_index]
+        best_params = self.trials[self.best_score_index]
 
         if self.parameter_names_mapping:
-            best_params = {self.parameter_names_mapping[key]: value for key, value in best_params.items()}
+            best_params = {value: best_params[key] for key, value in self.parameter_names_mapping.items()}
 
         return best_params
 
     @property
-    def best_primary_score(self) -> float:
+    def best_score(self) -> float:
         """
         The "best" score (could be the highest or lowest depending on `higher_score_is_better`) associated
         with the primary score.
         """
-        return self.primary_score_averages[self.best_primary_score_index]
+        return self.primary_score_averages[self.best_score_index]
 
     @property
-    def best_primary_score_standard_error(self) -> float:
-        """The standard error associated with the best score of the primary scorer"""
-        return self.score_standard_errors(score_name=self.primary_score_name)[self.best_primary_score_index]
+    def best_standard_error(self) -> float:
+        """The standard error associated with the best of the primary scores"""
+        return self.score_standard_errors(score_name=self.primary_score_name)[self.best_score_index]
 
     @property
     def indexes_within_1_standard_error(self) -> list:
@@ -802,10 +835,10 @@ class MLExperimentResults:
 
         if self.higher_score_is_better:
             return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] >=
-                                           self.best_primary_score - self.best_primary_score_standard_error])
+                                           self.best_score - self.best_standard_error])
 
         return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] <=
-                                       self.best_primary_score + self.best_primary_score_standard_error])
+                                       self.best_score + self.best_standard_error])
 
     @property
     def fit_time_averages(self) -> np.array:
@@ -1167,8 +1200,8 @@ class MLExperimentResults:
             data_frame=labeled_long,
             x='value',
             y=primary_score_column,
-            #color=primary_score_column,
-            #color_continuous_scale=color_continuous_scale,
+            # color=primary_score_column,
+            # color_continuous_scale=color_continuous_scale,
             facet_col='parameter',
             facet_col_wrap=2,
             labels={
@@ -1280,9 +1313,6 @@ class MLExperimentResults:
                 The name of a hyper-parameter to plot against another parameter, on the y-axis.
             size:
                 The name of a hyper-parameter, the values of which will be used to determine the size of the
-                corresponding points in the plot. This value is passed to plotly.
-            color:
-                The name of a hyper-parameter, the values of which will be used to determine the color of the
                 corresponding points in the plot. This value is passed to plotly.
             height:
                 The height of the plot. This value is passed to plotly.

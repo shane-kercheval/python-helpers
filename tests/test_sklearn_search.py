@@ -2,17 +2,16 @@ import unittest
 from collections import OrderedDict
 
 import numpy as np
-
-import helpsk as hlp
-from helpsk.exceptions import HelpskAssertionError
-from helpsk.sklearn_eval import MLExperimentResults, TwoClassEvaluator, RegressionEvaluator
-from helpsk.sklearn_pipeline import CustomOrdinalEncoder
-from helpsk.sklearn_search import ClassifierSearchSpace, ClassifierSearchSpaceModels
 from sklearn.model_selection import train_test_split
-
-from helpsk.utility import redirect_stdout_to_file
-from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing
 from sklearn.preprocessing import label_binarize, MinMaxScaler, StandardScaler, OneHotEncoder
+from sklearn.model_selection import RepeatedKFold
+from skopt import BayesSearchCV
+
+from helpsk.sklearn_pipeline import CustomOrdinalEncoder
+from helpsk.sklearn_search import ClassifierSearchSpace
+from helpsk.sklearn_eval import MLExperimentResults
+from helpsk.utility import redirect_stdout_to_file
+from tests.helpers import get_data_credit, get_test_path
 
 
 # noinspection PyMethodMayBeStatic
@@ -33,6 +32,25 @@ class TestSklearnEval(unittest.TestCase):
         X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)  # noqa
         del y_full, X_full
         cls.search_space = ClassifierSearchSpace(data=X_train)
+
+        cls.search_space_used = ClassifierSearchSpace(
+            data=X_train,
+            iterations=[5, 5]
+        )
+        # pip install scikit-optimize
+
+        cls.bayes_search = BayesSearchCV(
+            estimator=cls.search_space_used.pipeline(),
+            search_spaces=cls.search_space_used.search_spaces(),
+            cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
+            scoring='roc_auc',
+            refit=False,  # required if passing in multiple scorers
+            return_train_score=False,
+            n_jobs=-1,
+            verbose=0,
+            random_state=42,
+        )
+        cls.bayes_search.fit(X_train, y_train)
 
     def test_ClassifierSearchSpace(self):
 
@@ -184,3 +202,32 @@ class TestSklearnEval(unittest.TestCase):
                                       ('prep__numeric__imputer__transformer', 'imputer'),
                                       ('prep__numeric__scaler__transformer', 'scaler'),
                                       ('prep__non_numeric__encoder__transformer', 'encoder')]))
+
+    def test_eval(self):
+
+        results = MLExperimentResults.from_sklearn_search_cv(
+            searcher=self.bayes_search,
+            higher_score_is_better=True,
+            description='BayesSearchCV using ClassifierSearchSpace',
+            parameter_name_mappings=self.search_space_used.param_name_mappings()
+        )
+        results.to_yaml_file(get_test_path() + '/test_files/sklearn_search/multi-model-search.yaml')
+
+
+
+        temp = results.to_dataframe()
+        results.trials
+        results.parameter_names
+        results.trial_labels()
+
+
+
+        results.trial_labels()
+        labels = results.trial_labels()
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/labels_default.txt'):
+            print(labels)
+        del labels
+
+        #test that exclude_zero_variance_params works because now we will have params that might only
+        # be zero variance but will also include NAs when there are multiple spaces; so unique would return
+        # a lenght of two, the value and NA
