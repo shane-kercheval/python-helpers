@@ -1,6 +1,6 @@
-   roc_auc Mean  roc_auc 95CI.LO  roc_auc 95CI.HI               model  max_depth  n_estimators  learning_rate  colsample_bytree  subsample   C                                  imputer scaler                 encoder
-1      0.749529         0.741304         0.757753  XGBClassifier(...)        6.0         229.0       0.040409          0.919535   0.508299 NaN  SimpleImputer(strategy='most_frequent')   None         OneHotEncoder()
-3      0.724996         0.692341         0.757650  XGBClassifier(...)        8.0         909.0       0.162720          0.443649   0.745328 NaN         SimpleImputer(strategy='median')   None         OneHotEncoder()
-4      0.720113         0.688329         0.751897  XGBClassifier(...)        4.0         810.0       0.057446          0.939976   0.435322 NaN         SimpleImputer(strategy='median')   None         OneHotEncoder()
-2      0.712990         0.644978         0.781001  XGBClassifier(...)        9.0         547.0       0.183434          0.180153   0.185910 NaN  SimpleImputer(strategy='most_frequent')   None  CustomOrdinalEncoder()
-0      0.695324         0.679052         0.711596  XGBClassifier(...)       10.0         871.0       0.097989          0.884482   0.156082 NaN         SimpleImputer(strategy='median')   None         OneHotEncoder()
+   roc_auc Mean  roc_auc 95CI.LO  roc_auc 95CI.HI  max_depth  n_estimators  learning_rate  colsample_bytree  subsample                                  imputer                 encoder
+1      0.749529         0.741304         0.757753        6.0         229.0       0.040409          0.919535   0.508299  SimpleImputer(strategy='most_frequent')         OneHotEncoder()
+3      0.724996         0.692341         0.757650        8.0         909.0       0.162720          0.443649   0.745328         SimpleImputer(strategy='median')         OneHotEncoder()
+4      0.720113         0.688329         0.751897        4.0         810.0       0.057446          0.939976   0.435322         SimpleImputer(strategy='median')         OneHotEncoder()
+2      0.712990         0.644978         0.781001        9.0         547.0       0.183434          0.180153   0.185910  SimpleImputer(strategy='most_frequent')  CustomOrdinalEncoder()
+0      0.695324         0.679052         0.711596       10.0         871.0       0.097989          0.884482   0.156082         SimpleImputer(strategy='median')         OneHotEncoder()
