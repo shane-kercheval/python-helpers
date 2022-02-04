@@ -298,6 +298,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertTrue(isinstance(results.test_score_rankings, dict))
         self.assertEqual(list(results.test_score_rankings.keys()), results.score_names)
         self.assertTrue(all(np.array(results.test_score_rankings['roc_auc']) == bayes_search.cv_results_['rank_test_score']))
+        self.assertTrue(np.isclose(results.best_score, bayes_search.best_score_))
 
         def assert_np_arrays_are_close(array1, array2):
             self.assertEqual(len(array1), len(array2))
@@ -401,7 +402,8 @@ class TestSklearnEval(unittest.TestCase):
                     self.assertEqual(remove_parentheses(results.best_params[new_name]),
                                      remove_parentheses(bayes_search.best_params_[original_name]))
                 elif original_name.startswith('model__'):
-                    np.isclose(results.best_params[new_name], bayes_search.best_params_[original_name])
+                    self.assertTrue(np.isclose(results.best_params[new_name],
+                                               bayes_search.best_params_[original_name]))
                 else:
                     self.assertEqual(results.best_params[new_name],
                                      str(bayes_search.best_params_[original_name]))
