@@ -177,10 +177,9 @@ class ClassifierSearchSpace:
                 space = ClassifierSearchSpace._search_space_logistic()
             elif model_enum == ClassifierSearchSpaceModels.XGBoost:
                 space = ClassifierSearchSpace._search_space_xgboost()
-                
             else:
                 assert False
-                     
+
             search_spaces = search_spaces + [(space, num_iterations)]
         
         return search_spaces
