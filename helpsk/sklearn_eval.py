@@ -631,18 +631,19 @@ class MLExperimentResults:
                 resulting column), then a query value of `"model == 'LogisticRegression(...)'"` would return
                 only the rows where the value of the `model` column matches `LogisticRegression(...)`.
         """
-        if self._labeled_dataframe is None:
-            labeled_dataframe = self.to_dataframe(sort_by_score=False, query=query)  # leave original trial order
-            columns = labeled_dataframe.columns.to_list()  # cache columns to move Iteration column to front
-            labeled_dataframe['Trial Index'] = np.arange(1, self.number_of_trials + 1)
-            labeled_dataframe = labeled_dataframe[['Trial Index'] + columns]
-            # create the labels that will be used in the plotly hover text
-            labeled_dataframe['label'] = [x.replace('{', '<br>').replace(', ', '<br>').replace('}', '')
-                                          for x in self.trial_labels(order_from_best_to_worst=False)]
+        sort_by_score = False  # leave original trial order
+        labeled_dataframe = self.to_dataframe(sort_by_score=sort_by_score, query=query)
+        columns = labeled_dataframe.columns.to_list()  # cache columns to move Iteration column to front
+        labeled_dataframe['Trial Index'] = np.arange(1, labeled_dataframe.shape[0] + 1)
+        labeled_dataframe = labeled_dataframe[['Trial Index'] + columns]
+        # create the labels that will be used in the plotly hover text
+        # only include the labels that correspond to the remaining trials after `query`
+        trial_labels = self.trial_labels(order_from_best_to_worst=sort_by_score)
+        trial_labels = [trial_labels[x] for x in labeled_dataframe.index]
+        labeled_dataframe['label'] = [x.replace('{', '<br>').replace(', ', '<br>').replace('}', '')
+                                      for x in trial_labels]
 
-            self._labeled_dataframe = labeled_dataframe
-
-        return self._labeled_dataframe.copy(deep=True)
+        return labeled_dataframe
 
     ####
     # The following properties expose the highest levels of the underlying dictionary/yaml

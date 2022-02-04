@@ -2,6 +2,7 @@ import unittest
 from collections import OrderedDict
 
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import RepeatedKFold
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize, MinMaxScaler, StandardScaler, OneHotEncoder
@@ -231,9 +232,35 @@ class TestSklearnEval(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__logistic.html', 'w') as file:
             file.write(results.to_formatted_dataframe(query="model == 'LogisticRegression(...)'").render())
 
+        pd.set_option('display.max_columns', 500)
+        pd.set_option('display.width', 10000)
+
+        def label_column_formatter(label_column):
+            return [str(x).replace('<br>', '; ').replace('; model', '\nmodel').replace('; ', '\n       ') for x in label_column]
+
+        labeled_df = results.to_labeled_dataframe()
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe.txt'):
+            print_dataframe(labeled_df)
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__label.txt', 'w') as file:
+            for x in label_column_formatter(labeled_df['label']):
+                file.write(x)
+
+        labeled_df = results.to_labeled_dataframe(query="model == 'XGBClassifier(...)'")
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__xgboost.txt'):
+            print_dataframe(labeled_df)
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__xgboost__label.txt', 'w') as file:
+            for x in label_column_formatter(labeled_df['label']):
+                file.write(x)
+
+        labeled_df = results.to_labeled_dataframe(query="model == 'LogisticRegression(...)'")
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__logistic.txt'):
+            print_dataframe(labeled_df)
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__logistic__label.txt', 'w') as file:
+            for x in label_column_formatter(labeled_df['label']):
+                file.write(x)
 
 
-
+        results.trial_labels(order_from_best_to_worst=False)
         results.trials
         results.parameter_names
         results.trial_labels()
