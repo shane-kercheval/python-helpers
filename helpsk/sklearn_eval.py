@@ -850,7 +850,8 @@ class MLExperimentResults:
         best_params = self.trials[self.best_score_index]
 
         if self.parameter_names_mapping:
-            best_params = {value: best_params[key] for key, value in self.parameter_names_mapping.items()}
+            best_params = {value: best_params[key] for key, value in self.parameter_names_mapping.items()
+                           if key in best_params}
 
         return best_params
 

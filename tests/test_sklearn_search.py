@@ -1,3 +1,4 @@
+import re
 import unittest
 from collections import OrderedDict
 
@@ -8,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize, MinMaxScaler, StandardScaler, OneHotEncoder
 from skopt import BayesSearchCV
 
+from helpsk import validation
 from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
@@ -204,7 +206,7 @@ class TestSklearnEval(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_search/param_name_mappings_default.txt', 'w') as file:
             file.write(to_string(mappings))
 
-    def test_eval(self):
+    def test_MLExperimentResults_multi_model(self):
 
         results = MLExperimentResults.from_sklearn_search_cv(
             searcher=self.bayes_search,
@@ -259,17 +261,6 @@ class TestSklearnEval(unittest.TestCase):
             for x in label_column_formatter(labeled_df['label']):
                 file.write(x)
 
-
-        cv_results = self.bayes_search.cv_results_
-
-
-        results.trial_labels(order_from_best_to_worst=False)
-        results.trials
-        results.parameter_names
-        results.trial_labels()
-        results.trial_labels()
-
-
         def to_string(obj):
             return str(obj).\
                 replace(", '", ",\n'").\
@@ -287,6 +278,132 @@ class TestSklearnEval(unittest.TestCase):
             file.write(to_string(labels))
         del labels
 
-        #test that exclude_zero_variance_params works because now we will have params that might only
-        # be zero variance but will also include NAs when there are multiple spaces; so unique would return
-        # a length of two, the value and NA
+    def test_MLExperimentResults_multi_model2(self):
+        # test grid search object that has one score (classification)
+        # not passing in parameter mappings
+        bayes_search = self.bayes_search
+        results = MLExperimentResults.from_sklearn_search_cv(
+            searcher=self.bayes_search,
+            higher_score_is_better=True,
+            description='BayesSearchCV using ClassifierSearchSpace',
+            parameter_name_mappings=self.search_space_used.param_name_mappings()
+        )
+        self.assertEqual(results.higher_score_is_better, True)
+        self.assertEqual(results.cross_validation_type, "<class 'skopt.searchcv.BayesSearchCV'>")
+        self.assertEqual(results.number_of_splits,
+                         bayes_search.cv.n_repeats * bayes_search.n_splits_)
+        self.assertEqual(results.score_names, ['roc_auc'])
+        self.assertEqual(results.parameter_names_original,
+                         list(self.search_space_used.param_name_mappings().keys()))
+        self.assertEqual(results.parameter_names, list(self.search_space_used.param_name_mappings().values()))
+        self.assertIsNotNone(results.parameter_names_mapping)
+        self.assertTrue(isinstance(results.test_score_rankings, dict))
+        self.assertEqual(list(results.test_score_rankings.keys()), results.score_names)
+        self.assertTrue(all(np.array(results.test_score_rankings['roc_auc']) == bayes_search.cv_results_['rank_test_score']))
+
+        def assert_np_arrays_are_close(array1, array2):
+            self.assertEqual(len(array1), len(array2))
+            for index in range(len(array1)):
+                is_close = validation.is_close(array1[index], array2[index])
+                both_nan = np.isnan(array1[index]) and np.isnan(array2[index])
+                self.assertTrue(is_close or both_nan)
+
+        assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3]))
+        assert_np_arrays_are_close(np.array([1, 2, np.nan]), np.array([1, 2, np.nan]))
+        self.assertRaises(AssertionError,
+                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001])))
+        self.assertRaises(AssertionError,
+                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
+
+        assert_np_arrays_are_close(np.array(results.test_score_averages[results.primary_score_name]),
+                                   bayes_search.cv_results_['mean_test_score'])
+
+        self.assertEqual(list(results.best_trial_indexes), list(results.to_dataframe().index))
+        cv_dataframe = results.to_dataframe().sort_index()
+        validation.assert_dataframes_match([results.to_dataframe(sort_by_score=False), cv_dataframe])
+        assert_np_arrays_are_close(cv_dataframe[f'{results.score_names[0]} Mean'],
+                                   bayes_search.cv_results_['mean_test_score'])
+
+        labeled_dataframe = results.to_labeled_dataframe()
+        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, results.number_of_trials + 1))))
+        self.assertIsNotNone(labeled_dataframe['label'])
+        validation.assert_dataframes_match(dataframes=[results.to_dataframe(sort_by_score=False),
+                                                           labeled_dataframe.drop(columns=['Trial Index',
+                                                                                           'label'])])
+
+        def remove_parentheses(obj):
+            return re.sub(r'\(.*', '', str(obj).replace('\n', ''))
+
+        self.assertEqual([remove_parentheses(x) for x in bayes_search.cv_results_['param_model'].data],
+                         [remove_parentheses(x) for x in cv_dataframe['model']])
+
+        # check that all of the hyper-param values match in the dataframe vs bayes_search.cv_results_
+        hyper_param_df = cv_dataframe.iloc[:, 4:]
+        for key, value in self.search_space_used.param_name_mappings().items():
+            if key != 'model':
+                mask = bayes_search.cv_results_['param_' + key].mask
+                cv_data = list(bayes_search.cv_results_['param_' + key].data)
+                cv_data = [np.nan if m else d for m, d in zip(mask, cv_data)]
+
+                if key.startswith('model__'):
+                    assert_np_arrays_are_close(np.array(cv_data),
+                                               np.array(hyper_param_df.loc[:, value].tolist()))
+                if key.startswith('prep__'):
+                    self.assertEqual([str(x) for x in cv_data],
+                                     hyper_param_df.loc[:, value].tolist())
+
+        self.assertTrue(isinstance(results.test_score_averages, dict))
+        self.assertEqual(list(results.test_score_averages.keys()), results.score_names)
+
+        assert_np_arrays_are_close(results.primary_score_averages,
+                                   np.array(results.test_score_averages[results.primary_score_name]))
+        assert_np_arrays_are_close(results.primary_score_averages,
+                                   bayes_search.cv_results_['mean_test_score'])
+
+        self.assertEqual(len(results.score_standard_errors(score_name=results.score_names[0])),
+                         results.number_of_trials)
+
+        self.assertTrue(isinstance(results.test_score_standard_deviations, dict))
+        self.assertEqual(list(results.test_score_standard_deviations.keys()), results.score_names)
+
+        assert_np_arrays_are_close(np.array(results.test_score_standard_deviations[results.primary_score_name]),
+                                   bayes_search.cv_results_['std_test_score'])
+
+        self.assertIsNone(results.train_score_averages)
+        self.assertIsNone(results.train_score_standard_deviations)
+
+        self.assertTrue(isinstance(results.trials, list))
+        self.assertEqual(len(results.trials), results.number_of_trials)
+
+        self.assertTrue(isinstance(results.timings, dict))
+        self.assertEqual(list(results.timings.keys()), ['fit time averages',
+                                                       'fit time standard deviations',
+                                                       'score time averages',
+                                                       'score time standard deviations'])
+
+        assert_np_arrays_are_close(np.array(results.timings[list(results.timings.keys())[0]]),
+                                   bayes_search.cv_results_['mean_fit_time'])
+        assert_np_arrays_are_close(np.array(results.timings[list(results.timings.keys())[1]]),
+                                   bayes_search.cv_results_['std_fit_time'])
+        assert_np_arrays_are_close(np.array(results.timings[list(results.timings.keys())[2]]),
+                                   bayes_search.cv_results_['mean_score_time'])
+        assert_np_arrays_are_close(np.array(results.timings[list(results.timings.keys())[3]]),
+                                   bayes_search.cv_results_['std_score_time'])
+
+        self.assertEqual(results.primary_score_name, 'roc_auc')
+
+        self.assertTrue(all(results.trial_rankings == bayes_search.cv_results_['rank_test_score']))  # noqa
+
+        self.assertTrue(all([results.to_dataframe().loc[results.best_score_index, key] == value
+                             for key, value in results.best_params.items()]))
+
+        for original_name, new_name in results.parameter_names_mapping.items():
+            if new_name in results.best_params:
+                if original_name == 'model':
+                    self.assertEqual(remove_parentheses(results.best_params[new_name]),
+                                     remove_parentheses(bayes_search.best_params_[original_name]))
+                elif original_name.startswith('model__'):
+                    np.isclose(results.best_params[new_name], bayes_search.best_params_[original_name])
+                else:
+                    self.assertEqual(results.best_params[new_name],
+                                     str(bayes_search.best_params_[original_name]))
