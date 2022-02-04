@@ -2,15 +2,14 @@ import unittest
 from collections import OrderedDict
 
 import numpy as np
+from sklearn.model_selection import RepeatedKFold
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize, MinMaxScaler, StandardScaler, OneHotEncoder
-from sklearn.model_selection import RepeatedKFold
 from skopt import BayesSearchCV
 
+from helpsk.sklearn_eval import MLExperimentResults
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 from helpsk.sklearn_search import ClassifierSearchSpace
-from helpsk.sklearn_eval import MLExperimentResults
-from helpsk.utility import redirect_stdout_to_file
 from tests.helpers import get_data_credit, get_test_path
 
 
@@ -40,8 +39,8 @@ class TestSklearnEval(unittest.TestCase):
         # pip install scikit-optimize
 
         cls.bayes_search = BayesSearchCV(
-            estimator=cls.search_space_used.pipeline(),
-            search_spaces=cls.search_space_used.search_spaces(),
+            estimator=cls.search_space_used.pipeline(),  # noqa
+            search_spaces=cls.search_space_used.search_spaces(),  # noqa
             cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
             scoring='roc_auc',
             refit=False,  # required if passing in multiple scorers
@@ -50,7 +49,7 @@ class TestSklearnEval(unittest.TestCase):
             verbose=0,
             random_state=42,
         )
-        cls.bayes_search.fit(X_train, y_train)
+        cls.bayes_search.fit(X_train, y_train)  # noqa
 
     def test_ClassifierSearchSpace(self):
 
@@ -107,6 +106,13 @@ class TestSklearnEval(unittest.TestCase):
         self.assertIsInstance(categorical.categories[0], OneHotEncoder)
         del categorical
 
+        def to_string(obj):
+            return str(obj).\
+                replace(", '", ",\n'").\
+                replace('{', '{\n').\
+                replace('}', '\n}').\
+                replace(', ({', ',\n({')
+
         # default space for logistic regression
         logistic_space = ClassifierSearchSpace._search_space_logistic()
         self.assertEqual(list(logistic_space.keys()),
@@ -115,8 +121,9 @@ class TestSklearnEval(unittest.TestCase):
                           'prep__numeric__imputer__transformer',
                           'prep__numeric__scaler__transformer',
                           'prep__non_numeric__encoder__transformer'])
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/logistic_space_default.txt'):
-            print(logistic_space)
+
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_space_default.txt', 'w') as file:
+            file.write(to_string(logistic_space))
         del logistic_space
 
         # search space for logistic regression with modified params
@@ -134,8 +141,8 @@ class TestSklearnEval(unittest.TestCase):
                           'prep__numeric__imputer__transformer',
                           'prep__numeric__scaler__transformer',
                           'prep__non_numeric__encoder__transformer'])
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/logistic_space_modified.txt'):
-            print(logistic_space)
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_space_modified.txt', 'w') as file:
+            file.write(to_string(logistic_space))
         del logistic_space
 
         # default space for xgboost
@@ -150,8 +157,8 @@ class TestSklearnEval(unittest.TestCase):
                           'prep__numeric__imputer__transformer',
                           'prep__numeric__scaler__transformer',
                           'prep__non_numeric__encoder__transformer'])
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/xgboost_space_default.txt'):
-            print(xgboost_space)
+        with open(get_test_path() + '/test_files/sklearn_search/xgboost_space_default.txt', 'w') as file:
+            file.write(to_string(xgboost_space))
         del xgboost_space
 
         # search space for xgboost with modified params
@@ -176,18 +183,18 @@ class TestSklearnEval(unittest.TestCase):
                           'prep__numeric__imputer__transformer',
                           'prep__numeric__scaler__transformer',
                           'prep__non_numeric__encoder__transformer'])
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/xgboost_space_modified.txt'):
-            print(xgboost_space)
+        with open(get_test_path() + '/test_files/sklearn_search/xgboost_space_modified.txt', 'w') as file:
+            file.write(to_string(xgboost_space))
         del xgboost_space
 
         pipeline = self.search_space.pipeline()
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/pipeline_default.txt'):
-            print(pipeline)
+        with open(get_test_path() + '/test_files/sklearn_search/pipeline_default.txt', 'w') as file:
+            file.write(to_string(pipeline))
         del pipeline
 
         search_spaces = self.search_space.search_spaces()
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/search_spaces_default.txt'):
-            print(search_spaces)
+        with open(get_test_path() + '/test_files/sklearn_search/search_spaces_default.txt', 'w') as file:
+            file.write(to_string(search_spaces))
         del search_spaces
 
         mappings = self.search_space.param_name_mappings()
@@ -213,19 +220,22 @@ class TestSklearnEval(unittest.TestCase):
         )
         results.to_yaml_file(get_test_path() + '/test_files/sklearn_search/multi-model-search.yaml')
 
-
-
         temp = results.to_dataframe()
         results.trials
         results.parameter_names
         results.trial_labels()
-
-
-
         results.trial_labels()
         labels = results.trial_labels()
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/labels_default.txt'):
-            print(labels)
+
+        def to_string(obj):
+            return str(obj).\
+                replace(", '", ",\n'").\
+                replace('{', '{\n').\
+                replace('}', '\n}').\
+                replace(', ({', ',\n({')
+
+        with open(get_test_path() + '/test_files/sklearn_search/labels_default.txt', 'w') as file:
+            file.write(to_string(labels))
         del labels
 
         #test that exclude_zero_variance_params works because now we will have params that might only

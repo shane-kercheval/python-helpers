@@ -22,8 +22,8 @@ class ClassifierSearchSpace:
                  # remove these and pass data and get column names directly?
                  data,
                  models=[  # noqa
+                     ClassifierSearchSpaceModels.XGBoost,
                      ClassifierSearchSpaceModels.LogisticRegression,
-                     ClassifierSearchSpaceModels.XGBoost
                  ],
                  iterations=[50, 50]):  # noqa
         assert len(models) == len(iterations)
