@@ -448,7 +448,8 @@ class MLExperimentResults:
 
     def to_dataframe(self,
                      sort_by_score: bool = True,
-                     exclude_zero_variance_params: bool = True) -> pd.DataFrame:
+                     exclude_zero_variance_params: bool = True,
+                     query: str = None) -> pd.DataFrame:
         """This function converts the score information from the SearchCV object into a pd.DataFrame.
 
         Args:
@@ -459,6 +460,13 @@ class MLExperimentResults:
 
             exclude_zero_variance_params:
                 if True, exclude columns that only have 1 unique value
+
+            query:
+                a string that queries the resulting pd.DataFrame (passed directly to pandas `.query()`)
+
+                For example, if multiple models are being searched, and `model` is a parameter name (and a
+                resulting column), then a query value of `"model == 'LogisticRegression(...)'"` would return
+                only the rows where the value of the `model` column matches `LogisticRegression(...)`.
 
         Returns:
             a DataFrame containing score information for each cross-validation trial. A single row
@@ -491,12 +499,20 @@ class MLExperimentResults:
 
         copy = self._dataframe.copy(deep=True)
 
+        if sort_by_score:
+            copy = copy.iloc[self.best_trial_indexes]
+
+        # need to query after we sort so that e.g. best_trial_indexes correspond to same rows
+        if query:
+            copy = copy.query(query)
+
+        # need to do this after querying because the it's possible a columns could become zero-variance after
+        # the query
         if exclude_zero_variance_params:
             zero_variance_columns = [x for x in self.parameter_names if len(copy[x].unique()) == 1]
             copy = copy.drop(columns=zero_variance_columns)
 
-        if sort_by_score:
-            copy = copy.iloc[self.best_trial_indexes]
+        copy = copy.dropna(axis=1, how='all')  # drop columns that have all NAs
 
         return copy
 
@@ -506,6 +522,7 @@ class MLExperimentResults:
                                num_rows: int = 50,
                                primary_score_only: bool = False,
                                exclude_zero_variance_params: bool = True,
+                               query: str = None,
                                return_style: bool = True,
                                sort_by_score: bool = True) -> Union[pd.DataFrame, Styler]:
         """This function converts the score information from the SearchCV object into a pd.DataFrame or a
@@ -525,6 +542,12 @@ class MLExperimentResults:
                 if True, then only include the primary score.
             exclude_zero_variance_params:
                 if True, exclude columns that only have 1 unique value
+            query:
+                a string that queries the resulting pd.DataFrame (passed directly to pandas `.query()`)
+
+                For example, if multiple models are being searched, and `model` is a parameter name (and a
+                resulting column), then a query value of `"model == 'LogisticRegression(...)'"` would return
+                only the rows where the value of the `model` column matches `LogisticRegression(...)`.
             return_style:
                 If True, return Styler object, else return pd.DataFrame
             sort_by_score:
@@ -535,7 +558,16 @@ class MLExperimentResults:
             Returns either pd.DataFrame or pd.DataFrame.Styler.
         """
         cv_dataframe = self.to_dataframe(sort_by_score=sort_by_score,
-                                         exclude_zero_variance_params=exclude_zero_variance_params)
+                                         exclude_zero_variance_params=exclude_zero_variance_params,
+                                         query=query)
+
+        # if we are querying (and returning the style, i.e. highlighting rows within 1 standard error), then
+        # we need to only include the indexes that remain after querying
+        indexes_within_1_standard_error = self.indexes_within_1_standard_error
+        if query and return_style:
+            indexes_within_1_standard_error = [x for x in indexes_within_1_standard_error
+                                               if x in cv_dataframe.index]
+
         cv_dataframe = cv_dataframe.head(num_rows)
 
         score_columns = list(cv_dataframe.columns[cv_dataframe.columns.str.endswith((' Mean',
@@ -578,21 +610,29 @@ class MLExperimentResults:
             # were in the final set
             columns_to_highlight = [x for x in self.parameter_names if x in final_columns]
             cv_dataframe.applymap(highlight_cols,
-                             subset=pd.IndexSlice[self.indexes_within_1_standard_error,
+                             subset=pd.IndexSlice[indexes_within_1_standard_error,
                                                   columns_to_highlight])
 
         return cv_dataframe
 
-    def to_labeled_dataframe(self) -> pd.DataFrame:
+    def to_labeled_dataframe(self, query: str = None) -> pd.DataFrame:
         """Returns a pd.DataFrame similar to `to_dataframe()` with additional columns 'Trial Index' and
         'labels' (which are the labels corresponding to the `trial_label` property and collapse all the
         name/values for the hyper-parameters into a single string)
 
         This function is mainly used internally to generate graphs, but is useful for users creating custom
         graphs that are not yet implemented by the class.
+
+        Args:
+            query:
+                a string that queries the resulting pd.DataFrame (passed directly to pandas `.query()`)
+
+                For example, if multiple models are being searched, and `model` is a parameter name (and a
+                resulting column), then a query value of `"model == 'LogisticRegression(...)'"` would return
+                only the rows where the value of the `model` column matches `LogisticRegression(...)`.
         """
         if self._labeled_dataframe is None:
-            labeled_dataframe = self.to_dataframe(sort_by_score=False)  # leave original trial order
+            labeled_dataframe = self.to_dataframe(sort_by_score=False, query=query)  # leave original trial order
             columns = labeled_dataframe.columns.to_list()  # cache columns to move Iteration column to front
             labeled_dataframe['Trial Index'] = np.arange(1, self.number_of_trials + 1)
             labeled_dataframe = labeled_dataframe[['Trial Index'] + columns]

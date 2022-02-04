@@ -216,8 +216,21 @@ class TestSklearnEval(unittest.TestCase):
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe.txt'):
             print_dataframe(results.to_dataframe())
 
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__xgboost.txt'):
+            print_dataframe(results.to_dataframe(query="model == 'XGBClassifier(...)'"))
+
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__logistic.txt'):
+            print_dataframe(results.to_dataframe(query="model == 'LogisticRegression(...)'"))
+
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe.html', 'w') as file:
             file.write(results.to_formatted_dataframe().render())
+
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__xgboost.html', 'w') as file:
+            file.write(results.to_formatted_dataframe(query="model == 'XGBClassifier(...)'").render())
+
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__logistic.html', 'w') as file:
+            file.write(results.to_formatted_dataframe(query="model == 'LogisticRegression(...)'").render())
+
 
 
 
