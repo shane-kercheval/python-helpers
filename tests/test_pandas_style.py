@@ -46,7 +46,7 @@ class TestPandasStyle(unittest.TestCase):
     def test_bar_inverse(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
         # a count of `0` for a category (i.e. category existed but not any values)
-        test_data = self.sample_data
+        test_data = self.sample_data.copy()
         test_data.insert(loc=1,
                          column='col_a_copy',
                          value=test_data['col_a'].copy())
