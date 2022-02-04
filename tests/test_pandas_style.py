@@ -5,7 +5,7 @@ from helpsk.pandas import *
 from helpsk.pandas_style import html_escape_dataframe
 from helpsk.utility import suppress_warnings
 from helpsk.validation import dataframes_match
-from tests.helpers import get_data_credit, get_test_path
+from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
 
 
 @unique
@@ -36,12 +36,12 @@ class TestPandasStyle(unittest.TestCase):
 
     def test_format(self):
         with open(get_test_path() + '/test_files/pandas_style/format__default.html', 'w') as file:
-            file.write(pstyle.format(self.sample_data).render())
+            file.write(clean_formatted_dataframe(pstyle.format(self.sample_data).render()))
 
     def test_background_color(self):
         with suppress_warnings():
             with open(get_test_path() + '/test_files/pandas_style/background_color__default.html', 'w') as file:
-                file.write(pstyle.background_color(self.sample_data).render())
+                file.write(clean_formatted_dataframe(pstyle.background_color(self.sample_data).render()))
 
     def test_bar_inverse(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
@@ -62,7 +62,7 @@ class TestPandasStyle(unittest.TestCase):
                 pipe(pstyle.bar_inverse, subset='bar_inverse', color='green'). \
                 render()
 
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
     def test_all_styles(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
@@ -78,7 +78,7 @@ class TestPandasStyle(unittest.TestCase):
                 pipe(pstyle.bar_inverse, subset='credit_amount_copy', color='gray'). \
                 bar(subset=['credit_amount'], color='grey'). \
                 render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
     def test_html_escape_dataframe(self):
         dataframe = pd.DataFrame({

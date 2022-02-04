@@ -13,7 +13,7 @@ from helpsk.sklearn_eval import MLExperimentResults
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 from helpsk.sklearn_search import ClassifierSearchSpace
 from helpsk.utility import redirect_stdout_to_file
-from tests.helpers import get_data_credit, get_test_path
+from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
 
 
 # noinspection PyMethodMayBeStatic
@@ -224,13 +224,13 @@ class TestSklearnEval(unittest.TestCase):
             print_dataframe(results.to_dataframe(query="model == 'LogisticRegression(...)'"))
 
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe.html', 'w') as file:
-            file.write(results.to_formatted_dataframe().render())
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe().render()))
 
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__xgboost.html', 'w') as file:
-            file.write(results.to_formatted_dataframe(query="model == 'XGBClassifier(...)'").render())
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query="model == 'XGBClassifier(...)'").render()))
 
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__logistic.html', 'w') as file:
-            file.write(results.to_formatted_dataframe(query="model == 'LogisticRegression(...)'").render())
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query="model == 'LogisticRegression(...)'").render()))
 
         # pd.set_option('display.max_columns', 500)
         # pd.set_option('display.width', 10000)

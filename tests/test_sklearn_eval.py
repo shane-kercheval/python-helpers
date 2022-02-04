@@ -19,7 +19,7 @@ from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults, TwoClassEvaluator, RegressionEvaluator
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 from helpsk.utility import redirect_stdout_to_file
-from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing
+from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing, clean_formatted_dataframe
 
 
 def warn(*args, **kwargs):  # noqa
@@ -312,13 +312,13 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[3]].tolist())
 
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores.html', 'w') as file:
-            file.write(parser.to_formatted_dataframe().render())
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().render()))
 
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores_2.html', 'w') as file:
-            file.write(parser.to_formatted_dataframe(exclude_zero_variance_params=False).render())
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(exclude_zero_variance_params=False).render()))
 
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__primary_score_only.html', 'w') as file:
-            file.write(parser.to_formatted_dataframe(primary_score_only=True).render())
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).render()))
 
         assert_np_arrays_are_close(parser.primary_score_averages,
                                    np.array(parser.test_score_averages[parser.primary_score_name]))
@@ -553,10 +553,10 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[2]].tolist())
 
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__single_score_all_scores.html', 'w') as file:
-            file.write(parser.to_formatted_dataframe().render())
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().render()))
 
         with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__single_score_primary_score_only.html', 'w') as file:
-            file.write(parser.to_formatted_dataframe(primary_score_only=True).render())
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).render()))
 
         self.assertTrue(isinstance(parser.test_score_averages, dict))
         self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
@@ -761,10 +761,10 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(list(grid_search_housing.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
 
         with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__all_scores.html', 'w') as file:
-            file.write(parser.to_formatted_dataframe().render())
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().render()))
 
         with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__primary_score_only.html', 'w') as file:
-            file.write(parser.to_formatted_dataframe(primary_score_only=True).render())
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).render()))
 
         self.assertTrue(isinstance(parser.test_score_averages, dict))
         self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
@@ -961,35 +961,35 @@ class TestSklearnEval(unittest.TestCase):
             table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   dummy_classifier_strategy=None,
                                                   return_style=True).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__dummy.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   dummy_classifier_strategy='prior',
                                                   return_style=True).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__dummies.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   dummy_classifier_strategy=['prior', 'constant'],
                                                   return_style=True).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__round_3.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   return_style=True,
                                                   round_by=3).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__with_details.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=True, return_style=True).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__with_details__round_3.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=True,
                                                   return_style=True,
                                                   round_by=3).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
     def test_RegressionEvaluator(self):
         evaluator = RegressionEvaluator(actual_values=self.housing_data__y_test,
@@ -1009,25 +1009,25 @@ class TestSklearnEval(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True,
                                                   dummy_regressor_strategy=None).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__dummy.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True,
                                                   dummy_regressor_strategy='mean').render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__dummies.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True,
                                                   dummy_regressor_strategy=['mean', 'median']).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__round_3.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True, round_by=3).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__round_0.html', 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True, round_by=0).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/reg_eval__plot_residuals_vs_fits.png',
                    plot_function=lambda: evaluator.plot_residuals_vs_fits())
@@ -1093,8 +1093,8 @@ class TestSklearnEval(unittest.TestCase):
 
         with open(get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain.html', 'w') as file:
             table_html = evaluator.calculate_lift_gain(return_style=True).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain__10_buckets.html', 'w') as file:
             table_html = evaluator.calculate_lift_gain(return_style=True, num_buckets=10).render()
-            file.write(table_html)
+            file.write(clean_formatted_dataframe(table_html))

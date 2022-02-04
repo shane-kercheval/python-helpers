@@ -6,7 +6,7 @@ from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
 from helpsk.validation import iterables_are_equal, assert_dataframes_match
-from tests.helpers import get_data_credit, get_test_path
+from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
 
 
 @unique
@@ -497,7 +497,7 @@ class TestPandas(unittest.TestCase):
                                  numeric_summary(test_data))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__credit__all_missing.html',
-                                 numeric_summary(test_data, return_style=True).render())
+                                 clean_formatted_dataframe(numeric_summary(test_data, return_style=True).render()))
 
     def test_numeric_summary_style(self):
         test_data = self.credit_data.copy()
@@ -505,10 +505,10 @@ class TestPandas(unittest.TestCase):
         test_data.loc[10:54, ['credit_amount']] = 0
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__credit.html',
-                                 numeric_summary(test_data, return_style=True).render())
+                                 clean_formatted_dataframe(numeric_summary(test_data, return_style=True).render()))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__sample.html',
-                                 numeric_summary(self.sample_data, return_style=True).render())
+                                 clean_formatted_dataframe(numeric_summary(self.sample_data, return_style=True).render()))
 
     def test_non_numeric_summary(self):
         credit_data = self.credit_data.copy()
@@ -527,7 +527,7 @@ class TestPandas(unittest.TestCase):
                                  non_numeric_summary(test_data))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit__all_missing.html',
-                                 non_numeric_summary(test_data, return_style=True).render())
+                                 clean_formatted_dataframe(non_numeric_summary(test_data, return_style=True).render()))
 
     def test_non_numeric_summary_test(self):
         test_data = self.credit_data.copy()
@@ -535,10 +535,10 @@ class TestPandas(unittest.TestCase):
         test_data.loc[25:75, ['checking_status']] = np.nan
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit.html',
-                                 non_numeric_summary(test_data, return_style=True).render())
+                                 clean_formatted_dataframe(non_numeric_summary(test_data, return_style=True).render()))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__sample.html',
-                                 non_numeric_summary(self.sample_data, return_style=True).render())
+                                 clean_formatted_dataframe(non_numeric_summary(self.sample_data, return_style=True).render()))
 
     def test_convert_integer_series_to_categorical(self):
         # check that function fails if mapping doesn't contains all numbers in data
@@ -805,7 +805,7 @@ class TestPandas(unittest.TestCase):
 
         results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=True)
         with open(get_test_path() + '/test_files/pandas/count_groups.html', 'w') as file:
-            file.write(results.render())
+            file.write(clean_formatted_dataframe(results.render()))
 
         # test all of group 1 missing group_sum
         data.loc[data['target'] == True, 'credit_amount'] = np.nan  # noqa
@@ -820,4 +820,4 @@ class TestPandas(unittest.TestCase):
 
         results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=True)
         with open(get_test_path() + '/test_files/pandas/count_groups_group_1_na_sum.html', 'w') as file:
-            file.write(results.render())
+            file.write(clean_formatted_dataframe(results.render()))

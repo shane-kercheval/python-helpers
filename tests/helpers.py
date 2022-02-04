@@ -1,4 +1,5 @@
 import os
+import re
 from importlib import reload
 from os import getcwd
 from typing import Callable, Union
@@ -90,6 +91,30 @@ def check_plot(file_name: str, plot_function: Callable, set_size_w_h: Union[tupl
     plt.savefig(file_name)
     clear()
     assert os.path.isfile(file_name)
+
+
+def clean_formatted_dataframe(rendered):
+    """`This dataframe changes the random code generated when saving formatted dataframes
+    (i.e df.style.render()). This is necessary because it each time unit tests are ran, the html changes,
+    and it is difficult to know if the change/diff occurred because of the random code, or because something
+    actually changed.
+
+    For example, it changes the `1ef9B` in
+
+    ```
+    '<style type="text/css">\n#T_1ef9B_row0_col0, #T_1ef9B_row0_col1, ...
+    ```
+
+    to `99999`:
+
+    ```
+    '<style type="text/css">\n#T_99999_row0_col0, #T_99999_row0_col1, ...
+    ```
+    `"""
+    temp = rendered.replace('\n', '')
+    'style type="text/css">#T_d3e0b_row0_col1'
+    code = re.sub('_row.*', '_', rendered.replace('\n', '')).replace('<style type="text/css">#T', '')
+    return rendered.replace(code, '_99999_')
 
 
 def get_data_credit() -> pd.DataFrame:
