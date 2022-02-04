@@ -7,9 +7,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize, MinMaxScaler, StandardScaler, OneHotEncoder
 from skopt import BayesSearchCV
 
+from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 from helpsk.sklearn_search import ClassifierSearchSpace
+from helpsk.utility import redirect_stdout_to_file
 from tests.helpers import get_data_credit, get_test_path
 
 
@@ -198,17 +200,8 @@ class TestSklearnEval(unittest.TestCase):
         del search_spaces
 
         mappings = self.search_space.param_name_mappings()
-        self.assertEqual(mappings,
-                         OrderedDict([('model', 'model'),
-                                      ('model__C', 'C'),
-                                      ('model__max_depth', 'max_depth'),
-                                      ('model__n_estimators', 'n_estimators'),
-                                      ('model__learning_rate', 'learning_rate'),
-                                      ('model__colsample_bytree', 'colsample_bytree'),
-                                      ('model__subsample', 'subsample'),
-                                      ('prep__numeric__imputer__transformer', 'imputer'),
-                                      ('prep__numeric__scaler__transformer', 'scaler'),
-                                      ('prep__non_numeric__encoder__transformer', 'encoder')]))
+        with open(get_test_path() + '/test_files/sklearn_search/param_name_mappings_default.txt', 'w') as file:
+            file.write(to_string(mappings))
 
     def test_eval(self):
 
@@ -220,7 +213,14 @@ class TestSklearnEval(unittest.TestCase):
         )
         results.to_yaml_file(get_test_path() + '/test_files/sklearn_search/multi-model-search.yaml')
 
-        temp = results.to_dataframe()
+        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe.txt'):
+            print_dataframe(results.to_dataframe())
+
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe.html', 'w') as file:
+            file.write(results.to_formatted_dataframe().render())
+
+
+
         results.trials
         results.parameter_names
         results.trial_labels()
@@ -240,4 +240,4 @@ class TestSklearnEval(unittest.TestCase):
 
         #test that exclude_zero_variance_params works because now we will have params that might only
         # be zero variance but will also include NAs when there are multiple spaces; so unique would return
-        # a lenght of two, the value and NA
+        # a length of two, the value and NA
