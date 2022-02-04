@@ -112,8 +112,11 @@ def clean_formatted_dataframe(rendered):
     ```
     `"""
     temp = rendered.replace('\n', '')
-    'style type="text/css">#T_d3e0b_row0_col1'
-    code = re.sub('_row.*', '_', rendered.replace('\n', '')).replace('<style type="text/css">#T', '')
+    if temp.startswith('<style type="text/css"></style>'):
+        code = re.sub('_">  <.*', '_', temp).replace('<style type="text/css"></style><table id="T', '')
+    else:
+        code = re.sub('_row.*', '_', temp).replace('<style type="text/css">#T', '')
+
     return rendered.replace(code, '_99999_')
 
 
