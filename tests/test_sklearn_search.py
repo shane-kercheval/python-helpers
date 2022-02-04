@@ -236,7 +236,7 @@ class TestSklearnEval(unittest.TestCase):
         # pd.set_option('display.width', 10000)
 
         def label_column_formatter(label_column):
-            return [str(x).replace('<br>', '; ').replace('; model', '\nmodel').replace('; ', '\n       ') for x in label_column]
+            return [str(value).replace('<br>', '; ').replace('; model', '\nmodel').replace('; ', '\n       ') for value in label_column]
 
         labeled_df = results.to_labeled_dataframe()
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe.txt'):
