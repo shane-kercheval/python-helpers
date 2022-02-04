@@ -1,9 +1,7 @@
 import re
 import unittest
-from collections import OrderedDict
 
 import numpy as np
-import pandas as pd
 from sklearn.model_selection import RepeatedKFold
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import label_binarize, MinMaxScaler, StandardScaler, OneHotEncoder
