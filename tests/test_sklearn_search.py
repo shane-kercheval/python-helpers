@@ -11,19 +11,15 @@ from helpsk import validation
 from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
-from helpsk.sklearn_search import ClassifierSearchSpace
+from helpsk.sklearn_search import ClassifierSearchSpace, ClassifierSearchSpaceModels
 from helpsk.utility import redirect_stdout_to_file
 from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
 
 
 # noinspection PyMethodMayBeStatic
-class TestSklearnEval(unittest.TestCase):
+class TestSklearnSearch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        ####
-        # set up grid-search on classification model for credit data
-        ####
-
         credit_data = get_data_credit()
         credit_data.loc[0:46, ['duration']] = np.nan
         credit_data.loc[25:75, ['checking_status']] = np.nan
@@ -33,10 +29,15 @@ class TestSklearnEval(unittest.TestCase):
         y_full = label_binarize(y_full, classes=['good', 'bad']).flatten()
         X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)  # noqa
         del y_full, X_full
-        cls.search_space = ClassifierSearchSpace(data=X_train)
-
+        cls.default_search_space = ClassifierSearchSpace(data=X_train)
+        cls.X_train = X_train
+        cls.y_train = y_train
         cls.search_space_used = ClassifierSearchSpace(
             data=X_train,
+            models=[
+                ClassifierSearchSpaceModels.XGBoost,
+                ClassifierSearchSpaceModels.LogisticRegression
+            ],
             iterations=[5, 5]
         )
         # pip install scikit-optimize
@@ -190,21 +191,24 @@ class TestSklearnEval(unittest.TestCase):
             file.write(to_string(xgboost_space))
         del xgboost_space
 
-        pipeline = self.search_space.pipeline()
+        pipeline = self.default_search_space.pipeline()
         with open(get_test_path() + '/test_files/sklearn_search/pipeline_default.txt', 'w') as file:
             file.write(to_string(pipeline))
         del pipeline
 
-        search_spaces = self.search_space.search_spaces()
+        search_spaces = self.default_search_space.search_spaces()
         with open(get_test_path() + '/test_files/sklearn_search/search_spaces_default.txt', 'w') as file:
             file.write(to_string(search_spaces))
         del search_spaces
 
-        mappings = self.search_space.param_name_mappings()
+        mappings = self.default_search_space.param_name_mappings()
         with open(get_test_path() + '/test_files/sklearn_search/param_name_mappings_default.txt', 'w') as file:
             file.write(to_string(mappings))
 
     def test_MLExperimentResults_multi_model(self):
+
+        from xgboost import XGBClassifier
+        XGBClassifier()
 
         results = MLExperimentResults.from_sklearn_search_cv(
             searcher=self.bayes_search,
@@ -212,6 +216,7 @@ class TestSklearnEval(unittest.TestCase):
             description='BayesSearchCV using ClassifierSearchSpace',
             parameter_name_mappings=self.search_space_used.param_name_mappings()
         )
+
         results.to_yaml_file(get_test_path() + '/test_files/sklearn_search/multi-model-search.yaml')
 
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe.txt'):
@@ -407,3 +412,25 @@ class TestSklearnEval(unittest.TestCase):
                 else:
                     self.assertEqual(results.best_params[new_name],
                                      str(bayes_search.best_params_[original_name]))
+
+    def test_MLExperimentResults_all_models(self):
+        search_space = ClassifierSearchSpace(
+            data=self.X_train,
+            iterations=[1] * len(ClassifierSearchSpaceModels.list())
+        )
+        bayes_search = BayesSearchCV(
+            estimator=search_space.pipeline(),  # noqa
+            search_spaces=search_space.search_spaces(),  # noqa
+            cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
+            scoring='roc_auc',
+            refit=False,  # required if passing in multiple scorers
+            return_train_score=False,
+            n_jobs=-1,
+            verbose=0,
+            random_state=42,
+        )
+        bayes_search.fit(self.X_train, self.y_train)  # noqa
+
+        results = MLExperimentResults.from_sklearn_search_cv(bayes_search,
+                                                             parameter_name_mappings=search_space.param_name_mappings())
+        self.assertIsNotNone(results)
