@@ -446,13 +446,16 @@ class TestSklearnSearch(unittest.TestCase):
                                                                                 include_rank=True).render()))
 
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-num_rows.html', 'w') as file:
-            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(num_rows=40,return_style=True).render()))
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(num_rows=40,
+                                                                                return_style=True).render()))
 
-        len(results.indexes_within_1_standard_error)
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-num_rows.html', 'w') as file:
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(num_rows=40,
+                                                                                return_style=True).render()))
 
-        results.to_formatted_dataframe(return_style=True).render()
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-XGBClassifier.html', 'w') as file:
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query='model == "XGBClassifier(...)"').render()))
 
-        results.to_formatted_dataframe(query='model == "XGBClassifier(...)"').render()
         results.to_formatted_dataframe(query='model == "XGBClassifier(...)"', num_rows=10).render()
 
         with open(get_test_path() + '/test_files/pandas/count_groups_group_1_na_sum.html', 'w') as file:
