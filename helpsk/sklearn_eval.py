@@ -523,6 +523,7 @@ class MLExperimentResults:
                                primary_score_only: bool = False,
                                exclude_zero_variance_params: bool = True,
                                query: str = None,
+                               include_rank=False,
                                return_style: bool = True,
                                sort_by_score: bool = True) -> Union[pd.DataFrame, Styler]:
         """This function converts the score information from the SearchCV object into a pd.DataFrame or a
@@ -548,6 +549,8 @@ class MLExperimentResults:
                 For example, if multiple models are being searched, and `model` is a parameter name (and a
                 resulting column), then a query value of `"model == 'LogisticRegression(...)'"` would return
                 only the rows where the value of the `model` column matches `LogisticRegression(...)`.
+            include_rank:
+                if True, include a column to show the index of score rank.
             return_style:
                 If True, return Styler object, else return pd.DataFrame
             sort_by_score:
@@ -561,14 +564,12 @@ class MLExperimentResults:
                                          exclude_zero_variance_params=exclude_zero_variance_params,
                                          query=query)
 
-        # if we are querying (and returning the style, i.e. highlighting rows within 1 standard error), then
-        # we need to only include the indexes that remain after querying
-        indexes_within_1_standard_error = self.indexes_within_1_standard_error
-        if query and return_style:
-            indexes_within_1_standard_error = [x for x in indexes_within_1_standard_error
-                                               if x in cv_dataframe.index]
-
         cv_dataframe = cv_dataframe.head(num_rows)
+
+        # if, for example, we are querying (and returning the style, i.e. highlighting rows within 1 standard
+        # error), then we need to only include the indexes that remain after querying
+        indexes_within_1_standard_error = [x for x in self.indexes_within_1_standard_error
+                                           if x in cv_dataframe.index]
 
         score_columns = list(cv_dataframe.columns[cv_dataframe.columns.str.endswith((' Mean',
                                                                                      ' 95CI.LO',
@@ -579,7 +580,12 @@ class MLExperimentResults:
 
         cv_dataframe = cv_dataframe.round(dict(zip(score_columns, [round_by] * len(score_columns))))
 
-        final_columns = cv_dataframe.columns  # save for style logic
+        final_columns = list(cv_dataframe.columns)  # save for style logic
+
+        if include_rank:
+            cv_dataframe['rank'] = list(range(1, cv_dataframe.shape[0] + 1))
+            final_columns = ['rank'] + final_columns
+            cv_dataframe = cv_dataframe[final_columns]
 
         if return_style:
             cv_dataframe = cv_dataframe.style
