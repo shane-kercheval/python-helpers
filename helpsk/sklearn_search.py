@@ -211,10 +211,10 @@ class ClassifierSearchSpace:
 
     @staticmethod
     def _search_space_xgboost(eval_metric='logloss',
-                              max_depth=(1, 100),
+                              max_depth=(1, 50),
                               learning_rate=(0.0001, 0.5),
                               n_estimators=(100, 2000),
-                              min_child_weight=(1, 100),
+                              min_child_weight=(1, 50),
                               subsample=(0.5, 1),
                               colsample_bytree=(0.5, 1),
                               colsample_bylevel=(0.5, 1),
