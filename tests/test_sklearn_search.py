@@ -456,10 +456,26 @@ class TestSklearnSearch(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-XGBClassifier.html', 'w') as file:
             file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query='model == "XGBClassifier(...)"').render()))
 
-        results.to_formatted_dataframe(query='model == "XGBClassifier(...)"', num_rows=10).render()
+        labeled_dataframe = results.to_labeled_dataframe()
+        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, results.number_of_trials + 1))))
+        self.assertIsNotNone(labeled_dataframe['label'])
+        validation.assert_dataframes_match(dataframes=[results.to_dataframe(sort_by_score=False),
+                                                       labeled_dataframe.drop(columns=['Trial Index',
+                                                                                       'label'])])
 
-        with open(get_test_path() + '/test_files/pandas/count_groups_group_1_na_sum.html', 'w') as file:
-            file.write(clean_formatted_dataframe(results.render()))
+        def to_string(obj):
+            return str(obj).\
+                replace(", '", ",\n'").\
+                replace('{', '{\n').\
+                replace('}', '\n}').\
+                replace(', ({', ',\n({')
 
+        labels = results.trial_labels(order_from_best_to_worst=True)
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-trial_labels_sorted.txt', 'w') as file:
+            file.write(to_string(labels))
+        del labels
 
-
+        labels = results.trial_labels(order_from_best_to_worst=False)
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-trial_labels_not_sorted.txt', 'w') as file:
+            file.write(to_string(labels))
+        del labels
