@@ -434,3 +434,29 @@ class TestSklearnSearch(unittest.TestCase):
         results = MLExperimentResults.from_sklearn_search_cv(bayes_search,
                                                              parameter_name_mappings=search_space.param_name_mappings())
         self.assertIsNotNone(results)
+
+    def test_MLExperimentResults_many_models(self):
+        # loads in a yaml created from running ClassifierSearchSpace in external jupyter notebook
+        # the purpose is not to check the values against the sklearn cv_results_ object, but rather to
+        # make sure that the results can be parsed by MLExperimentResults
+        results = MLExperimentResults.from_yaml_file(get_test_path() + '/test_files/sklearn_search/multi-model-many.yaml')
+
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-all.html', 'w') as file:
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(num_rows=1000,
+                                                                                include_rank=True).render()))
+
+        with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-num_rows.html', 'w') as file:
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(num_rows=40,return_style=True).render()))
+
+        len(results.indexes_within_1_standard_error)
+
+        results.to_formatted_dataframe(return_style=True).render()
+
+        results.to_formatted_dataframe(query='model == "XGBClassifier(...)"').render()
+        results.to_formatted_dataframe(query='model == "XGBClassifier(...)"', num_rows=10).render()
+
+        with open(get_test_path() + '/test_files/pandas/count_groups_group_1_na_sum.html', 'w') as file:
+            file.write(clean_formatted_dataframe(results.render()))
+
+
+
