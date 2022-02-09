@@ -294,7 +294,7 @@ class ClassifierSearchSpace:
                 assert False
 
             search_spaces = search_spaces + [(space, num_iterations)]
-        
+
         return search_spaces
 
     def param_name_mappings(self):
