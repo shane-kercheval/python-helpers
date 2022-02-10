@@ -543,10 +543,16 @@ class TestPandas(unittest.TestCase):
         test_data['purpose'] = test_data['purpose'].replace({'radio/tv': '1111111111222222222233333333334444444444'})
         test_data['all_missing'] = None
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__credit__all_missing.txt',
-                                 non_numeric_summary(test_data))
+                                 non_numeric_summary(test_data, return_style=False, sort_by_columns=False))
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__credit__all_missing__sorted.txt',
+                                 non_numeric_summary(test_data, return_style=False, sort_by_columns=True))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit__all_missing.html',
-                                 clean_formatted_dataframe(non_numeric_summary(test_data, return_style=True).render()))
+                                 clean_formatted_dataframe(non_numeric_summary(test_data, return_style=True, sort_by_columns=False).render()))
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit__all_missing__sorted.html',
+                                 clean_formatted_dataframe(non_numeric_summary(test_data, return_style=True, sort_by_columns=True).render()))
 
     def test_non_numeric_summary_test(self):
         test_data = self.credit_data.copy()
