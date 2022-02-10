@@ -1,0 +1,15 @@
+                     # of Non-Nulls  # of Nulls  % Nulls                     Most Freq. Value  # of Unique  % Unique
+checking_status                1000           0      0.0                          no checking            4     0.004
+credit_history                 1000           0      0.0                        existing paid            5     0.005
+employment                     1000           0      0.0                               1<=X<4            5     0.005
+foreign_worker                 1000           0      0.0                                  yes            2     0.002
+housing                        1000           0      0.0                                  own            3     0.003
+job                            1000           0      0.0                              skilled            4     0.004
+other_parties                  1000           0      0.0                                 none            3     0.003
+other_payment_plans            1000           0      0.0                                 none            3     0.003
+own_telephone                  1000           0      0.0                                 none            2     0.002
+personal_status                1000           0      0.0                          male single            4     0.004
+property_magnitude             1000           0      0.0                                  car            4     0.004
+purpose                        1000           0      0.0  111111111122222222223333333333[...]           10     0.010
+savings_status                 1000           0      0.0                                 <100            5     0.005
+target                         1000           0      0.0                                 good            2     0.002
