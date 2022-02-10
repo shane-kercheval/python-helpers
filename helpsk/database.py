@@ -205,11 +205,14 @@ class Snowflake(Database):
     Instructions for installing snowflake dependencies:
         https://docs.snowflake.com/en/user-guide/python-connector-install.html
 
-    I used v2.5.0, and python v3.9 (requirements_39):
+    I used v2.7.4, and python v3.9 (requirements_39):
+
+    This page shows the latest versions:
+        https://pypi.org/project/snowflake-connector-python/
 
     ```
-    pip install -r ......./snowflake-connector-python/v2.5.0/tested_requirements/requirements_39.reqs
-    pip install snowflake-connector-python==v2.5.0
+    pip install -r ......./snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
+    pip install snowflake-connector-python==v2.7.4
     ```
 
     Additionally:
