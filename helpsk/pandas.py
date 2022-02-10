@@ -404,8 +404,10 @@ def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
 
 def numeric_summary(dataframe: pd.DataFrame,
                     round_by: int = 2,
-                    return_style: bool = False) -> Union[pd.DataFrame, Styler, None]:
-    """Provides a summary of basic stats for the numeric columns of a DataFrame.
+                    return_style: bool = True,
+                    sort_by_columns: bool = False) -> Union[pd.DataFrame, Styler, None]:
+    """Provides a summary of basic stats for the numeric columns of a DataFrame. Each numeric column in
+    `dataframe` will correspond to a row in the pd.DataFrame returned.
 
     Args:
         dataframe:
@@ -415,6 +417,10 @@ def numeric_summary(dataframe: pd.DataFrame,
         return_style:
             If True, returns a pd.DataFrame.style object. This can be used for displaying in Jupyter Notebook.
             If False, returns a pd.DataFrame
+        sort_by_columns:
+            If True, sorts the rows of the pd.DataFrame returned by the name of the columns of `dataframe`,
+            alphabetically. If False, return the rows in the order of that of the original `dataframe`
+            columns.
 
     Returns:
         Returns a pandas DataFrame with the following attributes (returned as columns) for each of the
@@ -485,8 +491,10 @@ def numeric_summary(dataframe: pd.DataFrame,
          'Max': [round(dataframe[x].max(), round_by) for x in numeric_columns]},
         index=columns)
 
-    if return_style:
+    if sort_by_columns:
+        results = results.sort_index()
 
+    if return_style:
         results = pstyle.html_escape_dataframe(results)
 
         columns_to_format = [x for x in results.columns
@@ -511,9 +519,11 @@ def numeric_summary(dataframe: pd.DataFrame,
 
 
 def non_numeric_summary(dataframe: pd.DataFrame,
-                        return_style: bool = False,
-                        unique_freq_value_max_chars: int = 30) -> Union[pd.DataFrame, None]:
-    """Provides a summary of basic stats for the non-numeric columns of a DataFrame.
+                        return_style: bool = True,
+                        unique_freq_value_max_chars: int = 30,
+                        sort_by_columns: bool = False) -> Union[pd.DataFrame, None]:
+    """Provides a summary of basic stats for the non-numeric columns of a DataFrame. Each non-numeric column
+    in `dataframe` will correspond to a row in the pd.DataFrame returned.
 
     Args:
         dataframe:
@@ -524,6 +534,10 @@ def non_numeric_summary(dataframe: pd.DataFrame,
         unique_freq_value_max_chars:
             the maximum number of characters to display in the `Most Freq. Value` column
             If the value is truncated, then `[...]` is appended to the value to indicate it was shortened
+        sort_by_columns:
+            If True, sorts the rows of the pd.DataFrame returned by the name of the columns of `dataframe`,
+            alphabetically. If False, return the rows in the order of that of the original `dataframe`
+            columns.
 
     Returns:
         Returns a pandas DataFrame with the following attributes (returned as columns) for each of the
@@ -576,6 +590,9 @@ def non_numeric_summary(dataframe: pd.DataFrame,
                             '# of Unique': num_unique,
                             '% Unique': perc_unique},
                            index=columns)
+
+    if sort_by_columns:
+        results = results.sort_index()
 
     if return_style:
         results = pstyle.html_escape_dataframe(results)
