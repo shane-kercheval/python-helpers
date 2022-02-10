@@ -485,19 +485,28 @@ class TestPandas(unittest.TestCase):
 
     def test_numeric_summary(self):
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__credit.txt',
-                                 numeric_summary(self.credit_data))
+                                 numeric_summary(self.credit_data, return_style=False, sort_by_columns=False))
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__credit__sorted.txt',
+                                 numeric_summary(self.credit_data, return_style=False, sort_by_columns=True))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__sample.txt',
-                                 numeric_summary(self.sample_data))
+                                 numeric_summary(self.sample_data, return_style=False, sort_by_columns=False))
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__sample__sorted.txt',
+                                 numeric_summary(self.sample_data, return_style=False, sort_by_columns=True))
 
     def test_numeric_summary__nan_column(self):
         test_data = self.credit_data.copy()
         test_data['all_missing'] = np.nan
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__credit__all_missing.txt',
-                                 numeric_summary(test_data))
+                                 numeric_summary(test_data, return_style=False))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__credit__all_missing.html',
-                                 clean_formatted_dataframe(numeric_summary(test_data, return_style=True).render()))
+                                 clean_formatted_dataframe(numeric_summary(test_data, return_style=True, sort_by_columns=False).render()))
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__credit__all_missing__sorted.html',
+                                 clean_formatted_dataframe(numeric_summary(test_data, return_style=True, sort_by_columns=True).render()))
 
     def test_numeric_summary_style(self):
         test_data = self.credit_data.copy()
@@ -505,7 +514,10 @@ class TestPandas(unittest.TestCase):
         test_data.loc[10:54, ['credit_amount']] = 0
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__credit.html',
-                                 clean_formatted_dataframe(numeric_summary(test_data, return_style=True).render()))
+                                 clean_formatted_dataframe(numeric_summary(test_data, return_style=True, sort_by_columns=False).render()))
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__credit__sorted.html',
+                                 clean_formatted_dataframe(numeric_summary(test_data, return_style=True, sort_by_columns=True).render()))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_numeric_summary__style__sample.html',
                                  clean_formatted_dataframe(numeric_summary(self.sample_data, return_style=True).render()))
@@ -513,11 +525,18 @@ class TestPandas(unittest.TestCase):
     def test_non_numeric_summary(self):
         credit_data = self.credit_data.copy()
         credit_data['purpose'] = credit_data['purpose'].replace({'radio/tv': '1111111111222222222233333333334444444444'})
+
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__credit.txt',
-                                 non_numeric_summary(credit_data))
+                                 non_numeric_summary(credit_data, return_style=False, sort_by_columns=False))
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__credit__sorted.txt',
+                                 non_numeric_summary(credit_data, return_style=False, sort_by_columns=True))
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__sample.txt',
-                                 non_numeric_summary(self.sample_data))
+                                 non_numeric_summary(self.sample_data, return_style=False, sort_by_columns=False))
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__sample__sorted.txt',
+                                 non_numeric_summary(self.sample_data, return_style=False, sort_by_columns=True))
 
     def test_non_numeric_summary__nan_column(self):
         test_data = self.credit_data.copy()
