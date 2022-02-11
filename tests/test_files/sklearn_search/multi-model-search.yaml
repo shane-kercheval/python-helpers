@@ -7,10 +7,14 @@ score_names:
 parameter_names:
 - model
 - model__max_depth
-- model__n_estimators
 - model__learning_rate
-- model__colsample_bytree
+- model__n_estimators
+- model__min_child_weight
 - model__subsample
+- model__colsample_bytree
+- model__colsample_bylevel
+- model__reg_alpha
+- model__reg_lambda
 - model__C
 - prep__numeric__imputer__transformer
 - prep__numeric__scaler__transformer
@@ -18,33 +22,37 @@ parameter_names:
 parameter_names_mapping:
   model: model
   model__max_depth: max_depth
-  model__n_estimators: n_estimators
   model__learning_rate: learning_rate
-  model__colsample_bytree: colsample_bytree
+  model__n_estimators: n_estimators
+  model__min_child_weight: min_child_weight
   model__subsample: subsample
+  model__colsample_bytree: colsample_bytree
+  model__colsample_bylevel: colsample_bylevel
+  model__reg_alpha: reg_alpha
+  model__reg_lambda: reg_lambda
   model__C: C
   prep__numeric__imputer__transformer: imputer
   prep__numeric__scaler__transformer: scaler
   prep__non_numeric__encoder__transformer: encoder
 test_score_rankings:
   roc_auc:
-  - 10
-  - 3
-  - 9
   - 5
-  - 8
+  - 3
+  - 10
+  - 9
+  - 6
   - 1
   - 4
+  - 8
   - 7
-  - 6
   - 2
 test_score_averages:
   roc_auc:
-  - 0.6953237481028642
-  - 0.749528698607775
-  - 0.7129896549012247
-  - 0.7249956464718301
-  - 0.7201128636750904
+  - 0.7310470373921603
+  - 0.7477872191367426
+  - 0.6988838275407324
+  - 0.7168138899817452
+  - 0.7260753494685872
   - 0.7572841788723951
   - 0.7398009194420251
   - 0.7206637158626356
@@ -52,11 +60,11 @@ test_score_averages:
   - 0.7524516660481084
 test_score_standard_deviations:
   roc_auc:
-  - 0.006550389860273028
-  - 0.003310917498753688
-  - 0.02737822905053269
-  - 0.013145136693474854
-  - 0.012794808840259282
+  - 0.013879640507650289
+  - 0.003415187478993287
+  - 0.022997420007865116
+  - 0.021351104269894793
+  - 0.007762749648129412
   - 0.015832681177252183
   - 0.02683802066055745
   - 0.030061507882577092
@@ -64,48 +72,68 @@ test_score_standard_deviations:
   - 0.027241897747693224
 trials:
 - model: XGBClassifier(...)
-  model__colsample_bytree: 0.8844821246070537
-  model__learning_rate: 0.09798893186641074
-  model__max_depth: 10
-  model__n_estimators: 871
-  model__subsample: 0.15608164675966435
-  prep__non_numeric__encoder__transformer: OneHotEncoder()
-  prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
-  prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
-  model__colsample_bytree: 0.9195352964526833
-  model__learning_rate: 0.04040915598028404
-  model__max_depth: 6
-  model__n_estimators: 229
-  model__subsample: 0.5082988094256691
-  prep__non_numeric__encoder__transformer: OneHotEncoder()
-  prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
-  prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
-  model__colsample_bytree: 0.1801528457825951
-  model__learning_rate: 0.18343365247851712
-  model__max_depth: 9
-  model__n_estimators: 547
-  model__subsample: 0.18590953529349413
+  model__colsample_bylevel: 0.9416576386904312
+  model__colsample_bytree: 0.6517050549420875
+  model__learning_rate: 0.4756168309060054
+  model__max_depth: 29
+  model__min_child_weight: 1
+  model__n_estimators: 151
+  model__reg_alpha: 0.0025962684183737316
+  model__reg_lambda: 2.4140544277669678
+  model__subsample: 0.9767400750948969
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
   prep__numeric__scaler__transformer: None
 - model: XGBClassifier(...)
-  model__colsample_bytree: 0.44364889457651413
-  model__learning_rate: 0.16271986876703082
-  model__max_depth: 8
-  model__n_estimators: 909
-  model__subsample: 0.7453280360438532
-  prep__non_numeric__encoder__transformer: OneHotEncoder()
+  model__colsample_bylevel: 0.9593612608346885
+  model__colsample_bytree: 0.5524295792763518
+  model__learning_rate: 0.21672306765492555
+  model__max_depth: 2
+  model__min_child_weight: 6
+  model__n_estimators: 159
+  model__reg_alpha: 0.10144020667237337
+  model__reg_lambda: 2.1654709911636405
+  model__subsample: 0.9866034888464443
+  prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: None
 - model: XGBClassifier(...)
-  model__colsample_bytree: 0.9399760402267441
-  model__learning_rate: 0.05744608180517957
-  model__max_depth: 4
-  model__n_estimators: 810
-  model__subsample: 0.43532180018493205
+  model__colsample_bylevel: 0.5859357806982803
+  model__colsample_bytree: 0.799023538756064
+  model__learning_rate: 0.4014021141000396
+  model__max_depth: 8
+  model__min_child_weight: 1
+  model__n_estimators: 962
+  model__reg_alpha: 0.30940078642444824
+  model__reg_lambda: 3.5402659040014948
+  model__subsample: 0.6933976321088419
   prep__non_numeric__encoder__transformer: OneHotEncoder()
+  prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
+  prep__numeric__scaler__transformer: None
+- model: XGBClassifier(...)
+  model__colsample_bylevel: 0.7190145932204617
+  model__colsample_bytree: 0.7633101185638462
+  model__learning_rate: 0.3578850597273058
+  model__max_depth: 34
+  model__min_child_weight: 17
+  model__n_estimators: 356
+  model__reg_alpha: 0.03991502512609639
+  model__reg_lambda: 1.6314646082653332
+  model__subsample: 0.8297131143495482
+  prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
+  prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
+  prep__numeric__scaler__transformer: None
+- model: XGBClassifier(...)
+  model__colsample_bylevel: 0.9696848688013859
+  model__colsample_bytree: 0.5818035893192751
+  model__learning_rate: 0.09429380335353854
+  model__max_depth: 23
+  model__min_child_weight: 4
+  model__n_estimators: 396
+  model__reg_alpha: 0.01377401781906964
+  model__reg_lambda: 2.9702160489961873
+  model__subsample: 0.7787136018188425
+  prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: None
 - model: LogisticRegression(...)
@@ -135,46 +163,46 @@ trials:
   prep__numeric__scaler__transformer: MinMaxScaler()
 timings:
   fit time averages:
-  - 0.5176599025726318
-  - 0.35719140370686847
-  - 0.12309177716573079
-  - 0.6776309013366699
-  - 0.8133610089619955
-  - 0.02013532320658366
-  - 0.02466297149658203
-  - 0.02984031041463216
-  - 0.031178712844848633
-  - 0.010313034057617188
+  - 0.12033534049987793
+  - 0.05240956942240397
+  - 0.6565103530883789
+  - 0.11594827969868977
+  - 0.21266651153564453
+  - 0.021702289581298828
+  - 0.02599366505940755
+  - 0.030471960703531902
+  - 0.03136030832926432
+  - 0.009780645370483398
   fit time standard deviations:
-  - 0.006279697367454461
-  - 0.004632952186185059
-  - 0.003401239775937254
-  - 0.006263544694712073
-  - 0.010189144126313544
-  - 0.0030848983563563485
-  - 0.005127634290473467
-  - 0.0014831678051215114
-  - 0.0006470650661366246
-  - 5.8974109871979e-05
+  - 0.0014437741089986381
+  - 8.63626852976598e-05
+  - 0.012212283600465786
+  - 0.0007089233981882761
+  - 0.0006913595342653932
+  - 0.0012068011027604106
+  - 0.006824744616926369
+  - 0.002131645590976675
+  - 0.0007912556103270271
+  - 0.0006425628262187877
   score time averages:
-  - 0.010688066482543945
-  - 0.008081992467244467
-  - 0.013527949651082357
-  - 0.012051979700724283
-  - 0.009256998697916666
-  - 0.004405021667480469
-  - 0.004242738087972005
-  - 0.00950932502746582
-  - 0.009302536646525065
-  - 0.0047266483306884766
+  - 0.013164043426513672
+  - 0.011361440022786459
+  - 0.01071310043334961
+  - 0.012772639592488607
+  - 0.013739267985026041
+  - 0.004908084869384766
+  - 0.004538615544637044
+  - 0.010161717732747396
+  - 0.009439945220947266
+  - 0.004023631413777669
   score time standard deviations:
-  - 0.00042932948281239965
-  - 0.00026702599391513455
-  - 0.0001381830334400461
-  - 0.00044388435856660205
-  - 0.00020800198839833085
-  - 8.003646952405354e-05
-  - 0.00019963218524678958
-  - 4.7674575565421886e-05
-  - 9.969818777238077e-05
-  - 0.00011956844268642406
+  - 0.0005171399923816431
+  - 0.00010344735214884225
+  - 0.000275875537973599
+  - 0.0007886073647689184
+  - 0.00035389206421721273
+  - 3.8269462226982386e-05
+  - 0.0001215079470086791
+  - 0.00011359627167600191
+  - 4.84629382156186e-05
+  - 5.2075163635433144e-05
