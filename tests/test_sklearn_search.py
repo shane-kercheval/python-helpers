@@ -479,3 +479,14 @@ class TestSklearnSearch(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-trial_labels_not_sorted.txt', 'w') as file:
             file.write(to_string(labels))
         del labels
+
+        _ = results.plot_performance_across_trials(facet_by='model')
+        _ = results.plot_performance_across_trials(query='model == "XGBClassifier(...)"')
+        _ = results.plot_parameter_values_across_trials(query='model == "XGBClassifier(...)"')
+        _ = results.plot_parallel_coordinates(query='model == "XGBClassifier(...)"')
+        _ = results.plot_scatter_matrix(query='model == "XGBClassifier(...)"')
+        _ = results.plot_score_vs_parameter(query='model == "XGBClassifier(...)"')
+        _ = results.plot_parameter_values_across_trials(query='model == "XGBClassifier(...)"')
+        _ = results.plot_parameter_vs_parameter(query='model == "XGBClassifier(...)"')
+        _ = results.plot_performance_non_numeric_params(query='model == "XGBClassifier(...)"')
+        _ = results.plot_performance_numeric_params(query='model == "XGBClassifier(...)"')

@@ -975,6 +975,9 @@ class MLExperimentResults:
                                        size: str = None,
                                        color: str = None,
                                        color_continuous_scale: List[str] = px.colors.diverging.balance,
+                                       facet_by: str = None,
+                                       facet_num_col: int = 3,
+                                       query: str = None,
                                        height: float = 600,
                                        width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -990,6 +993,12 @@ class MLExperimentResults:
                 corresponding points in the plot. This value is passed to plotly.
             color_continuous_scale:
                 A list of strings that should contain valid CSS-colors. This value is passed to plotly.
+            facet_by:
+                name of the hyper-parameter to facet by.
+            facet_num_col:
+                the max number of columns in the graph to facet
+            query:
+                string to be passed to `to_dataframe()`; see documentation for that method.
             height:
                 The height of the plot. This value is passed to plotly.
             width:
@@ -1002,16 +1011,23 @@ class MLExperimentResults:
         if size is not None:
             title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
 
+        labeled_df = results.to_labeled_dataframe(query=query)
+        if facet_by:
+            labeled_df['Trial Index'] = labeled_df.groupby(facet_by)["Trial Index"].rank(method="first",
+                                                                                          ascending=True)
+            
         fig = px.scatter(
-            data_frame=self.to_labeled_dataframe(),
+            data_frame=labeled_df,
             x='Trial Index',
             y=score_column,
             size=size,
             color=color,
             color_continuous_scale=color_continuous_scale,
             trendline='lowess',
+            facet_col=facet_by,
+            facet_col_wrap=facet_num_col,
             labels={
-                score_column: f"Average Cross Validation Score ({self.primary_score_name})",
+                score_column: f"Average CV Score<br>({results.primary_score_name})",
             },
             title=title,
             custom_data=['label'],
@@ -1028,6 +1044,7 @@ class MLExperimentResults:
         return fig
 
     def plot_parameter_values_across_trials(self,
+                                            query: str = None,
                                             height: float = 600,
                                             width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1035,6 +1052,8 @@ class MLExperimentResults:
         order of trial execution (x-axis). Especially useful for e.g. BayesSearchCV.
 
         Args:
+            query:
+                string to be passed to `to_dataframe()`; see documentation for that method.
             height:
                 The height of the plot. This value is passed to plotly.
             width:
@@ -1045,9 +1064,11 @@ class MLExperimentResults:
             color_continuous_scale = color_continuous_scale.reverse()
 
         score_column = self.primary_score_name + " Mean"
-        labeled_long = pd.melt(self.to_labeled_dataframe(),
+
+        labeled_df = self.to_labeled_dataframe(query=query)    
+        labeled_long = pd.melt(labeled_df,
                                id_vars=['Trial Index', score_column, 'label'],
-                               value_vars=self.numeric_parameters,
+                               value_vars=[x for x in self.numeric_parameters if x in labeled_df.columns],
                                var_name='parameter')
 
         fig = px.scatter(
@@ -1082,6 +1103,7 @@ class MLExperimentResults:
 
     def plot_parallel_coordinates(self,
                                   include_all_scores: bool = True,
+                                  query: str = None,
                                   height: float = 600,
                                   width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1092,6 +1114,8 @@ class MLExperimentResults:
             include_all_scores:
                 Only applicable if the results have multiple scores.
                 If True, includes all of the scores. If False, includes only the primary score.
+            query:
+                string to be passed to `to_dataframe()`; see documentation for that method.
             height:
                 The height of the plot. This value is passed to plotly.
             width:
@@ -1112,7 +1136,7 @@ class MLExperimentResults:
         # not 0-x than the order seems to get messed up
         # https://github.com/plotly/plotly.py/issues/3576
         # https://github.com/plotly/plotly.py/issues/3577
-        df = self.to_dataframe(sort_by_score=False)
+        df = self.to_dataframe(sort_by_score=False, query=query)
         numeric_columns = [x for x in self.numeric_parameters if x in df.columns]
         fig = px.parallel_coordinates(
             df[numeric_columns + score_columns].dropna(axis=0),
@@ -1127,6 +1151,7 @@ class MLExperimentResults:
 
     def plot_scatter_matrix(self,
                             include_all_scores: bool = True,
+                            query: str = None,
                             height: float = 600,
                             width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1136,6 +1161,8 @@ class MLExperimentResults:
             include_all_scores:
                 Only applicable if the results have multiple scores.
                 If True, includes all of the scores. If False, includes only the primary score.
+            query:
+                string to be passed to `to_dataframe()`; see documentation for that method.
             height:
                 The height of the plot. This value is passed to plotly.
             width:
@@ -1156,7 +1183,7 @@ class MLExperimentResults:
         # not 0-x than the order seems to get messed up
         # https://github.com/plotly/plotly.py/issues/3576
         # https://github.com/plotly/plotly.py/issues/3577
-        df = self.to_dataframe(sort_by_score=False)
+        df = self.to_dataframe(sort_by_score=False, query=query)
         columns = [x for x in self.parameter_names if x in df.columns]
         fig = px.scatter_matrix(df[score_columns + columns],
                                 color=primary_score_column,
@@ -1166,6 +1193,7 @@ class MLExperimentResults:
         return fig
 
     def plot_performance_numeric_params(self,
+                                        query: str = None,
                                         height: float = 600,
                                         width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1173,6 +1201,8 @@ class MLExperimentResults:
         primary score (y-axis).
 
         Args:
+            query:
+                string to be passed to `to_dataframe()`; see documentation for that method.
             height:
                 The height of the plot. This value is passed to plotly.
             width:
@@ -1184,7 +1214,7 @@ class MLExperimentResults:
 
         primary_score_column = self.primary_score_name + " Mean"
 
-        df = self.to_labeled_dataframe()
+        df = self.to_labeled_dataframe(query=query)
         columns = [x for x in self.numeric_parameters if x in df.columns]
         labeled_long = pd.melt(df,
                                id_vars=[primary_score_column, 'label'],
@@ -1219,6 +1249,7 @@ class MLExperimentResults:
         return fig
 
     def plot_performance_non_numeric_params(self,
+                                            query: str = None,
                                             height: float = 600,
                                             width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1226,6 +1257,8 @@ class MLExperimentResults:
         the primary score (y-axis).
 
         Args:
+            query:
+                string to be passed to `to_dataframe()`; see documentation for that method.
             height:
                 The height of the plot. This value is passed to plotly.
             width:
@@ -1237,7 +1270,7 @@ class MLExperimentResults:
 
         primary_score_column = self.primary_score_name + " Mean"
 
-        df = self.to_labeled_dataframe()
+        df = self.to_labeled_dataframe(query=query)
         columns = [x for x in self.non_numeric_parameters if x in df.columns]
         labeled_long = pd.melt(df,
                                id_vars=[primary_score_column, 'label'],
@@ -1290,6 +1323,7 @@ class MLExperimentResults:
 
     def plot_score_vs_parameter(self,
                                 parameter,
+                                query: str = None,
                                 size=None,
                                 color=None,
                                 height: float = 600,
@@ -1300,6 +1334,8 @@ class MLExperimentResults:
         Args:
             parameter:
                 The name of a hyper-parameter to plot against the score, on the x-axis.
+            query:
+                string to be passed to `to_dataframe()`; see documentation for that method.
             size:
                 The name of a hyper-parameter, the values of which will be used to determine the size of the
                 corresponding points in the plot. This value is passed to plotly.
@@ -1321,7 +1357,7 @@ class MLExperimentResults:
             title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
 
         fig = px.scatter(
-            data_frame=self.to_labeled_dataframe(),
+            data_frame=self.to_labeled_dataframe(query=query),
             x=parameter,
             y=primary_score_column,
             size=size,
@@ -1348,6 +1384,7 @@ class MLExperimentResults:
     def plot_parameter_vs_parameter(self,
                                     parameter_x,
                                     parameter_y,
+                                    query: str = None,
                                     size=None,
                                     height: float = 600,
                                     width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
@@ -1359,6 +1396,8 @@ class MLExperimentResults:
                 The name of a hyper-parameter to plot against another parameter, on the x-axis.
             parameter_y:
                 The name of a hyper-parameter to plot against another parameter, on the y-axis.
+            query:
+                string to be passed to `to_dataframe()`; see documentation for that method.
             size:
                 The name of a hyper-parameter, the values of which will be used to determine the size of the
                 corresponding points in the plot. This value is passed to plotly.
@@ -1375,16 +1414,18 @@ class MLExperimentResults:
         title = f"<b>{parameter_y}</b> vs <b>{parameter_x}</b>"
 
         scaled_size = None
+        labeled_df = self.to_labeled_dataframe(query=query)
+
         if size:
             title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
             if size in self.numeric_parameters:
                 # need to do this or else the points are all the same size
                 # but only if size has numeric values
-                scaled_size = MinMaxScaler(feature_range=(0.1, 0.9)).fit_transform(self._labeled_dataframe[[size]]).reshape(1, -1)
+                scaled_size = MinMaxScaler(feature_range=(0.1, 0.9)).fit_transform(labeled_df[[size]]).reshape(1, -1)
                 scaled_size = scaled_size.tolist()[0]
 
         fig = px.scatter(
-            data_frame=self._labeled_dataframe,
+            data_frame=labeled_df,
             x=parameter_x,
             y=parameter_y,
             size=scaled_size,
