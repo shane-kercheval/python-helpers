@@ -554,7 +554,7 @@ class TestPandas(unittest.TestCase):
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit__all_missing__sorted.html',
                                  clean_formatted_dataframe(non_numeric_summary(test_data, return_style=True, sort_by_columns=True).render()))
 
-    def test_non_numeric_summarytest_non_numeric_summary_test(self):
+    def test_non_numeric_summary2(self):
         test_data = self.credit_data.copy()
         test_data['purpose'] = test_data['purpose'].replace({'radio/tv': '1111111111222222222233333333334444444444'})
         test_data.loc[25:75, ['checking_status']] = np.nan
@@ -736,9 +736,9 @@ class TestPandas(unittest.TestCase):
                                   remove_first_level_duplicates=remove_first_level_duplicates,
                                   return_style=False)
 
-            file_name = get_test_path() + f'/test_files/pandas/count_groups_{group_1}_{group_2}_' \
-                                          f'{group_sum}_{remove_first_level_duplicates}.txt'
-            with redirect_stdout_to_file(file_name):
+            name = get_test_path() + f'/test_files/pandas/count_groups_{group_1}_{group_2}_' \
+                                     f'{group_sum}_{remove_first_level_duplicates}.txt'
+            with redirect_stdout_to_file(name):
                 print_dataframe(counts)
             return counts
 
