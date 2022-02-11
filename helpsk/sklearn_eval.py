@@ -1011,7 +1011,7 @@ class MLExperimentResults:
         if size is not None:
             title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
 
-        labeled_df = results.to_labeled_dataframe(query=query)
+        labeled_df = self.to_labeled_dataframe(query=query)
         if facet_by:
             labeled_df['Trial Index'] = labeled_df.groupby(facet_by)["Trial Index"].rank(method="first",
                                                                                           ascending=True)
@@ -1027,7 +1027,7 @@ class MLExperimentResults:
             facet_col=facet_by,
             facet_col_wrap=facet_num_col,
             labels={
-                score_column: f"Average CV Score<br>({results.primary_score_name})",
+                score_column: f"Average CV Score<br>({self.primary_score_name})",
             },
             title=title,
             custom_data=['label'],
