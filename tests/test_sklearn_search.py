@@ -207,9 +207,6 @@ class TestSklearnSearch(unittest.TestCase):
 
     def test_MLExperimentResults_multi_model(self):
 
-        from xgboost import XGBClassifier
-        XGBClassifier()
-
         results = MLExperimentResults.from_sklearn_search_cv(
             searcher=self.bayes_search,
             higher_score_is_better=True,
