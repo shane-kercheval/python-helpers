@@ -135,7 +135,6 @@ class TestSklearnSearch(unittest.TestCase):
             solver='sag',
             max_iter=999,
             C=(1e-5, 1e+3),  # noqa
-            C_prior='uniform',  # noqa
             imputer_strategies=['most_frequent'],  # noqa
             random_state=42
         )
