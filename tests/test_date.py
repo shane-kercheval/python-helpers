@@ -794,7 +794,7 @@ class TestDate(unittest.TestCase):
                          parse('2021-12-01').date())
 
     def test_floor_series(self):
-        date_series = pd.Series(pd.to_datetime([
+        datetimes = pd.to_datetime([
             '2021-01-01 00:00:00', '2021-01-01 00:00:01',
             np.NaN,
             '2021-01-02 00:00:01', '2021-01-02 23:59:59',
@@ -831,7 +831,9 @@ class TestDate(unittest.TestCase):
             '2021-12-01 00:00:00', '2021-12-01 00:00:01',
             np.NaN,
             '2021-12-02 00:00:01', '2021-12-02 23:59:59',
-        ]))
+        ])
+        index_values = list(reversed(range(0, len(datetimes))))
+        date_series = pd.Series(datetimes, index=index_values)
         expected_day = pd.Series(pd.to_datetime([
             '2021-01-01', '2021-01-01',
             np.NaN,
@@ -869,7 +871,7 @@ class TestDate(unittest.TestCase):
             '2021-12-01', '2021-12-01',
             np.NaN,
             '2021-12-02', '2021-12-02',
-        ]))
+        ]), index=index_values)
         expected_month = pd.Series(pd.to_datetime([
             '2021-01-01', '2021-01-01',
             np.NaN,
@@ -907,7 +909,7 @@ class TestDate(unittest.TestCase):
             '2021-12-01', '2021-12-01',
             np.NaN,
             '2021-12-01', '2021-12-01',
-        ]))
+        ]), index=index_values)
         expected_quarter = pd.Series(pd.to_datetime([
             '2021-01-01', '2021-01-01',
             np.NaN,
@@ -945,34 +947,35 @@ class TestDate(unittest.TestCase):
             '2021-10-01', '2021-10-01',
             np.NaN,
             '2021-10-01', '2021-10-01',
-        ]))
+        ]), index=index_values)
 
         # without series.name
         validation.assert_dataframes_match([
             pd.DataFrame(date_series.dt.date),
             pd.DataFrame(expected_day.dt.date),
             pd.DataFrame(date.floor(date_series, granularity=date.Granularity.DAY))
-        ])
+        ], ignore_indexes=False)
 
         validation.assert_dataframes_match([
             pd.DataFrame(expected_month.dt.date),
             pd.DataFrame(date.floor(date_series, granularity=date.Granularity.MONTH))
-        ])
+        ], ignore_indexes=False)
 
         validation.assert_dataframes_match([
             pd.DataFrame(expected_quarter.dt.date),
             pd.DataFrame(date.floor(date_series, granularity=date.Granularity.QUARTER))
-        ])
+        ], ignore_indexes=False)
 
         # with series.name
         date_series.name = 'date_day'
         expected_day.name = 'date_day'
         actual_values = date.floor(date_series, granularity=date.Granularity.DAY)
+
         self.assertEqual(actual_values.name, 'date_day')
         validation.assert_dataframes_match([
             pd.DataFrame(expected_day.dt.date),
             pd.DataFrame(actual_values)
-        ])
+        ], ignore_indexes=False)
 
         date_series.name = 'date_month'
         expected_day.name = 'date_month'
@@ -981,7 +984,7 @@ class TestDate(unittest.TestCase):
         validation.assert_dataframes_match([
             pd.DataFrame(expected_month.dt.date),
             pd.DataFrame(actual_values)
-        ])
+        ], ignore_indexes=False)
 
         date_series.name = 'date_quarter'
         expected_day.name = 'date_quarter'
@@ -990,4 +993,4 @@ class TestDate(unittest.TestCase):
         validation.assert_dataframes_match([
             pd.DataFrame(expected_quarter.dt.date),
             pd.DataFrame(actual_values)
-        ])
+        ], ignore_indexes=False)

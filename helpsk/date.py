@@ -50,7 +50,8 @@ def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
     """
     if isinstance(value, pd.Series):
         return pd.Series([floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value],
-                         name=value.name)
+                         name=value.name,
+                         index=value.index)
 
     if any_none_nan(value):
         return value
