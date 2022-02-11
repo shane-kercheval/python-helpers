@@ -153,10 +153,14 @@ class TestSklearnSearch(unittest.TestCase):
         self.assertEqual(list(xgboost_space.keys()),
                          ['model',
                           'model__max_depth',
-                          'model__n_estimators',
                           'model__learning_rate',
-                          'model__colsample_bytree',
+                          'model__n_estimators',
+                          'model__min_child_weight',
                           'model__subsample',
+                          'model__colsample_bytree',
+                          'model__colsample_bylevel',
+                          'model__reg_alpha',
+                          'model__reg_lambda',
                           'prep__numeric__imputer__transformer',
                           'prep__numeric__scaler__transformer',
                           'prep__non_numeric__encoder__transformer'])
@@ -179,10 +183,14 @@ class TestSklearnSearch(unittest.TestCase):
         self.assertEqual(list(xgboost_space.keys()),
                          ['model',
                           'model__max_depth',
-                          'model__n_estimators',
                           'model__learning_rate',
-                          'model__colsample_bytree',
+                          'model__n_estimators',
+                          'model__min_child_weight',
                           'model__subsample',
+                          'model__colsample_bytree',
+                          'model__colsample_bylevel',
+                          'model__reg_alpha',
+                          'model__reg_lambda',
                           'prep__numeric__imputer__transformer',
                           'prep__numeric__scaler__transformer',
                           'prep__non_numeric__encoder__transformer'])
@@ -481,8 +489,9 @@ class TestSklearnSearch(unittest.TestCase):
         _ = results.plot_parameter_values_across_trials(query='model == "XGBClassifier(...)"')
         _ = results.plot_parallel_coordinates(query='model == "XGBClassifier(...)"')
         _ = results.plot_scatter_matrix(query='model == "XGBClassifier(...)"')
-        _ = results.plot_score_vs_parameter(query='model == "XGBClassifier(...)"')
+        _ = results.plot_score_vs_parameter(parameter='max_depth', query='model == "XGBClassifier(...)"')
         _ = results.plot_parameter_values_across_trials(query='model == "XGBClassifier(...)"')
-        _ = results.plot_parameter_vs_parameter(query='model == "XGBClassifier(...)"')
+        _ = results.plot_parameter_vs_parameter(parameter_x='max_depth', parameter_y='min_child_weight',
+                                                query='model == "XGBClassifier(...)"')
         _ = results.plot_performance_non_numeric_params(query='model == "XGBClassifier(...)"')
         _ = results.plot_performance_numeric_params(query='model == "XGBClassifier(...)"')

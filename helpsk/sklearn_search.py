@@ -195,6 +195,7 @@ class ClassifierSearchSpace:
         from skopt.space import Real, Categorical
 
         model = LinearSVC(
+            max_iter=1000,
             random_state=random_state
         )
 
