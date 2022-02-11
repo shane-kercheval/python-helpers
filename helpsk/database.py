@@ -266,5 +266,9 @@ class Snowflake(Database):
         cursor = self.connection_object.cursor()
         cursor.execute(sql)
         dataframe = cursor.fetch_pandas_all()
-
+        # We need to reset_index because there seems to be a bug in the connector that returns duplicated
+        # index values. This can cause unexpected behavior downstream.
+        # https://github.com/snowflakedb/snowflake-connector-python/issues/1061
+        # https://stackoverflow.com/questions/69911999/none-unique-pandas-dataframe-index-created-using-cur-fetch-pandas-all-after-lo
+        dataframe.reset_index(drop=True, inplace=True)
         return dataframe
