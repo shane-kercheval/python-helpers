@@ -1,3 +1,4 @@
+import warnings
 import re
 import unittest
 
@@ -82,6 +83,35 @@ class TestSklearnSearch(unittest.TestCase):
         self.assertIsInstance(categorical.categories[0], OneHotEncoder)
         self.assertIsInstance(categorical.categories[1], CustomOrdinalEncoder)
         del categorical
+        del transformer_search_space
+
+        self.assertRaises(AssertionError,
+                          lambda: ClassifierSearchSpace._build_transformer_search_space(
+                              scaler_min_max=False,
+                              scaler_standard=False,
+                              scaler_none=False,
+                          ))
+        transformer_search_space = ClassifierSearchSpace._build_transformer_search_space(
+            scaler_min_max=True,
+            scaler_standard=False,
+            scaler_none=False,
+        )
+        values = transformer_search_space['prep__numeric__scaler__transformer'].categories
+        self.assertEqual(len(values), 1)
+        self.assertIsInstance(values[0], MinMaxScaler)
+        del values
+        del transformer_search_space
+
+        transformer_search_space = ClassifierSearchSpace._build_transformer_search_space(
+            scaler_min_max=False,
+            scaler_standard=True,
+            scaler_none=False,
+        )
+        values = transformer_search_space['prep__numeric__scaler__transformer'].categories
+        self.assertEqual(len(values), 1)
+        self.assertIsInstance(values[0], StandardScaler)
+        del values
+        del transformer_search_space
 
         transformer_search_space = ClassifierSearchSpace._build_transformer_search_space(
             imputer_strategies=['most_frequent'],
@@ -109,6 +139,7 @@ class TestSklearnSearch(unittest.TestCase):
         self.assertEqual(len(categorical.categories), 1)
         self.assertIsInstance(categorical.categories[0], OneHotEncoder)
         del categorical
+        del transformer_search_space
 
         def to_string(obj):
             return str(obj).\
@@ -433,6 +464,8 @@ class TestSklearnSearch(unittest.TestCase):
             verbose=0,
             random_state=42,
         )
+        # we get convergence warnings with LinearSVC, ignore for now; I do not see this when running with
+        # other datasets
         bayes_search.fit(self.X_train, self.y_train)  # noqa
 
         results = MLExperimentResults.from_sklearn_search_cv(bayes_search,

@@ -74,8 +74,31 @@ class ClassifierSearchSpace:
     def _build_transformer_search_space(imputer_strategies=['mean', 'median', 'most_frequent'],  # noqa
                                         scaler_min_max=True,
                                         scaler_standard=True,
+                                        scaler_none=True,
                                         encoder_one_hot=True,
                                         encoder_ordinal=True):
+        """
+
+        Args:
+            imputer_strategies:
+
+            scaler_min_max:
+
+            scaler_standard:
+
+            scaler_none:
+                 If True, include `None` as a hyper-param value. If False, only do min/max or standard (either
+                 scaler_min_max or scaler_standard has to be True). Setting this to True does *not* imply no
+                 scaling at all, only if we want to tune not scaling.
+
+                 For example, for models we always want to scale (e.g. Logistic Regression, LinearSVC), then
+                 setting `scaler_none=False` (and either/both `scaler_min_max=True` and/or
+                 `scaler_standard=True` will accomplish this.
+            encoder_one_hot:
+
+            encoder_ordinal:
+
+        """
         from skopt.space import Categorical
 
         if imputer_strategies:
@@ -83,11 +106,15 @@ class ClassifierSearchSpace:
         else:
             imputers = [None]
 
+        assert scaler_none or scaler_min_max or scaler_standard
         scalers = [None]
         if scaler_min_max:
             scalers += [MinMaxScaler()]
         if scaler_standard:
             scalers += [StandardScaler()]
+
+        if not scaler_none:
+            scalers = [x for x in scalers if x is not None]
 
         assert encoder_one_hot or encoder_ordinal
         encoders = []
@@ -123,6 +150,7 @@ class ClassifierSearchSpace:
         # these steps correspond to the pipeline built in `build_classifier_search_pipeline()`
         logistic_search_space.update(ClassifierSearchSpace._build_transformer_search_space(
             imputer_strategies=imputer_strategies,
+            scaler_none=False,
         ))
 
         return logistic_search_space
@@ -195,7 +223,6 @@ class ClassifierSearchSpace:
         from skopt.space import Real, Categorical
 
         model = LinearSVC(
-            max_iter=1000,
             random_state=random_state
         )
 
@@ -206,6 +233,7 @@ class ClassifierSearchSpace:
         # these steps correspond to the pipeline built in `build_classifier_search_pipeline()`
         search_space.update(ClassifierSearchSpace._build_transformer_search_space(
             imputer_strategies=imputer_strategies,
+            scaler_none=False,
         ))
 
         return search_space
