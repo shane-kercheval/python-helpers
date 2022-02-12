@@ -334,6 +334,7 @@ class ClassifierSearchSpace:
                     }
                     default_space.update(ClassifierSearchSpace._build_transformer_search_space(
                         imputer_strategies=['mean'],
+                        scaler_min_max=False,
                         scaler_none=False,
                         encoder_ordinal=False
                     ))
@@ -363,6 +364,7 @@ class ClassifierSearchSpace:
                     }
                     default_space.update(ClassifierSearchSpace._build_transformer_search_space(
                         imputer_strategies=['mean'],
+                        scaler_min_max=False,
                         scaler_none=False,
                         encoder_ordinal=False,
                     ))
