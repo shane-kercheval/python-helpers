@@ -2,7 +2,7 @@
 model: LogisticRegression(...)
        C: 1.5955669452672732
        imputer: SimpleImputer(strategy='most_frequent')
-       scaler: MinMaxScaler()
+       scaler: StandardScaler()
        encoder: OneHotEncoder()
 model: LogisticRegression(...)
        C: 22.91257035436645
@@ -17,7 +17,7 @@ model: LogisticRegression(...)
 model: LogisticRegression(...)
        C: 3.4885114865499216
        imputer: SimpleImputer(strategy='median')
-       scaler: MinMaxScaler()
+       scaler: StandardScaler()
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression(...)
        C: 0.0007376531147826206

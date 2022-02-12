@@ -1,6 +1,6 @@
-   roc_auc Mean  roc_auc 95CI.LO  roc_auc 95CI.HI          C                                  imputer                 encoder
-5      0.757284         0.717954         0.796615   1.595567  SimpleImputer(strategy='most_frequent')         OneHotEncoder()
-9      0.752452         0.684779         0.820124   0.000738         SimpleImputer(strategy='median')         OneHotEncoder()
-6      0.739801         0.673132         0.806470  22.912570  SimpleImputer(strategy='most_frequent')         OneHotEncoder()
-8      0.721946         0.633361         0.810531   3.488511         SimpleImputer(strategy='median')  CustomOrdinalEncoder()
-7      0.720664         0.645987         0.795341   0.402691         SimpleImputer(strategy='median')  CustomOrdinalEncoder()
+   roc_auc Mean  roc_auc 95CI.LO  roc_auc 95CI.HI          C                                  imputer            scaler                 encoder
+5      0.755270         0.707733         0.802807   1.595567  SimpleImputer(strategy='most_frequent')  StandardScaler()         OneHotEncoder()
+9      0.752452         0.684779         0.820124   0.000738         SimpleImputer(strategy='median')    MinMaxScaler()         OneHotEncoder()
+6      0.739801         0.673132         0.806470  22.912570  SimpleImputer(strategy='most_frequent')    MinMaxScaler()         OneHotEncoder()
+7      0.720664         0.645987         0.795341   0.402691         SimpleImputer(strategy='median')    MinMaxScaler()  CustomOrdinalEncoder()
+8      0.720586         0.628596         0.812576   3.488511         SimpleImputer(strategy='median')  StandardScaler()  CustomOrdinalEncoder()

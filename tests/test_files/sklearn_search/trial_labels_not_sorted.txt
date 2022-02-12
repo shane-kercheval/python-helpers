@@ -9,13 +9,13 @@ model: XGBClassifier(...), max_depth: 34, learning_rate: 0.3578850597273058, n_e
 }", "{
 model: XGBClassifier(...), max_depth: 23, learning_rate: 0.09429380335353854, n_estimators: 396, min_child_weight: 4, subsample: 0.7787136018188425, colsample_bytree: 0.5818035893192751, colsample_bylevel: 0.9696848688013859, reg_alpha: 0.01377401781906964, reg_lambda: 2.9702160489961873, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
 }", "{
-model: LogisticRegression(...), C: 1.5955669452672732, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(...), C: 1.5955669452672732, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }", "{
 model: LogisticRegression(...), C: 22.91257035436645, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }", "{
 model: LogisticRegression(...), C: 0.402690660245868, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
 }", "{
-model: LogisticRegression(...), C: 3.4885114865499216, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+model: LogisticRegression(...), C: 3.4885114865499216, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
 }", "{
 model: LogisticRegression(...), C: 0.0007376531147826206, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }"]
