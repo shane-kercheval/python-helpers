@@ -369,7 +369,9 @@ class TestSklearnSearch(unittest.TestCase):
                                                                                            'label'])])
 
         def remove_parentheses(obj):
-            return re.sub(r'\(.*', '', str(obj).replace('\n', ''))
+            obj = str(obj)
+            obj = obj.replace("OneHotEncoder(handle_unknown='ignore')", "OneHotEncoder()")
+            return re.sub(r'\(.*', '', obj.replace('\n', ''))
 
         self.assertEqual([remove_parentheses(x) for x in bayes_search.cv_results_['param_model'].data],
                          [remove_parentheses(x) for x in cv_dataframe['model']])
@@ -386,7 +388,9 @@ class TestSklearnSearch(unittest.TestCase):
                     assert_np_arrays_are_close(np.array(cv_data),
                                                np.array(hyper_param_df.loc[:, value].tolist()))
                 if key.startswith('prep__'):
-                    self.assertEqual([str(x) for x in cv_data],
+                    self.assertEqual([str(x).replace("OneHotEncoder(handle_unknown='ignore')",
+                                                     "OneHotEncoder()")
+                                      for x in cv_data],
                                      hyper_param_df.loc[:, value].tolist())
 
         self.assertTrue(isinstance(results.test_score_averages, dict))
@@ -444,7 +448,8 @@ class TestSklearnSearch(unittest.TestCase):
                                                bayes_search.best_params_[original_name]))
                 else:
                     self.assertEqual(results.best_params[new_name],
-                                     str(bayes_search.best_params_[original_name]))
+                                     str(bayes_search.best_params_[original_name]).replace("OneHotEncoder(handle_unknown='ignore')",
+                                                                                           "OneHotEncoder()"))
 
     def test_MLExperimentResults_all_models(self):
         search_space = ClassifierSearchSpace(

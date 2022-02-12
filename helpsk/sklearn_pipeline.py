@@ -37,9 +37,11 @@ class CustomOrdinalEncoder(BaseEstimator, TransformerMixin):
     """First replaces missing values with '<missing>' then applies OrdinalEncoder
     """
 
-    def __init__(self):
-        self._ordinal_encoder = OrdinalEncoder()  # unknown_value=-1,
+    def __init__(self, handle_unknown='use_encoded_value'):
+        self._ordinal_encoder = OrdinalEncoder(handle_unknown=handle_unknown, unknown_value=-1)
+        # unknown_value=-1,
         # handle_unknown='use_encoded_value')
+        self.handle_unknown = handle_unknown
         self._missing_value = '<missing>'
 
     def _fill_na(self, X):  # pylint: disable=invalid-name # noqa

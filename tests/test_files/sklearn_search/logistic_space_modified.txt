@@ -3,5 +3,5 @@
 'model__C': Real(low=1e-05, high=1000.0, prior='log-uniform', transform='identity'),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(strategy='most_frequent'),), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(MinMaxScaler(), StandardScaler()), prior=None),
-'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(), CustomOrdinalEncoder()), prior=None)
+'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'), CustomOrdinalEncoder()), prior=None)
 }

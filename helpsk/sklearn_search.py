@@ -121,7 +121,7 @@ class ClassifierSearchSpace:
         assert encoder_one_hot or encoder_ordinal
         encoders = []
         if encoder_one_hot:
-            encoders += [OneHotEncoder()]
+            encoders += [OneHotEncoder(handle_unknown='ignore')]
         if encoder_ordinal:
             encoders += [hlp.sklearn_pipeline.CustomOrdinalEncoder()]
 

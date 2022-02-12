@@ -273,6 +273,7 @@ class MLExperimentResults:
             string_value = re.sub(r'Classifier\(.+\)', 'Classifier(...)', string_value)
             string_value = re.sub(r'Regressor\(.+\)', 'Regressor(...)', string_value)
             string_value = re.sub(r'Regression\(.+\)', 'Regression(...)', string_value)
+            string_value = string_value.replace("OneHotEncoder(handle_unknown='ignore')", "OneHotEncoder()")
             return string_value
 
         cv_results_dict = {
