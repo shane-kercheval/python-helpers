@@ -36,79 +36,50 @@ parameter_names_mapping:
   prep__non_numeric__encoder__transformer: encoder
 test_score_rankings:
   roc_auc:
-  - 5
-  - 3
-  - 10
+  - 8
   - 9
   - 6
-  - 1
-  - 4
-  - 7
-  - 8
+  - 12
+  - 10
+  - 5
   - 2
+  - 3
+  - 11
+  - 7
+  - 4
+  - 1
 test_score_averages:
   roc_auc:
-  - 0.7310470373921603
-  - 0.7477872191367426
-  - 0.6988838275407324
+  - 0.7183888283755744
   - 0.7168138899817452
   - 0.7260753494685872
-  - 0.7552702321522607
-  - 0.7398009194420251
-  - 0.7206637158626356
-  - 0.7205863049995814
+  - 0.6999267897579838
+  - 0.7062537360612767
+  - 0.729144286164393
+  - 0.7603478446449657
   - 0.7524516660481084
+  - 0.7029784509943559
+  - 0.7228258005487223
+  - 0.7395348887611041
+  - 0.7650357120514085
 test_score_standard_deviations:
   roc_auc:
-  - 0.013879640507650289
-  - 0.003415187478993287
-  - 0.022997420007865116
+  - 0.0027180378025144043
   - 0.021351104269894793
   - 0.007762749648129412
-  - 0.019136259097164682
-  - 0.02683802066055745
-  - 0.030061507882577092
-  - 0.03703101743220679
+  - 0.010145228126219352
+  - 0.012724837881966045
+  - 0.013231565867482656
+  - 0.015644327455357487
   - 0.027241897747693224
+  - 0.015892927436002964
+  - 0.015079771616225115
+  - 0.02700178270268214
+  - 0.015382103321788826
 trials:
 - model: XGBClassifier(...)
-  model__colsample_bylevel: 0.9416576386904312
-  model__colsample_bytree: 0.6517050549420875
-  model__learning_rate: 0.4756168309060054
-  model__max_depth: 29
-  model__min_child_weight: 1
-  model__n_estimators: 151
-  model__reg_alpha: 0.0025962684183737316
-  model__reg_lambda: 2.4140544277669678
-  model__subsample: 0.9767400750948969
-  prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
-  prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
-  prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
-  model__colsample_bylevel: 0.9593612608346885
-  model__colsample_bytree: 0.5524295792763518
-  model__learning_rate: 0.21672306765492555
-  model__max_depth: 2
-  model__min_child_weight: 6
-  model__n_estimators: 159
-  model__reg_alpha: 0.10144020667237337
-  model__reg_lambda: 2.1654709911636405
-  model__subsample: 0.9866034888464443
-  prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
-  prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
-  prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
-  model__colsample_bylevel: 0.5859357806982803
-  model__colsample_bytree: 0.799023538756064
-  model__learning_rate: 0.4014021141000396
-  model__max_depth: 8
-  model__min_child_weight: 1
-  model__n_estimators: 962
-  model__reg_alpha: 0.30940078642444824
-  model__reg_lambda: 3.5402659040014948
-  model__subsample: 0.6933976321088419
   prep__non_numeric__encoder__transformer: OneHotEncoder()
-  prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
+  prep__numeric__imputer__transformer: SimpleImputer()
   prep__numeric__scaler__transformer: None
 - model: XGBClassifier(...)
   model__colsample_bylevel: 0.7190145932204617
@@ -136,73 +107,124 @@ trials:
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: None
-- model: LogisticRegression(...)
-  model__C: 1.5955669452672732
-  prep__non_numeric__encoder__transformer: OneHotEncoder()
-  prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
-  prep__numeric__scaler__transformer: StandardScaler()
-- model: LogisticRegression(...)
-  model__C: 22.91257035436645
-  prep__non_numeric__encoder__transformer: OneHotEncoder()
-  prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
-  prep__numeric__scaler__transformer: MinMaxScaler()
-- model: LogisticRegression(...)
-  model__C: 0.402690660245868
+- model: XGBClassifier(...)
+  model__colsample_bylevel: 0.8876821894139413
+  model__colsample_bytree: 0.679511465960702
+  model__learning_rate: 0.43717521513769547
+  model__max_depth: 10
+  model__min_child_weight: 10
+  model__n_estimators: 698
+  model__reg_alpha: 0.004878994671461945
+  model__reg_lambda: 2.765930623533157
+  model__subsample: 0.8171497855716499
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
-  prep__numeric__scaler__transformer: MinMaxScaler()
-- model: LogisticRegression(...)
-  model__C: 3.4885114865499216
+  prep__numeric__scaler__transformer: None
+- model: XGBClassifier(...)
+  model__colsample_bylevel: 0.9600046132186582
+  model__colsample_bytree: 0.7482333517983584
+  model__learning_rate: 0.4188444528865573
+  model__max_depth: 4
+  model__min_child_weight: 1
+  model__n_estimators: 553
+  model__reg_alpha: 0.00012682484500023283
+  model__reg_lambda: 1.7069954134453618
+  model__subsample: 0.9129729782239605
+  prep__non_numeric__encoder__transformer: OneHotEncoder()
+  prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
+  prep__numeric__scaler__transformer: None
+- model: XGBClassifier(...)
+  model__colsample_bylevel: 0.8503107223106829
+  model__colsample_bytree: 0.9358259642316076
+  model__learning_rate: 0.20796896168096884
+  model__max_depth: 4
+  model__min_child_weight: 2
+  model__n_estimators: 100
+  model__reg_alpha: 0.003039078727520555
+  model__reg_lambda: 2.27956386247516
+  model__subsample: 0.5879532027938977
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
-  prep__numeric__scaler__transformer: StandardScaler()
+  prep__numeric__scaler__transformer: None
+- model: LogisticRegression(...)
+  prep__non_numeric__encoder__transformer: OneHotEncoder()
+  prep__numeric__imputer__transformer: SimpleImputer()
+  prep__numeric__scaler__transformer: MinMaxScaler()
 - model: LogisticRegression(...)
   model__C: 0.0007376531147826206
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: MinMaxScaler()
+- model: LogisticRegression(...)
+  model__C: 0.00028712123350695286
+  prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
+  prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
+  prep__numeric__scaler__transformer: MinMaxScaler()
+- model: LogisticRegression(...)
+  model__C: 1.274865255061674e-06
+  prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
+  prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
+  prep__numeric__scaler__transformer: StandardScaler()
+- model: LogisticRegression(...)
+  model__C: 23.32672808600529
+  prep__non_numeric__encoder__transformer: OneHotEncoder()
+  prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
+  prep__numeric__scaler__transformer: MinMaxScaler()
+- model: LogisticRegression(...)
+  model__C: 0.13184996310179986
+  prep__non_numeric__encoder__transformer: OneHotEncoder()
+  prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
+  prep__numeric__scaler__transformer: MinMaxScaler()
 timings:
   fit time averages:
-  - 0.11605008443196614
-  - 0.052715698877970375
-  - 0.6602350076039633
-  - 0.10712901751200359
-  - 0.20423404375712076
-  - 0.027588605880737305
-  - 0.02862373987833659
-  - 0.032268524169921875
-  - 0.024220625559488933
-  - 0.009176254272460938
+  - 0.18143129348754883
+  - 0.10985128084818523
+  - 0.20551300048828125
+  - 0.23520557085673013
+  - 0.49903178215026855
+  - 0.07201838493347168
+  - 0.01681995391845703
+  - 0.01136620839436849
+  - 0.01813062032063802
+  - 0.020314534505208332
+  - 0.023934364318847656
+  - 0.0145570437113444
   fit time standard deviations:
-  - 0.001228642324862699
-  - 0.00011188079558685004
-  - 0.01661804581463534
-  - 0.001861748000783878
-  - 0.00276402402262339
-  - 0.005955851575493382
-  - 0.003986398618049997
-  - 0.002686280325425096
-  - 0.0005965807850852751
-  - 0.00014160176995998017
+  - 0.0015142047235456803
+  - 0.001084171297819501
+  - 0.007038898398196906
+  - 0.008070646183421468
+  - 0.014481314510855133
+  - 0.0051450788146118875
+  - 0.0015213761476426568
+  - 0.0029817023550788705
+  - 0.00024084228824957878
+  - 0.0007704254372732127
+  - 0.0028444856955835815
+  - 0.001366569157299481
   score time averages:
-  - 0.012921492258707682
-  - 0.01141206423441569
-  - 0.010513703028361002
-  - 0.011310338973999023
-  - 0.014462629954020182
-  - 0.004752556482950847
-  - 0.004717906316121419
-  - 0.009408712387084961
-  - 0.009460210800170898
-  - 0.0038927396138509116
+  - 0.006795724232991536
+  - 0.012010653813680014
+  - 0.01387627919514974
+  - 0.01259613037109375
+  - 0.007788896560668945
+  - 0.011271317799886068
+  - 0.004731655120849609
+  - 0.003981113433837891
+  - 0.009325583775838217
+  - 0.00979177157084147
+  - 0.004176696141560872
+  - 0.008926947911580404
   score time standard deviations:
-  - 0.000164245580678394
-  - 9.999290240524134e-05
-  - 0.0002965765064809694
-  - 0.00021586271213463673
-  - 0.0002499234309264408
-  - 0.0001660238446008666
-  - 0.00020211946663883945
-  - 5.577194434189997e-05
-  - 4.084874065198011e-05
-  - 3.9091115528975034e-05
+  - 0.00010619566639077003
+  - 0.00024692356912190555
+  - 0.00026780037822263307
+  - 6.0725481998506285e-05
+  - 7.418764848530296e-05
+  - 0.0004052570873597954
+  - 7.318505444661053e-05
+  - 0.0001228373304227031
+  - 0.00016192493262877188
+  - 0.00016053254059242032
+  - 0.00021450291647670807
+  - 0.004492306514081136
