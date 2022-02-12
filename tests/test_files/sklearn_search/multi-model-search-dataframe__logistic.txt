@@ -1,6 +1,6 @@
     roc_auc Mean  roc_auc 95CI.LO  roc_auc 95CI.HI          C                           imputer            scaler                 encoder
 11      0.765036         0.726824         0.803247   0.131850  SimpleImputer(strategy='median')    MinMaxScaler()         OneHotEncoder()
-6       0.760348         0.721485         0.799211        NaN                   SimpleImputer()    MinMaxScaler()         OneHotEncoder()
+6       0.759022         0.712778         0.805266        NaN                   SimpleImputer()  StandardScaler()         OneHotEncoder()
 7       0.752452         0.684779         0.820124   0.000738  SimpleImputer(strategy='median')    MinMaxScaler()         OneHotEncoder()
 10      0.739535         0.672459         0.806611  23.326728  SimpleImputer(strategy='median')    MinMaxScaler()         OneHotEncoder()
 9       0.722826         0.685366         0.760286   0.000001  SimpleImputer(strategy='median')  StandardScaler()  CustomOrdinalEncoder()

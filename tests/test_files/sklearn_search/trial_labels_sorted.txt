@@ -2,7 +2,7 @@
 model: LogisticRegression(...), C: 0.13184996310179986, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }",
 '{
-model: LogisticRegression(...), imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(...), imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }', "{
 model: LogisticRegression(...), C: 0.0007376531147826206, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }", "{

@@ -20,7 +20,7 @@
 ({
 'model': Categorical(categories=(LogisticRegression(max_iter=1000),), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(),), prior=None),
-'prep__numeric__scaler__transformer': Categorical(categories=(MinMaxScaler(), StandardScaler()), prior=None),
+'prep__numeric__scaler__transformer': Categorical(categories=(StandardScaler(),), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(),), prior=None)
 }, 1),
 ({
@@ -52,7 +52,7 @@
 ({
 'model': Categorical(categories=(LinearSVC(),), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(),), prior=None),
-'prep__numeric__scaler__transformer': Categorical(categories=(MinMaxScaler(), StandardScaler()), prior=None),
+'prep__numeric__scaler__transformer': Categorical(categories=(StandardScaler(),), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(),), prior=None)
 }, 1),
 ({

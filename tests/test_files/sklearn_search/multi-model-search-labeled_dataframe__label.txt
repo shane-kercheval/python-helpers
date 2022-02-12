@@ -70,7 +70,7 @@ model: XGBClassifier(...)
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression(...)
        imputer: SimpleImputer()
-       scaler: MinMaxScaler()
+       scaler: StandardScaler()
        encoder: OneHotEncoder()
 model: LogisticRegression(...)
        C: 0.0007376531147826206
