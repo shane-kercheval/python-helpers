@@ -34,6 +34,7 @@ class ClassifierSearchSpace:
                  data,
                  models=ClassifierSearchSpaceModels.list(),  # noqa
                  iterations=[50] * len(ClassifierSearchSpaceModels.list()),  # noqa
+                 tune_model_with_defaults=True,
                  random_state=None):
         assert len(models) == len(iterations)
 
@@ -41,6 +42,7 @@ class ClassifierSearchSpace:
         self._non_numeric_column_names = hlp.pandas.get_non_numeric_columns(data)
         self._models = models
         self._iterations = iterations
+        self._tune_model_with_defaults = tune_model_with_defaults
         self._random_state = random_state
 
     def pipeline(self):
@@ -250,7 +252,6 @@ class ClassifierSearchSpace:
                               reg_alpha=(0.0001, 1),
                               reg_lambda=(1, 4),
                               imputer_strategies=['mean', 'median', 'most_frequent'],  # noqa
-                              use_label_encoder=False,
                               random_state=None):
         """
         `XGBoostError: XGBoost Library (libxgboost.dylib) could not be loaded on Apple Silicon (ARM)`
@@ -267,7 +268,7 @@ class ClassifierSearchSpace:
         model = XGBClassifier(
             n_estimators=500,
             eval_metric=eval_metric,
-            use_label_encoder=use_label_encoder,
+            use_label_encoder=False,
             random_state=random_state,
         )
         # https://towardsdatascience.com/xgboost-fine-tune-and-optimize-your-model-23d996fab663
@@ -302,22 +303,86 @@ class ClassifierSearchSpace:
         return search_space
 
     def search_spaces(self):
+        from skopt.space import Categorical
+        from xgboost import XGBClassifier
+
         search_spaces = []
         for model_enum, num_iterations in zip(self._models, self._iterations):
             if (model_enum in [ClassifierSearchSpaceModels.ExtraTrees,
                                ClassifierSearchSpaceModels.ExtraTrees.value]):
+                if self._tune_model_with_defaults:
+                    default_space = {
+                        'model': Categorical([ExtraTreesClassifier(bootstrap=True,
+                                                                   random_state=self._random_state)])
+                    }
+                    default_space.update(ClassifierSearchSpace._build_transformer_search_space(
+                        imputer_strategies=['mean'],
+                        scaler_min_max=False,
+                        scaler_standard=False,
+                        encoder_ordinal=False,
+                    ))
+                    search_spaces = search_spaces + [(default_space, 1)]
                 space = ClassifierSearchSpace._search_space_extra_trees(random_state=self._random_state)
             elif (model_enum in [ClassifierSearchSpaceModels.LogisticRegression,
                                  ClassifierSearchSpaceModels.LogisticRegression.value]):
+                if self._tune_model_with_defaults:
+                    default_space = {
+                        'model': Categorical([LogisticRegression(
+                            solver='lbfgs',
+                            max_iter=1000,
+                            random_state=self._random_state)])
+                    }
+                    default_space.update(ClassifierSearchSpace._build_transformer_search_space(
+                        imputer_strategies=['mean'],
+                        scaler_none=False,
+                        encoder_ordinal=False
+                    ))
+                    search_spaces = search_spaces + [(default_space, 1)]
                 space = ClassifierSearchSpace._search_space_logistic(random_state=self._random_state)
             elif (model_enum in [ClassifierSearchSpaceModels.RandomForest,
                                  ClassifierSearchSpaceModels.RandomForest.value]):
+                if self._tune_model_with_defaults:
+                    default_space = {
+                        'model': Categorical([RandomForestClassifier(bootstrap=True,
+                                                                     random_state=self._random_state)])
+                    }
+                    default_space.update(ClassifierSearchSpace._build_transformer_search_space(
+                        imputer_strategies=['mean'],
+                        scaler_min_max=False,
+                        scaler_standard=False,
+                        encoder_ordinal=False,
+                    ))
+                    search_spaces = search_spaces + [(default_space, 1)]
                 space = ClassifierSearchSpace._search_space_random_forest(random_state=self._random_state)
             elif (model_enum in [ClassifierSearchSpaceModels.SupportVectorClassificationLinear,
                                  ClassifierSearchSpaceModels.SupportVectorClassificationLinear.value]):
+                if self._tune_model_with_defaults:
+                    default_space = {
+                        'model': Categorical([LinearSVC(
+                            random_state=self._random_state)])
+                    }
+                    default_space.update(ClassifierSearchSpace._build_transformer_search_space(
+                        imputer_strategies=['mean'],
+                        scaler_none=False,
+                        encoder_ordinal=False,
+                    ))
+                    search_spaces = search_spaces + [(default_space, 1)]
                 space = ClassifierSearchSpace._search_space_support_vector_classification_linear(random_state=self._random_state)
             elif (model_enum in [ClassifierSearchSpaceModels.XGBoost,
                                  ClassifierSearchSpaceModels.XGBoost.value]):
+                if self._tune_model_with_defaults:
+                    default_space = {
+                        'model': Categorical([XGBClassifier(eval_metric='logloss',
+                                                            use_label_encoder=False,
+                                                            random_state=self._random_state)])
+                    }
+                    default_space.update(ClassifierSearchSpace._build_transformer_search_space(
+                        imputer_strategies=['mean'],
+                        scaler_min_max=False,
+                        scaler_standard=False,
+                        encoder_ordinal=False,
+                    ))
+                    search_spaces = search_spaces + [(default_space, 1)]
                 space = ClassifierSearchSpace._search_space_xgboost(random_state=self._random_state)
             else:
                 assert False

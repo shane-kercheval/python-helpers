@@ -201,7 +201,6 @@ class TestSklearnSearch(unittest.TestCase):
         # search space for xgboost with modified params
         xgboost_space = ClassifierSearchSpace._search_space_xgboost(
             eval_metric='logloss',
-            use_label_encoder=False,
             max_depth=(2, 30),
             n_estimators=(10, 10000),
             learning_rate=(0.01111, 0.3333),
@@ -457,7 +456,7 @@ class TestSklearnSearch(unittest.TestCase):
             search_spaces=search_space.search_spaces(),  # noqa
             cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
             scoring='roc_auc',
-            refit=False,  # required if passing in multiple scorers
+            refit=False,  # required if use_label_encoder passing in multiple scorers
             return_train_score=False,
             n_jobs=-1,
             verbose=0,
