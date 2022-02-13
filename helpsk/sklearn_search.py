@@ -1,5 +1,4 @@
 from abc import abstractmethod, ABC
-from enum import unique, Enum
 from typing import List
 
 import pandas as pd
@@ -121,13 +120,15 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
         super().__init__(random_state)
 
     @staticmethod
-    def _build_transformer_search_space(imputer_strategies,
-                                        scaler_min_max,
-                                        scaler_standard,
-                                        scaler_none,
-                                        encoder_one_hot,
-                                        encoder_ordinal) -> dict:
+    def _build_transformer_search_space(imputer_strategies: List[str],
+                                        scaler_min_max: bool,
+                                        scaler_standard: bool,
+                                        scaler_none: bool,
+                                        encoder_one_hot: bool,
+                                        encoder_ordinal: bool) -> dict:
         from skopt.space import Categorical
+
+        assert isinstance(imputer_strategies, list)
 
         if imputer_strategies:
             imputers = [SimpleImputer(strategy=x) if x else None for x in imputer_strategies]
@@ -282,7 +283,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
-            imputer_strategies='mean',
+            imputer_strategies=['mean'],
             scaler_min_max=False,
             scaler_standard=True,
             scaler_none=False,
@@ -340,7 +341,7 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
-            imputer_strategies='mean',
+            imputer_strategies=['mean'],
             scaler_min_max=False,
             scaler_standard=True,
             scaler_none=False,
@@ -410,7 +411,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
-            imputer_strategies='mean',
+            imputer_strategies=['mean'],
             scaler_min_max=False,
             scaler_standard=False,
             scaler_none=True,
@@ -519,7 +520,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
-            imputer_strategies='mean',
+            imputer_strategies=['mean'],
             scaler_min_max=False,
             scaler_standard=False,
             scaler_none=True,
@@ -550,7 +551,7 @@ class ClassificationBayesianSearchSpace(BayesianSearchSpaceBase):
 
     def search_spaces(self) -> List[tuple]:
         all_spaces = []
-        for space in  self._model_search_spaces:  # each `space.search_spaces()` is a list of tuples
+        for space in self._model_search_spaces:  # each `space.search_spaces()` is a list of tuples
             all_spaces = all_spaces + space.search_spaces()
 
         return all_spaces
