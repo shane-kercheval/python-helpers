@@ -77,11 +77,11 @@ test_score_standard_deviations:
   - 0.02700178270268214
   - 0.015382103321788826
 trials:
-- model: XGBClassifier(...)
+- model: XGBClassifier()
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer()
   prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
+- model: XGBClassifier()
   model__colsample_bylevel: 0.7190145932204617
   model__colsample_bytree: 0.7633101185638462
   model__learning_rate: 0.3578850597273058
@@ -94,7 +94,7 @@ trials:
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='most_frequent')
   prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
+- model: XGBClassifier()
   model__colsample_bylevel: 0.9696848688013859
   model__colsample_bytree: 0.5818035893192751
   model__learning_rate: 0.09429380335353854
@@ -107,7 +107,7 @@ trials:
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
+- model: XGBClassifier()
   model__colsample_bylevel: 0.8876821894139413
   model__colsample_bytree: 0.679511465960702
   model__learning_rate: 0.43717521513769547
@@ -120,7 +120,7 @@ trials:
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
+- model: XGBClassifier()
   model__colsample_bylevel: 0.9600046132186582
   model__colsample_bytree: 0.7482333517983584
   model__learning_rate: 0.4188444528865573
@@ -133,7 +133,7 @@ trials:
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: None
-- model: XGBClassifier(...)
+- model: XGBClassifier()
   model__colsample_bylevel: 0.8503107223106829
   model__colsample_bytree: 0.9358259642316076
   model__learning_rate: 0.20796896168096884
@@ -146,85 +146,85 @@ trials:
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: None
-- model: LogisticRegression(...)
+- model: LogisticRegression()
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer()
   prep__numeric__scaler__transformer: StandardScaler()
-- model: LogisticRegression(...)
+- model: LogisticRegression()
   model__C: 0.0007376531147826206
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: MinMaxScaler()
-- model: LogisticRegression(...)
+- model: LogisticRegression()
   model__C: 0.00028712123350695286
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: MinMaxScaler()
-- model: LogisticRegression(...)
+- model: LogisticRegression()
   model__C: 1.274865255061674e-06
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: StandardScaler()
-- model: LogisticRegression(...)
+- model: LogisticRegression()
   model__C: 23.32672808600529
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: MinMaxScaler()
-- model: LogisticRegression(...)
+- model: LogisticRegression()
   model__C: 0.13184996310179986
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
   prep__numeric__scaler__transformer: MinMaxScaler()
 timings:
   fit time averages:
-  - 0.19255431493123373
-  - 0.11046997706095378
-  - 0.2010523478190104
-  - 0.21672995885213217
-  - 0.47554222742716473
-  - 0.0689232349395752
-  - 0.02514163653055827
-  - 0.00968011220296224
-  - 0.01824792226155599
-  - 0.018137057622273762
-  - 0.02239569028218587
-  - 0.011481682459513346
+  - 0.18469905853271484
+  - 0.11030157407124837
+  - 0.20322060585021973
+  - 0.2239860693613688
+  - 0.4843599796295166
+  - 0.06596962610880534
+  - 0.019409338633219402
+  - 0.009652296702067057
+  - 0.019882996877034504
+  - 0.018247604370117188
+  - 0.023494164148966473
+  - 0.011608044306437174
   fit time standard deviations:
-  - 0.0008385504065088784
-  - 0.0017141852854306303
-  - 0.007215415195490896
-  - 0.006721586925234354
-  - 0.0010088103312122906
-  - 0.0011627137563050298
-  - 0.005345257130867668
-  - 0.00028300237356543556
-  - 0.0003390443156711984
-  - 0.00019962933781894707
-  - 0.0032132620048288805
-  - 0.00021056462782614464
+  - 0.00033674922973283395
+  - 0.0008860584201733659
+  - 0.00623468846694935
+  - 0.0012905173056179866
+  - 0.010865810129129648
+  - 0.0003211472202104996
+  - 0.0012945724205436105
+  - 0.0004961047546625192
+  - 0.00018957264116355594
+  - 0.0003459457690593402
+  - 0.0032831527331751717
+  - 0.0002994693215816399
   score time averages:
-  - 0.007881641387939453
-  - 0.012277603149414062
-  - 0.013665278752644857
-  - 0.01276556650797526
-  - 0.008066733678181967
-  - 0.011844476064046225
-  - 0.004866441090901692
-  - 0.003993829091389974
-  - 0.009325424830118815
-  - 0.009344657262166342
-  - 0.0038565794626871743
-  - 0.003881374994913737
+  - 0.006452004114786784
+  - 0.012146075566609701
+  - 0.01396942138671875
+  - 0.013908306757609049
+  - 0.00881807009379069
+  - 0.011066436767578125
+  - 0.00430599848429362
+  - 0.0040124257405598955
+  - 0.009850025177001953
+  - 0.009377082188924154
+  - 0.004023154576619466
+  - 0.0039479732513427734
   score time standard deviations:
-  - 0.0008299567054392254
-  - 0.00023798171391212458
-  - 0.0003218827026944024
-  - 0.000630628163666644
-  - 0.000274795751472247
-  - 0.0006682043921622165
-  - 0.0005038569402233705
-  - 7.362061344919864e-05
-  - 0.00010456429920052533
-  - 5.3626104535493805e-05
-  - 6.99035069994443e-05
-  - 1.9587440199493607e-05
+  - 8.609284290567893e-05
+  - 0.00021607847748748846
+  - 0.0001786916102459605
+  - 0.0007875158833568847
+  - 0.0005614815862631228
+  - 0.00016138807040600342
+  - 0.00011543421244656458
+  - 2.7103857319860707e-05
+  - 0.0002494393923925738
+  - 2.0439517237088137e-05
+  - 0.0001440032866973685
+  - 6.273112542038913e-05

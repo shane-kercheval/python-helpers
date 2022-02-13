@@ -1,578 +1,606 @@
 ["{
-model: LogisticRegression(...), C: 0.1321714160260592, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 29, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: LogisticRegression(...), C: 0.1322165591850243, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 70, min_samples_split: 36, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 70, min_samples_split: 2, min_samples_leaf: 6, max_samples: 0.9226328485017692, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.021230989840839983, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.1373223935309154, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.1298175843417688, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 64, min_samples_split: 21, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }",
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 11, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.01716031258205489, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: LinearSVC(), C: 0.005568636346515556, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.026013276672636608, max_depth: 98, min_samples_split: 46, min_samples_leaf: 1, max_samples: 0.9889788849586736, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: LogisticRegression(), C: 0.05611104727494758, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 59, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 0.04469183578567019, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 39, min_samples_split: 33, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(), C: 0.054455837400146104, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }',
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 21, min_samples_leaf: 10, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: LogisticRegression(), C: 0.03029122234160651, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: RandomForestClassifier(), max_features: 0.1532776365854847, max_depth: 67, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 0.05342135102183043, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: LogisticRegression(), C: 0.055475958939643764, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: LogisticRegression(), C: 0.05962230991021745, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: LogisticRegression(), C: 0.0864270330546957, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 7, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: ExtraTreesClassifier(), max_features: 0.8970822889768214, max_depth: 32, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }', "{
-model: LogisticRegression(...), C: 0.13341396172905667, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.004209441366829126, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.10009932401163649, max_depth: 100, min_samples_split: 31, min_samples_leaf: 1, max_samples: 0.6699923392099892, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 0.04443946276533772, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }",
 '{
-model: LinearSVC(), C: 0.023771166892255658, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }', "{
-model: LogisticRegression(...), C: 0.13025746628420962, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.008579732001333846, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }",
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 12, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.057534879099406834, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.05789757218307603, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }', "{
-model: LinearSVC(), C: 0.005535114209132761, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}",
-'{
-model: LinearSVC(), C: 0.022709426732822252, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
-}', "{
-model: LogisticRegression(...), C: 0.13483735235039407, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.003172799070108475, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }", "{
-model: LogisticRegression(...), C: 0.13227162846517612, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.6853845721139037, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 0.04426400084611972, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }",
 '{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 70, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
-}', "{
-model: RandomForestClassifier(...), max_features: 0.022814005854715654, max_depth: 85, min_samples_split: 18, min_samples_leaf: 21, max_samples: 0.9867174121401621, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 42, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }',
 '{
-model: LinearSVC(), C: 0.02440120972330825, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 13, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.01526060478683473, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }', "{
-model: LinearSVC(), C: 0.023453572798929123, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: ExtraTreesClassifier(), max_features: 0.014043088501654779, max_depth: 46, min_samples_split: 6, min_samples_leaf: 3, max_samples: 0.9815667473937162, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: ExtraTreesClassifier(...), max_features: 0.23919708157274078, max_depth: 52, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: RandomForestClassifier(...), max_features: 0.04812598389302365, max_depth: 94, min_samples_split: 34, min_samples_leaf: 12, max_samples: 0.8993701671108224, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.13372931324123008, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.05447830567213674, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }",
 '{
-model: LinearSVC(), C: 0.022562694063798103, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.10159886784556517, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }', "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 47, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: LogisticRegression(...), C: 0.1344939147482279, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 14, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: LinearSVC(), C: 0.02597009917723651, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: ExtraTreesClassifier(), max_features: 0.015601965739779887, max_depth: 94, min_samples_split: 50, min_samples_leaf: 8, max_samples: 0.8392782464045371, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(), C: 0.04533376581953548, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 7, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 1, subsample: 0.5, colsample_bytree: 0.5, colsample_bylevel: 0.8283618049851271, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
 }",
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 58, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.6016773592187359, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.0024841154868798926, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 61, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.7104426517728846, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: LinearSVC(), C: 0.02295105342780147, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.024488286565018842, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.11798068442236062, max_depth: 50, min_samples_split: 37, min_samples_leaf: 1, max_samples: 0.9465143633978903, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: LinearSVC(), C: 0.02546082367382642, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
-}', "{
-model: LogisticRegression(...), C: 0.13276726684209073, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.024403256875594925, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.04013531452425399, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.13326627463004187, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 15, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.9618547411345797, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.02090743448782125, max_depth: 8, min_samples_split: 47, min_samples_leaf: 10, max_samples: 0.6954428768809571, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: LinearSVC(), C: 0.02497078583277068, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.05610542354519348, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: ExtraTreesClassifier(...), max_features: 0.036154175775207895, max_depth: 78, min_samples_split: 42, min_samples_leaf: 1, max_samples: 0.5683313352311468, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 89, min_samples_split: 41, min_samples_leaf: 1, max_samples: 0.9012061878358323, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: LinearSVC(), C: 0.024798490861504614, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.019297120829140885, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 1, min_samples_split: 50, min_samples_leaf: 6, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.0568605262830987, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }', "{
-model: LogisticRegression(...), C: 0.13499038319146628, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.024067813198048522, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.04451610229328283, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }",
 '{
-model: LinearSVC(), C: 0.022152279795021615, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.0752731949518932, max_depth: 100, min_samples_split: 42, min_samples_leaf: 19, max_samples: 0.9934081618876365, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: LogisticRegression(...), C: 0.23685927079165425, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 4, min_samples_leaf: 9, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }', "{
-model: LogisticRegression(...), C: 0.013449251264873093, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.005346847797986487, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }", "{
-model: ExtraTreesClassifier(...), max_features: 0.05011109578293145, max_depth: 99, min_samples_split: 41, min_samples_leaf: 1, max_samples: 0.7618300519177568, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 1, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.6964340748280747, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: LinearSVC(), C: 0.023385012288547936, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.135623903320982, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.14246417867639896, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.7111661607652825, max_depth: 100, min_samples_split: 4, min_samples_leaf: 11, max_samples: 0.8870537038199915, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.02090743448782125, max_depth: 8, min_samples_split: 47, min_samples_leaf: 10, max_samples: 0.6954428768809571, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
 }",
 '{
-model: LinearSVC(), C: 0.023619275779353535, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.09161215437755531, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}',
+'{
+model: LinearSVC(), C: 0.006209469792564176, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }', "{
-model: LogisticRegression(...), C: 0.8905560203006863, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.9393834388284167, max_depth: 49, min_samples_split: 3, min_samples_leaf: 2, max_samples: 0.7094749449339106, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.02212905920520495, max_depth: 18, min_samples_split: 46, min_samples_leaf: 2, max_samples: 0.829447943653709, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.56704588560365, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.015593615570062485, max_depth: 29, min_samples_split: 4, min_samples_leaf: 16, max_samples: 0.9983013718393603, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 97, min_samples_split: 35, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.013287059989004714, max_depth: 11, min_samples_split: 44, min_samples_leaf: 11, max_samples: 0.847417926335009, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: LogisticRegression(), C: 0.05542925877248923, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}',
+'{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: ExtraTreesClassifier(), max_features: 0.011344828275492498, max_depth: 15, min_samples_split: 14, min_samples_leaf: 2, max_samples: 0.5789753052453891, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 23, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: LinearSVC(), imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: RandomForestClassifier(), max_features: 0.016459524750693476, max_depth: 22, min_samples_split: 3, min_samples_leaf: 28, max_samples: 0.8461017015814238, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.7003133830237206, max_depth: 38, min_samples_split: 18, min_samples_leaf: 1, max_samples: 0.5144422625256673, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.15814665520912777, max_depth: 5, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5225368933158698, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LinearSVC(), C: 0.004955873760554001, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 35, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }", "{
 model: LinearSVC(), C: 0.028012345586794787, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.025673969592496744, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.21136792888628345, max_depth: 23, min_samples_split: 35, min_samples_leaf: 8, max_samples: 0.6775104656182822, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.12478684306577423, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.02316164075323811, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.023463478854811846, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.022732211312113674, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.3285820377415821, max_depth: 49, min_samples_split: 10, min_samples_leaf: 1, max_samples: 0.9697495925293971, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 55, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.12150339714978561, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 58, min_samples_split: 11, min_samples_leaf: 1, max_samples: 0.8591981852835175, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.013677551089819866, max_depth: 55, min_samples_split: 48, min_samples_leaf: 23, max_samples: 0.9978022054969938, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }",
 '{
-model: ExtraTreesClassifier(...), max_features: 0.28765483204138687, max_depth: 56, min_samples_split: 34, min_samples_leaf: 1, max_samples: 0.7639581196869188, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: RandomForestClassifier(), max_features: 0.012153954954275776, max_depth: 73, min_samples_split: 38, min_samples_leaf: 31, max_samples: 0.9984994297532177, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }', "{
-model: LogisticRegression(...), C: 0.1318734001879867, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.37511900808935533, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
 }", "{
-model: ExtraTreesClassifier(...), max_features: 0.07591173933901155, max_depth: 43, min_samples_split: 48, min_samples_leaf: 11, max_samples: 0.9489678274632075, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+model: LinearSVC(), C: 0.003295064019464745, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }", "{
-model: LogisticRegression(...), C: 0.13177370111783923, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.2426774732502122, max_depth: 42, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.7733879946713176, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.13380085055409266, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }",
 '{
-model: LogisticRegression(...), C: 1.308386198100965, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.010415808650741456, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: XGBClassifier(), max_depth: 9, learning_rate: 0.0001, n_estimators: 1546, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.636467040650577, reg_alpha: 0.03183917549601788, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.5511166072790119, max_depth: 71, min_samples_split: 43, min_samples_leaf: 5, max_samples: 0.7838249480056945, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LinearSVC(), C: 6.918129520109431, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(), C: 0.014397976219624705, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 50, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 1, subsample: 0.7627779298757693, colsample_bytree: 0.5, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: LogisticRegression(), C: 0.38385463534189274, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}', "{
+model: LogisticRegression(), C: 0.05597970340056406, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.8837909423729298, max_depth: 16, min_samples_split: 50, min_samples_leaf: 2, max_samples: 0.6897060810857436, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 0.06931501975554819, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 46, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.7624719116669084, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LogisticRegression(), imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }', "{
-model: ExtraTreesClassifier(...), max_features: 0.797397050836895, max_depth: 50, min_samples_split: 29, min_samples_leaf: 4, max_samples: 0.6620299911421869, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 23, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LinearSVC(), C: 4.986878708049422, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 1, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
 }",
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 11, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: ExtraTreesClassifier(), max_features: 0.33121166727662854, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 1, min_samples_split: 2, min_samples_leaf: 13, max_samples: 0.5539855393102435, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.0008729329663816999, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }', "{
-model: LinearSVC(), C: 0.02432901334071879, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.262211818329651, max_depth: 98, min_samples_split: 44, min_samples_leaf: 12, max_samples: 0.5409884804575659, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: RandomForestClassifier(...), max_features: 0.5511166072790119, max_depth: 71, min_samples_split: 43, min_samples_leaf: 5, max_samples: 0.7838249480056945, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+model: LogisticRegression(), C: 100.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.18574002609298654, max_depth: 74, min_samples_split: 14, min_samples_leaf: 1, max_samples: 0.8131245280913415, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LinearSVC(), C: 1.7148640284827699, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(), C: 0.0003942038343709884, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.7846727737253352, max_depth: 4, min_samples_split: 7, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 9.810911483948752, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.09561107818600736, max_depth: 4, min_samples_split: 33, min_samples_leaf: 1, max_samples: 0.9961665643560078, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
 }",
 '{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.4655024120729946, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.9670506850496075, reg_alpha: 0.0012649292883342958, reg_lambda: 2.4850473339087666, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LogisticRegression(), C: 100.0, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.40640802961949113, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.7325783142833413, colsample_bylevel: 0.8782633887210951, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.27923150045324885, n_estimators: 100, min_child_weight: 25, subsample: 1.0, colsample_bytree: 0.9772023828378219, colsample_bylevel: 0.9909341210241038, reg_alpha: 1.0, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 1.2625468738772982, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.050555638494048746, max_depth: 94, min_samples_split: 44, min_samples_leaf: 49, max_samples: 0.9981343055551386, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.3606970756883986, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5784747230481362, colsample_bylevel: 0.7134699223621359, reg_alpha: 0.017595236868095904, reg_lambda: 1.9645161639183286, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 69, min_samples_split: 2, min_samples_leaf: 15, max_samples: 0.689093366601841, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 1.0967723681421644, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: LinearSVC(), C: 0.023649503945511765, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.12803227673567422, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }', "{
-model: LinearSVC(), C: 0.021518998837754506, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.015164638425146221, max_depth: 42, min_samples_split: 49, min_samples_leaf: 27, max_samples: 0.958191665836232, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.47849606423839997, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.7221744830033217, colsample_bylevel: 1.0, reg_alpha: 0.005772762987651843, reg_lambda: 1.8856887421530446, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.560893118312729, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.0261327027953075, max_depth: 1, min_samples_split: 16, min_samples_leaf: 24, max_samples: 0.5254744930636215, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
 }",
 '{
-model: LinearSVC(), C: 0.30172213171569023, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.0019667393387354207, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }', "{
-model: ExtraTreesClassifier(...), max_features: 0.4887964682691186, max_depth: 83, min_samples_split: 22, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.4563981489847337, max_depth: 100, min_samples_split: 29, min_samples_leaf: 1, max_samples: 0.7151880712533107, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+model: LogisticRegression(), C: 6.109926202212488e-05, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }",
 '{
-model: LogisticRegression(...), C: 0.03029122234160651, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.020671874059424465, max_depth: 33, min_samples_split: 3, min_samples_leaf: 5, max_samples: 0.6255340433816545, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.31197173771351894, max_depth: 18, min_samples_split: 46, min_samples_leaf: 1, max_samples: 0.9810626640737345, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 1, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }',
 '{
-model: LinearSVC(), C: 0.02314899154966583, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}', "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 6, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.3581610813791982, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.6471667170027505, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.2277878207485646, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.524345214222662, max_depth: 53, min_samples_split: 41, min_samples_leaf: 6, max_samples: 0.8966842396226606, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.9999884501096489, colsample_bylevel: 1.0, reg_alpha: 0.0012907704830570164, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.1470852340106569, n_estimators: 100, min_child_weight: 2, subsample: 0.9750430036564013, colsample_bytree: 0.5, colsample_bylevel: 0.9372532739726, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.38731466899794464, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.7378173497190456, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 1.3679895502167145, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 2, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 1, min_samples_split: 11, min_samples_leaf: 8, max_samples: 0.5676003591411541, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.9136077969486001, reg_alpha: 0.5878963633356217, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: ExtraTreesClassifier(), max_features: 0.95, max_depth: 94, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: LogisticRegression(), C: 1.109831603470211, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}', "{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 28, min_samples_split: 50, min_samples_leaf: 18, max_samples: 0.5665179526118492, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 29, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 1, subsample: 0.5, colsample_bytree: 0.5, colsample_bylevel: 1.0, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LinearSVC(), C: 0.034685305083170186, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.6381434070697748, max_depth: 97, min_samples_split: 39, min_samples_leaf: 3, max_samples: 0.5176511854390519, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 16, learning_rate: 0.0001, n_estimators: 164, min_child_weight: 1, subsample: 0.5, colsample_bytree: 0.5, colsample_bylevel: 0.5, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: RandomForestClassifier(), max_features: 0.3210609154123267, max_depth: 4, min_samples_split: 6, min_samples_leaf: 1, max_samples: 0.9497564662785036, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: LogisticRegression(), C: 80.08489830558847, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: LogisticRegression(), C: 1.0006941932940702e-06, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}', "{
+model: ExtraTreesClassifier(), max_features: 0.017859074855284974, max_depth: 82, min_samples_split: 4, min_samples_leaf: 20, max_samples: 0.5780318267616571, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LinearSVC(), C: 1.8579028869401981, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(), C: 6.447789801438356, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.4734820214585714, max_depth: 25, min_samples_split: 48, min_samples_leaf: 6, max_samples: 0.6308684032130806, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 12, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 2, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.8316438402475951, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: LogisticRegression(), C: 0.005899527378013826, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 14, learning_rate: 0.0001, n_estimators: 131, min_child_weight: 1, subsample: 0.5, colsample_bytree: 1.0, colsample_bylevel: 0.9675908966729874, reg_alpha: 0.0005604070328240068, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+}', "{
+model: RandomForestClassifier(), max_features: 0.05391411806350266, max_depth: 100, min_samples_split: 49, min_samples_leaf: 49, max_samples: 0.6203249291194352, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: LogisticRegression(), C: 1.1322260526329455, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: LinearSVC(), C: 0.0005891489944346768, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: LinearSVC(), C: 0.009599253638474527, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: LinearSVC(), C: 0.02422260702778968, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+model: ExtraTreesClassifier(), imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+}', "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 1, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 3, learning_rate: 0.06243408656792147, n_estimators: 173, min_child_weight: 3, subsample: 0.5449989546519758, colsample_bytree: 0.8007062263866702, colsample_bylevel: 0.8061233330058671, reg_alpha: 0.00018478429548393532, reg_lambda: 1.0087628326587912, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: LinearSVC(), C: 6.997882306827813, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}', "{
+model: RandomForestClassifier(), max_features: 0.9186006798617599, max_depth: 85, min_samples_split: 47, min_samples_leaf: 3, max_samples: 0.9946392899025707, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.6247691288041897, max_depth: 43, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 3, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 1, subsample: 0.7045714839233689, colsample_bytree: 0.6800769833186527, colsample_bylevel: 0.5, reg_alpha: 0.0019335820946301506, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: RandomForestClassifier(), imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+}', "{
+model: RandomForestClassifier(), max_features: 0.524345214222662, max_depth: 53, min_samples_split: 41, min_samples_leaf: 6, max_samples: 0.8966842396226606, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 7, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 4, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.7344112961955547, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: RandomForestClassifier(...), max_features: 0.9256748729445506, max_depth: 13, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.9900543627982158, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: LogisticRegression(...), C: 0.5518581750158322, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.4988389641416324, max_depth: 26, min_samples_split: 30, min_samples_leaf: 9, max_samples: 0.765384692180908, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: LinearSVC(), C: 1.4311589741992943, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 1.0, colsample_bylevel: 1.0, reg_alpha: 0.00010051275085385614, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.0013800192804602552, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 0.8184037881390428, colsample_bytree: 0.5, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 1.4629234377216478, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: LogisticRegression(...), C: 1.911700200341816, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.022787147468275492, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.07418196632756607, max_depth: 61, min_samples_split: 23, min_samples_leaf: 50, max_samples: 0.9978641591088707, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: LinearSVC(), C: 0.024090699136930065, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}', "{
-model: RandomForestClassifier(...), max_features: 0.09235275433906613, max_depth: 89, min_samples_split: 14, min_samples_leaf: 36, max_samples: 0.6895472060685487, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.12810776004096966, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 80.08489830558847, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 1.0, colsample_bylevel: 0.5467111269412567, reg_alpha: 0.0014450952595658473, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.036037255836206136, max_depth: 32, min_samples_split: 34, min_samples_leaf: 35, max_samples: 0.9959993532107771, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.3953743482869536, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5253718346246959, colsample_bylevel: 0.8787245127928907, reg_alpha: 0.730718292567923, reg_lambda: 1.4578261064482914, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 100.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 5, subsample: 1.0, colsample_bytree: 0.9105483481639173, colsample_bylevel: 0.648786224012795, reg_alpha: 0.23272082201601324, reg_lambda: 4.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.3860853057681297, max_depth: 59, min_samples_split: 6, min_samples_leaf: 1, max_samples: 0.9974199606870047, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.7158243918774866, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.4734820214585714, max_depth: 25, min_samples_split: 48, min_samples_leaf: 6, max_samples: 0.6308684032130806, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: ExtraTreesClassifier(...), max_features: 0.06902689121159945, max_depth: 43, min_samples_split: 39, min_samples_leaf: 18, max_samples: 0.5024808920796618, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 1, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.3617796308310402, n_estimators: 100, min_child_weight: 1, subsample: 0.9553589288947042, colsample_bytree: 0.6905307546706124, colsample_bylevel: 0.834773823463663, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.10180694249531401, max_depth: 100, min_samples_split: 49, min_samples_leaf: 13, max_samples: 0.7272945242784377, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.5, reg_alpha: 0.011218667770761331, reg_lambda: 1.7244096582337973, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.36238465000657355, max_depth: 85, min_samples_split: 5, min_samples_leaf: 10, max_samples: 0.8987194012367643, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: LinearSVC(), C: 0.023263258470451458, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 93, min_samples_split: 32, min_samples_leaf: 39, max_samples: 0.7925986037590671, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 18, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: LogisticRegression(...), C: 99.78441185627352, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
-}', "{
-model: LinearSVC(), C: 0.02408852292202081, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.2492810023922022, max_depth: 74, min_samples_split: 17, min_samples_leaf: 14, max_samples: 0.7893321681141925, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: LinearSVC(), C: 0.020519915943596027, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.4008718223246863, max_depth: 87, min_samples_split: 2, min_samples_leaf: 11, max_samples: 0.6905323823987464, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 14.639520570910319, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.7290647832525718, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.4457921591105172, n_estimators: 118, min_child_weight: 3, subsample: 0.752831902043835, colsample_bytree: 0.6201839583625708, colsample_bylevel: 0.8260485416502482, reg_alpha: 0.010367722249365871, reg_lambda: 1.0011838447370598, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: ExtraTreesClassifier(...), max_features: 0.32400522488710515, max_depth: 48, min_samples_split: 2, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.011292908295405659, max_depth: 3, min_samples_split: 3, min_samples_leaf: 27, max_samples: 0.5352022519495521, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.9470428382808451, max_depth: 88, min_samples_split: 3, min_samples_leaf: 1, max_samples: 0.9984362402927611, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.3938197933865835, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.6476177942804549, colsample_bylevel: 0.9124015220269415, reg_alpha: 0.0001, reg_lambda: 1.33399821088819, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.8237048132818932, colsample_bylevel: 0.6485140011115004, reg_alpha: 0.10954449423667904, reg_lambda: 3.777422126743251, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.95, max_depth: 66, min_samples_split: 7, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.3348864967689162, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.9607991154956372, colsample_bylevel: 0.6081445164627002, reg_alpha: 0.0008156995617179993, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: ExtraTreesClassifier(...), max_features: 0.9336974409622576, max_depth: 34, min_samples_split: 49, min_samples_leaf: 6, max_samples: 0.6956765042083076, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: RandomForestClassifier(), max_features: 0.9372414426523735, max_depth: 53, min_samples_split: 18, min_samples_leaf: 1, max_samples: 0.9808227901624585, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: ExtraTreesClassifier(...), max_features: 0.95, max_depth: 62, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 1, min_samples_split: 50, min_samples_leaf: 50, max_samples: 0.8555501190560248, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }', "{
-model: RandomForestClassifier(...), max_features: 0.9423809467657925, max_depth: 58, min_samples_split: 41, min_samples_leaf: 18, max_samples: 0.9006165717444452, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+model: RandomForestClassifier(), max_features: 0.01, max_depth: 52, min_samples_split: 8, min_samples_leaf: 50, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
 }", "{
-model: ExtraTreesClassifier(...), max_features: 0.95, max_depth: 80, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 0.06318275208100582, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.95, max_depth: 24, min_samples_split: 50, min_samples_leaf: 1, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
 }",
 '{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 21, subsample: 1.0, colsample_bytree: 0.9555563513757337, colsample_bylevel: 1.0, reg_alpha: 0.027456422937096898, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: LogisticRegression(...), C: 100.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 2.3637275726622057e-06, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.18711977425950435, max_depth: 17, min_samples_split: 24, min_samples_leaf: 19, max_samples: 0.9002516157283724, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.34978879325178314, max_depth: 48, min_samples_split: 36, min_samples_leaf: 19, max_samples: 0.9991003575314892, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.4020077680604498, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.9049964868625475, reg_alpha: 0.311870076727828, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: RandomForestClassifier(...), max_features: 0.0367994062539427, max_depth: 48, min_samples_split: 9, min_samples_leaf: 49, max_samples: 0.5474604880893708, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.7789414127771916, max_depth: 35, min_samples_split: 47, min_samples_leaf: 30, max_samples: 0.9961175190301961, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.4998553503446881, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.6838052676967015, colsample_bylevel: 0.827767096010616, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.6598681998442996, max_depth: 100, min_samples_split: 33, min_samples_leaf: 11, max_samples: 0.643475565369805, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 8, subsample: 1.0, colsample_bytree: 1.0, colsample_bylevel: 0.863242840436839, reg_alpha: 0.00013427733968325006, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.10885294372583514, max_depth: 76, min_samples_split: 3, min_samples_leaf: 47, max_samples: 0.5295044640228727, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: ExtraTreesClassifier(), max_features: 0.030094647757153765, max_depth: 84, min_samples_split: 24, min_samples_leaf: 36, max_samples: 0.9812939388768892, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }',
 '{
-model: ExtraTreesClassifier(...), max_features: 0.29997689949170153, max_depth: 96, min_samples_split: 21, min_samples_leaf: 20, max_samples: 0.7455551022408218, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 0.5689040528402038, colsample_bytree: 0.7675936180165182, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 1, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.6422121651075534, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 100, min_child_weight: 3, subsample: 0.5, colsample_bytree: 0.5616253634762948, colsample_bylevel: 0.9206308522646313, reg_alpha: 0.11773040274399411, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.01, max_depth: 100, min_samples_split: 50, min_samples_leaf: 50, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.4488627218681163, n_estimators: 242, min_child_weight: 3, subsample: 0.7869088330688009, colsample_bytree: 0.9179588939450538, colsample_bylevel: 0.6908808939215723, reg_alpha: 0.030329722102636875, reg_lambda: 2.7091781555856964, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.682770466380611, max_depth: 53, min_samples_split: 22, min_samples_leaf: 36, max_samples: 0.9519260362533433, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.8318657776143903, max_depth: 37, min_samples_split: 33, min_samples_leaf: 30, max_samples: 0.796309837652784, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.95, max_depth: 1, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: RandomForestClassifier(), max_features: 0.95, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5692609299089362, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }',
 '{
-model: ExtraTreesClassifier(...), max_features: 0.8814828874165372, max_depth: 1, min_samples_split: 17, min_samples_leaf: 1, max_samples: 0.9503414495830436, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: RandomForestClassifier(), max_features: 0.10885294372583514, max_depth: 76, min_samples_split: 3, min_samples_leaf: 47, max_samples: 0.5295044640228727, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }', "{
+model: ExtraTreesClassifier(), max_features: 0.36238465000657355, max_depth: 85, min_samples_split: 5, min_samples_leaf: 10, max_samples: 0.8987194012367643, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.9284515633603371, max_depth: 56, min_samples_split: 3, min_samples_leaf: 16, max_samples: 0.6152273404853954, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 1, subsample: 0.5, colsample_bytree: 0.5, colsample_bylevel: 0.5, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 40, min_samples_split: 50, min_samples_leaf: 12, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 2, subsample: 0.5, colsample_bytree: 0.5, colsample_bylevel: 0.5, reg_alpha: 0.3704794143447448, reg_lambda: 3.133591795091082, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 1, min_samples_split: 23, min_samples_leaf: 1, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LinearSVC(), C: 0.1782179219689405, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: ExtraTreesClassifier(), max_features: 0.95, max_depth: 100, min_samples_split: 50, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+}', "{
+model: XGBClassifier(), max_depth: 2, learning_rate: 0.0001, n_estimators: 206, min_child_weight: 3, subsample: 0.5, colsample_bytree: 0.7222219698509609, colsample_bylevel: 0.6162625681679033, reg_alpha: 0.0031133667188576264, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 50, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 1.0, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+}',
+'{
+model: ExtraTreesClassifier(), max_features: 0.9418871660261328, max_depth: 3, min_samples_split: 41, min_samples_leaf: 2, max_samples: 0.7596687359962351, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: XGBClassifier(), max_depth: 33, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 2, subsample: 0.5, colsample_bytree: 1.0, colsample_bylevel: 0.8872903947638997, reg_alpha: 0.0031076925901489163, reg_lambda: 4.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: RandomForestClassifier(), max_features: 0.4988389641416324, max_depth: 26, min_samples_split: 30, min_samples_leaf: 9, max_samples: 0.765384692180908, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}',
+'{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 50, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.5, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+}', "{
+model: LogisticRegression(), C: 2.3637275726622057e-06, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.4428629766357152, max_depth: 52, min_samples_split: 48, min_samples_leaf: 36, max_samples: 0.8483101433518945, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.95, max_depth: 43, min_samples_split: 2, min_samples_leaf: 1, max_samples: 0.8727729817417405, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LogisticRegression(), C: 99.46638143316103, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 1, subsample: 0.5, colsample_bytree: 0.5, colsample_bylevel: 0.5, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 1, min_samples_split: 38, min_samples_leaf: 50, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 2, min_samples_leaf: 31, max_samples: 1.0, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: RandomForestClassifier(), max_features: 0.34595255136194397, max_depth: 94, min_samples_split: 2, min_samples_leaf: 30, max_samples: 0.9654046713149688, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+}', "{
+model: ExtraTreesClassifier(), max_features: 0.5590482974652552, max_depth: 72, min_samples_split: 35, min_samples_leaf: 32, max_samples: 0.6304453528545368, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: ExtraTreesClassifier(), max_features: 0.29997689949170153, max_depth: 96, min_samples_split: 21, min_samples_leaf: 20, max_samples: 0.7455551022408218, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
+}',
+'{
+model: XGBClassifier(), max_depth: 5, learning_rate: 0.0001, n_estimators: 259, min_child_weight: 2, subsample: 0.6495890112731719, colsample_bytree: 1.0, colsample_bylevel: 0.6736353622564673, reg_alpha: 0.00019377668525848184, reg_lambda: 1.9668878080529786, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}',
+'{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 2, subsample: 0.5, colsample_bytree: 0.8395292946593076, colsample_bylevel: 0.5, reg_alpha: 0.0001, reg_lambda: 2.8254171443180365, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: ExtraTreesClassifier(), max_features: 0.49180611808491104, max_depth: 49, min_samples_split: 32, min_samples_leaf: 36, max_samples: 0.6816015479755677, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 22, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 6, subsample: 0.6404589326297906, colsample_bytree: 0.9067791904502519, colsample_bylevel: 0.8583833509519976, reg_alpha: 0.00012074578207768518, reg_lambda: 1.2956562641663694, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: XGBClassifier(), max_depth: 22, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 5, subsample: 1.0, colsample_bytree: 0.8155973893445074, colsample_bylevel: 0.5, reg_alpha: 0.1656038073934717, reg_lambda: 4.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.7789414127771916, max_depth: 35, min_samples_split: 47, min_samples_leaf: 30, max_samples: 0.9961175190301961, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 118, min_child_weight: 1, subsample: 0.5, colsample_bytree: 0.9559577938180137, colsample_bylevel: 0.7163385600723872, reg_alpha: 0.0022805605319241935, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 5, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 6, subsample: 1.0, colsample_bytree: 1.0, colsample_bylevel: 0.5, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 50, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 1, subsample: 0.5, colsample_bytree: 1.0, colsample_bylevel: 1.0, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.6448305026897199, max_depth: 83, min_samples_split: 46, min_samples_leaf: 44, max_samples: 0.6475647936637973, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.7624359173890012, max_depth: 24, min_samples_split: 31, min_samples_leaf: 36, max_samples: 0.6082852779612609, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 6, subsample: 0.5, colsample_bytree: 0.8784405994598901, colsample_bylevel: 0.516607761901269, reg_alpha: 0.011391293128053778, reg_lambda: 2.035586871761429, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.6720263104468132, max_depth: 81, min_samples_split: 34, min_samples_leaf: 34, max_samples: 0.9708723155369877, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 360, min_child_weight: 3, subsample: 0.9940716093217477, colsample_bytree: 0.6355561410908421, colsample_bylevel: 0.552881214241574, reg_alpha: 0.00012465745944460077, reg_lambda: 1.7518558073343393, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: LinearSVC(), C: 0.14057804693127185, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+}', "{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.5, n_estimators: 454, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.5568949984178236, reg_alpha: 0.005228250215771465, reg_lambda: 4.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.4488627218681163, n_estimators: 242, min_child_weight: 3, subsample: 0.7869088330688009, colsample_bytree: 0.9179588939450538, colsample_bylevel: 0.6908808939215723, reg_alpha: 0.030329722102636875, reg_lambda: 2.7091781555856964, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}',
+'{
+model: XGBClassifier(), max_depth: 8, learning_rate: 0.10339348793539964, n_estimators: 121, min_child_weight: 3, subsample: 0.5791568705348975, colsample_bytree: 1.0, colsample_bylevel: 0.6989676506263433, reg_alpha: 0.00027285651324247264, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: LinearSVC(), C: 0.0011185574229422661, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}",
+'{
+model: LogisticRegression(), C: 9.46116457989142, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+}', "{
+model: LinearSVC(), C: 0.015557058851379733, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 2, learning_rate: 0.18623504947187017, n_estimators: 261, min_child_weight: 12, subsample: 0.8203139833155411, colsample_bytree: 0.9727039226921457, colsample_bylevel: 0.7379651667270184, reg_alpha: 0.09094290730951683, reg_lambda: 1.706207810557758, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 99.38602907502292, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 1472, min_child_weight: 3, subsample: 0.6167158947652797, colsample_bytree: 0.8626040670024664, colsample_bylevel: 0.5, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 7.097411092472356, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.856962325271055, max_depth: 30, min_samples_split: 17, min_samples_leaf: 28, max_samples: 0.5625745905758682, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 36, learning_rate: 0.07264292959254243, n_estimators: 1465, min_child_weight: 2, subsample: 0.6534385540482984, colsample_bytree: 0.7853934478961704, colsample_bylevel: 0.587637355559277, reg_alpha: 0.32471478826487365, reg_lambda: 2.0619261303880205, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: LinearSVC(), C: 0.5709002533054882, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}', "{
+model: LogisticRegression(), C: 0.060169750112152934, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}", "{
 model: LinearSVC(), C: 0.41525282077429876, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
 }",
 '{
-model: ExtraTreesClassifier(...), max_features: 0.35411983065637204, max_depth: 13, min_samples_split: 49, min_samples_leaf: 50, max_samples: 0.9345677752567225, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: ExtraTreesClassifier(...), max_features: 0.27871454348754654, max_depth: 1, min_samples_split: 8, min_samples_leaf: 50, max_samples: 0.783487679818081, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.9296424351806778, max_depth: 1, min_samples_split: 9, min_samples_leaf: 1, max_samples: 1.0, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: LinearSVC(), C: 0.015557058851379733, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.016323722288896295, max_depth: 64, min_samples_split: 12, min_samples_leaf: 50, max_samples: 0.8278795677589978, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.6448305026897199, max_depth: 83, min_samples_split: 46, min_samples_leaf: 44, max_samples: 0.6475647936637973, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
-'{
-model: LogisticRegression(...), C: 0.019198473016173074, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: XGBClassifier(), max_depth: 4, learning_rate: 0.5, n_estimators: 100, min_child_weight: 1, subsample: 0.5, colsample_bytree: 0.5, colsample_bylevel: 0.5, reg_alpha: 1.0, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: ExtraTreesClassifier(...), max_features: 0.95, max_depth: 100, min_samples_split: 14, min_samples_leaf: 50, max_samples: 0.9058470195817517, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: XGBClassifier(), max_depth: 22, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 13, subsample: 0.6100688032436145, colsample_bytree: 1.0, colsample_bylevel: 0.9151023897125247, reg_alpha: 0.06710264394383998, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
 }',
 '{
-model: XGBClassifier(...), max_depth: 100, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 23, subsample: 1.0, colsample_bytree: 1.0, colsample_bylevel: 0.5, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: LogisticRegression(), C: 35.370981915459254, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+}', "{
+model: RandomForestClassifier(), max_features: 0.8627876809557973, max_depth: 49, min_samples_split: 37, min_samples_leaf: 46, max_samples: 0.6463854797506566, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}", "{
+model: LogisticRegression(), C: 0.00018320446728216852, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 50, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 18, subsample: 1.0, colsample_bytree: 1.0, colsample_bylevel: 0.5, reg_alpha: 0.16972962892882168, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: LinearSVC(), C: 0.026747946413006315, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 112, min_child_weight: 2, subsample: 0.762037356469902, colsample_bytree: 0.8451380493193046, colsample_bylevel: 0.7747464733172423, reg_alpha: 0.0005721916761304783, reg_lambda: 2.9834336460650652, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: XGBClassifier(), max_depth: 21, learning_rate: 0.23523688900307663, n_estimators: 135, min_child_weight: 2, subsample: 0.6892984554924466, colsample_bytree: 0.8244160577135398, colsample_bylevel: 0.9786644099106183, reg_alpha: 0.031902234549004566, reg_lambda: 1.8723575427875105, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: ExtraTreesClassifier(), max_features: 0.01, max_depth: 100, min_samples_split: 42, min_samples_leaf: 50, max_samples: 0.5, criterion: entropy, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: ExtraTreesClassifier(), max_features: 0.9293466820567537, max_depth: 99, min_samples_split: 45, min_samples_leaf: 50, max_samples: 0.5010087156020766, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 50, learning_rate: 0.10240302806513212, n_estimators: 100, min_child_weight: 50, subsample: 1.0, colsample_bytree: 0.9948142663498789, colsample_bylevel: 0.8796439767021693, reg_alpha: 0.0001, reg_lambda: 2.8719831908377316, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: LogisticRegression(), C: 0.00019839591935906576, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}", "{
+model: ExtraTreesClassifier(), max_features: 0.7812332723251562, max_depth: 50, min_samples_split: 35, min_samples_leaf: 47, max_samples: 0.8455558039385863, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: RandomForestClassifier(), max_features: 0.95, max_depth: 98, min_samples_split: 2, min_samples_leaf: 50, max_samples: 0.5020845181730657, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: LogisticRegression(), C: 1e-06, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
 }',
 '{
-model: LogisticRegression(...), C: 35.370981915459254, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+model: LogisticRegression(), C: 1.0000209249504456e-06, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
 }', "{
-model: ExtraTreesClassifier(...), max_features: 0.49180611808491104, max_depth: 49, min_samples_split: 32, min_samples_leaf: 36, max_samples: 0.6816015479755677, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 4, learning_rate: 0.22402354345283226, n_estimators: 106, min_child_weight: 3, subsample: 0.9202357888090007, colsample_bytree: 0.8376722167822778, colsample_bylevel: 0.8235602811179822, reg_alpha: 0.0004580319109458466, reg_lambda: 1.894932971138975, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+model: ExtraTreesClassifier(), max_features: 0.95, max_depth: 1, min_samples_split: 2, min_samples_leaf: 9, max_samples: 0.9339647826685389, criterion: gini, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
 }",
 '{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 24, subsample: 1.0, colsample_bytree: 0.7871199579785222, colsample_bylevel: 0.6464889326965747, reg_alpha: 0.00014825958227534855, reg_lambda: 1.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: LinearSVC(), C: 0.00326002158490251, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
 }', "{
-model: XGBClassifier(...), max_depth: 2, learning_rate: 0.18623504947187017, n_estimators: 261, min_child_weight: 18, subsample: 0.8203139833155411, colsample_bytree: 0.9727039226921457, colsample_bylevel: 0.7379651667270184, reg_alpha: 0.09094290730951683, reg_lambda: 1.706207810557758, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+model: LinearSVC(), C: 3.8145672497749736e-05, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}", "{
+model: XGBClassifier(), max_depth: 19, learning_rate: 0.08873289670507682, n_estimators: 429, min_child_weight: 10, subsample: 0.7362631225301774, colsample_bytree: 0.8779427375763669, colsample_bylevel: 0.5502593252639497, reg_alpha: 0.0018745406666254548, reg_lambda: 1.1313155361659026, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}", "{
+model: LinearSVC(), C: 88.2271135135671, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
+}", "{
+model: LinearSVC(), C: 6.423780149029393, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
 }",
 '{
-model: LogisticRegression(...), C: 9.46116457989142, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+model: XGBClassifier(), imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }', "{
-model: LogisticRegression(...), C: 7.097411092472356, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
-}", "{
-model: LogisticRegression(...), C: 1.4034158704768943e-06, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 0.013559759498812685, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.8407360249211452, max_depth: 1, min_samples_split: 17, min_samples_leaf: 1, max_samples: 0.5725249203257339, criterion: gini, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.008273356206542409, n_estimators: 100, min_child_weight: 12, subsample: 0.5, colsample_bytree: 0.6837647698135024, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 2.0846500901180955, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 1e-06, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 1, subsample: 0.5, colsample_bytree: 1.0, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
 }",
 '{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.5167385919678645, reg_alpha: 0.0001, reg_lambda: 1.8337633083111502, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 100, learning_rate: 0.3659709701795878, n_estimators: 100, min_child_weight: 23, subsample: 1.0, colsample_bytree: 0.8691957453572892, colsample_bylevel: 1.0, reg_alpha: 1.0, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.022462730284886538, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
-}", "{
-model: LogisticRegression(...), C: 0.11050734833220796, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
-}",
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.5, n_estimators: 1152, min_child_weight: 3, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 0.988976526232658, reg_alpha: 0.1679759169036272, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}',
 '{
-model: LogisticRegression(...), C: 0.000595359314025688, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+model: LogisticRegression(), C: 0.019198473016173074, imputer: SimpleImputer(), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
 }', "{
-model: LogisticRegression(...), C: 100.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+model: LinearSVC(), C: 0.00016696035314892513, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
 }", "{
-model: LogisticRegression(...), C: 0.00019839591935906576, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
-}",
-'{
-model: RandomForestClassifier(...), max_features: 0.908749401314679, max_depth: 33, min_samples_split: 6, min_samples_leaf: 48, max_samples: 0.999778841548284, criterion: gini, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.025805179683828262, n_estimators: 100, min_child_weight: 6, subsample: 0.8909367510386179, colsample_bytree: 0.8015918880936403, colsample_bylevel: 0.5310770788937306, reg_alpha: 0.0992434791163437, reg_lambda: 1.0454610869434022, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+model: XGBClassifier(), max_depth: 5, learning_rate: 0.09049932260372565, n_estimators: 1216, min_child_weight: 3, subsample: 0.9747024017430823, colsample_bytree: 0.6496454911361622, colsample_bylevel: 0.8195540311828022, reg_alpha: 0.00018863183421865195, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.0001, n_estimators: 2000, min_child_weight: 2, subsample: 1.0, colsample_bytree: 0.5, colsample_bylevel: 1.0, reg_alpha: 0.00016418842132486178, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: RandomForestClassifier(...), max_features: 0.8627876809557973, max_depth: 49, min_samples_split: 37, min_samples_leaf: 46, max_samples: 0.6463854797506566, criterion: entropy, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 26, subsample: 1.0, colsample_bytree: 0.6091997005293946, colsample_bylevel: 0.619354870684868, reg_alpha: 0.4673286863346598, reg_lambda: 4.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: ExtraTreesClassifier(...), max_features: 0.95, max_depth: 1, min_samples_split: 2, min_samples_leaf: 36, max_samples: 0.8860307093390862, criterion: entropy, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: LinearSVC(), C: 100.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}",
-'{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.2046706951960987, n_estimators: 2000, min_child_weight: 1, subsample: 0.7591130978568883, colsample_bytree: 0.8115035697596011, colsample_bylevel: 1.0, reg_alpha: 0.0001, reg_lambda: 1.275092894114252, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
 model: LinearSVC(), C: 0.00015775181320339915, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
+}",
+'{
+model: LinearSVC(), C: 1.0014961405968034e-06, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: XGBClassifier(), max_depth: 34, learning_rate: 0.5, n_estimators: 100, min_child_weight: 2, subsample: 0.8944313920312243, colsample_bytree: 1.0, colsample_bylevel: 0.6369194860963618, reg_alpha: 0.008733848223168247, reg_lambda: 1.0, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
 }", "{
-model: XGBClassifier(...), max_depth: 20, learning_rate: 0.462456468425166, n_estimators: 559, min_child_weight: 3, subsample: 0.8264550446801299, colsample_bytree: 0.6179431148132194, colsample_bylevel: 0.6474808268561457, reg_alpha: 0.04772191953234671, reg_lambda: 1.341119550934357, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
+model: LinearSVC(), C: 3.3256354971970308e-06, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 3, learning_rate: 0.45689558020947435, n_estimators: 226, min_child_weight: 7, subsample: 0.6479379980172523, colsample_bytree: 0.6457249950191193, colsample_bylevel: 0.7739351383177151, reg_alpha: 0.0001547758820288251, reg_lambda: 2.574415708066991, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}',
+'{
+model: LinearSVC(), C: 3.5589158372379366e-05, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}', "{
+model: LogisticRegression(), C: 8.497573077546403e-06, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
 }", "{
-model: XGBClassifier(...), max_depth: 19, learning_rate: 0.23151568938936665, n_estimators: 1219, min_child_weight: 35, subsample: 0.8970245542373194, colsample_bytree: 0.6513906177446346, colsample_bylevel: 0.695756710016573, reg_alpha: 0.00099012704247865, reg_lambda: 1.7620902204716906, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+model: XGBClassifier(), max_depth: 2, learning_rate: 0.2609178503119241, n_estimators: 1066, min_child_weight: 13, subsample: 0.6923574041211398, colsample_bytree: 0.7798965252706274, colsample_bylevel: 0.8005307190191707, reg_alpha: 0.0022280296054526553, reg_lambda: 2.5606286263555877, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 6, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 1, subsample: 1.0, colsample_bytree: 1.0, colsample_bylevel: 0.9322474174740314, reg_alpha: 0.002605929528092538, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}', "{
+model: XGBClassifier(), max_depth: 6, learning_rate: 0.15287643594102046, n_estimators: 1510, min_child_weight: 10, subsample: 0.8728727190499073, colsample_bytree: 0.5432425417982732, colsample_bylevel: 0.7010942342436819, reg_alpha: 0.8530424062822517, reg_lambda: 1.1333923098784455, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
 }", "{
-model: XGBClassifier(...), max_depth: 2, learning_rate: 0.2609178503119241, n_estimators: 1066, min_child_weight: 21, subsample: 0.6923574041211398, colsample_bytree: 0.7798965252706274, colsample_bylevel: 0.8005307190191707, reg_alpha: 0.0022280296054526553, reg_lambda: 2.5606286263555877, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 100, learning_rate: 0.4449525679980041, n_estimators: 2000, min_child_weight: 1, subsample: 0.7454483789540891, colsample_bytree: 0.6757126184712905, colsample_bylevel: 0.7811359421464261, reg_alpha: 0.15863943483279996, reg_lambda: 1.4286818149561602, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 4, learning_rate: 0.15744959908451117, n_estimators: 1423, min_child_weight: 9, subsample: 0.984991163381304, colsample_bytree: 0.657684685278632, colsample_bylevel: 0.6711678123843275, reg_alpha: 0.001461957802501527, reg_lambda: 2.7607744715672027, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LogisticRegression(...), C: 8.497573077546403e-06, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 8, learning_rate: 0.15287643594102046, n_estimators: 1510, min_child_weight: 15, subsample: 0.8728727190499073, colsample_bytree: 0.5432425417982732, colsample_bylevel: 0.7010942342436819, reg_alpha: 0.8530424062822517, reg_lambda: 1.1333923098784455, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 4.46286113630136e-06, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 3, learning_rate: 0.44471037372755157, n_estimators: 1962, min_child_weight: 37, subsample: 0.6386326623646477, colsample_bytree: 0.7578511153982423, colsample_bylevel: 0.8205695629866829, reg_alpha: 0.3866525074790303, reg_lambda: 3.109494334508716, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: CustomOrdinalEncoder()
+model: XGBClassifier(), max_depth: 33, learning_rate: 0.37236487581254557, n_estimators: 923, min_child_weight: 20, subsample: 0.9676927755618308, colsample_bytree: 0.8503235520166503, colsample_bylevel: 0.9782657696674566, reg_alpha: 0.022355013075107007, reg_lambda: 2.465041494025497, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
+}",
+'{
+model: XGBClassifier(), max_depth: 50, learning_rate: 0.5, n_estimators: 2000, min_child_weight: 4, subsample: 0.5, colsample_bytree: 0.8474152416384718, colsample_bylevel: 1.0, reg_alpha: 0.016230849269712303, reg_lambda: 4.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}',
+'{
+model: LinearSVC(), C: 100.0, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: OneHotEncoder()
+}', "{
+model: LinearSVC(), C: 1.0053886903767406e-06, imputer: SimpleImputer(strategy='most_frequent'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
 }", "{
 model: LinearSVC(), C: 4.023624070099052e-06, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
 }", "{
 model: LinearSVC(), C: 3.0999190724740995e-06, imputer: SimpleImputer(strategy='median'), scaler: MinMaxScaler(), encoder: CustomOrdinalEncoder()
 }", "{
 model: LinearSVC(), C: 2.8724341161910274e-06, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 3.3256354971970308e-06, imputer: SimpleImputer(strategy='most_frequent'), scaler: MinMaxScaler(), encoder: OneHotEncoder()
-}", "{
-model: LinearSVC(), C: 86.49609222580355, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
 }",
 '{
-model: LinearSVC(), C: 100.0, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
-}', "{
-model: LinearSVC(), C: 0.00016916075536618875, imputer: SimpleImputer(strategy='median'), scaler: None, encoder: OneHotEncoder()
-}",
+model: LinearSVC(), C: 100.0, imputer: SimpleImputer(), scaler: StandardScaler(), encoder: CustomOrdinalEncoder()
+}',
 '{
-model: LogisticRegression(...), C: 1e-06, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
-}', "{
-model: LogisticRegression(...), C: 1e-06, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}", "{
-model: LinearSVC(), C: 0.00016696035314892513, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 1, learning_rate: 0.5, n_estimators: 2000, min_child_weight: 100, subsample: 1.0, colsample_bytree: 1.0, colsample_bylevel: 1.0, reg_alpha: 1.0, reg_lambda: 1.0, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: OneHotEncoder()
-}", "{
-model: XGBClassifier(...), max_depth: 100, learning_rate: 0.1707763412358799, n_estimators: 100, min_child_weight: 100, subsample: 0.7849107763014507, colsample_bytree: 0.5, colsample_bylevel: 0.5, reg_alpha: 1.0, reg_lambda: 3.520303902399158, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, encoder: CustomOrdinalEncoder()
-}",
+model: XGBClassifier(), max_depth: 8, learning_rate: 0.0001, n_estimators: 100, min_child_weight: 45, subsample: 0.521899684726276, colsample_bytree: 0.5696453581150446, colsample_bylevel: 1.0, reg_alpha: 0.11701538807988202, reg_lambda: 1.2194314331411482, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+}',
 '{
-model: XGBClassifier(...), max_depth: 4, learning_rate: 0.5, n_estimators: 157, min_child_weight: 69, subsample: 0.5, colsample_bytree: 0.6811428171670588, colsample_bylevel: 0.628231040875874, reg_alpha: 0.0018229625587641081, reg_lambda: 3.2867952766786726, imputer: SimpleImputer(), scaler: None, encoder: CustomOrdinalEncoder()
+model: XGBClassifier(), max_depth: 1, learning_rate: 0.5, n_estimators: 227, min_child_weight: 50, subsample: 0.5, colsample_bytree: 1.0, colsample_bylevel: 0.7848218168355854, reg_alpha: 0.0002536427732052701, reg_lambda: 1.0656031313029477, imputer: SimpleImputer(), scaler: None, encoder: OneHotEncoder()
 }']
