@@ -11,7 +11,7 @@ from helpsk import validation
 from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
-from helpsk.sklearn_search import ClassifierSearchSpace, ClassifierSearchSpaceModels
+from helpsk.sklearn_search import *
 from helpsk.utility import redirect_stdout_to_file
 from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
 
@@ -20,6 +20,7 @@ from tests.helpers import get_data_credit, get_test_path, clean_formatted_datafr
 class TestSklearnSearch(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        pass
         credit_data = get_data_credit()
         credit_data.loc[0:46, ['duration']] = np.nan
         credit_data.loc[25:75, ['checking_status']] = np.nan
@@ -32,28 +33,45 @@ class TestSklearnSearch(unittest.TestCase):
         cls.default_search_space = ClassifierSearchSpace(data=X_train)
         cls.X_train = X_train
         cls.y_train = y_train
-        cls.search_space_used = ClassifierSearchSpace(
-            data=X_train,
-            models=[
-                ClassifierSearchSpaceModels.XGBoost,
-                ClassifierSearchSpaceModels.LogisticRegression
-            ],
-            iterations=[5, 5]
-        )
-        # pip install scikit-optimize
+        # cls.search_space_used = ClassifierSearchSpace(
+        #     data=X_train,
+        #     models=[
+        #         ClassifierSearchSpaceModels.XGBoost,
+        #         ClassifierSearchSpaceModels.LogisticRegression
+        #     ],
+        #     iterations=[5, 5]
+        # )
+        # # pip install scikit-optimize
+        #
+        # cls.bayes_search = BayesSearchCV(
+        #     estimator=cls.search_space_used.pipeline(),  # noqa
+        #     search_spaces=cls.search_space_used.search_spaces(),  # noqa
+        #     cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
+        #     scoring='roc_auc',
+        #     refit=False,  # required if passing in multiple scorers
+        #     return_train_score=False,
+        #     n_jobs=-1,
+        #     verbose=0,
+        #     random_state=42,
+        # )
+        # cls.bayes_search.fit(X_train, y_train)  # noqa
 
-        cls.bayes_search = BayesSearchCV(
-            estimator=cls.search_space_used.pipeline(),  # noqa
-            search_spaces=cls.search_space_used.search_spaces(),  # noqa
-            cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
-            scoring='roc_auc',
-            refit=False,  # required if passing in multiple scorers
-            return_train_score=False,
-            n_jobs=-1,
-            verbose=0,
-            random_state=42,
-        )
-        cls.bayes_search.fit(X_train, y_train)  # noqa
+    def test_search(self):
+        space = XGBoostBayesianSearchSpace()
+        space.prime(data=self.X_train)
+        space.pipeline()
+        space.search_spaces()
+        space.param_name_mappings()
+
+        spaces = ClassificationBayesianSearchSpace(data=self.X_train)
+        spaces.pipeline()
+        _ = spaces.search_spaces()
+        _[1]
+        spaces.param_name_mappings()
+
+
+
+
 
     def test_ClassifierSearchSpace(self):
 
