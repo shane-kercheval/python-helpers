@@ -30,7 +30,7 @@ class TestSklearnSearch(unittest.TestCase):
         y_full = label_binarize(y_full, classes=['good', 'bad']).flatten()
         X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)  # noqa
         del y_full, X_full
-        cls.default_search_space = ClassifierSearchSpace(data=X_train)
+        #cls.default_search_space = ClassifierSearchSpace(data=X_train)
         cls.X_train = X_train
         cls.y_train = y_train
         # cls.search_space_used = ClassifierSearchSpace(
