@@ -56,6 +56,34 @@ class TestSklearnSearch(unittest.TestCase):
         # )
         # cls.bayes_search.fit(X_train, y_train)  # noqa
 
+    def test_ModelBayesianSearchSpaceBase(self):
+        space = LogisticBayesianSearchSpace()
+        self.assertRaises(RuntimeError, lambda: space.pipeline())
+        space.prime(data=self.X_train)
+
+        def to_string(obj):
+            return str(obj).\
+                replace(", '", ",\n'").\
+                replace('{', '{\n').\
+                replace('}', '\n}').\
+                replace(', ({', ',\n({')
+
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_pipeline.txt', 'w') as file:
+            file.write(str(space.pipeline()))
+
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_search_spaces__default.txt', 'w') as file:
+            file.write(to_string(space.search_spaces()))
+
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_param_name_mappings.txt', 'w') as file:
+            file.write(to_string(space.param_name_mappings()))
+
+        
+
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_pipeline.txt', 'w') as file:
+            file.write(str(space.pipeline()))
+
+
+
     def test_search(self):
         space = XGBoostBayesianSearchSpace()
         space.prime(data=self.X_train)
