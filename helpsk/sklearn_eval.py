@@ -1357,8 +1357,14 @@ class MLExperimentResults:
         if size:
             title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
 
+        df = self.to_labeled_dataframe(query=query)
+        # only include the columns we need, so that we don't unnecessarily drop rows with NA (i.e. NAs in
+        # columns not used in the graph)
+        columns = [x for x in [parameter, primary_score_column, size, color, 'label'] if x is not None]
+        df = df[columns]
+        df.dropna(axis=0, how='any', inplace=True)
         fig = px.scatter(
-            data_frame=self.to_labeled_dataframe(query=query),
+            data_frame=df,
             x=parameter,
             y=primary_score_column,
             size=size,
@@ -1416,6 +1422,13 @@ class MLExperimentResults:
 
         scaled_size = None
         labeled_df = self.to_labeled_dataframe(query=query)
+
+        # only include the columns we need, so that we don't unnecessarily drop rows with NA (i.e. NAs in
+        # columns not used in the graph)
+        columns = [x for x in [parameter_x, parameter_y, primary_score_column, size, 'label']
+                   if x is not None]
+        labeled_df = labeled_df[columns]
+        labeled_df.dropna(axis=0, how='any', inplace=True)
 
         if size:
             title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
