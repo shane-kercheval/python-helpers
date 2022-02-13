@@ -256,19 +256,19 @@ class TestSklearnSearch(unittest.TestCase):
             print_dataframe(results.to_dataframe())
 
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__xgboost.txt'):
-            print_dataframe(results.to_dataframe(query="model == 'XGBClassifier(...)'"))
+            print_dataframe(results.to_dataframe(query="model == 'XGBClassifier()'"))
 
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__logistic.txt'):
-            print_dataframe(results.to_dataframe(query="model == 'LogisticRegression(...)'"))
+            print_dataframe(results.to_dataframe(query="model == 'LogisticRegression()'"))
 
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe.html', 'w') as file:
             file.write(clean_formatted_dataframe(results.to_formatted_dataframe().render()))
 
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__xgboost.html', 'w') as file:
-            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query="model == 'XGBClassifier(...)'").render()))
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query="model == 'XGBClassifier()'").render()))
 
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-dataframe__logistic.html', 'w') as file:
-            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query="model == 'LogisticRegression(...)'").render()))
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query="model == 'LogisticRegression()'").render()))
 
         # pd.set_option('display.max_columns', 500)
         # pd.set_option('display.width', 10000)
@@ -283,14 +283,14 @@ class TestSklearnSearch(unittest.TestCase):
             for x in label_column_formatter(labeled_df['label']):
                 file.write(x)
 
-        labeled_df = results.to_labeled_dataframe(query="model == 'XGBClassifier(...)'")
+        labeled_df = results.to_labeled_dataframe(query="model == 'XGBClassifier()'")
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__xgboost.txt'):
             print_dataframe(labeled_df)
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__xgboost__label.txt', 'w') as file:
             for x in label_column_formatter(labeled_df['label']):
                 file.write(x)
 
-        labeled_df = results.to_labeled_dataframe(query="model == 'LogisticRegression(...)'")
+        labeled_df = results.to_labeled_dataframe(query="model == 'LogisticRegression()'")
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__logistic.txt'):
             print_dataframe(labeled_df)
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe__logistic__label.txt', 'w') as file:
@@ -494,7 +494,7 @@ class TestSklearnSearch(unittest.TestCase):
                                                                                 return_style=True).render()))
 
         with open(get_test_path() + '/test_files/sklearn_search/multi-model-many-XGBClassifier.html', 'w') as file:
-            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query='model == "XGBClassifier(...)"').render()))
+            file.write(clean_formatted_dataframe(results.to_formatted_dataframe(query='model == "XGBClassifier()"').render()))
 
         labeled_dataframe = results.to_labeled_dataframe()
         self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, results.number_of_trials + 1))))
@@ -521,13 +521,13 @@ class TestSklearnSearch(unittest.TestCase):
         del labels
 
         _ = results.plot_performance_across_trials(facet_by='model')
-        _ = results.plot_performance_across_trials(query='model == "XGBClassifier(...)"')
-        _ = results.plot_parameter_values_across_trials(query='model == "XGBClassifier(...)"')
-        _ = results.plot_parallel_coordinates(query='model == "XGBClassifier(...)"')
-        _ = results.plot_scatter_matrix(query='model == "XGBClassifier(...)"')
-        _ = results.plot_score_vs_parameter(parameter='max_depth', query='model == "XGBClassifier(...)"')
-        _ = results.plot_parameter_values_across_trials(query='model == "XGBClassifier(...)"')
+        _ = results.plot_performance_across_trials(query='model == "XGBClassifier()"')
+        _ = results.plot_parameter_values_across_trials(query='model == "XGBClassifier()"')
+        _ = results.plot_parallel_coordinates(query='model == "XGBClassifier()"')
+        _ = results.plot_scatter_matrix(query='model == "XGBClassifier()"')
+        _ = results.plot_score_vs_parameter(parameter='max_depth', query='model == "XGBClassifier()"')
+        _ = results.plot_parameter_values_across_trials(query='model == "XGBClassifier()"')
         _ = results.plot_parameter_vs_parameter(parameter_x='max_depth', parameter_y='min_child_weight',
-                                                query='model == "XGBClassifier(...)"')
-        _ = results.plot_performance_non_numeric_params(query='model == "XGBClassifier(...)"')
-        _ = results.plot_performance_numeric_params(query='model == "XGBClassifier(...)"')
+                                                query='model == "XGBClassifier()"')
+        _ = results.plot_performance_non_numeric_params(query='model == "XGBClassifier()"')
+        _ = results.plot_performance_numeric_params(query='model == "XGBClassifier()"')

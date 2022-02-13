@@ -267,12 +267,12 @@ class MLExperimentResults:
             if isinstance(obj, (int, float, complex)):
                 return obj
             # convert to a string, but convert e.g. `XGBoostClassifier(parameter=x, etc)` to
-            # `XGBoostClassifier(...)`
+            # `XGBoostClassifier()`
             string_value = str(obj)
             string_value = string_value.replace('\n', '')
-            string_value = re.sub(r'Classifier\(.+\)', 'Classifier(...)', string_value)
-            string_value = re.sub(r'Regressor\(.+\)', 'Regressor(...)', string_value)
-            string_value = re.sub(r'Regression\(.+\)', 'Regression(...)', string_value)
+            string_value = re.sub(r'Classifier\(.+\)', 'Classifier()', string_value)
+            string_value = re.sub(r'Regressor\(.+\)', 'Regressor()', string_value)
+            string_value = re.sub(r'Regression\(.+\)', 'Regression()', string_value)
             string_value = string_value.replace("OneHotEncoder(handle_unknown='ignore')", "OneHotEncoder()")
             return string_value
 
@@ -466,8 +466,8 @@ class MLExperimentResults:
                 a string that queries the resulting pd.DataFrame (passed directly to pandas `.query()`)
 
                 For example, if multiple models are being searched, and `model` is a parameter name (and a
-                resulting column), then a query value of `"model == 'LogisticRegression(...)'"` would return
-                only the rows where the value of the `model` column matches `LogisticRegression(...)`.
+                resulting column), then a query value of `"model == 'LogisticRegression()'"` would return
+                only the rows where the value of the `model` column matches `LogisticRegression()`.
 
         Returns:
             a DataFrame containing score information for each cross-validation trial. A single row
@@ -548,8 +548,8 @@ class MLExperimentResults:
                 a string that queries the resulting pd.DataFrame (passed directly to pandas `.query()`)
 
                 For example, if multiple models are being searched, and `model` is a parameter name (and a
-                resulting column), then a query value of `"model == 'LogisticRegression(...)'"` would return
-                only the rows where the value of the `model` column matches `LogisticRegression(...)`.
+                resulting column), then a query value of `"model == 'LogisticRegression()'"` would return
+                only the rows where the value of the `model` column matches `LogisticRegression()`.
             include_rank:
                 if True, include a column to show the index of score rank.
             return_style:
@@ -635,8 +635,8 @@ class MLExperimentResults:
                 a string that queries the resulting pd.DataFrame (passed directly to pandas `.query()`)
 
                 For example, if multiple models are being searched, and `model` is a parameter name (and a
-                resulting column), then a query value of `"model == 'LogisticRegression(...)'"` would return
-                only the rows where the value of the `model` column matches `LogisticRegression(...)`.
+                resulting column), then a query value of `"model == 'LogisticRegression()'"` would return
+                only the rows where the value of the `model` column matches `LogisticRegression()`.
         """
         sort_by_score = False  # leave original trial order
         labeled_dataframe = self.to_dataframe(sort_by_score=sort_by_score, query=query)
