@@ -520,7 +520,7 @@ class MLExperimentResults:
     # pylint: disable=too-many-arguments
     def to_formatted_dataframe(self,
                                round_by: int = 3,
-                               num_rows: int = 50,
+                               num_rows: int = 100,
                                primary_score_only: bool = False,
                                exclude_zero_variance_params: bool = True,
                                query: str = None,
@@ -854,7 +854,7 @@ class MLExperimentResults:
         The *best* score. "Best" could be the highest or lowest depending on `higher_score_is_better`)
         associated with the "primary" (i.e. first) score.
         """
-        best_params = self.trials[self.best_score_index]
+        best_params = self.trials[self.best_score_index].copy()
 
         if self.parameter_names_mapping:
             best_params = {value: best_params[key] for key, value in self.parameter_names_mapping.items()
