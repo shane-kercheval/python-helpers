@@ -1016,7 +1016,13 @@ class MLExperimentResults:
         if facet_by:
             labeled_df['Trial Index'] = labeled_df.groupby(facet_by)["Trial Index"].rank(method="first",
                                                                                           ascending=True)
-            
+        # only include the columns we need, so that we don't unnecessarily drop rows with NA (i.e. NAs in
+        # columns not used in the graph)
+        columns = [x for x in ['Trial Index', score_column, size, color, facet_by, 'label']
+                   if x is not None]
+        labeled_df = labeled_df[columns]
+        labeled_df.dropna(axis=0, how='any', inplace=True)
+
         fig = px.scatter(
             data_frame=labeled_df,
             x='Trial Index',
