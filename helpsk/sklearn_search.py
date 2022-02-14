@@ -17,12 +17,11 @@ import helpsk as hlp
 class BayesianSearchSpaceBase(ABC):
     def __init__(self, random_state: int = None):
         self._random_state = random_state
-        self._numeric_column_names = None
-        self._non_numeric_column_names = None
 
-    def pipeline(self):
-        if self._numeric_column_names is None and self._non_numeric_column_names is None:
-            raise RuntimeError('You must call `prime()` before using this function()')
+    @staticmethod
+    def pipeline(data: pd.DataFrame):
+        numeric_column_names = hlp.pandas.get_numeric_columns(data)
+        non_numeric_column_names = hlp.pandas.get_non_numeric_columns(data)
 
         numeric_pipeline = Pipeline([
             # tune how we want to impute values
@@ -39,8 +38,8 @@ class BayesianSearchSpaceBase(ABC):
         ])
         # associate numeric/non-numeric columns with corresponding pipeline
         transformations_pipeline = ColumnTransformer([
-            ('numeric', numeric_pipeline, self._numeric_column_names),
-            ('non_numeric', non_numeric_pipeline, self._non_numeric_column_names)
+            ('numeric', numeric_pipeline, numeric_column_names),
+            ('non_numeric', non_numeric_pipeline, non_numeric_column_names)
         ])
         # add model to create the full pipeline
         full_pipeline = Pipeline([
@@ -54,7 +53,7 @@ class BayesianSearchSpaceBase(ABC):
     def search_spaces(self) -> List[tuple]:
         """"""
 
-    def param_name_mappings(self):
+    def param_name_mappings(self) -> dict:
         mappings = {}
         for space in self.search_spaces():
             params = list(space[0].keys())
@@ -158,10 +157,6 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
             'prep__non_numeric__encoder__transformer': Categorical(encoders),
         }
 
-    def prime(self, data: pd.DataFrame):
-        self._numeric_column_names = hlp.pandas.get_numeric_columns(data)
-        self._non_numeric_column_names = hlp.pandas.get_non_numeric_columns(data)
-
     @abstractmethod
     def _create_model(self):
         """This method returns a model object with whatever default values should be set."""
@@ -189,7 +184,7 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
         (number of iterations) as second item."""
         from skopt.space import Categorical
 
-        model_search_space = {'model': self._create_model()}
+        model_search_space = {'model': Categorical([self._create_model()])}
         model_search_space.update(self._model_search_space())
         model_search_space.update(self._transformer_search_space())
         search_spaces = [(
