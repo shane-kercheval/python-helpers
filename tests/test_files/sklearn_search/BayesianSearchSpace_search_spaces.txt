@@ -1,31 +1,31 @@
 [({
-'model': Categorical(categories=(LogisticRegression(max_iter=1000),), prior=None),
+'model': Categorical(categories=(LogisticRegression(max_iter=1000, random_state=42),), prior=None),
 'model__C': Real(low=1e-06, high=100, prior='log-uniform', transform='identity'),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(MinMaxScaler(), StandardScaler()), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'), CustomOrdinalEncoder()), prior=None)
-}, 50),
+}, 45),
 ({
-'model': Categorical(categories=(LogisticRegression(max_iter=1000),), prior=None),
+'model': Categorical(categories=(LogisticRegression(max_iter=1000, random_state=42),), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(),), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(StandardScaler(),), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'),), prior=None)
 }, 1),
 ({
-'model': Categorical(categories=(LinearSVC(),), prior=None),
+'model': Categorical(categories=(LinearSVC(random_state=42),), prior=None),
 'model__C': Real(low=1e-06, high=100, prior='log-uniform', transform='identity'),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(MinMaxScaler(), StandardScaler()), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'), CustomOrdinalEncoder()), prior=None)
-}, 50),
+}, 45),
 ({
-'model': Categorical(categories=(LinearSVC(),), prior=None),
+'model': Categorical(categories=(LinearSVC(random_state=42),), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(),), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(StandardScaler(),), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'),), prior=None)
 }, 1),
 ({
-'model': Categorical(categories=(ExtraTreesClassifier(bootstrap=True, n_estimators=500),), prior=None),
+'model': Categorical(categories=(ExtraTreesClassifier(bootstrap=True, n_estimators=500, random_state=42),), prior=None),
 'model__max_features': Real(low=0.01, high=0.95, prior='uniform', transform='identity'),
 'model__max_depth': Integer(low=1, high=100, prior='uniform', transform='identity'),
 'model__min_samples_split': Integer(low=2, high=50, prior='uniform', transform='identity'),
@@ -36,15 +36,15 @@
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'), CustomOrdinalEncoder()), prior=None)
-}, 50),
+}, 45),
 ({
-'model': Categorical(categories=(ExtraTreesClassifier(bootstrap=True, n_estimators=500),), prior=None),
+'model': Categorical(categories=(ExtraTreesClassifier(bootstrap=True, n_estimators=500, random_state=42),), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(),), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'),), prior=None)
 }, 1),
 ({
-'model': Categorical(categories=(RandomForestClassifier(n_estimators=500),), prior=None),
+'model': Categorical(categories=(RandomForestClassifier(n_estimators=500, random_state=42),), prior=None),
 'model__max_features': Real(low=0.01, high=0.95, prior='uniform', transform='identity'),
 'model__max_depth': Integer(low=1, high=100, prior='uniform', transform='identity'),
 'model__min_samples_split': Integer(low=2, high=50, prior='uniform', transform='identity'),
@@ -55,9 +55,9 @@
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'), CustomOrdinalEncoder()), prior=None)
-}, 50),
+}, 45),
 ({
-'model': Categorical(categories=(RandomForestClassifier(n_estimators=500),), prior=None),
+'model': Categorical(categories=(RandomForestClassifier(n_estimators=500, random_state=42),), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(),), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'),), prior=None)
@@ -70,10 +70,10 @@
               learning_rate=None, max_delta_step=None, max_depth=None,
               min_child_weight=None, missing=nan, monotone_constraints=None,
               n_estimators=500, n_jobs=None, num_parallel_tree=None,
-              predictor=None, random_state=None, reg_alpha=None,
-              reg_lambda=None, scale_pos_weight=None, subsample=None,
-              tree_method=None, use_label_encoder=False,
-              validate_parameters=None, verbosity=None),), prior=None),
+              predictor=None, random_state=42, reg_alpha=None, reg_lambda=None,
+              scale_pos_weight=None, subsample=None, tree_method=None,
+              use_label_encoder=False, validate_parameters=None,
+              verbosity=None),), prior=None),
 'model__max_depth': Integer(low=1, high=50, prior='log-uniform', transform='identity'),
 'model__learning_rate': Real(low=0.0001, high=0.5, prior='uniform', transform='identity'),
 'model__n_estimators': Integer(low=100, high=2000, prior='log-uniform', transform='identity'),
@@ -86,7 +86,7 @@
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'), CustomOrdinalEncoder()), prior=None)
-}, 50),
+}, 45),
 ({
 'model': Categorical(categories=(XGBClassifier(base_score=None, booster=None, colsample_bylevel=None,
               colsample_bynode=None, colsample_bytree=None,
@@ -95,10 +95,10 @@
               learning_rate=None, max_delta_step=None, max_depth=None,
               min_child_weight=None, missing=nan, monotone_constraints=None,
               n_estimators=500, n_jobs=None, num_parallel_tree=None,
-              predictor=None, random_state=None, reg_alpha=None,
-              reg_lambda=None, scale_pos_weight=None, subsample=None,
-              tree_method=None, use_label_encoder=False,
-              validate_parameters=None, verbosity=None),), prior=None),
+              predictor=None, random_state=42, reg_alpha=None, reg_lambda=None,
+              scale_pos_weight=None, subsample=None, tree_method=None,
+              use_label_encoder=False, validate_parameters=None,
+              verbosity=None),), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(),), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'),), prior=None)

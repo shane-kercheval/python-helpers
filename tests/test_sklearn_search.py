@@ -270,7 +270,7 @@ class TestSklearnSearch(unittest.TestCase):
         test_search_space(XGBoostBayesianSearchSpace, modified_args=args)
 
     def test_BayesianSearchSpace(self):
-        search_space = BayesianSearchSpace(self.X_train)
+        search_space = BayesianSearchSpace(self.X_train, iterations=45, random_state=42)
         self.assertEqual(str(BayesianSearchSpaceBase.pipeline(data=self.X_train)),
                          str(search_space.pipeline()))
 
@@ -287,11 +287,26 @@ class TestSklearnSearch(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_param_name_mappings.txt', 'w') as file:
             file.write(TestSklearnSearch.to_string(search_space.param_name_mappings()))
 
-        search_space.param_name_mappings()
-
     def test_MLExperimentResults_multi_model(self):
 
+        search_space = BayesianSearchSpace(self.X_train,
+                                           model_search_spaces=[
+                                               XGBoostBayesianSearchSpace(iterations=4),
+                                               LogisticBayesianSearchSpace(iterations=4),
+                                           ])
 
+        bayes_search = BayesSearchCV(
+                estimator=cls.search_space_used.pipeline(),  # noqa
+                search_spaces=cls.search_space_used.search_spaces(),  # noqa
+                cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
+                scoring='roc_auc',
+                refit=False,  # required if passing in multiple scorers
+                return_train_score=False,
+                n_jobs=-1,
+                verbose=0,
+                random_state=42,
+            )
+        bayes_search.fit(X_train, y_train)  # noqa
 
 
         results = MLExperimentResults.from_sklearn_search_cv(

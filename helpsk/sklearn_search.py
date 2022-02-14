@@ -529,6 +529,7 @@ class BayesianSearchSpace(BayesianSearchSpaceBase):
     def __init__(self,
                  data: pd.DataFrame,
                  model_search_spaces: List[ModelBayesianSearchSpaceBase] = None,
+                 iterations: int = 50,
                  model_type:str = 'classification',
                  random_state: int = None):
 
@@ -544,11 +545,11 @@ class BayesianSearchSpace(BayesianSearchSpaceBase):
 
             if model_type == 'classification':
                 self._model_search_spaces = [
-                    LogisticBayesianSearchSpace(),
-                    LinearSVCBayesianSearchSpace(),
-                    ExtraTreesBayesianSearchSpace(),
-                    RandomForestBayesianSearchSpace(),
-                    XGBoostBayesianSearchSpace(),
+                    LogisticBayesianSearchSpace(iterations=iterations, random_state=random_state),
+                    LinearSVCBayesianSearchSpace(iterations=iterations, random_state=random_state),
+                    ExtraTreesBayesianSearchSpace(iterations=iterations, random_state=random_state),
+                    RandomForestBayesianSearchSpace(iterations=iterations, random_state=random_state),
+                    XGBoostBayesianSearchSpace(iterations=iterations, random_state=random_state),
                 ]
             elif model_type == 'regression':
                 raise NotImplementedError()
