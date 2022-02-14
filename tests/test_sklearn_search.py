@@ -56,54 +56,28 @@ class TestSklearnSearch(unittest.TestCase):
         # )
         # cls.bayes_search.fit(X_train, y_train)  # noqa
 
-    def test_ModelBayesianSearchSpaceBase(self):
-        space = LogisticBayesianSearchSpace()
-        self.assertRaises(RuntimeError, lambda: space.pipeline())
-        space.prime(data=self.X_train)
+    @staticmethod
+    def to_string(obj):
+        return str(obj). \
+            replace(", '", ",\n'"). \
+            replace('{', '{\n'). \
+            replace('}', '\n}'). \
+            replace(', ({', ',\n({')
 
-        def to_string(obj):
-            return str(obj).\
-                replace(", '", ",\n'").\
-                replace('{', '{\n').\
-                replace('}', '\n}').\
-                replace(', ({', ',\n({')
+    def test_pipeline(self):
+        # this will be the same for all inherited classes, so just test base.
+        with open(get_test_path() + '/test_files/sklearn_search/search_space_base__pipeline.txt', 'w') as file:
+            file.write(str(BayesianSearchSpaceBase.pipeline(data=self.X_train)))
 
-        with open(get_test_path() + '/test_files/sklearn_search/logistic_pipeline.txt', 'w') as file:
-            file.write(str(space.pipeline()))
-
-        with open(get_test_path() + '/test_files/sklearn_search/logistic_search_spaces__default.txt', 'w') as file:
-            file.write(to_string(space.search_spaces()))
-
-        with open(get_test_path() + '/test_files/sklearn_search/logistic_param_name_mappings.txt', 'w') as file:
-            file.write(to_string(space.param_name_mappings()))
-
-        
-
-        with open(get_test_path() + '/test_files/sklearn_search/logistic_pipeline.txt', 'w') as file:
-            file.write(str(space.pipeline()))
-
-
-
-    def test_search(self):
-        space = XGBoostBayesianSearchSpace()
-        space.prime(data=self.X_train)
-        space.pipeline()
-        space.search_spaces()
-        space.param_name_mappings()
-
-        spaces = ClassificationBayesianSearchSpace(data=self.X_train)
-        spaces.pipeline()
-        _ = spaces.search_spaces()
-        _[1]
-        spaces.param_name_mappings()
-
-
-
-
-
-    def test_ClassifierSearchSpace(self):
-
-        transformer_search_space = ClassifierSearchSpace._build_transformer_search_space()
+    def test_build_transformer_search_space(self):
+        transformer_search_space = ModelBayesianSearchSpaceBase._build_transformer_search_space(
+            imputer_strategies=['mean', 'median', 'most_frequent'],
+            scaler_min_max=True,
+            scaler_standard=True,
+            scaler_none=True,
+            encoder_one_hot=True,
+            encoder_ordinal=True,
+        )
         self.assertEqual(list(transformer_search_space.keys()),
                          ['prep__numeric__imputer__transformer',
                           'prep__numeric__scaler__transformer',
@@ -131,15 +105,21 @@ class TestSklearnSearch(unittest.TestCase):
         del transformer_search_space
 
         self.assertRaises(AssertionError,
-                          lambda: ClassifierSearchSpace._build_transformer_search_space(
+                          lambda: ModelBayesianSearchSpaceBase._build_transformer_search_space(
+                              imputer_strategies=['mean', 'median', 'most_frequent'],
                               scaler_min_max=False,
                               scaler_standard=False,
                               scaler_none=False,
+                              encoder_one_hot=True,
+                              encoder_ordinal=True,
                           ))
-        transformer_search_space = ClassifierSearchSpace._build_transformer_search_space(
+        transformer_search_space = ModelBayesianSearchSpaceBase._build_transformer_search_space(
+            imputer_strategies=['mean', 'median', 'most_frequent'],
             scaler_min_max=True,
             scaler_standard=False,
             scaler_none=False,
+            encoder_one_hot=True,
+            encoder_ordinal=True,
         )
         values = transformer_search_space['prep__numeric__scaler__transformer'].categories
         self.assertEqual(len(values), 1)
@@ -147,10 +127,13 @@ class TestSklearnSearch(unittest.TestCase):
         del values
         del transformer_search_space
 
-        transformer_search_space = ClassifierSearchSpace._build_transformer_search_space(
+        transformer_search_space = ModelBayesianSearchSpaceBase._build_transformer_search_space(
+            imputer_strategies=['mean', 'median', 'most_frequent'],
             scaler_min_max=False,
             scaler_standard=True,
             scaler_none=False,
+            encoder_one_hot=True,
+            encoder_ordinal=True,
         )
         values = transformer_search_space['prep__numeric__scaler__transformer'].categories
         self.assertEqual(len(values), 1)
@@ -158,12 +141,13 @@ class TestSklearnSearch(unittest.TestCase):
         del values
         del transformer_search_space
 
-        transformer_search_space = ClassifierSearchSpace._build_transformer_search_space(
+        transformer_search_space = ModelBayesianSearchSpaceBase._build_transformer_search_space(
             imputer_strategies=['most_frequent'],
             scaler_min_max=False,
             scaler_standard=False,
+            scaler_none=True,
             encoder_one_hot=True,
-            encoder_ordinal=False
+            encoder_ordinal=False,
         )
         self.assertEqual(list(transformer_search_space.keys()),
                          ['prep__numeric__imputer__transformer',
@@ -193,6 +177,122 @@ class TestSklearnSearch(unittest.TestCase):
                 replace('}', '\n}').\
                 replace(', ({', ',\n({')
 
+    def test_LogisticBayesianSearchSpace(self):
+        default_space = LogisticBayesianSearchSpace()
+
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_search_spaces__default.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(default_space.search_spaces()))
+
+        default_mappings = default_space.param_name_mappings()
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_param_name_mappings.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(default_mappings))
+
+        self.assertIsInstance(default_space.search_spaces(), list)
+        self.assertEqual(len(default_space.search_spaces()), 2)
+        self.assertIsInstance(default_space.search_spaces()[0], tuple)
+        self.assertIsInstance(default_space.search_spaces()[1], tuple)
+        self.assertIsInstance(default_space.search_spaces()[0][0], dict)
+        self.assertIsInstance(default_space.search_spaces()[0][1], int)
+        self.assertIsInstance(default_space.search_spaces()[1][0], dict)
+        self.assertIsInstance(default_space.search_spaces()[1][1], int)
+
+        from skopt.space import Categorical
+        categorical = default_space.search_spaces()[0][0]['model']
+        self.assertIsInstance(categorical, Categorical)
+        del default_space, categorical
+
+        modified_space = LogisticBayesianSearchSpace(
+            C=(1e-5, 1e+3),
+            solver='sag',
+            max_iter=999,
+            iterations=30,
+            include_default_model=False,
+            imputer_strategies=['most_frequent'],
+            scaler_min_max=False,
+            scaler_standard=False,
+            scaler_none=True,
+            encoder_one_hot=False,
+            encoder_ordinal=True,
+            random_state=42
+        )
+
+        with open(get_test_path() + '/test_files/sklearn_search/logistic_search_spaces__modified.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(modified_space.search_spaces()))
+
+        self.assertEqual(default_mappings, modified_space.param_name_mappings())
+
+        self.assertIsInstance(modified_space.search_spaces(), list)
+        self.assertEqual(len(modified_space.search_spaces()), 1)
+        self.assertIsInstance(modified_space.search_spaces()[0], tuple)
+        self.assertIsInstance(modified_space.search_spaces()[0][0], dict)
+        self.assertIsInstance(modified_space.search_spaces()[0][1], int)
+        self.assertEqual(modified_space.search_spaces()[0][1], 30)
+
+        categorical = modified_space.search_spaces()[0][0]['model']
+        self.assertIsInstance(categorical, Categorical)
+        del modified_space, categorical
+
+    def test_LinearSVCBayesianSearchSpace(self):
+        default_space = LinearSVCBayesianSearchSpace()
+
+        with open(get_test_path() + '/test_files/sklearn_search/linear_svc_search_spaces__default.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(default_space.search_spaces()))
+
+        default_mappings = default_space.param_name_mappings()
+        with open(get_test_path() + '/test_files/sklearn_search/linear_svc_param_name_mappings.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(default_mappings))
+
+        self.assertIsInstance(default_space.search_spaces(), list)
+        self.assertEqual(len(default_space.search_spaces()), 2)
+        self.assertIsInstance(default_space.search_spaces()[0], tuple)
+        self.assertIsInstance(default_space.search_spaces()[1], tuple)
+        self.assertIsInstance(default_space.search_spaces()[0][0], dict)
+        self.assertIsInstance(default_space.search_spaces()[0][1], int)
+        self.assertIsInstance(default_space.search_spaces()[1][0], dict)
+        self.assertIsInstance(default_space.search_spaces()[1][1], int)
+
+        from skopt.space import Categorical
+        categorical = default_space.search_spaces()[0][0]['model']
+        self.assertIsInstance(categorical, Categorical)
+        del default_space, categorical
+
+        modified_space = LinearSVCBayesianSearchSpace(
+            C=(1e-5, 1e+3),
+            iterations=30,
+            include_default_model=False,
+            imputer_strategies=['most_frequent'],
+            scaler_min_max=False,
+            scaler_standard=False,
+            scaler_none=True,
+            encoder_one_hot=False,
+            encoder_ordinal=True,
+            random_state=42
+        )
+
+        with open(get_test_path() + '/test_files/sklearn_search/linear_svc_search_spaces__modified.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(modified_space.search_spaces()))
+
+        self.assertEqual(default_mappings, modified_space.param_name_mappings())
+
+        self.assertIsInstance(modified_space.search_spaces(), list)
+        self.assertEqual(len(modified_space.search_spaces()), 1)
+        self.assertIsInstance(modified_space.search_spaces()[0], tuple)
+        self.assertIsInstance(modified_space.search_spaces()[0][0], dict)
+        self.assertIsInstance(modified_space.search_spaces()[0][1], int)
+        self.assertEqual(modified_space.search_spaces()[0][1], 30)
+
+        categorical = modified_space.search_spaces()[0][0]['model']
+        self.assertIsInstance(categorical, Categorical)
+        del modified_space, categorical
+
+
+
+
+
+
+
+
+    def test_old(self):
         # default space for logistic regression
         logistic_space = ClassifierSearchSpace._search_space_logistic()
         self.assertEqual(list(logistic_space.keys()),
