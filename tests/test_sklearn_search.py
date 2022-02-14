@@ -296,8 +296,8 @@ class TestSklearnSearch(unittest.TestCase):
                                            ])
 
         bayes_search = BayesSearchCV(
-                estimator=cls.search_space_used.pipeline(),  # noqa
-                search_spaces=cls.search_space_used.search_spaces(),  # noqa
+                estimator=search_space.pipeline(),  # noqa
+                search_spaces=search_space.search_spaces(),  # noqa
                 cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
                 scoring='roc_auc',
                 refit=False,  # required if passing in multiple scorers
@@ -306,14 +306,13 @@ class TestSklearnSearch(unittest.TestCase):
                 verbose=0,
                 random_state=42,
             )
-        bayes_search.fit(X_train, y_train)  # noqa
-
+        _ = bayes_search.fit(self.X_train, self.y_train)
 
         results = MLExperimentResults.from_sklearn_search_cv(
-            searcher=self.bayes_search,
+            searcher=bayes_search,
             higher_score_is_better=True,
             description='BayesSearchCV using ClassifierSearchSpace',
-            parameter_name_mappings=self.search_space_used.param_name_mappings()
+            parameter_name_mappings=search_space.param_name_mappings()
         )
 
         results.to_yaml_file(get_test_path() + '/test_files/sklearn_search/multi-model-search.yaml')
@@ -380,24 +379,14 @@ class TestSklearnSearch(unittest.TestCase):
             file.write(to_string(labels))
         del labels
 
-    def test_MLExperimentResults_multi_model2(self):
-        # test grid search object that has one score (classification)
-        # not passing in parameter mappings
-        bayes_search = self.bayes_search
-        results = MLExperimentResults.from_sklearn_search_cv(
-            searcher=self.bayes_search,
-            higher_score_is_better=True,
-            description='BayesSearchCV using ClassifierSearchSpace',
-            parameter_name_mappings=self.search_space_used.param_name_mappings()
-        )
         self.assertEqual(results.higher_score_is_better, True)
         self.assertEqual(results.cross_validation_type, "<class 'skopt.searchcv.BayesSearchCV'>")
         self.assertEqual(results.number_of_splits,
                          bayes_search.cv.n_repeats * bayes_search.n_splits_)
         self.assertEqual(results.score_names, ['roc_auc'])
         self.assertEqual(results.parameter_names_original,
-                         list(self.search_space_used.param_name_mappings().keys()))
-        self.assertEqual(results.parameter_names, list(self.search_space_used.param_name_mappings().values()))
+                         list(search_space.param_name_mappings().keys()))
+        self.assertEqual(results.parameter_names, list(search_space.param_name_mappings().values()))
         self.assertIsNotNone(results.parameter_names_mapping)
         self.assertTrue(isinstance(results.test_score_rankings, dict))
         self.assertEqual(list(results.test_score_rankings.keys()), results.score_names)
@@ -444,7 +433,7 @@ class TestSklearnSearch(unittest.TestCase):
 
         # check that all of the hyper-param values match in the dataframe vs bayes_search.cv_results_
         hyper_param_df = cv_dataframe.iloc[:, 4:]
-        for key, value in self.search_space_used.param_name_mappings().items():
+        for key, value in search_space.param_name_mappings().items():
             if key != 'model':
                 mask = bayes_search.cv_results_['param_' + key].mask
                 cv_data = list(bayes_search.cv_results_['param_' + key].data)
@@ -518,9 +507,10 @@ class TestSklearnSearch(unittest.TestCase):
                                                                                            "OneHotEncoder()"))
 
     def test_MLExperimentResults_all_models(self):
-        search_space = ClassifierSearchSpace(
+        search_space = BayesianSearchSpace(
             data=self.X_train,
-            iterations=[1] * len(ClassifierSearchSpaceModels.list())
+            iterations=1,
+            include_default_model=False
         )
         bayes_search = BayesSearchCV(
             estimator=search_space.pipeline(),  # noqa

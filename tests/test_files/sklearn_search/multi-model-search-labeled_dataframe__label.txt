@@ -1,6 +1,15 @@
 
 model: XGBClassifier()
-       imputer: SimpleImputer()
+       max_depth: 8
+       learning_rate: 0.4014021141000396
+       n_estimators: 962
+       min_child_weight: 1
+       subsample: 0.6933976321088419
+       colsample_bytree: 0.799023538756064
+       colsample_bylevel: 0.5859357806982803
+       reg_alpha: 0.30940078642444824
+       reg_lambda: 3.5402659040014948
+       imputer: SimpleImputer(strategy='most_frequent')
        scaler: None
        encoder: OneHotEncoder()
 model: XGBClassifier()
@@ -43,35 +52,19 @@ model: XGBClassifier()
        scaler: None
        encoder: CustomOrdinalEncoder()
 model: XGBClassifier()
-       max_depth: 4
-       learning_rate: 0.4188444528865573
-       n_estimators: 553
-       min_child_weight: 1
-       subsample: 0.9129729782239605
-       colsample_bytree: 0.7482333517983584
-       colsample_bylevel: 0.9600046132186582
-       reg_alpha: 0.00012682484500023283
-       reg_lambda: 1.7069954134453618
-       imputer: SimpleImputer(strategy='median')
+       imputer: SimpleImputer()
        scaler: None
        encoder: OneHotEncoder()
-model: XGBClassifier()
-       max_depth: 4
-       learning_rate: 0.20796896168096884
-       n_estimators: 100
-       min_child_weight: 2
-       subsample: 0.5879532027938977
-       colsample_bytree: 0.9358259642316076
-       colsample_bylevel: 0.8503107223106829
-       reg_alpha: 0.003039078727520555
-       reg_lambda: 2.27956386247516
+model: LogisticRegression()
+       C: 0.402690660245868
        imputer: SimpleImputer(strategy='median')
-       scaler: None
+       scaler: MinMaxScaler()
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression()
-       imputer: SimpleImputer()
+       C: 3.4885114865499216
+       imputer: SimpleImputer(strategy='median')
        scaler: StandardScaler()
-       encoder: OneHotEncoder()
+       encoder: CustomOrdinalEncoder()
 model: LogisticRegression()
        C: 0.0007376531147826206
        imputer: SimpleImputer(strategy='median')
@@ -83,17 +76,6 @@ model: LogisticRegression()
        scaler: MinMaxScaler()
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression()
-       C: 1.274865255061674e-06
-       imputer: SimpleImputer(strategy='median')
+       imputer: SimpleImputer()
        scaler: StandardScaler()
-       encoder: CustomOrdinalEncoder()
-model: LogisticRegression()
-       C: 23.32672808600529
-       imputer: SimpleImputer(strategy='median')
-       scaler: MinMaxScaler()
-       encoder: OneHotEncoder()
-model: LogisticRegression()
-       C: 0.13184996310179986
-       imputer: SimpleImputer(strategy='median')
-       scaler: MinMaxScaler()
        encoder: OneHotEncoder()
