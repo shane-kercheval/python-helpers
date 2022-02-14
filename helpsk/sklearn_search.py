@@ -531,7 +531,7 @@ class BayesianSearchSpace(BayesianSearchSpaceBase):
                  model_search_spaces: List[ModelBayesianSearchSpaceBase] = None,
                  iterations: int = 50,
                  include_default_model: bool = True,
-                 model_type:str = 'classification',
+                 model_type: str = 'classification',
                  random_state: int = None):
 
         assert model_type in ['classification', 'regression']
