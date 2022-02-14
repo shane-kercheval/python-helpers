@@ -184,6 +184,7 @@ class TestSklearnSearch(unittest.TestCase):
             file.write(TestSklearnSearch.to_string(default_space.search_spaces()))
 
         default_mappings = default_space.param_name_mappings()
+        self.assertEqual(default_space.search_spaces()[0][0].keys(), default_mappings.keys())
         with open(get_test_path() + '/test_files/sklearn_search/logistic_param_name_mappings.txt', 'w') as file:
             file.write(TestSklearnSearch.to_string(default_mappings))
 
@@ -239,6 +240,7 @@ class TestSklearnSearch(unittest.TestCase):
             file.write(TestSklearnSearch.to_string(default_space.search_spaces()))
 
         default_mappings = default_space.param_name_mappings()
+        self.assertEqual(default_space.search_spaces()[0][0].keys(), default_mappings.keys())
         with open(get_test_path() + '/test_files/sklearn_search/linear_svc_param_name_mappings.txt', 'w') as file:
             file.write(TestSklearnSearch.to_string(default_mappings))
 
