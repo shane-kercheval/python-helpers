@@ -166,10 +166,17 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
         """This method returns a dictionary of model hyper-params to tune. The key should be the name of the
         parameter, prefixed with 'model__' and the value is the skopt.space to search."""
 
-    @abstractmethod
     def _transformer_search_space(self) -> dict:
         """This method returns a dictionary of the transformations to tune. This can be accomplished by
         calling the `_build_transformer_search_space` function."""
+        return self._build_transformer_search_space(
+            imputer_strategies=self._imputer_strategies,
+            scaler_min_max=self._scaler_min_max,
+            scaler_standard=self._scaler_standard,
+            scaler_none=self._scaler_none,
+            encoder_one_hot=self._encoder_one_hot,
+            encoder_ordinal=self._encoder_ordinal,
+        )
 
     @abstractmethod
     def _default_model_transformer_search_space(self) -> dict:
@@ -266,16 +273,6 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             'model__C': Real(self._C[0], self._C[1], prior='log-uniform'),
         }
 
-    def _transformer_search_space(self) -> dict:
-        return self._build_transformer_search_space(
-            imputer_strategies=self._imputer_strategies,
-            scaler_min_max=self._scaler_min_max,
-            scaler_standard=self._scaler_standard,
-            scaler_none=self._scaler_none,
-            encoder_one_hot=self._encoder_one_hot,
-            encoder_ordinal=self._encoder_ordinal,
-        )
-
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
             imputer_strategies=['mean'],
@@ -323,16 +320,6 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         return {
             'model__C': Real(self._C[0], self._C[1], prior='log-uniform'),
         }
-
-    def _transformer_search_space(self) -> dict:
-        return self._build_transformer_search_space(
-            imputer_strategies=self._imputer_strategies,
-            scaler_min_max=self._scaler_min_max,
-            scaler_standard=self._scaler_standard,
-            scaler_none=self._scaler_none,
-            encoder_one_hot=self._encoder_one_hot,
-            encoder_ordinal=self._encoder_ordinal,
-        )
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
@@ -393,16 +380,6 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
             'model__max_samples': Real(self._max_samples[0], self._max_samples[1], prior='uniform'),
             'model__criterion': Categorical(self._criterion),
         }
-
-    def _transformer_search_space(self) -> dict:
-        return self._build_transformer_search_space(
-            imputer_strategies=self._imputer_strategies,
-            scaler_min_max=self._scaler_min_max,
-            scaler_standard=self._scaler_standard,
-            scaler_none=self._scaler_none,
-            encoder_one_hot=self._encoder_one_hot,
-            encoder_ordinal=self._encoder_ordinal,
-        )
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
@@ -502,16 +479,6 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             'model__reg_alpha': Real(self._reg_alpha[0], self._reg_alpha[1], prior='log-uniform'),
             'model__reg_lambda': Real(self._reg_lambda[0], self._reg_lambda[1], prior='log-uniform'),
         }
-
-    def _transformer_search_space(self) -> dict:
-        return self._build_transformer_search_space(
-            imputer_strategies=self._imputer_strategies,
-            scaler_min_max=self._scaler_min_max,
-            scaler_standard=self._scaler_standard,
-            scaler_none=self._scaler_none,
-            encoder_one_hot=self._encoder_one_hot,
-            encoder_ordinal=self._encoder_ordinal,
-        )
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
