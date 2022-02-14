@@ -170,14 +170,7 @@ class TestSklearnSearch(unittest.TestCase):
         del categorical
         del transformer_search_space
 
-        def to_string(obj):
-            return str(obj).\
-                replace(", '", ",\n'").\
-                replace('{', '{\n').\
-                replace('}', '\n}').\
-                replace(', ({', ',\n({')
-
-    def test_LogisticBayesianSearchSpace(self):
+    def test_ModelBayesianSearchSpace(self):
         def test_search_space(search_object, modified_args):
             default_space = search_object()
             class_name = default_space.__class__.__name__
@@ -276,9 +269,30 @@ class TestSklearnSearch(unittest.TestCase):
         )
         test_search_space(XGBoostBayesianSearchSpace, modified_args=args)
 
+    def test_BayesianSearchSpace(self):
+        search_space = BayesianSearchSpace(self.X_train)
+        self.assertEqual(str(BayesianSearchSpaceBase.pipeline(data=self.X_train)),
+                         str(search_space.pipeline()))
 
+        with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_search_spaces.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(search_space.search_spaces()))
+
+        self.assertIsInstance(search_space.search_spaces(), list)
+
+        for space in search_space.search_spaces():
+            self.assertIsInstance(space, tuple)
+            self.assertIsInstance(space[0], dict)
+            self.assertIsInstance(space[1], int)
+
+        with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_param_name_mappings.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(search_space.param_name_mappings()))
+
+        search_space.param_name_mappings()
 
     def test_MLExperimentResults_multi_model(self):
+
+
+
 
         results = MLExperimentResults.from_sklearn_search_cv(
             searcher=self.bayes_search,
