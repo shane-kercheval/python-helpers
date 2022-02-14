@@ -1,0 +1,12 @@
+[({
+'model': Categorical(categories=(RandomForestClassifier(n_estimators=500, random_state=42),), prior=None),
+'model__max_features': Real(low=0.06, high=0.92, prior='uniform', transform='identity'),
+'model__max_depth': Integer(low=4, high=101, prior='uniform', transform='identity'),
+'model__min_samples_split': Integer(low=5, high=55, prior='uniform', transform='identity'),
+'model__min_samples_leaf': Integer(low=2, high=55, prior='uniform', transform='identity'),
+'model__max_samples': Real(low=0.8, high=0.9, prior='uniform', transform='identity'),
+'model__criterion': Categorical(categories=('entropy',), prior=None),
+'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(strategy='most_frequent'),), prior=None),
+'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
+'prep__non_numeric__encoder__transformer': Categorical(categories=(CustomOrdinalEncoder(),), prior=None)
+}, 30)]
