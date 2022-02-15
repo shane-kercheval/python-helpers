@@ -116,8 +116,6 @@ class TestSklearnSearch(unittest.TestCase):
         model_mappings = [x for x in search_space.param_name_mappings().keys() if x.startswith('model__')]
         self.assertEqual(len(model_mappings), 0)
 
-
-
     def test_ModelBayesianSearchSpace(self):
 
         def test_search_space(search_object, modified_args):
