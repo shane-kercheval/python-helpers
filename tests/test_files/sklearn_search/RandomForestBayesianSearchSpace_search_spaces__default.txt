@@ -7,9 +7,9 @@
 'model__max_samples': Real(low=0.5, high=1.0, prior='uniform', transform='identity'),
 'model__criterion': Categorical(categories=('gini',
 'entropy'), prior=None),
-'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=None),
+'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=[0.5, 0.25, 0.25]),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
-'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'), CustomOrdinalEncoder()), prior=None)
+'prep__non_numeric__encoder__transformer': Categorical(categories=(OneHotEncoder(handle_unknown='ignore'), CustomOrdinalEncoder()), prior=[0.65, 0.35])
 }, 50),
 ({
 'model': Categorical(categories=(RandomForestClassifier(n_estimators=500),), prior=None),

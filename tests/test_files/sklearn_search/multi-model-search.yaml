@@ -37,47 +37,47 @@ parameter_names_mapping:
 test_score_rankings:
   roc_auc:
   - 10
+  - 7
+  - 2
+  - 9
+  - 8
+  - 5
   - 6
   - 3
-  - 9
-  - 7
   - 4
-  - 5
-  - 2
-  - 8
   - 1
 test_score_averages:
   roc_auc:
-  - 0.6988838275407324
-  - 0.7168138899817452
-  - 0.7260753494685872
-  - 0.6999267897579838
+  - 0.7074739038078938
+  - 0.7212065041129566
+  - 0.7484277511124476
+  - 0.7094892529847474
   - 0.7105632404197456
-  - 0.7206637158626356
-  - 0.7205863049995814
-  - 0.7524516660481084
-  - 0.7029784509943559
+  - 0.7230873649390758
+  - 0.7219459110293337
+  - 0.7344820920852982
+  - 0.726089938941468
   - 0.7590218765217673
 test_score_standard_deviations:
   roc_auc:
-  - 0.022997420007865116
-  - 0.021351104269894793
-  - 0.007762749648129412
-  - 0.010145228126219352
+  - 0.009697633163375031
+  - 0.011002551929430511
+  - 0.007834759117704001
+  - 0.018694393590819577
   - 0.0038881681977205444
-  - 0.030061507882577092
-  - 0.03703101743220679
-  - 0.027241897747693224
-  - 0.015892927436002964
+  - 0.03498278053691444
+  - 0.03566029814318316
+  - 0.027171801213250794
+  - 0.014773857736875099
   - 0.01861580270082367
 trials:
 - model: XGBClassifier()
   model__colsample_bylevel: 0.5859357806982803
   model__colsample_bytree: 0.799023538756064
-  model__learning_rate: 0.4014021141000396
-  model__max_depth: 8
+  model__learning_rate: 0.1533843042738779
+  model__max_depth: 3
   model__min_child_weight: 1
-  model__n_estimators: 962
+  model__n_estimators: 1536
   model__reg_alpha: 0.30940078642444824
   model__reg_lambda: 3.5402659040014948
   model__subsample: 0.6933976321088419
@@ -87,10 +87,10 @@ trials:
 - model: XGBClassifier()
   model__colsample_bylevel: 0.7190145932204617
   model__colsample_bytree: 0.7633101185638462
-  model__learning_rate: 0.3578850597273058
-  model__max_depth: 34
+  model__learning_rate: 0.11407625931280554
+  model__max_depth: 8
   model__min_child_weight: 17
-  model__n_estimators: 356
+  model__n_estimators: 906
   model__reg_alpha: 0.03991502512609639
   model__reg_lambda: 1.6314646082653332
   model__subsample: 0.8297131143495482
@@ -100,10 +100,10 @@ trials:
 - model: XGBClassifier()
   model__colsample_bylevel: 0.9696848688013859
   model__colsample_bytree: 0.5818035893192751
-  model__learning_rate: 0.09429380335353854
-  model__max_depth: 23
+  model__learning_rate: 0.018981345896813002
+  model__max_depth: 6
   model__min_child_weight: 4
-  model__n_estimators: 396
+  model__n_estimators: 972
   model__reg_alpha: 0.01377401781906964
   model__reg_lambda: 2.9702160489961873
   model__subsample: 0.7787136018188425
@@ -113,10 +113,10 @@ trials:
 - model: XGBClassifier()
   model__colsample_bylevel: 0.8876821894139413
   model__colsample_bytree: 0.679511465960702
-  model__learning_rate: 0.43717521513769547
-  model__max_depth: 10
+  model__learning_rate: 0.19565208359558597
+  model__max_depth: 4
   model__min_child_weight: 10
-  model__n_estimators: 698
+  model__n_estimators: 1333
   model__reg_alpha: 0.004878994671461945
   model__reg_lambda: 2.765930623533157
   model__subsample: 0.8171497855716499
@@ -131,68 +131,68 @@ trials:
   model__C: 0.402690660245868
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
-  prep__numeric__scaler__transformer: MinMaxScaler()
+  prep__numeric__scaler__transformer: StandardScaler()
 - model: LogisticRegression()
   model__C: 3.4885114865499216
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
-  prep__numeric__scaler__transformer: StandardScaler()
+  prep__numeric__scaler__transformer: MinMaxScaler()
 - model: LogisticRegression()
   model__C: 0.0007376531147826206
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
-  prep__numeric__scaler__transformer: MinMaxScaler()
+  prep__numeric__scaler__transformer: StandardScaler()
 - model: LogisticRegression()
   model__C: 0.00028712123350695286
   prep__non_numeric__encoder__transformer: CustomOrdinalEncoder()
   prep__numeric__imputer__transformer: SimpleImputer(strategy='median')
-  prep__numeric__scaler__transformer: MinMaxScaler()
+  prep__numeric__scaler__transformer: StandardScaler()
 - model: LogisticRegression()
   prep__non_numeric__encoder__transformer: OneHotEncoder()
   prep__numeric__imputer__transformer: SimpleImputer()
   prep__numeric__scaler__transformer: StandardScaler()
 timings:
   fit time averages:
-  - 0.7428910732269287
-  - 0.15142122904459634
-  - 0.2689523696899414
-  - 0.29675547281901044
-  - 0.8949077129364014
-  - 0.13866194089253744
-  - 0.09101033210754395
-  - 0.025983889897664387
-  - 0.08414872487386067
-  - 0.04692594210306803
+  - 0.8612573941548666
+  - 0.27034497261047363
+  - 0.5081892808278402
+  - 0.4194784164428711
+  - 0.6681428750356039
+  - 0.06902170181274414
+  - 0.041089375813802086
+  - 0.028485774993896484
+  - 0.02516007423400879
+  - 0.023471832275390625
   fit time standard deviations:
-  - 0.004601265432102341
-  - 0.0015290725750915155
-  - 0.021410463419192217
-  - 0.005456920328488343
-  - 0.03136758029342839
-  - 0.009298348961360748
-  - 0.027546320283356636
-  - 0.0023254330234323624
-  - 0.020194495733096788
-  - 0.005157826736497255
+  - 0.013128137919006447
+  - 0.013804406654412939
+  - 0.00865524060429477
+  - 0.0044454053473247405
+  - 0.0056199667535192415
+  - 0.0050286281468094685
+  - 0.0030819262345111757
+  - 0.005046451701962747
+  - 0.0019014234001459099
+  - 0.0019428303092020069
   score time averages:
-  - 0.018102645874023438
-  - 0.026224374771118164
-  - 0.027949730555216473
-  - 0.031810919443766274
-  - 0.02681104342142741
-  - 0.0323789914449056
-  - 0.025333881378173828
-  - 0.009837706883748373
-  - 0.03763333956400553
-  - 0.010460694630940756
+  - 0.010582923889160156
+  - 0.012582063674926758
+  - 0.02062567075093587
+  - 0.01427610715230306
+  - 0.011850277582804361
+  - 0.016396601994832356
+  - 0.01031653086344401
+  - 0.005825916926066081
+  - 0.013188362121582031
+  - 0.0054658253987630205
   score time standard deviations:
-  - 0.0006681124168891261
-  - 0.000534964221950933
-  - 0.0006598712276749087
-  - 0.0021177234222450997
-  - 0.001684880042064439
-  - 0.0009789197492953044
-  - 0.0034365846856471774
-  - 0.001175366249118797
-  - 0.004723955515545364
-  - 0.0006773407725916597
+  - 0.0011261793889607978
+  - 0.000407721842105059
+  - 0.0022578848388947886
+  - 0.0002046256845379047
+  - 0.00397089940247036
+  - 0.0014166909588227694
+  - 0.0004194809562825382
+  - 0.00016669992601165483
+  - 0.0007130355019152118
+  - 0.0005255358561755889

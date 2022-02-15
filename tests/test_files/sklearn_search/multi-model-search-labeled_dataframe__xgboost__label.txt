@@ -1,8 +1,8 @@
 
 model: XGBClassifier()
-       max_depth: 8
-       learning_rate: 0.4014021141000396
-       n_estimators: 962
+       max_depth: 3
+       learning_rate: 0.1533843042738779
+       n_estimators: 1536
        min_child_weight: 1
        subsample: 0.6933976321088419
        colsample_bytree: 0.799023538756064
@@ -13,9 +13,9 @@ model: XGBClassifier()
        scaler: None
        encoder: OneHotEncoder()
 model: XGBClassifier()
-       max_depth: 34
-       learning_rate: 0.3578850597273058
-       n_estimators: 356
+       max_depth: 8
+       learning_rate: 0.11407625931280554
+       n_estimators: 906
        min_child_weight: 17
        subsample: 0.8297131143495482
        colsample_bytree: 0.7633101185638462
@@ -26,9 +26,9 @@ model: XGBClassifier()
        scaler: None
        encoder: CustomOrdinalEncoder()
 model: XGBClassifier()
-       max_depth: 23
-       learning_rate: 0.09429380335353854
-       n_estimators: 396
+       max_depth: 6
+       learning_rate: 0.018981345896813002
+       n_estimators: 972
        min_child_weight: 4
        subsample: 0.7787136018188425
        colsample_bytree: 0.5818035893192751
@@ -39,9 +39,9 @@ model: XGBClassifier()
        scaler: None
        encoder: CustomOrdinalEncoder()
 model: XGBClassifier()
-       max_depth: 10
-       learning_rate: 0.43717521513769547
-       n_estimators: 698
+       max_depth: 4
+       learning_rate: 0.19565208359558597
+       n_estimators: 1333
        min_child_weight: 10
        subsample: 0.8171497855716499
        colsample_bytree: 0.679511465960702

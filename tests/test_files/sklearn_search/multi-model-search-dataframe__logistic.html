@@ -12,63 +12,68 @@
 #T_99999_row0_col2 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,#B4B7B9 80.8%, transparent 80.8%);
+  background: linear-gradient(90deg,#B4B7B9 87.5%, transparent 87.5%);
 }
 #T_99999_row0_col3 {
   background-color: #EBB13E;
   background-color: #7AA9CF;
 }
-#T_99999_row0_col4, #T_99999_row0_col5, #T_99999_row0_col6, #T_99999_row1_col3, #T_99999_row1_col4, #T_99999_row1_col5, #T_99999_row1_col6 {
+#T_99999_row0_col4, #T_99999_row0_col5, #T_99999_row0_col6 {
   background-color: #7AA9CF;
 }
 #T_99999_row1_col0 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,#1AAF54 87.5%, transparent 87.5%);
+  background: linear-gradient(90deg,#1AAF54 32.4%, transparent 32.4%);
 }
 #T_99999_row1_col1 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,transparent 66.7%, #B4B7B9 66.7%);
+  background: linear-gradient(90deg,transparent 42.5%, #B4B7B9 42.5%);
 }
 #T_99999_row1_col2 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,#B4B7B9 100.0%, transparent 100.0%);
+  background: linear-gradient(90deg,#B4B7B9 81.2%, transparent 81.2%);
 }
-#T_99999_row2_col0, #T_99999_row3_col0 {
+#T_99999_row2_col0 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,#1AAF54 32.1%, transparent 32.1%);
+  background: linear-gradient(90deg,#1AAF54 10.8%, transparent 10.8%);
 }
 #T_99999_row2_col1 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,transparent 20.2%, #B4B7B9 20.2%);
+  background: linear-gradient(90deg,transparent 70.0%, #B4B7B9 70.0%);
 }
-#T_99999_row2_col2 {
+#T_99999_row2_col2, #T_99999_row4_col0 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,#B4B7B9 67.9%, transparent 67.9%);
+}
+#T_99999_row3_col0 {
+  width: 10em;
+  height: 80%;
+  background: linear-gradient(90deg,#1AAF54 2.7%, transparent 2.7%);
 }
 #T_99999_row3_col1 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg, #B4B7B9 100.0%, transparent 100.0%, transparent 100.0%, #B4B7B9 100.0%);
+  background: linear-gradient(90deg,transparent 3.7%, #B4B7B9 3.7%);
 }
 #T_99999_row3_col2 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,#B4B7B9 91.0%, transparent 91.0%);
-}
-#T_99999_row4_col0, #T_99999_row4_col2 {
-  width: 10em;
-  height: 80%;
+  background: linear-gradient(90deg,#B4B7B9 97.9%, transparent 97.9%);
 }
 #T_99999_row4_col1 {
   width: 10em;
   height: 80%;
-  background: linear-gradient(90deg,transparent 40.5%, #B4B7B9 40.5%);
+  background: linear-gradient(90deg, #B4B7B9 100.0%, transparent 100.0%, transparent 100.0%, #B4B7B9 100.0%);
+}
+#T_99999_row4_col2 {
+  width: 10em;
+  height: 80%;
+  background: linear-gradient(90deg,#B4B7B9 100.0%, transparent 100.0%);
 }
 </style>
 <table id="T_99999_">
@@ -94,37 +99,37 @@
       <td id="T_99999_row0_col6" class="data row0 col6" >OneHotEncoder()</td>
     </tr>
     <tr>
-      <td id="T_99999_row1_col0" class="data row1 col0" >0.752</td>
-      <td id="T_99999_row1_col1" class="data row1 col1" >0.685</td>
-      <td id="T_99999_row1_col2" class="data row1 col2" >0.820</td>
+      <td id="T_99999_row1_col0" class="data row1 col0" >0.734</td>
+      <td id="T_99999_row1_col1" class="data row1 col1" >0.667</td>
+      <td id="T_99999_row1_col2" class="data row1 col2" >0.802</td>
       <td id="T_99999_row1_col3" class="data row1 col3" >0.001</td>
       <td id="T_99999_row1_col4" class="data row1 col4" >SimpleImputer(strategy='median')</td>
-      <td id="T_99999_row1_col5" class="data row1 col5" >MinMaxScaler()</td>
+      <td id="T_99999_row1_col5" class="data row1 col5" >StandardScaler()</td>
       <td id="T_99999_row1_col6" class="data row1 col6" >OneHotEncoder()</td>
     </tr>
     <tr>
-      <td id="T_99999_row2_col0" class="data row2 col0" >0.721</td>
-      <td id="T_99999_row2_col1" class="data row2 col1" >0.646</td>
-      <td id="T_99999_row2_col2" class="data row2 col2" >0.795</td>
-      <td id="T_99999_row2_col3" class="data row2 col3" >0.403</td>
+      <td id="T_99999_row2_col0" class="data row2 col0" >0.726</td>
+      <td id="T_99999_row2_col1" class="data row2 col1" >0.689</td>
+      <td id="T_99999_row2_col2" class="data row2 col2" >0.763</td>
+      <td id="T_99999_row2_col3" class="data row2 col3" >0.000</td>
       <td id="T_99999_row2_col4" class="data row2 col4" >SimpleImputer(strategy='median')</td>
-      <td id="T_99999_row2_col5" class="data row2 col5" >MinMaxScaler()</td>
+      <td id="T_99999_row2_col5" class="data row2 col5" >StandardScaler()</td>
       <td id="T_99999_row2_col6" class="data row2 col6" >CustomOrdinalEncoder()</td>
     </tr>
     <tr>
-      <td id="T_99999_row3_col0" class="data row3 col0" >0.721</td>
-      <td id="T_99999_row3_col1" class="data row3 col1" >0.629</td>
-      <td id="T_99999_row3_col2" class="data row3 col2" >0.813</td>
-      <td id="T_99999_row3_col3" class="data row3 col3" >3.489</td>
+      <td id="T_99999_row3_col0" class="data row3 col0" >0.723</td>
+      <td id="T_99999_row3_col1" class="data row3 col1" >0.636</td>
+      <td id="T_99999_row3_col2" class="data row3 col2" >0.810</td>
+      <td id="T_99999_row3_col3" class="data row3 col3" >0.403</td>
       <td id="T_99999_row3_col4" class="data row3 col4" >SimpleImputer(strategy='median')</td>
       <td id="T_99999_row3_col5" class="data row3 col5" >StandardScaler()</td>
       <td id="T_99999_row3_col6" class="data row3 col6" >CustomOrdinalEncoder()</td>
     </tr>
     <tr>
-      <td id="T_99999_row4_col0" class="data row4 col0" >0.703</td>
-      <td id="T_99999_row4_col1" class="data row4 col1" >0.663</td>
-      <td id="T_99999_row4_col2" class="data row4 col2" >0.742</td>
-      <td id="T_99999_row4_col3" class="data row4 col3" >0.000</td>
+      <td id="T_99999_row4_col0" class="data row4 col0" >0.722</td>
+      <td id="T_99999_row4_col1" class="data row4 col1" >0.633</td>
+      <td id="T_99999_row4_col2" class="data row4 col2" >0.811</td>
+      <td id="T_99999_row4_col3" class="data row4 col3" >3.489</td>
       <td id="T_99999_row4_col4" class="data row4 col4" >SimpleImputer(strategy='median')</td>
       <td id="T_99999_row4_col5" class="data row4 col5" >MinMaxScaler()</td>
       <td id="T_99999_row4_col6" class="data row4 col6" >CustomOrdinalEncoder()</td>

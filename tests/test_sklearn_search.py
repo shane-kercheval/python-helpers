@@ -46,108 +46,8 @@ class TestSklearnSearch(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_search/search_space_base__pipeline.txt', 'w') as file:
             file.write(str(BayesianSearchSpaceBase.pipeline(data=self.X_train)))
 
-    def test_build_transformer_search_space(self):
-        transformer_search_space = ModelBayesianSearchSpaceBase._build_transformer_search_space(
-            imputer_strategies=['mean', 'median', 'most_frequent'],
-            scaler_min_max=True,
-            scaler_standard=True,
-            scaler_none=True,
-            encoder_one_hot=True,
-            encoder_ordinal=True,
-        )
-        self.assertEqual(list(transformer_search_space.keys()),
-                         ['prep__numeric__imputer__transformer',
-                          'prep__numeric__scaler__transformer',
-                          'prep__non_numeric__encoder__transformer'])
-
-        categorical = transformer_search_space['prep__numeric__imputer__transformer']
-        self.assertEqual(len(categorical.categories), 3)
-        self.assertEqual(categorical.categories[0].strategy, 'mean')
-        self.assertEqual(categorical.categories[1].strategy, 'median')
-        self.assertEqual(categorical.categories[2].strategy, 'most_frequent')
-        del categorical
-
-        categorical = transformer_search_space['prep__numeric__scaler__transformer']
-        self.assertEqual(len(categorical.categories), 3)
-        self.assertIsNone(categorical.categories[0])
-        self.assertIsInstance(categorical.categories[1], MinMaxScaler)
-        self.assertIsInstance(categorical.categories[2], StandardScaler)
-        del categorical
-
-        categorical = transformer_search_space['prep__non_numeric__encoder__transformer']
-        self.assertEqual(len(categorical.categories), 2)
-        self.assertIsInstance(categorical.categories[0], OneHotEncoder)
-        self.assertIsInstance(categorical.categories[1], CustomOrdinalEncoder)
-        del categorical
-        del transformer_search_space
-
-        self.assertRaises(AssertionError,
-                          lambda: ModelBayesianSearchSpaceBase._build_transformer_search_space(
-                              imputer_strategies=['mean', 'median', 'most_frequent'],
-                              scaler_min_max=False,
-                              scaler_standard=False,
-                              scaler_none=False,
-                              encoder_one_hot=True,
-                              encoder_ordinal=True,
-                          ))
-        transformer_search_space = ModelBayesianSearchSpaceBase._build_transformer_search_space(
-            imputer_strategies=['mean', 'median', 'most_frequent'],
-            scaler_min_max=True,
-            scaler_standard=False,
-            scaler_none=False,
-            encoder_one_hot=True,
-            encoder_ordinal=True,
-        )
-        values = transformer_search_space['prep__numeric__scaler__transformer'].categories
-        self.assertEqual(len(values), 1)
-        self.assertIsInstance(values[0], MinMaxScaler)
-        del values
-        del transformer_search_space
-
-        transformer_search_space = ModelBayesianSearchSpaceBase._build_transformer_search_space(
-            imputer_strategies=['mean', 'median', 'most_frequent'],
-            scaler_min_max=False,
-            scaler_standard=True,
-            scaler_none=False,
-            encoder_one_hot=True,
-            encoder_ordinal=True,
-        )
-        values = transformer_search_space['prep__numeric__scaler__transformer'].categories
-        self.assertEqual(len(values), 1)
-        self.assertIsInstance(values[0], StandardScaler)
-        del values
-        del transformer_search_space
-
-        transformer_search_space = ModelBayesianSearchSpaceBase._build_transformer_search_space(
-            imputer_strategies=['most_frequent'],
-            scaler_min_max=False,
-            scaler_standard=False,
-            scaler_none=True,
-            encoder_one_hot=True,
-            encoder_ordinal=False,
-        )
-        self.assertEqual(list(transformer_search_space.keys()),
-                         ['prep__numeric__imputer__transformer',
-                          'prep__numeric__scaler__transformer',
-                          'prep__non_numeric__encoder__transformer'])
-
-        categorical = transformer_search_space['prep__numeric__imputer__transformer']
-        self.assertEqual(len(categorical.categories), 1)
-        self.assertEqual(categorical.categories[0].strategy, 'most_frequent')
-        del categorical
-
-        categorical = transformer_search_space['prep__numeric__scaler__transformer']
-        self.assertEqual(len(categorical.categories), 1)
-        self.assertIsNone(categorical.categories[0])
-        del categorical
-
-        categorical = transformer_search_space['prep__non_numeric__encoder__transformer']
-        self.assertEqual(len(categorical.categories), 1)
-        self.assertIsInstance(categorical.categories[0], OneHotEncoder)
-        del categorical
-        del transformer_search_space
-
     def test_ModelBayesianSearchSpace(self):
+
         def test_search_space(search_object, modified_args):
             default_space = search_object()
             class_name = default_space.__class__.__name__
@@ -178,12 +78,9 @@ class TestSklearnSearch(unittest.TestCase):
                 **modified_args,
                 iterations=30,
                 include_default_model=False,
-                imputer_strategies=['most_frequent'],
-                scaler_min_max=False,
-                scaler_standard=False,
-                scaler_none=True,
-                encoder_one_hot=False,
-                encoder_ordinal=True,
+                imputers=Categorical([SimpleImputer(strategy='most_frequent')]),
+                scalers=Categorical([None]),
+                encoders=Categorical([CustomOrdinalEncoder()]),
                 random_state=42
             )
 
@@ -205,44 +102,44 @@ class TestSklearnSearch(unittest.TestCase):
 
         # with self.subTest(i='LogisticBayesianSearchSpace'):
         args = dict(
-            C=(1e-5, 1e+3),
+            C=Real(1e-5, 1e+3, prior='uniform'),
             solver='sag',
             max_iter=999,
         )
         test_search_space(LogisticBayesianSearchSpace, modified_args=args)
 
         args = dict(
-            C=(1e-5, 1e+3),
+            C=Real(1e-5, 1e+3),
         )
         test_search_space(LinearSVCBayesianSearchSpace, modified_args=args)
 
         args = dict(
-            max_features=(0.06, 0.92),
-            max_depth=(4, 101),
-            min_samples_split=(5, 55),
-            min_samples_leaf=(2, 55),
-            max_samples=(0.8, 0.9),
-            criterion=['entropy'],
+            max_features=Real(0.06, 0.92),
+            max_depth=Integer(4, 101),
+            min_samples_split=Integer(5, 55),
+            min_samples_leaf=Integer(2, 55),
+            max_samples=Real(0.8, 0.9),
+            criterion=Categorical(['entropy']),
         )
         test_search_space(ExtraTreesBayesianSearchSpace, modified_args=args)
 
         args = dict(
-            max_features=(0.06, 0.92),
-            max_depth=(4, 101),
-            min_samples_split=(5, 55),
-            min_samples_leaf=(2, 55),
-            max_samples=(0.8, 0.9),
-            criterion=['entropy'],
+            max_features=Real(0.06, 0.92),
+            max_depth=Integer(5, 102),
+            min_samples_split=Integer(3, 52),
+            min_samples_leaf=Integer(5, 52),
+            max_samples=Real(0.7, 0.99),
+            criterion=Categorical(['gini']),
         )
         test_search_space(RandomForestBayesianSearchSpace, modified_args=args)
 
         args = dict(
             eval_metric='logloss',
-            max_depth=(2, 30),
-            n_estimators=(10, 10000),
-            learning_rate=(0.01111, 0.3333),
-            colsample_bytree=(0.01234, 1123),
-            subsample=(0.1111, 0.999),
+            max_depth=Integer(2, 30),
+            n_estimators=Integer(10, 10000),
+            learning_rate=Real(0.01111, 0.3333),
+            colsample_bytree=Real(0.01234, 1123),
+            subsample=Real(0.1111, 0.999),
         )
         test_search_space(XGBoostBayesianSearchSpace, modified_args=args)
 
