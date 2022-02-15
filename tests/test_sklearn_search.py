@@ -45,6 +45,79 @@ class TestSklearnSearch(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_search/search_space_base__pipeline.txt', 'w') as file:
             file.write(str(BayesianSearchSpaceBase.pipeline(data=self.X_train)))
 
+    def test_ModelBayesianSearchSpace_params(self):
+        search_space = LogisticBayesianSearchSpace(
+            C=None,
+        )
+        model_space = search_space.search_spaces()[0][0]
+        model_params = [x for x in model_space.keys() if x.startswith('model__')]
+        self.assertEqual(len(model_params), 0)
+
+        model_mappings = [x for x in search_space.param_name_mappings().keys() if x.startswith('model__')]
+        self.assertEqual(len(model_mappings), 0)
+        del search_space, model_space, model_mappings
+
+        search_space = LinearSVCBayesianSearchSpace(
+            C=None,
+        )
+        model_space = search_space.search_spaces()[0][0]
+        model_params = [x for x in model_space.keys() if x.startswith('model__')]
+        self.assertEqual(len(model_params), 0)
+
+        model_mappings = [x for x in search_space.param_name_mappings().keys() if x.startswith('model__')]
+        self.assertEqual(len(model_mappings), 0)
+        del search_space, model_space, model_mappings
+
+        search_space = ExtraTreesBayesianSearchSpace(
+            max_features=None,
+            max_depth=None,
+            min_samples_split=None,
+            min_samples_leaf=None,
+            max_samples=None,
+            criterion=None,
+        )
+        model_space = search_space.search_spaces()[0][0]
+        model_params = [x for x in model_space.keys() if x.startswith('model__')]
+        self.assertEqual(len(model_params), 0)
+
+        model_mappings = [x for x in search_space.param_name_mappings().keys() if x.startswith('model__')]
+        self.assertEqual(len(model_mappings), 0)
+
+        search_space = RandomForestBayesianSearchSpace(
+            max_features=None,
+            max_depth=None,
+            min_samples_split=None,
+            min_samples_leaf=None,
+            max_samples=None,
+            criterion=None,
+        )
+        model_space = search_space.search_spaces()[0][0]
+        model_params = [x for x in model_space.keys() if x.startswith('model__')]
+        self.assertEqual(len(model_params), 0)
+
+        model_mappings = [x for x in search_space.param_name_mappings().keys() if x.startswith('model__')]
+        self.assertEqual(len(model_mappings), 0)
+
+        search_space = XGBoostBayesianSearchSpace(
+            max_depth=None,
+            learning_rate=None,
+            n_estimators=None,
+            min_child_weight=None,
+            subsample=None,
+            colsample_bytree=None,
+            colsample_bylevel=None,
+            reg_alpha=None,
+            reg_lambda=None,
+        )
+        model_space = search_space.search_spaces()[0][0]
+        model_params = [x for x in model_space.keys() if x.startswith('model__')]
+        self.assertEqual(len(model_params), 0)
+
+        model_mappings = [x for x in search_space.param_name_mappings().keys() if x.startswith('model__')]
+        self.assertEqual(len(model_mappings), 0)
+
+
+
     def test_ModelBayesianSearchSpace(self):
 
         def test_search_space(search_object, modified_args):
