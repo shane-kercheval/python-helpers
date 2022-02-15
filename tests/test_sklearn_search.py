@@ -4,13 +4,12 @@ import unittest
 import numpy as np
 from sklearn.model_selection import RepeatedKFold
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import label_binarize, MinMaxScaler, StandardScaler, OneHotEncoder
+from sklearn.preprocessing import label_binarize
 from skopt import BayesSearchCV
 
 from helpsk import validation
 from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults
-from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 from helpsk.sklearn_search import *
 from helpsk.utility import redirect_stdout_to_file
 from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
@@ -213,7 +212,9 @@ class TestSklearnSearch(unittest.TestCase):
         # pd.set_option('display.width', 10000)
 
         def label_column_formatter(label_column):
-            return [str(value).replace('<br>', '; ').replace('; model', '\nmodel').replace('; ', '\n       ') for value in label_column]
+            return [str(value).replace('<br>', '; ').
+                        replace('; model', '\nmodel').
+                        replace('; ', '\n       ') for value in label_column]  # noqa
 
         labeled_df = results.to_labeled_dataframe()
         with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_search/multi-model-search-labeled_dataframe.txt'):
