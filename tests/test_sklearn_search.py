@@ -374,9 +374,15 @@ class TestSklearnSearch(unittest.TestCase):
                                                            labeled_dataframe.drop(columns=['Trial Index',
                                                                                            'label'])])
 
+        def clean_param_name(name):
+            return str(name).\
+                replace("OneHotEncoder(handle_unknown='ignore')",
+                        "OneHotEncoder()").\
+                replace("PCA(n_components='mle')",
+                        "PCA('mle')")
+
         def remove_parentheses(obj):
-            obj = str(obj)
-            obj = obj.replace("OneHotEncoder(handle_unknown='ignore')", "OneHotEncoder()")
+            obj = clean_param_name(obj)
             return re.sub(r'\(.*', '', obj.replace('\n', ''))
 
         self.assertEqual([remove_parentheses(x) for x in bayes_search.cv_results_['param_model'].data],
@@ -394,9 +400,7 @@ class TestSklearnSearch(unittest.TestCase):
                     assert_np_arrays_are_close(np.array(cv_data),
                                                np.array(hyper_param_df.loc[:, value].tolist()))
                 if key.startswith('prep__'):
-                    self.assertEqual([str(x).replace("OneHotEncoder(handle_unknown='ignore')",
-                                                     "OneHotEncoder()")
-                                      for x in cv_data],
+                    self.assertEqual([clean_param_name(x) for x in cv_data],
                                      hyper_param_df.loc[:, value].tolist())
 
         self.assertTrue(isinstance(results.test_score_averages, dict))
@@ -454,8 +458,7 @@ class TestSklearnSearch(unittest.TestCase):
                                                bayes_search.best_params_[original_name]))
                 else:
                     self.assertEqual(results.best_params[new_name],
-                                     str(bayes_search.best_params_[original_name]).replace("OneHotEncoder(handle_unknown='ignore')",
-                                                                                           "OneHotEncoder()"))
+                                     clean_param_name(bayes_search.best_params_[original_name]))
 
     def test_MLExperimentResults_all_models(self):
         search_space = BayesianSearchSpace(

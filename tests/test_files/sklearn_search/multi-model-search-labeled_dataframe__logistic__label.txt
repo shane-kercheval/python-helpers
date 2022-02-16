@@ -9,7 +9,7 @@ model: LogisticRegression()
        C: 3.4885114865499216
        imputer: SimpleImputer(strategy='median')
        scaler: StandardScaler()
-       pca: PCA(n_components='mle')
+       pca: PCA('mle')
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression()
        C: 0.0007376531147826206

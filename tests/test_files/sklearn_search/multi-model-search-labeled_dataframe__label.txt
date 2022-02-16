@@ -11,7 +11,7 @@ model: XGBClassifier()
        reg_lambda: 3.5402659040014948
        imputer: SimpleImputer(strategy='most_frequent')
        scaler: None
-       pca: PCA(n_components='mle')
+       pca: PCA('mle')
        encoder: OneHotEncoder()
 model: XGBClassifier()
        max_depth: 15
@@ -53,7 +53,7 @@ model: XGBClassifier()
        reg_lambda: 2.765930623533157
        imputer: SimpleImputer(strategy='median')
        scaler: None
-       pca: PCA(n_components='mle')
+       pca: PCA('mle')
        encoder: CustomOrdinalEncoder()
 model: XGBClassifier()
        imputer: SimpleImputer()
@@ -70,7 +70,7 @@ model: LogisticRegression()
        C: 3.4885114865499216
        imputer: SimpleImputer(strategy='median')
        scaler: StandardScaler()
-       pca: PCA(n_components='mle')
+       pca: PCA('mle')
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression()
        C: 0.0007376531147826206

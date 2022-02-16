@@ -7,13 +7,13 @@ model: XGBClassifier(), max_depth: 11, learning_rate: 0.018981345896813002, n_es
 }", "{
 model: LogisticRegression(), C: 0.00028712123350695286, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), pca: None, encoder: CustomOrdinalEncoder()
 }", "{
-model: XGBClassifier(), max_depth: 5, learning_rate: 0.1533843042738779, n_estimators: 1634, min_child_weight: 1, subsample: 0.6933976321088419, colsample_bytree: 0.799023538756064, colsample_bylevel: 0.5859357806982803, reg_alpha: 0.30940078642444824, reg_lambda: 3.5402659040014948, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, pca: PCA(n_components='mle'), encoder: OneHotEncoder()
+model: XGBClassifier(), max_depth: 5, learning_rate: 0.1533843042738779, n_estimators: 1634, min_child_weight: 1, subsample: 0.6933976321088419, colsample_bytree: 0.799023538756064, colsample_bylevel: 0.5859357806982803, reg_alpha: 0.30940078642444824, reg_lambda: 3.5402659040014948, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, pca: PCA('mle'), encoder: OneHotEncoder()
 }", "{
 model: LogisticRegression(), C: 0.402690660245868, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), pca: None, encoder: CustomOrdinalEncoder()
 }", "{
-model: XGBClassifier(), max_depth: 6, learning_rate: 0.19565208359558597, n_estimators: 1473, min_child_weight: 10, subsample: 0.8171497855716499, colsample_bytree: 0.679511465960702, colsample_bylevel: 0.8876821894139413, reg_alpha: 0.004878994671461945, reg_lambda: 2.765930623533157, imputer: SimpleImputer(strategy='median'), scaler: None, pca: PCA(n_components='mle'), encoder: CustomOrdinalEncoder()
+model: XGBClassifier(), max_depth: 6, learning_rate: 0.19565208359558597, n_estimators: 1473, min_child_weight: 10, subsample: 0.8171497855716499, colsample_bytree: 0.679511465960702, colsample_bylevel: 0.8876821894139413, reg_alpha: 0.004878994671461945, reg_lambda: 2.765930623533157, imputer: SimpleImputer(strategy='median'), scaler: None, pca: PCA('mle'), encoder: CustomOrdinalEncoder()
 }", "{
-model: LogisticRegression(), C: 3.4885114865499216, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), pca: PCA(n_components='mle'), encoder: CustomOrdinalEncoder()
+model: LogisticRegression(), C: 3.4885114865499216, imputer: SimpleImputer(strategy='median'), scaler: StandardScaler(), pca: PCA('mle'), encoder: CustomOrdinalEncoder()
 }", "{
 model: XGBClassifier(), max_depth: 15, learning_rate: 0.11407625931280554, n_estimators: 1136, min_child_weight: 17, subsample: 0.8297131143495482, colsample_bytree: 0.7633101185638462, colsample_bylevel: 0.7190145932204617, reg_alpha: 0.03991502512609639, reg_lambda: 1.6314646082653332, imputer: SimpleImputer(strategy='most_frequent'), scaler: None, pca: None, encoder: CustomOrdinalEncoder()
 }",
