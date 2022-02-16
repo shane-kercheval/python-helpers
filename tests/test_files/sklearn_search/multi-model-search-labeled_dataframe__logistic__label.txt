@@ -3,23 +3,28 @@ model: LogisticRegression()
        C: 0.402690660245868
        imputer: SimpleImputer(strategy='median')
        scaler: StandardScaler()
+       pca: None
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression()
        C: 3.4885114865499216
        imputer: SimpleImputer(strategy='median')
-       scaler: MinMaxScaler()
+       scaler: StandardScaler()
+       pca: PCA(n_components='mle')
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression()
        C: 0.0007376531147826206
        imputer: SimpleImputer(strategy='median')
-       scaler: StandardScaler()
+       scaler: MinMaxScaler()
+       pca: None
        encoder: OneHotEncoder()
 model: LogisticRegression()
        C: 0.00028712123350695286
        imputer: SimpleImputer(strategy='median')
        scaler: StandardScaler()
+       pca: None
        encoder: CustomOrdinalEncoder()
 model: LogisticRegression()
        imputer: SimpleImputer()
        scaler: StandardScaler()
+       pca: None
        encoder: OneHotEncoder()

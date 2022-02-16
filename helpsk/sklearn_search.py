@@ -3,6 +3,7 @@ from typing import List, Union
 
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.decomposition import PCA
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
 from sklearn.impute import SimpleImputer
@@ -65,6 +66,7 @@ class BayesianSearchSpaceBase(ABC):
             # tune how we want to scale values
             # e.g. MinMax/Normalization/None
             ('scaler', hlp.sklearn_pipeline.TransformerChooser()),
+            ('pca', hlp.sklearn_pipeline.TransformerChooser()),
         ])
         non_numeric_pipeline = Pipeline([
             # tune how we handle categoric values
@@ -117,6 +119,7 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
                  include_default_model: bool = True,
                  imputers: Categorical = DefaultCategorical(),
                  scalers: Categorical = DefaultCategorical(),
+                 pca: Categorical = DefaultCategorical(),
                  encoders: Categorical = DefaultCategorical(),
                  random_state: int = None):
         """
@@ -138,6 +141,7 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
         self._include_default_model = include_default_model
         self._imputers = imputers
         self._scalers = scalers
+        self._pca = pca
         self._encoders = encoders
         self._model_parameters = None
 
@@ -171,6 +175,13 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
         return Categorical(categories=[StandardScaler()])
 
     @staticmethod
+    def _get_default_pca() -> Categorical:
+        return Categorical(categories=[
+            None,
+            PCA(n_components='mle')
+        ])
+
+    @staticmethod
     def _get_default_encoders() -> Categorical:
         return Categorical(categories=[
                 OneHotEncoder(handle_unknown='ignore'),
@@ -190,11 +201,22 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
     @staticmethod
     def _build_transformer_search_space(imputers: Categorical,
                                         scalers: Categorical,
+                                        pca: Categorical,
                                         encoders: Categorical) -> dict:
+
+        if isinstance(imputers, DefaultValue):
+            imputers = ModelBayesianSearchSpaceBase._get_empty_categorical()
+        if isinstance(scalers, DefaultValue):
+            scalers = ModelBayesianSearchSpaceBase._get_empty_categorical()
+        if isinstance(pca, DefaultValue):
+            pca = ModelBayesianSearchSpaceBase._get_empty_categorical()
+        if isinstance(encoders, DefaultValue):
+            encoders = ModelBayesianSearchSpaceBase._get_empty_categorical()
 
         return {
             'prep__numeric__imputer__transformer': imputers,
             'prep__numeric__scaler__transformer': scalers,
+            'prep__numeric__pca__transformer': pca,
             'prep__non_numeric__encoder__transformer': encoders,
         }
 
@@ -211,9 +233,11 @@ class ModelBayesianSearchSpaceBase(BayesianSearchSpaceBase, ABC):
     def _transformer_search_space(self) -> dict:
         """This method returns a dictionary of the transformations to tune. This can be accomplished by
         calling the `_build_transformer_search_space` function."""
+
         return self._build_transformer_search_space(
             imputers=self._imputers,
             scalers=self._scalers,
+            pca=self._pca,
             encoders=self._encoders,
         )
 
@@ -285,6 +309,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  # transformation search space options
                  imputers: Union[Categorical, None] = DefaultCategorical(),
                  scalers: Union[Categorical, None] = DefaultCategorical(),
+                 pca: Union[Categorical, None] = DefaultCategorical(),
                  encoders: Union[Categorical, None] = DefaultCategorical(),
                  random_state: int = None):
 
@@ -292,6 +317,8 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             imputers = self._get_default_imputers()
         if isinstance(scalers, DefaultValue):
             scalers = self._get_default_scalers()
+        if isinstance(pca, DefaultValue):
+            pca = self._get_default_pca()
         if isinstance(encoders, DefaultValue):
             encoders = self._get_default_encoders()
 
@@ -299,6 +326,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                          include_default_model=include_default_model,
                          imputers=imputers,
                          scalers=scalers,
+                         pca=pca,
                          encoders=encoders,
                          random_state=random_state)
         self._model_parameters = dict(
@@ -319,6 +347,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         return self._build_transformer_search_space(
             imputers=self._get_single_imputer(),
             scalers=self._get_single_scaler(),
+            pca=self._get_empty_categorical(),
             encoders=self._get_single_encoder(),
         )
 
@@ -333,6 +362,7 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  # transformation search space options
                  imputers: Union[Categorical, None] = DefaultCategorical(),
                  scalers: Union[Categorical, None] = DefaultCategorical(),
+                 pca: Union[Categorical, None] = DefaultCategorical(),
                  encoders: Union[Categorical, None] = DefaultCategorical(),
                  random_state: int = None):
 
@@ -340,6 +370,8 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             imputers = self._get_default_imputers()
         if isinstance(scalers, DefaultValue):
             scalers = self._get_default_scalers()
+        if isinstance(pca, DefaultValue):
+            pca = self._get_default_pca()
         if isinstance(encoders, DefaultValue):
             encoders = self._get_default_encoders()
 
@@ -347,6 +379,7 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                          include_default_model=include_default_model,
                          imputers=imputers,
                          scalers=scalers,
+                         pca=pca,
                          encoders=encoders,
                          random_state=random_state)
         self._model_parameters = dict(
@@ -362,6 +395,7 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         return self._build_transformer_search_space(
             imputers=self._get_single_imputer(),
             scalers=self._get_single_scaler(),
+            pca=self._get_empty_categorical(),
             encoders=self._get_single_encoder(),
         )
 
@@ -371,6 +405,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
                  # hyper-params search space
                  max_features: Union[Real, None] = DefaultReal(),
                  max_depth: Union[Integer, None] = DefaultInteger(),
+                 n_estimators: Union[Integer, None] = DefaultInteger(),
                  min_samples_split: Union[Integer, None] = DefaultInteger(),
                  min_samples_leaf: Union[Integer, None] = DefaultInteger(),
                  max_samples: Union[Real, None] = DefaultReal(),
@@ -381,6 +416,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
                  # transformation search space options
                  imputers: Union[Categorical, None] = DefaultCategorical(),
                  scalers: Union[Categorical, None] = DefaultCategorical(),
+                 pca: Union[Categorical, None] = DefaultCategorical(),
                  encoders: Union[Categorical, None] = DefaultCategorical(),
                  random_state: int = None):
 
@@ -388,6 +424,8 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
             imputers = self._get_default_imputers()
         if isinstance(scalers, DefaultValue):
             scalers = self._get_empty_categorical()
+        if isinstance(pca, DefaultValue):
+            pca = self._get_default_pca()
         if isinstance(encoders, DefaultValue):
             encoders = self._get_default_encoders()
 
@@ -395,12 +433,14 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
                          include_default_model=include_default_model,
                          imputers=imputers,
                          scalers=scalers,
+                         pca=pca,
                          encoders=encoders,
                          random_state=random_state)
 
         self._model_parameters = dict(
             max_features=Real(low=0.01, high=0.95, prior='uniform') if isinstance(max_features, DefaultValue) else max_features,
             max_depth=Integer(low=1, high=100, prior='uniform') if isinstance(max_depth, DefaultValue) else max_depth,
+            n_estimators=Integer(500, 2000, prior='uniform') if isinstance(n_estimators, DefaultValue) else n_estimators,  # noqa
             min_samples_split=Integer(low=2, high=50, prior='uniform') if isinstance(min_samples_split, DefaultValue) else min_samples_split,
             min_samples_leaf=Integer(low=1, high=50, prior='uniform') if isinstance(min_samples_leaf, DefaultValue) else min_samples_leaf,
             max_samples=Real(low=0.5, high=1.0, prior='uniform') if isinstance(max_samples, DefaultValue) else max_samples,
@@ -411,6 +451,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
         return self._build_transformer_search_space(
             imputers=self._get_single_imputer(),
             scalers=self._get_empty_categorical(),
+            pca=self._get_empty_categorical(),
             encoders=self._get_single_encoder(),
         )
 
@@ -460,6 +501,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  # transformation search space options
                  imputers: Union[Categorical, None] = DefaultCategorical(),
                  scalers: Union[Categorical, None] = DefaultCategorical(),
+                 pca: Union[Categorical, None] = DefaultCategorical(),
                  encoders: Union[Categorical, None] = DefaultCategorical(),
                  random_state: int = None):
 
@@ -467,6 +509,8 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             imputers = self._get_default_imputers()
         if isinstance(scalers, DefaultValue):
             scalers = self._get_empty_categorical()  # do not scale for XGBoost
+        if isinstance(pca, DefaultValue):
+            pca = self._get_default_pca()
         if isinstance(encoders, DefaultValue):
             encoders = self._get_default_encoders()
 
@@ -474,13 +518,14 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                          include_default_model=include_default_model,
                          imputers=imputers,
                          scalers=scalers,
+                         pca=pca,
                          encoders=encoders,
                          random_state=random_state)
 
         self._model_parameters = dict(
-            max_depth=Integer(low=1, high=10, prior='log-uniform') if isinstance(max_depth, DefaultValue) else max_depth,  # noqa
+            max_depth=Integer(low=1, high=20, prior='log-uniform') if isinstance(max_depth, DefaultValue) else max_depth,  # noqa
             learning_rate=Real(0.01, 0.3, prior='log-uniform') if isinstance(learning_rate, DefaultValue) else learning_rate,  # noqa
-            n_estimators=Integer(100, 2000, prior='uniform') if isinstance(n_estimators, DefaultValue) else n_estimators,  # noqa
+            n_estimators=Integer(500, 2000, prior='uniform') if isinstance(n_estimators, DefaultValue) else n_estimators,  # noqa
             min_child_weight=Integer(1, 50, prior='log-uniform') if isinstance(min_child_weight, DefaultValue) else min_child_weight,  # noqa
             subsample=Real(0.5, 1, prior='uniform') if isinstance(subsample, DefaultValue) else subsample,
             colsample_bytree=Real(0.5, 1, prior='uniform') if isinstance(colsample_bytree, DefaultValue) else colsample_bytree,  # noqa
@@ -504,6 +549,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         return self._build_transformer_search_space(
             imputers=self._get_single_imputer(),
             scalers=self._get_empty_categorical(),
+            pca=self._get_empty_categorical(),
             encoders=self._get_single_encoder(),
         )
 

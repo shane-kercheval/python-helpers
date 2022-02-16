@@ -21,5 +21,6 @@
 'model__reg_lambda': Real(low=1, high=4, prior='log-uniform', transform='identity'),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(strategy='most_frequent'),), prior=None),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
+'prep__numeric__pca__transformer': Categorical(categories=(None, PCA(n_components='mle')), prior=None),
 'prep__non_numeric__encoder__transformer': Categorical(categories=(CustomOrdinalEncoder(),), prior=None)
 }, 30)]

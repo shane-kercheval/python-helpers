@@ -273,6 +273,9 @@ class MLExperimentResults:
             string_value = re.sub(r'Classifier\(.+\)', 'Classifier()', string_value)
             string_value = re.sub(r'Regressor\(.+\)', 'Regressor()', string_value)
             string_value = re.sub(r'Regression\(.+\)', 'Regression()', string_value)
+            string_value = re.sub(r'LinearSVC\(.+\)', 'LinearSVC()', string_value)
+            
+            string_value = string_value.replace("PCA(n_components='mle')", "PCA('mle')")
             string_value = string_value.replace("OneHotEncoder(handle_unknown='ignore')", "OneHotEncoder()")
             return string_value
 
@@ -520,7 +523,7 @@ class MLExperimentResults:
     # pylint: disable=too-many-arguments
     def to_formatted_dataframe(self,
                                round_by: int = 3,
-                               num_rows: int = 100,
+                               num_rows: int = 500,
                                primary_score_only: bool = False,
                                exclude_zero_variance_params: bool = True,
                                query: str = None,

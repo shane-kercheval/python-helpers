@@ -71,6 +71,7 @@ class TestSklearnSearch(unittest.TestCase):
         search_space = ExtraTreesBayesianSearchSpace(
             max_features=None,
             max_depth=None,
+            n_estimators=None,
             min_samples_split=None,
             min_samples_leaf=None,
             max_samples=None,
@@ -86,6 +87,7 @@ class TestSklearnSearch(unittest.TestCase):
         search_space = RandomForestBayesianSearchSpace(
             max_features=None,
             max_depth=None,
+            n_estimators=None,
             min_samples_split=None,
             min_samples_leaf=None,
             max_samples=None,
@@ -150,6 +152,7 @@ class TestSklearnSearch(unittest.TestCase):
                 include_default_model=False,
                 imputers=Categorical([SimpleImputer(strategy='most_frequent')]),
                 scalers=Categorical([None]),
+                pca=Categorical([None]),
                 encoders=Categorical([CustomOrdinalEncoder()]),
                 random_state=42
             )
@@ -186,6 +189,7 @@ class TestSklearnSearch(unittest.TestCase):
         args = dict(
             max_features=Real(0.06, 0.92),
             max_depth=Integer(4, 101),
+            n_estimators=Integer(666, 6666),
             min_samples_split=Integer(5, 55),
             min_samples_leaf=Integer(2, 55),
             max_samples=Real(0.8, 0.9),
@@ -196,6 +200,7 @@ class TestSklearnSearch(unittest.TestCase):
         args = dict(
             max_features=Real(0.06, 0.92),
             max_depth=Integer(5, 102),
+            n_estimators=Integer(6666, 66666),
             min_samples_split=Integer(3, 52),
             min_samples_leaf=Integer(5, 52),
             max_samples=Real(0.7, 0.99),
