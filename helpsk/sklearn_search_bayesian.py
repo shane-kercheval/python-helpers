@@ -1,232 +1,10 @@
 from typing import Union
 
-from sklearn.decomposition import PCA
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
-from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, OneHotEncoder
 from sklearn.svm import LinearSVC
-from skopt.space import Real, Integer, Categorical, Dimension
 
-from helpsk.sklearn_pipeline import CustomOrdinalEncoder
-from helpsk.sklearn_search_base import *
-
-
-class DefaultValue(Dimension):
-    def __init__(self):
-        pass
-
-    def set_transformer(self):
-        pass
-
-    @property
-    def bounds(self):
-        return None
-
-    @property
-    def is_constant(self):
-        return None
-
-    @property
-    def transformed_bounds(self):
-        return None
-
-
-class DefaultReal(DefaultValue, Real):
-    pass
-
-
-class DefaultInteger(DefaultValue, Integer):
-    pass
-
-
-class DefaultCategorical(DefaultValue, Categorical):
-    pass
-
-
-
-class ModelBayesianSearchSpaceBase(SearchSpaceBase, ABC):
-    def __init__(self,
-                 iterations: int = 50,
-                 include_default_model: bool = True,
-                 imputers: Categorical = DefaultCategorical(),
-                 scalers: Categorical = DefaultCategorical(),
-                 pca: Categorical = DefaultCategorical(),
-                 encoders: Categorical = DefaultCategorical(),
-                 random_state: int = None):
-        """
-        Args:
-            iterations:
-
-            include_default_model:
-
-            imputers:
-
-            scalers:
-
-            encoders:
-
-            random_state:
-        """
-
-        self._iterations = iterations
-        self._include_default_model = include_default_model
-        self._imputers = imputers
-        self._scalers = scalers
-        self._pca = pca
-        self._encoders = encoders
-        self._model_parameters = None
-
-        super().__init__(random_state)
-
-    @staticmethod
-    def _get_default_imputers() -> Categorical:
-        return Categorical(categories=[
-                SimpleImputer(strategy='mean'),
-                SimpleImputer(strategy='median'),
-                SimpleImputer(strategy='most_frequent')
-            ],
-            prior=[0.5, 0.25, 0.25]
-        )
-
-    @staticmethod
-    def _get_single_imputer() -> Categorical:
-        return Categorical(categories=[SimpleImputer(strategy='mean')])
-
-    @staticmethod
-    def _get_default_scalers() -> Categorical:
-        return Categorical(categories=[
-                StandardScaler(),
-                MinMaxScaler(),
-            ],
-            prior=[0.65, 0.35]
-        )
-
-    @staticmethod
-    def _get_single_scaler() -> Categorical:
-        return Categorical(categories=[StandardScaler()])
-
-    @staticmethod
-    def _get_default_pca() -> Categorical:
-        return Categorical(categories=[
-            None,
-            PCA(n_components='mle')
-        ])
-
-    @staticmethod
-    def _get_default_encoders() -> Categorical:
-        return Categorical(categories=[
-                OneHotEncoder(handle_unknown='ignore'),
-                CustomOrdinalEncoder(),
-            ],
-            prior=[0.65, 0.35]
-        )
-
-    @staticmethod
-    def _get_single_encoder() -> Categorical:
-        return Categorical(categories=[OneHotEncoder(handle_unknown='ignore')])
-
-    @staticmethod
-    def _get_empty_categorical() -> Categorical:
-        return Categorical([None])
-
-    @staticmethod
-    def _build_transformer_search_space(imputers: Categorical,
-                                        scalers: Categorical,
-                                        pca: Categorical,
-                                        encoders: Categorical) -> dict:
-
-        if isinstance(imputers, DefaultValue):
-            imputers = ModelBayesianSearchSpaceBase._get_empty_categorical()
-        if isinstance(scalers, DefaultValue):
-            scalers = ModelBayesianSearchSpaceBase._get_empty_categorical()
-        if isinstance(pca, DefaultValue):
-            pca = ModelBayesianSearchSpaceBase._get_empty_categorical()
-        if isinstance(encoders, DefaultValue):
-            encoders = ModelBayesianSearchSpaceBase._get_empty_categorical()
-
-        return {
-            'prep__numeric__imputer__transformer': imputers,
-            'prep__numeric__scaler__transformer': scalers,
-            'prep__numeric__pca__transformer': pca,
-            'prep__non_numeric__encoder__transformer': encoders,
-        }
-
-    @abstractmethod
-    def _create_model(self):
-        """This method returns a model object with whatever default values should be set."""
-
-    @abstractmethod
-    def _default_model_transformer_search_space(self) -> dict:
-        """This method returns a dictionary of the default transformations to apply if including the default
-        model in the search spaces (i.e. if `_include_default_model` is True). This can be accomplished by
-        calling the `_build_transformer_search_space` function."""
-
-    def _transformer_search_space(self) -> dict:
-        """This method returns a dictionary of the transformations to tune. This can be accomplished by
-        calling the `_build_transformer_search_space` function."""
-
-        return self._build_transformer_search_space(
-            imputers=self._imputers,
-            scalers=self._scalers,
-            pca=self._pca,
-            encoders=self._encoders,
-        )
-
-    def _model_search_space(self) -> dict:
-        def add_param(param_dict, param_name, param_value):
-            if param_value:
-                param_dict['model__' + param_name] = param_value
-
-        parameters = dict()
-        for name, value in self._model_parameters.items():
-            add_param(parameters, name, value)
-
-        return parameters
-
-    def search_spaces(self) -> List[tuple]:
-        """Returns a list of search spaces (e.g. 2 items if `include_default_model` is True; one for the
-        model with default params, and one for searching across all params.)
-        Each space is a tuple with a dictionary (hyper-param search space) as the first item and an integer
-        (number of iterations) as second item."""
-        from skopt.space import Categorical
-
-        model_search_space = {'model': Categorical([self._create_model()])}
-        model_search_space.update(self._model_search_space())
-        model_search_space.update(self._transformer_search_space())
-        search_spaces = [(
-            model_search_space,
-            self._iterations
-        )]
-
-        if self._include_default_model:
-            default_space = {'model': Categorical([self._create_model()])}
-            default_space.update(self._default_model_transformer_search_space())
-            search_spaces = search_spaces + [(default_space, 1)]
-
-        return search_spaces
-
-    def param_name_mappings(self):
-        mappings = {}
-        for space in self.search_spaces():
-            params = list(space[0].keys())
-            for param in params:
-                if param not in mappings:
-                    if param == 'model':
-                        mappings[param] = param
-                    elif param.startswith('model__'):
-                        mappings[param] = param.removeprefix('model__')
-                    elif param.endswith('__transformer'):
-                        mappings[param] = param.\
-                            removesuffix('__transformer').\
-                            removeprefix('prep__numeric__').\
-                            removeprefix('prep__non_numeric__')
-                    else:
-                        mappings[param] = param
-
-        ordered_mappings = {key: value for key, value in mappings.items() if not key.startswith('prep__')}
-        ordered_mappings.update({key: value for key, value in mappings.items() if key.startswith('prep__')})
-        return ordered_mappings
+from helpsk.sklearn_search_bayesian_base import *
 
 
 class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
@@ -246,13 +24,13 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  random_state: int = None):
 
         if isinstance(imputers, DefaultValue):
-            imputers = self._get_default_imputers()
+            imputers = self._create_default_imputers()
         if isinstance(scalers, DefaultValue):
-            scalers = self._get_default_scalers()
+            scalers = self._create_default_scalers()
         if isinstance(pca, DefaultValue):
-            pca = self._get_default_pca()
+            pca = self._create_default_pca()
         if isinstance(encoders, DefaultValue):
-            encoders = self._get_default_encoders()
+            encoders = self._create_default_encoders()
 
         super().__init__(iterations=iterations,
                          include_default_model=include_default_model,
@@ -277,10 +55,10 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
-            imputers=self._get_single_imputer(),
-            scalers=self._get_single_scaler(),
-            pca=self._get_empty_categorical(),
-            encoders=self._get_single_encoder(),
+            imputers=self._create_single_imputer(),
+            scalers=self._create_single_scaler(),
+            pca=self._create_empty_categorical(),
+            encoders=self._create_single_encoder(),
         )
 
 
@@ -299,13 +77,13 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  random_state: int = None):
 
         if isinstance(imputers, DefaultValue):
-            imputers = self._get_default_imputers()
+            imputers = self._create_default_imputers()
         if isinstance(scalers, DefaultValue):
-            scalers = self._get_default_scalers()
+            scalers = self._create_default_scalers()
         if isinstance(pca, DefaultValue):
-            pca = self._get_default_pca()
+            pca = self._create_default_pca()
         if isinstance(encoders, DefaultValue):
-            encoders = self._get_default_encoders()
+            encoders = self._create_default_encoders()
 
         super().__init__(iterations=iterations,
                          include_default_model=include_default_model,
@@ -325,10 +103,10 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
-            imputers=self._get_single_imputer(),
-            scalers=self._get_single_scaler(),
-            pca=self._get_empty_categorical(),
-            encoders=self._get_single_encoder(),
+            imputers=self._create_single_imputer(),
+            scalers=self._create_single_scaler(),
+            pca=self._create_empty_categorical(),
+            encoders=self._create_single_encoder(),
         )
 
 
@@ -353,13 +131,13 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
                  random_state: int = None):
 
         if isinstance(imputers, DefaultValue):
-            imputers = self._get_default_imputers()
+            imputers = self._create_default_imputers()
         if isinstance(scalers, DefaultValue):
-            scalers = self._get_empty_categorical()
+            scalers = self._create_empty_categorical()
         if isinstance(pca, DefaultValue):
-            pca = self._get_default_pca()
+            pca = self._create_default_pca()
         if isinstance(encoders, DefaultValue):
-            encoders = self._get_default_encoders()
+            encoders = self._create_default_encoders()
 
         super().__init__(iterations=iterations,
                          include_default_model=include_default_model,
@@ -381,10 +159,10 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
-            imputers=self._get_single_imputer(),
-            scalers=self._get_empty_categorical(),
-            pca=self._get_empty_categorical(),
-            encoders=self._get_single_encoder(),
+            imputers=self._create_single_imputer(),
+            scalers=self._create_empty_categorical(),
+            pca=self._create_empty_categorical(),
+            encoders=self._create_single_encoder(),
         )
 
 
@@ -438,13 +216,13 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  random_state: int = None):
 
         if isinstance(imputers, DefaultValue):
-            imputers = self._get_default_imputers()
+            imputers = self._create_default_imputers()
         if isinstance(scalers, DefaultValue):
-            scalers = self._get_empty_categorical()  # do not scale for XGBoost
+            scalers = self._create_empty_categorical()  # do not scale for XGBoost
         if isinstance(pca, DefaultValue):
-            pca = self._get_default_pca()
+            pca = self._create_default_pca()
         if isinstance(encoders, DefaultValue):
-            encoders = self._get_default_encoders()
+            encoders = self._create_default_encoders()
 
         super().__init__(iterations=iterations,
                          include_default_model=include_default_model,
@@ -479,10 +257,10 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
     def _default_model_transformer_search_space(self) -> dict:
         return self._build_transformer_search_space(
-            imputers=self._get_single_imputer(),
-            scalers=self._get_empty_categorical(),
-            pca=self._get_empty_categorical(),
-            encoders=self._get_single_encoder(),
+            imputers=self._create_single_imputer(),
+            scalers=self._create_empty_categorical(),
+            pca=self._create_empty_categorical(),
+            encoders=self._create_single_encoder(),
         )
 
 

@@ -11,7 +11,7 @@ from helpsk import validation
 from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults
 from helpsk.sklearn_search_base import *
-from helpsk.sklearn_search import *
+from helpsk.sklearn_search_bayesian import *
 from helpsk.utility import redirect_stdout_to_file
 from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
 

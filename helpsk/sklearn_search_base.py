@@ -3,10 +3,14 @@ from typing import List
 
 import pandas as pd
 from sklearn.compose import ColumnTransformer
+from sklearn.decomposition import PCA
 from sklearn.dummy import DummyClassifier
+from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
+from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 
 
 class SearchSpaceBase(ABC):
@@ -104,3 +108,134 @@ class SearchSpaceBase(ABC):
         ordered_mappings = {key: value for key, value in mappings.items() if not key.startswith('prep__')}
         ordered_mappings.update({key: value for key, value in mappings.items() if key.startswith('prep__')})
         return ordered_mappings
+
+
+class ModelSearchSpaceBase(SearchSpaceBase, ABC):
+    def __init__(self,
+                 iterations: int = 50,
+                 include_default_model: bool = True,
+                 imputers=None,
+                 scalers=None,
+                 pca=None,
+                 encoders=None,
+                 random_state: int = None):
+        """
+        Args:
+            iterations:
+
+            include_default_model:
+
+            imputers:
+
+            scalers:
+
+            encoders:
+
+            random_state:
+        """
+        super().__init__(random_state)
+
+        self._iterations = iterations
+        self._include_default_model = include_default_model
+        self._imputers = imputers
+        self._scalers = scalers
+        self._pca = pca
+        self._encoders = encoders
+        self._model_parameters = None
+
+    @staticmethod
+    def _create_default_imputers() -> list:
+        """Return default imputers to be used in the search space"""
+        return [
+            SimpleImputer(strategy='mean'),
+            SimpleImputer(strategy='median'),
+            SimpleImputer(strategy='most_frequent')
+        ]
+
+    @staticmethod
+    def _create_single_imputer() -> list:
+        """Return a single imputer to be used, for example, when searching default hyper-param values"""
+        return [SimpleImputer(strategy='mean')]
+
+    @staticmethod
+    def _create_default_scalers() -> list:
+        """Return default scalers to be used in the search space"""
+        return [
+            StandardScaler(),
+            MinMaxScaler(),
+        ]
+
+    @staticmethod
+    def _create_single_scaler() -> list:
+        """Return a single imputer to be used, for example, when searching default hyper-param values"""
+        return [StandardScaler()]
+
+    @staticmethod
+    def _create_default_pca() -> list:
+        return [
+            None,
+            PCA(n_components='mle')
+        ]
+
+    @staticmethod
+    def _create_default_encoders() -> list:
+        return [
+            OneHotEncoder(handle_unknown='ignore'),
+            CustomOrdinalEncoder(),
+        ]
+
+    @staticmethod
+    def _create_single_encoder() -> list:
+        return [OneHotEncoder(handle_unknown='ignore')]
+
+    @staticmethod
+    def _build_transformer_search_space(imputers,
+                                        scalers,
+                                        pca,
+                                        encoders) -> dict:
+
+        return {
+            'prep__numeric__imputer__transformer': imputers,
+            'prep__numeric__scaler__transformer': scalers,
+            'prep__numeric__pca__transformer': pca,
+            'prep__non_numeric__encoder__transformer': encoders,
+        }
+
+    @abstractmethod
+    def _create_model(self):
+        """This method returns a model object with whatever default values should be set."""
+
+    @abstractmethod
+    def _default_model_transformer_search_space(self) -> dict:
+        """This method returns a dictionary of the default transformations to apply if including the default
+        model in the search spaces (i.e. if `_include_default_model` is True). This can be accomplished by
+        calling the `_build_transformer_search_space` function."""
+
+    def _transformer_search_space(self) -> dict:
+        """This method returns a dictionary of the transformations to tune. This can be accomplished by
+        calling the `_build_transformer_search_space` function."""
+
+        return self._build_transformer_search_space(
+            imputers=self._imputers,
+            scalers=self._scalers,
+            pca=self._pca,
+            encoders=self._encoders,
+        )
+
+    def _model_search_space(self) -> dict:
+        def add_param(param_dict, param_name, param_value):
+            if param_value:
+                param_dict['model__' + param_name] = param_value
+
+        parameters = dict()
+        for name, value in self._model_parameters.items():
+            add_param(parameters, name, value)
+
+        return parameters
+
+    @abstractmethod
+    def search_spaces(self) -> List[tuple]:
+        """Returns a list of search spaces (e.g. 2 items if `include_default_model` is True; one for the
+        model with default params, and one for searching across all params.)
+        Each space is a tuple with a dictionary (hyper-param search space) as the first item and an integer
+        (number of iterations) as second item."""
