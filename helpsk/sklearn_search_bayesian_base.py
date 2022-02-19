@@ -1,37 +1,57 @@
 from skopt.space import Real, Integer, Categorical, Dimension
-
 from helpsk.sklearn_search_base import *
 
 
 class DefaultValue(Dimension):
+    """
+    A class to indicate a default value (for a model's parameter) to be used in a
+    `ModelBayesianSearchSpaceBase` class.
+    """
     def __init__(self):
+        """this method is not intended to be used directly, the class itself is used to indicate state."""
         pass
 
     def set_transformer(self):
+        """this method is not intended to be used directly, the class itself is used to indicate state."""
         pass
 
     @property
     def bounds(self):
+        """this method is not intended to be used directly, the class itself is used to indicate state."""
         return None
 
     @property
     def is_constant(self):
+        """this method is not intended to be used directly, the class itself is used to indicate state."""
         return None
 
     @property
     def transformed_bounds(self):
+        """this method is not intended to be used directly, the class itself is used to indicate state."""
         return None
 
 
 class DefaultReal(DefaultValue, Real):
+    """
+    A class to indicate a default value of type Real (for a model's parameter) to be used in a
+    `ModelBayesianSearchSpaceBase` class.
+    """
     pass
 
 
 class DefaultInteger(DefaultValue, Integer):
+    """
+    A class to indicate a default value of type Integer (for a model's parameter) to be used in a
+    `ModelBayesianSearchSpaceBase` class.
+    """
     pass
 
 
 class DefaultCategorical(DefaultValue, Categorical):
+    """
+    A class to indicate a default value of type Categorical (for a model's parameter) to be used in a
+    `ModelBayesianSearchSpaceBase` class.
+    """
     pass
 
 
