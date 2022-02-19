@@ -31,7 +31,7 @@ class TestSklearnSearch(unittest.TestCase):
         del y_full, X_full
         cls.X_train = X_train
         cls.y_train = y_train
-        
+
     @staticmethod
     def to_string(obj):
         return str(obj). \
