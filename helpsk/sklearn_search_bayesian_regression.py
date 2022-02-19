@@ -1,23 +1,21 @@
 """
-This module contains classes that define search spaces compatible with BayesSearchCV for classification 
+This module contains classes that define search spaces compatible with BayesSearchCV for classification
 models.
 """
 from typing import Union
 
-from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.svm import LinearSVC
+from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor
+from sklearn.linear_model import ElasticNet
+from sklearn.svm import LinearSVR
 
 from helpsk.sklearn_search_bayesian_base import *
 
 
-class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
-    """Defines the BayesSearchCV search space for Logistic Regression."""
+class ElasticNetBayesianSearchSpace(ModelBayesianSearchSpaceBase):
+    """Defines the BayesSearchCV search space for ElasticNet Regression."""
     def __init__(self,
-                 C: Union[Real, None] = DefaultReal(),  # noqa
-                 # model default value options
-                 solver: str = 'lbfgs',
-                 max_iter: int = 1000,
+                 alpha: Union[Real, None] = DefaultReal(),
+                 l1_ratio: Union[Real, None] = DefaultReal(),
                  # search space options
                  iterations: int = 50,
                  include_default_model: bool = True,
@@ -46,17 +44,13 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                          encoders=encoders,
                          random_state=random_state)
         self._model_parameters = dict(
-            C=Real(low=1e-6, high=100, prior='log-uniform') if isinstance(C, DefaultValue) else C,
+            alpha=Real(low=1e-5, high=10, prior='log-uniform') if isinstance(alpha, DefaultValue) else alpha,
+            l1_ratio=Real(low=0, high=1, prior='uniform') if isinstance(l1_ratio, DefaultValue) else l1_ratio,
         )
-
-        self._solver = solver
-        self._max_iter = max_iter
 
     def _create_model(self):
         """Defines the model that will be trained/tuned."""
-        return LogisticRegression(
-            solver=self._solver,
-            max_iter=self._max_iter,
+        return ElasticNet(
             random_state=self._random_state
         )
 
@@ -70,8 +64,8 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         )
 
 
-class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
-    """Defines the BayesSearchCV search space for LinearSVC."""
+class LinearSVRBayesianSearchSpace(ModelBayesianSearchSpaceBase):
+    """Defines the BayesSearchCV search space for LinearSVR."""
     def __init__(self,
                  # hyper-params search space
                  C: Union[Real, None] = DefaultReal(),  # noqa
@@ -108,7 +102,7 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
     def _create_model(self):
         """Defines the model that will be trained/tuned."""
-        return LinearSVC(
+        return LinearSVR(
             random_state=self._random_state
         )
 
@@ -168,7 +162,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
             min_samples_split=Integer(low=2, high=50, prior='uniform') if isinstance(min_samples_split, DefaultValue) else min_samples_split,
             min_samples_leaf=Integer(low=1, high=50, prior='uniform') if isinstance(min_samples_leaf, DefaultValue) else min_samples_leaf,
             max_samples=Real(low=0.5, high=1.0, prior='uniform') if isinstance(max_samples, DefaultValue) else max_samples,
-            criterion=Categorical(['gini', 'entropy']) if isinstance(criterion, DefaultValue) else criterion,
+            criterion=Categorical(['squared_error', 'absolute_error', 'poisson']) if isinstance(criterion, DefaultValue) else criterion,
         )
 
     def _default_model_transformer_search_space(self) -> dict:
@@ -185,7 +179,7 @@ class ExtraTreesBayesianSearchSpace(TreesBayesianSearchSpaceBase):
     """Defines the BayesSearchCV search space for ExtraTreesClassifier models."""
     def _create_model(self):
         """Defines the model that will be trained/tuned."""
-        return ExtraTreesClassifier(
+        return ExtraTreesRegressor(
             n_estimators=500,
             bootstrap=True,
             random_state=self._random_state
@@ -196,7 +190,7 @@ class RandomForestBayesianSearchSpace(TreesBayesianSearchSpaceBase):
     """Defines the BayesSearchCV search space for RandomForestClassifier models."""
     def _create_model(self):
         """Defines the model that will be trained/tuned."""
-        return RandomForestClassifier(
+        return RandomForestRegressor(
             n_estimators=500,
             random_state=self._random_state
         )
@@ -224,7 +218,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  reg_alpha: Union[Real, None] = DefaultReal(),
                  reg_lambda: Union[Real, None] = DefaultReal(),
                  # model options
-                 eval_metric: str = 'logloss',
+                 eval_metric: str = 'rmse',
                  # search space options
                  iterations: int = 50,
                  include_default_model: bool = True,
@@ -269,8 +263,8 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
     def _create_model(self):
         """Defines the model that will be trained/tuned."""
-        from xgboost import XGBClassifier
-        return XGBClassifier(
+        from xgboost import XGBRegressor
+        return XGBRegressor(
             n_estimators=500,
             eval_metric=self._eval_metric,
             use_label_encoder=False,

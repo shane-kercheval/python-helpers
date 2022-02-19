@@ -2,7 +2,14 @@
 This module contains classes that define search spaces compatible with BayesSearchCV for classification 
 models.
 """
-from helpsk.sklearn_search_bayesian_classification import *
+from typing import List
+
+import pandas as pd
+
+import helpsk.sklearn_search_bayesian_classification as bc
+import helpsk.sklearn_search_bayesian_regression as br
+from helpsk.sklearn_search_base import SearchSpaceBase
+from helpsk.sklearn_search_bayesian_base import ModelBayesianSearchSpaceBase
 
 
 class BayesianSearchSpace(SearchSpaceBase):
@@ -31,24 +38,40 @@ class BayesianSearchSpace(SearchSpaceBase):
 
             if model_type == 'classification':
                 self._model_search_spaces = [
-                    LogisticBayesianSearchSpace(iterations=iterations,
-                                                include_default_model=include_default_model,
-                                                random_state=random_state),
-                    LinearSVCBayesianSearchSpace(iterations=iterations,
-                                                 include_default_model=include_default_model,
-                                                 random_state=random_state),
-                    ExtraTreesBayesianSearchSpace(iterations=iterations,
-                                                  include_default_model=include_default_model,
-                                                  random_state=random_state),
-                    RandomForestBayesianSearchSpace(iterations=iterations,
+                    bc.LogisticBayesianSearchSpace(iterations=iterations,
+                                                   include_default_model=include_default_model,
+                                                   random_state=random_state),
+                    bc.LinearSVCBayesianSearchSpace(iterations=iterations,
                                                     include_default_model=include_default_model,
                                                     random_state=random_state),
-                    XGBoostBayesianSearchSpace(iterations=iterations,
-                                               include_default_model=include_default_model,
-                                               random_state=random_state),
+                    bc.ExtraTreesBayesianSearchSpace(iterations=iterations,
+                                                     include_default_model=include_default_model,
+                                                     random_state=random_state),
+                    bc.RandomForestBayesianSearchSpace(iterations=iterations,
+                                                       include_default_model=include_default_model,
+                                                       random_state=random_state),
+                    bc.XGBoostBayesianSearchSpace(iterations=iterations,
+                                                  include_default_model=include_default_model,
+                                                  random_state=random_state),
                 ]
             elif model_type == 'regression':
-                raise NotImplementedError()
+                self._model_search_spaces = [
+                    br.ElasticNetBayesianSearchSpace(iterations=iterations,
+                                                     include_default_model=include_default_model,
+                                                     random_state=random_state),
+                    br.LinearSVRBayesianSearchSpace(iterations=iterations,
+                                                    include_default_model=include_default_model,
+                                                    random_state=random_state),
+                    br.ExtraTreesBayesianSearchSpace(iterations=iterations,
+                                                     include_default_model=include_default_model,
+                                                     random_state=random_state),
+                    br.RandomForestBayesianSearchSpace(iterations=iterations,
+                                                       include_default_model=include_default_model,
+                                                       random_state=random_state),
+                    br.XGBoostBayesianSearchSpace(iterations=iterations,
+                                                  include_default_model=include_default_model,
+                                                  random_state=random_state),
+                ]
             else:
                 raise NotImplementedError()
 
