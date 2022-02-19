@@ -10,6 +10,7 @@ from skopt import BayesSearchCV
 from helpsk import validation
 from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults
+from helpsk.sklearn_search_base import *
 from helpsk.sklearn_search import *
 from helpsk.utility import redirect_stdout_to_file
 from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
@@ -43,7 +44,7 @@ class TestSklearnSearch(unittest.TestCase):
     def test_pipeline(self):
         # this will be the same for all inherited classes, so just test base.
         with open(get_test_path() + '/test_files/sklearn_search/search_space_base__pipeline.txt', 'w') as file:
-            file.write(str(BayesianSearchSpaceBase.pipeline(data=self.X_train)))
+            file.write(str(SearchSpaceBase.pipeline(data=self.X_train)))
 
     def test_ModelBayesianSearchSpace_params(self):
         search_space = LogisticBayesianSearchSpace(
@@ -220,7 +221,7 @@ class TestSklearnSearch(unittest.TestCase):
 
     def test_BayesianSearchSpace(self):
         search_space = BayesianSearchSpace(self.X_train, iterations=45, random_state=42)
-        self.assertEqual(str(BayesianSearchSpaceBase.pipeline(data=self.X_train)),
+        self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)),
                          str(search_space.pipeline()))
 
         with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_search_spaces.txt', 'w') as file:
