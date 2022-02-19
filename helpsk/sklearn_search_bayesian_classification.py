@@ -164,7 +164,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
         self._model_parameters = dict(
             max_features=Real(low=0.01, high=0.95, prior='uniform') if isinstance(max_features, DefaultValue) else max_features,
             max_depth=Integer(low=1, high=100, prior='uniform') if isinstance(max_depth, DefaultValue) else max_depth,
-            n_estimators=Integer(500, 2000, prior='uniform') if isinstance(n_estimators, DefaultValue) else n_estimators,  # noqa
+            n_estimators=Integer(500, 2000, prior='uniform') if isinstance(n_estimators, DefaultValue) else n_estimators,
             min_samples_split=Integer(low=2, high=50, prior='uniform') if isinstance(min_samples_split, DefaultValue) else min_samples_split,
             min_samples_leaf=Integer(low=1, high=50, prior='uniform') if isinstance(min_samples_leaf, DefaultValue) else min_samples_leaf,
             max_samples=Real(low=0.5, high=1.0, prior='uniform') if isinstance(max_samples, DefaultValue) else max_samples,
