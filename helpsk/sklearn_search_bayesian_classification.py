@@ -8,6 +8,7 @@ from helpsk.sklearn_search_bayesian_base import *
 
 
 class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
+    """Defines the BayesSearchCV search space for Logistic Regression."""
     def __init__(self,
                  C: Union[Real, None] = DefaultReal(),  # noqa
                  # model default value options
@@ -22,6 +23,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  pca: Union[Categorical, None] = DefaultCategorical(),
                  encoders: Union[Categorical, None] = DefaultCategorical(),
                  random_state: int = None):
+        """Defines the model/transformation parameters that can be tuned."""
 
         if isinstance(imputers, DefaultValue):
             imputers = self._create_default_imputers()
@@ -47,6 +49,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         self._max_iter = max_iter
 
     def _create_model(self):
+        """Defines the model that will be trained/tuned."""
         return LogisticRegression(
             solver=self._solver,
             max_iter=self._max_iter,
@@ -54,6 +57,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         )
 
     def _default_model_transformer_search_space(self) -> dict:
+        """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
             scalers=self._create_single_scaler(),
@@ -63,6 +67,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
 
 class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
+    """Defines the BayesSearchCV search space for LinearSVC."""
     def __init__(self,
                  # hyper-params search space
                  C: Union[Real, None] = DefaultReal(),  # noqa
@@ -75,6 +80,7 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  pca: Union[Categorical, None] = DefaultCategorical(),
                  encoders: Union[Categorical, None] = DefaultCategorical(),
                  random_state: int = None):
+        """Defines the model/transformation parameters that can be tuned."""
 
         if isinstance(imputers, DefaultValue):
             imputers = self._create_default_imputers()
@@ -97,11 +103,13 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         )
 
     def _create_model(self):
+        """Defines the model that will be trained/tuned."""
         return LinearSVC(
             random_state=self._random_state
         )
 
     def _default_model_transformer_search_space(self) -> dict:
+        """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
             scalers=self._create_single_scaler(),
@@ -111,6 +119,7 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
 
 class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
+    """Base class that defines the BayesSearchCV search space for Tree-based models."""
     def __init__(self,
                  # hyper-params search space
                  max_features: Union[Real, None] = DefaultReal(),
@@ -129,6 +138,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
                  pca: Union[Categorical, None] = DefaultCategorical(),
                  encoders: Union[Categorical, None] = DefaultCategorical(),
                  random_state: int = None):
+        """Defines the model/transformation parameters that can be tuned."""
 
         if isinstance(imputers, DefaultValue):
             imputers = self._create_default_imputers()
@@ -158,6 +168,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
         )
 
     def _default_model_transformer_search_space(self) -> dict:
+        """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
             scalers=self._create_empty_categorical(),
@@ -167,7 +178,9 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
 
 
 class ExtraTreesBayesianSearchSpace(TreesBayesianSearchSpaceBase):
+    """Defines the BayesSearchCV search space for ExtraTreesClassifier models."""
     def _create_model(self):
+        """Defines the model that will be trained/tuned."""
         return ExtraTreesClassifier(
             n_estimators=500,
             bootstrap=True,
@@ -176,7 +189,9 @@ class ExtraTreesBayesianSearchSpace(TreesBayesianSearchSpaceBase):
 
 
 class RandomForestBayesianSearchSpace(TreesBayesianSearchSpaceBase):
+    """Defines the BayesSearchCV search space for RandomForestClassifier models."""
     def _create_model(self):
+        """Defines the model that will be trained/tuned."""
         return RandomForestClassifier(
             n_estimators=500,
             random_state=self._random_state
@@ -184,6 +199,7 @@ class RandomForestBayesianSearchSpace(TreesBayesianSearchSpaceBase):
 
 
 class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
+    """Defines the BayesSearchCV search space for XGBClassifier models."""
     from skopt.space import Real, Integer, Categorical
     # temp = Real(100, 2000, prior='uniform')
     # temp = Real(100, 2000, prior='log-uniform')
@@ -214,6 +230,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  pca: Union[Categorical, None] = DefaultCategorical(),
                  encoders: Union[Categorical, None] = DefaultCategorical(),
                  random_state: int = None):
+        """Defines the model/transformation parameters that can be tuned."""
 
         if isinstance(imputers, DefaultValue):
             imputers = self._create_default_imputers()
@@ -247,6 +264,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         self._eval_metric = eval_metric
 
     def _create_model(self):
+        """Defines the model that will be trained/tuned."""
         from xgboost import XGBClassifier
         return XGBClassifier(
             n_estimators=500,
@@ -256,6 +274,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
         )
 
     def _default_model_transformer_search_space(self) -> dict:
+        """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
             scalers=self._create_empty_categorical(),
@@ -265,7 +284,11 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
 
 
 class BayesianSearchSpace(SearchSpaceBase):
-
+    """
+    Wrapper/container that is used for specifying multiple models/spaces for the BayesSearchCV search space.
+    The user can pass a list of ModelBayesianSearchSpaceBase objects, or can allow the class to define the
+    search spaces. Can be used for classification or regression search spaces.
+    """
     def __init__(self,
                  data: pd.DataFrame,
                  model_search_spaces: List[ModelBayesianSearchSpaceBase] = None,
