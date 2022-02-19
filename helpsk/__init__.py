@@ -13,6 +13,7 @@ import helpsk.pandas_style
 import helpsk.plot
 import helpsk.sklearn_eval
 import helpsk.sklearn_search_base
+import helpsk.sklearn_search_bayesian
 import helpsk.sklearn_search_bayesian_base
 import helpsk.sklearn_search_bayesian_classification
 import helpsk.sklearn_pipeline
