@@ -1,4 +1,4 @@
-"""This model contains classes that wrap the connection/querying logic of various databases. Database objects
+"""This module contains classes that wrap the connection/querying logic of various databases. Database objects
 can be created from the __init__ function or from the .from_config class function by passing in an instance
 of the corresponding configuration class.
 

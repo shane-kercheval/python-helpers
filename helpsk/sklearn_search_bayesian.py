@@ -1,3 +1,7 @@
+"""
+This module contains classes that define search spaces compatible with BayesSearchCV for classification 
+models.
+"""
 from helpsk.sklearn_search_bayesian_classification import *
 
 

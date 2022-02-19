@@ -1,3 +1,7 @@
+"""
+This module contains classes that define search spaces compatible with GridSearchCV, RandomSearchCV, or 
+BayesSearchCV for classification models.
+"""
 from abc import abstractmethod, ABC
 from typing import List
 

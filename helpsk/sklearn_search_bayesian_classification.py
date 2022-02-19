@@ -1,3 +1,7 @@
+"""
+This module contains classes that define search spaces compatible with BayesSearchCV for classification 
+models.
+"""
 from typing import Union
 
 from sklearn.ensemble import ExtraTreesClassifier, RandomForestClassifier

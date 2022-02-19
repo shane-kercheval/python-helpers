@@ -1,3 +1,7 @@
+"""
+This module contains base classes that define search spaces compatible with BayesSearchCV for either
+classification or regression models.
+"""
 from skopt.space import Real, Integer, Categorical, Dimension
 from helpsk.sklearn_search_base import *
 
