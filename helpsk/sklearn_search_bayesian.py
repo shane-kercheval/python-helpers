@@ -35,7 +35,6 @@ class BayesianSearchSpace(SearchSpaceBase):
         if model_search_spaces:
             self._model_search_spaces = model_search_spaces
         else:
-
             if model_type == 'classification':
                 self._model_search_spaces = [
                     bc.LogisticBayesianSearchSpace(iterations=iterations,
