@@ -111,6 +111,12 @@ class SearchSpaceBase(ABC):
 
 
 class ModelSearchSpaceBase(SearchSpaceBase, ABC):
+    """
+    Base class for defining model specific search spaces, regardless of search type (e.g. GridSearchCV,
+    BayesSearchCV, etc.) or model type (e.g. classification, regression)
+
+    See ModelBayesianSearchSpaceBase and e.g. LogisticBayesianSearchSpace for examples of how to inherit.
+    """
     def __init__(self,
                  iterations: int = 50,
                  include_default_model: bool = True,
@@ -167,11 +173,12 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
 
     @staticmethod
     def _create_single_scaler() -> list:
-        """Return a single imputer to be used, for example, when searching default hyper-param values"""
+        """Return a single scaler to be used, for example, when searching default hyper-param values"""
         return [StandardScaler()]
 
     @staticmethod
     def _create_default_pca() -> list:
+        """Return default PCA to be used in the search space"""
         return [
             None,
             PCA(n_components='mle')
@@ -179,6 +186,7 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
 
     @staticmethod
     def _create_default_encoders() -> list:
+        """Return default encoders to be used in the search space"""
         return [
             OneHotEncoder(handle_unknown='ignore'),
             CustomOrdinalEncoder(),
@@ -186,6 +194,7 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
 
     @staticmethod
     def _create_single_encoder() -> list:
+        """Return a single encoder to be used, for example, when searching default hyper-param values"""
         return [OneHotEncoder(handle_unknown='ignore')]
 
     @staticmethod
@@ -193,7 +202,7 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
                                         scalers,
                                         pca,
                                         encoders) -> dict:
-
+        """Takes imputers, scalers, etc., and constructions the transformation search space."""
         return {
             'prep__numeric__imputer__transformer': imputers,
             'prep__numeric__scaler__transformer': scalers,
@@ -223,6 +232,8 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
         )
 
     def _model_search_space(self) -> dict:
+        """This method builds up the model's search space based on the `self._model_parameters` field that
+        should be set by the inheriting class."""
         def add_param(param_dict, param_name, param_value):
             if param_value:
                 param_dict['model__' + param_name] = param_value
