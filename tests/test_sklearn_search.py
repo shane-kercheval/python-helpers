@@ -223,8 +223,7 @@ class TestSklearnSearch(unittest.TestCase):
         search_space = BayesianSearchSpace(self.X_train,
                                            model_type='classification',
                                            iterations=45, random_state=42)
-        self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)),
-                         str(search_space.pipeline()))
+        self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)), str(search_space.pipeline()))
 
         with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_search_spaces.txt', 'w') as file:
             file.write(TestSklearnSearch.to_string(search_space.search_spaces()))
@@ -243,8 +242,7 @@ class TestSklearnSearch(unittest.TestCase):
         search_space = BayesianSearchSpace(self.X_train,
                                            model_type='regression',
                                            iterations=45, random_state=42)
-        self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)),
-                         str(search_space.pipeline()))
+        self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)), str(search_space.pipeline()))
 
         with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_search_spaces__regression.txt', 'w') as file:
             file.write(TestSklearnSearch.to_string(search_space.search_spaces()))
@@ -257,6 +255,32 @@ class TestSklearnSearch(unittest.TestCase):
             self.assertIsInstance(space[1], int)
 
         with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_param_name_mappings__regression.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(search_space.param_name_mappings()))
+        del search_space
+
+        search_space = BayesianSearchSpace(
+            self.X_train,
+            model_search_spaces= [
+                br.ElasticNetBayesianSearchSpace(encoders=None, pca=None, iterations=45, random_state=42),
+                br.ExtraTreesBayesianSearchSpace(encoders=None, pca=None, iterations=45, random_state=42),
+                br.RandomForestBayesianSearchSpace(encoders=None, pca=None, iterations=45, random_state=42),
+                br.XGBoostBayesianSearchSpace(encoders=None, pca=None, iterations=45, random_state=42),
+
+            ],
+        )
+        self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)), str(search_space.pipeline()))
+
+        with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_search_spaces__regression_custom.txt', 'w') as file:
+            file.write(TestSklearnSearch.to_string(search_space.search_spaces()))
+
+        self.assertIsInstance(search_space.search_spaces(), list)
+
+        for space in search_space.search_spaces():
+            self.assertIsInstance(space, tuple)
+            self.assertIsInstance(space[0], dict)
+            self.assertIsInstance(space[1], int)
+
+        with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_param_name_mappings__regression_custom.txt', 'w') as file:
             file.write(TestSklearnSearch.to_string(search_space.param_name_mappings()))
 
     def test_MLExperimentResults_multi_model(self):
