@@ -371,11 +371,11 @@ class MLExperimentResults:
             cv_results_dict['test_score_averages'] = averages_dict
             cv_results_dict['test_score_standard_deviations'] = standard_deviations_dict
 
-            # if higher_score_is_better is False, sklearn will return negative numbers; I want actual values
-            if not higher_score_is_better:
-                averages = cv_results_dict['test_score_averages']
-                for key in averages.keys():
-                    cv_results_dict['test_score_averages'][key] = [-1 * x for x in averages[key]]
+        # if higher_score_is_better is False, sklearn will return negative numbers; I want actual values
+        if not higher_score_is_better:
+            averages = cv_results_dict['test_score_averages']
+            for key in averages.keys():
+                cv_results_dict['test_score_averages'][key] = [-1 * x for x in averages[key]]
 
         # convert training scores to dictionaries, if training scores exists
         # i.e. if return_train_score=True for the SearchCV object
@@ -406,12 +406,12 @@ class MLExperimentResults:
                 cv_results_dict['train_score_averages'] = averages_dict
                 cv_results_dict['train_score_standard_deviations'] = standard_deviations_dict
 
-                # if higher_score_is_better is False, sklearn will return negative numbers; I want actual
-                # values
-                if not higher_score_is_better:
-                    averages = cv_results_dict['train_score_averages']
-                    for key in averages.keys():
-                        cv_results_dict['train_score_averages'][key] = [-1 * x for x in averages[key]]
+            # if higher_score_is_better is False, sklearn will return negative numbers; I want actual
+            # values
+            if not higher_score_is_better:
+                averages = cv_results_dict['train_score_averages']
+                for key in averages.keys():
+                    cv_results_dict['train_score_averages'][key] = [-1 * x for x in averages[key]]
 
         assert_true(len(searcher.cv_results_['params']) == number_of_trials)
 

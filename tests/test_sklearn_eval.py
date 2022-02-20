@@ -911,6 +911,84 @@ class TestSklearnEval(unittest.TestCase):
         _ = parser.plot_scatter_matrix()
         # plotly.offline.plot(_, filename=get_test_path() + '/test_files/sklearn_eval/temp.html', auto_open=True)
 
+    def test_MLExperimentResults_gridsearch_regression_single_score(self):
+        ####
+        # set up grid-search on regression model for housing data
+        # this will have the same search parameters as the self.housing_data__grid_search in the setUpClass,
+        # except a single score (rmse, which is the same primary score as the other) rather than multiple scores
+        # therefore, most of the values (e.g. best_score, best_params, should be the same between the two
+        # objects)
+        ####
+        housing_data = get_data_housing()
+        housing_data.loc[0:46, ['median_income']] = np.nan
+        housing_data.loc[25:75, ['housing_median_age']] = np.nan
+        y_full = housing_data['target']
+        X_full = housing_data.drop(columns='target')  # noqa
+        X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)  # noqa
+        del y_full, X_full
+        numeric_pipeline = Pipeline([
+            ('imputing', SimpleImputer(strategy='mean')),
+            ('scaling', StandardScaler()),
+        ])
+        random_forest_model = RandomForestRegressor(random_state=42)
+        full_pipeline = Pipeline([
+            ('preparation', numeric_pipeline),
+            ('model', random_forest_model)
+        ])
+        param_grad = [
+            {
+                'model__max_features': [2, 'auto'],
+                'model__n_estimators': [10, 50]
+            },
+        ]
+        grid_search_housing = GridSearchCV(
+            full_pipeline,
+            param_grid=param_grad,
+            cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),
+            scoring='neg_root_mean_squared_error',
+            return_train_score=True
+        )
+        grid_search_housing.fit(X_train, y_train)
+        results_single_score = MLExperimentResults.from_sklearn_search_cv(searcher=grid_search_housing,
+                                                            higher_score_is_better=False,
+                                                            description="test description")
+        yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search__single_score.yaml'
+        os.remove(yaml_file)
+        results_single_score.to_yaml_file(yaml_file)
+
+        results_multi_score = MLExperimentResults.from_sklearn_search_cv(
+            searcher=self.housing_data__grid_search,
+            higher_score_is_better=False,
+            description="test description"
+        )
+        self.assertEqual(results_multi_score.best_score, results_single_score.best_score)
+        self.assertEqual(results_multi_score.best_params, results_single_score.best_params)
+        self.assertEqual(results_multi_score.best_score_index, results_single_score.best_score_index)
+        self.assertEqual(list(results_multi_score.best_trial_indexes), list(results_single_score.best_trial_indexes))
+        self.assertEqual(list(results_multi_score.trial_rankings), list(results_single_score.trial_rankings))
+        self.assertEqual(results_multi_score.best_standard_error, results_single_score.best_standard_error)
+        self.assertEqual(results_multi_score.parameter_names, results_single_score.parameter_names)
+        self.assertEqual(results_multi_score.parameter_names_original, results_single_score.parameter_names_original)
+        self.assertEqual(results_multi_score.parameter_names_mapping, results_single_score.parameter_names_mapping)
+
+        self.assertEqual(results_multi_score.test_score_averages['RMSE'],
+                         results_single_score.test_score_averages['neg_root_mean_squared_error'])
+        self.assertEqual(results_multi_score.test_score_standard_deviations['RMSE'],
+                         results_single_score.test_score_standard_deviations['neg_root_mean_squared_error'])
+        self.assertEqual(results_multi_score.test_score_rankings['RMSE'],
+                         results_single_score.test_score_rankings['neg_root_mean_squared_error'])
+
+        self.assertEqual(results_multi_score.train_score_averages['RMSE'],
+                         results_single_score.train_score_averages['neg_root_mean_squared_error'])
+        self.assertEqual(results_multi_score.train_score_standard_deviations['RMSE'],
+                         results_single_score.train_score_standard_deviations['neg_root_mean_squared_error'])
+
+        self.assertTrue(all(results_multi_score.primary_score_averages == results_single_score.primary_score_averages))  # noqa
+
+        self.assertEqual(results_multi_score.trial_labels(), results_single_score.trial_labels())
+        self.assertEqual(results_multi_score.indexes_within_1_standard_error, results_single_score.indexes_within_1_standard_error)
+        self.assertTrue(all(results_multi_score.score_standard_errors('RMSE') == results_single_score.score_standard_errors('neg_root_mean_squared_error')))  # noqa
+
     def test_TwoClassEvaluator(self):
         y_true = self.credit_data__y_test
         y_score = self.credit_data__y_scores
