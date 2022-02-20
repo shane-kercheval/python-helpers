@@ -4,8 +4,8 @@
 'model__l1_ratio': Real(low=0, high=1, prior='uniform', transform='identity'),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=[0.5, 0.25, 0.25]),
 'prep__numeric__scaler__transformer': Categorical(categories=(StandardScaler(), MinMaxScaler()), prior=[0.65, 0.35]),
-'prep__numeric__pca__transformer': None,
-'prep__non_numeric__encoder__transformer': None
+'prep__numeric__pca__transformer': Categorical(categories=(None,), prior=None),
+'prep__non_numeric__encoder__transformer': Categorical(categories=(None,), prior=None)
 }, 45),
 ({
 'model': Categorical(categories=(ElasticNet(random_state=42),), prior=None),
@@ -25,8 +25,8 @@
 'model__criterion': Categorical(categories=('squared_error',), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=[0.5, 0.25, 0.25]),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
-'prep__numeric__pca__transformer': None,
-'prep__non_numeric__encoder__transformer': None
+'prep__numeric__pca__transformer': Categorical(categories=(None,), prior=None),
+'prep__non_numeric__encoder__transformer': Categorical(categories=(None,), prior=None)
 }, 45),
 ({
 'model': Categorical(categories=(ExtraTreesRegressor(bootstrap=True, n_estimators=500, random_state=42),), prior=None),
@@ -46,8 +46,8 @@
 'model__criterion': Categorical(categories=('squared_error',), prior=None),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=[0.5, 0.25, 0.25]),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
-'prep__numeric__pca__transformer': None,
-'prep__non_numeric__encoder__transformer': None
+'prep__numeric__pca__transformer': Categorical(categories=(None,), prior=None),
+'prep__non_numeric__encoder__transformer': Categorical(categories=(None,), prior=None)
 }, 45),
 ({
 'model': Categorical(categories=(RandomForestRegressor(n_estimators=500, random_state=42),), prior=None),
@@ -78,8 +78,8 @@
 'model__reg_lambda': Real(low=1, high=4, prior='log-uniform', transform='identity'),
 'prep__numeric__imputer__transformer': Categorical(categories=(SimpleImputer(), SimpleImputer(strategy='median'), SimpleImputer(strategy='most_frequent')), prior=[0.5, 0.25, 0.25]),
 'prep__numeric__scaler__transformer': Categorical(categories=(None,), prior=None),
-'prep__numeric__pca__transformer': None,
-'prep__non_numeric__encoder__transformer': None
+'prep__numeric__pca__transformer': Categorical(categories=(None,), prior=None),
+'prep__non_numeric__encoder__transformer': Categorical(categories=(None,), prior=None)
 }, 45),
 ({
 'model': Categorical(categories=(XGBRegressor(base_score=None, booster=None, colsample_bylevel=None,

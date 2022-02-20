@@ -261,10 +261,18 @@ class TestSklearnSearch(unittest.TestCase):
         search_space = BayesianSearchSpace(
             self.X_train,
             model_search_spaces= [
-                br.ElasticNetBayesianSearchSpace(encoders=None, pca=None, iterations=45, random_state=42),
-                br.ExtraTreesBayesianSearchSpace(encoders=None, pca=None, iterations=45, random_state=42),
-                br.RandomForestBayesianSearchSpace(encoders=None, pca=None, iterations=45, random_state=42),
-                br.XGBoostBayesianSearchSpace(encoders=None, pca=None, iterations=45, random_state=42),
+                br.ElasticNetBayesianSearchSpace(encoders=Categorical([None]),
+                                                 pca=Categorical([None]),
+                                                 iterations=45, random_state=42),
+                br.ExtraTreesBayesianSearchSpace(encoders=Categorical([None]),
+                                                 pca=Categorical([None]),
+                                                 iterations=45, random_state=42),
+                br.RandomForestBayesianSearchSpace(encoders=Categorical([None]),
+                                                   pca=Categorical([None]),
+                                                   iterations=45, random_state=42),
+                br.XGBoostBayesianSearchSpace(encoders=Categorical([None]),
+                                              pca=Categorical([None]),
+                                              iterations=45, random_state=42),
 
             ],
         )
