@@ -162,7 +162,10 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
             min_samples_split=Integer(low=2, high=50, prior='uniform') if isinstance(min_samples_split, DefaultValue) else min_samples_split,
             min_samples_leaf=Integer(low=1, high=50, prior='uniform') if isinstance(min_samples_leaf, DefaultValue) else min_samples_leaf,
             max_samples=Real(low=0.5, high=1.0, prior='uniform') if isinstance(max_samples, DefaultValue) else max_samples,
-            criterion=Categorical(['squared_error', 'absolute_error', 'poisson']) if isinstance(criterion, DefaultValue) else criterion,
+            # criterion=Categorical(['squared_error', 'absolute_error', 'poisson']) if isinstance(criterion, DefaultValue) else criterion,
+            # absolute_error is very slow
+            # https://stackoverflow.com/questions/57243267/why-is-training-a-random-forest-regressor-with-mae-criterion-so-slow-compared-to
+            criterion=Categorical(['squared_error']) if isinstance(criterion, DefaultValue) else criterion,
         )
 
     def _default_model_transformer_search_space(self) -> dict:
