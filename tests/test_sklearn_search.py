@@ -260,7 +260,7 @@ class TestSklearnSearch(unittest.TestCase):
 
         search_space = BayesianSearchSpace(
             self.X_train,
-            model_search_spaces= [
+            model_search_spaces=[
                 br.ElasticNetBayesianSearchSpace(encoders=Categorical([None]),
                                                  pca=Categorical([None]),
                                                  iterations=45, random_state=42),
