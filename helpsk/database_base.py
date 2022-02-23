@@ -153,3 +153,33 @@ class Database(metaclass=ABCMeta):
             print(f'Elapsed Time: {elapsed_time} {time_units}')
 
         return results
+
+    @abstractmethod
+    def execute_statement(self, statement: str):
+        """This method executes a statement without any data returned."""
+
+    @abstractmethod
+    def insert_records(self,
+                        dataframe: pd.DataFrame,
+                        table: str,
+                        create_table: bool = False,
+                        overwrite: bool = True,
+                        schema: str = None,
+                        database: str = None):
+        """
+        This method inserts rows into a table from a pandas DataFrame.
+
+        Args:
+            dataframe:
+                the pandas dataframe to insert
+            table:
+                the name of the table
+            create_table:
+                if True, creates the table before inserting
+            overwrite:
+                if True, drops all records before inserting
+            schema:
+                the name of the schema
+            database:
+                the name of the database
+        """

@@ -88,7 +88,8 @@ class GenericConfigFile(Configuration):  # pylint: disable=too-few-public-method
         """
         config = configparser.ConfigParser()
         config.read(self._config_file)
-        return {key: config[self._config_key][value] for key, value in self._config_mapping.items()}
+        return {key: config[self._config_key][value] for key, value in self._config_mapping.items()
+                if value in config[self._config_key]}
 
 
 class RedshiftConfigFile(GenericConfigFile):  # pylint: disable=too-few-public-methods
@@ -150,7 +151,8 @@ class SnowflakeConfigFile(GenericConfigFile):  # pylint: disable=too-few-public-
                           'account': 'account',
                           'authenticator': 'authenticator',
                           'warehouse': 'warehouse',
-                          'database': 'database'}
+                          'database': 'database',
+                          'autocommit': 'autocommit'}
 
         super().__init__(config_file=config_file, config_key=config_key, config_mapping=config_mapping)
 
@@ -163,6 +165,7 @@ class Redshift(Database):
         with Redshift.from_config(config) as redshift:
             redshift.query("SELECT * FROM table LIMIT 100")
     """
+
     def __init__(self, *,
                  user: str, password: str, database: str, host: str, port: Union[str, int]):  # pylint: disable=too-many-arguments
         """Initialization"""
@@ -193,6 +196,13 @@ class Redshift(Database):
         """
         return pd.read_sql_query(sql, self.connection_object)
 
+    def execute_statement(self, statement: str):
+        raise NotImplementedError()
+
+    def insert_records(self, dataframe: pd.DataFrame, table: str, create_table: bool = False, overwrite: bool = True, schema: str = None,
+                       database: str = None):
+        raise NotImplementedError()
+
 
 class Snowflake(Database):
     """Wraps logic for connecting to Snowflake and querying.
@@ -222,10 +232,11 @@ class Snowflake(Database):
     pip install snowflake-connector-python[pandas]
     ```
     """
+
     # pylint: disable=too-many-arguments
     def __init__(self, *,
                  user: str, account: str, authenticator: str, warehouse: str, database: str,
-                 autocommit: bool = False):
+                 autocommit: bool = True):
         """Initialization"""
         super().__init__()
         self.user = user
@@ -233,7 +244,16 @@ class Snowflake(Database):
         self.authenticator = authenticator
         self.warehouse = warehouse
         self.database = database
-        self.autocommit = autocommit
+        # need to check if string because it may be passed through a config
+        if isinstance(autocommit, str):
+            if autocommit.lower() == 'false':
+                self.autocommit = False
+            elif autocommit.lower() == 'true':
+                self.autocommit = True
+            else:
+                raise ValueError(f"autocommit needs to be true/false but received `{autocommit}`")
+        else:
+            self.autocommit = autocommit
 
     def _open_connection_object(self) -> object:
         """Wraps logic for connecting to snowflake
@@ -272,3 +292,108 @@ class Snowflake(Database):
         # https://stackoverflow.com/questions/69911999/none-unique-pandas-dataframe-index-created-using-cur-fetch-pandas-all-after-lo
         dataframe.reset_index(drop=True, inplace=True)
         return dataframe
+
+    def execute_statement(self, statement: str):
+        """This method executes a statement without any data returned."""
+        cursor = self.connection_object.cursor()
+        results = cursor.execute(statement)
+        results = results.fetchall()
+        return results
+
+    @staticmethod
+    def _generate_sql_create_table(table: str, dataframe: pd.DataFrame,
+                                   database: str = None, schema: str = None):
+        # adapted from https://stephenallwright.com/create-snowflake-table-pandas-dataframe/
+        final_table_name = ''
+        if database:
+            final_table_name += f'{database.upper()}.'
+        if schema:
+            final_table_name += f'{schema.upper()}.'
+        final_table_name += table.upper()
+
+        create_statement = f"CREATE OR REPLACE TABLE {final_table_name} (\n"
+        # Loop through each column finding the datatype and adding it to the statement
+        for column in dataframe.columns:
+            if dataframe[column].dtype.name == 'int' or dataframe[column].dtype.name == 'int64':
+                create_statement += f"    {column} int"
+            elif dataframe[column].dtype.name == 'object':
+                create_statement += f"    {column} varchar"
+            elif dataframe[column].dtype.name == 'datetime64[ns]':
+                create_statement += f"    {column} datetime"
+            elif dataframe[column].dtype.name == 'float64':
+                create_statement += f"    {column} float8"
+            elif dataframe[column].dtype.name == 'bool':
+                create_statement += f"    {column} boolean"
+            else:
+                create_statement += f"    {column} varchar"
+
+            # If column is not last column, add comma, else end sql-query
+            if dataframe[column].name != dataframe.columns[-1]:
+                create_statement += ",\n"
+
+        create_statement += "\n)"
+        return create_statement
+
+    def insert_records(self,
+                       dataframe: pd.DataFrame,
+                       table: str,
+                       create_table: bool = True,
+                       overwrite: bool = True,
+                       schema: str = None,
+                       database: str = None):
+        """
+        This method inserts rows into a table from a pandas DataFrame.
+
+        Args:
+            dataframe:
+                the pandas dataframe to insert
+            table:
+                the name of the table
+            create_table:
+                if True, creates the table before inserting
+            overwrite:
+                if True, drops all records before inserting
+            schema:
+                the name of the schema
+            database:
+                the name of the database
+        """
+        from snowflake.connector.pandas_tools import write_pandas
+
+        dataframe = dataframe.copy()
+        dataframe.columns = dataframe.columns.str.upper()  # snowflake is case sensitive and converts everything to upper-case
+
+        if create_table:
+            create_table_sql = Snowflake._generate_sql_create_table(
+                table=table,
+                dataframe=dataframe,
+                database=database,
+                schema=schema,
+            )
+            _ = self.execute_statement(statement=create_table_sql)
+
+        if not create_table and overwrite:  # if we are creating the table there is nothing to overwrite
+            final_table_name = ''
+            if database:
+                final_table_name += f'{database.upper()}.'
+            if schema:
+                final_table_name += f'{schema.upper()}.'
+            final_table_name += table.upper()
+
+            _ = self.execute_statement(f"DELETE FROM {final_table_name}")
+
+        if database:
+            database = database.upper()
+
+        if schema:
+            schema = schema.upper()
+
+        _ = self.execute_statement(statement=f"USE SCHEMA {schema};")
+        success, _, num_rows, _ = write_pandas(
+            conn=self.connection_object,
+            df=dataframe,
+            database=database,
+            schema=schema,
+            table_name=table.upper()
+        )
+        return success, num_rows
