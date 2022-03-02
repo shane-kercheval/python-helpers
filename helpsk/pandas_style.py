@@ -56,7 +56,7 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
         styler = styler.highlight_null(null_color=missing_color)
 
     if hide_index:
-        styler = styler.hide_index()
+        styler = styler.hide(axis='index')
 
     return styler.format(subset=subset,  # noqa
                          precision=round_by,  # noqa

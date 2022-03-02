@@ -165,16 +165,24 @@ def replace_all_bools_with_strings(series: pd.Series,
     Returns:
         Returns a copy of the pd.Series.
     """
+    series = series.copy()
+
     if replacements is None:
         replacements = {True: 'True', False: 'False'}
 
-    series = series.copy()
+    is_series = is_series_categorical(series)
 
-    if is_series_categorical(series):
-        series = series.cat.add_categories([replacements[True], replacements[False]])
+    if is_series:
+        categories = list(set(series.cat.categories.to_list() + [replacements[True], replacements[False]]))
+        series = pd.Series(series.to_list())
 
     mask = series.apply(type) != bool
-    return series.where(mask, series.replace(replacements))
+    series = series.where(mask, series.replace(replacements))
+
+    if is_series:
+        series = pd.Categorical(series, categories=categories)
+
+    return series
 
 
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
