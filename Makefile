@@ -1,7 +1,7 @@
 #################################################################################
 # File adapted from https://github.com/drivendata/cookiecutter-data-science
 #################################################################################
-.PHONY: environment tests clean
+.PHONY: environment tests clean build
 
 #################################################################################
 # GLOBALS
@@ -17,6 +17,13 @@ tests: environment
 	@echo "[MAKE tests]>>> Running unit tests."
 	. .venv/bin/activate && $(PYTHON_INTERPRETER) -m unittest discover tests
 
+## Build 
+build:
+	rm -fr dist
+	@echo "[MAKE build]>>> Building package."
+	. .venv/bin/activate && $(PYTHON_INTERPRETER) -m build
+	@echo "[MAKE build]>>> Uploading package."
+	. .venv/bin/activate && twine upload dist/*
 
 ## Delete all generated files (e.g. virtual environment)
 clean:
