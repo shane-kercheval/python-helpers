@@ -117,7 +117,10 @@ def clean_formatted_dataframe(rendered):
     else:
         code = re.sub('_row.*', '_', temp).replace('<style type="text/css">#T', '')
 
-    return rendered.replace(code, '_99999_')
+    if code.endswith('_'):
+        code = code[:-1]
+
+    return rendered.replace(code, '_99999')
 
 
 def get_data_credit() -> pd.DataFrame:
