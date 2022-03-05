@@ -14,15 +14,15 @@ PYTHON_INTERPRETER = python3.9
 
 ## Run unit-tests
 tests: environment
-	@echo "[MAKE tests]>>> Running unit tests."
+	@echo "\n[MAKE tests] >>>  Running unit tests."
 	. .venv/bin/activate && $(PYTHON_INTERPRETER) -m unittest discover tests
 
 ## Build 
 build:
 	rm -fr dist
-	@echo "[MAKE build]>>> Building package."
+	@echo "\n[MAKE build] >>>  Building package."
 	. .venv/bin/activate && $(PYTHON_INTERPRETER) -m build
-	@echo "[MAKE build]>>> Uploading package."
+	@echo "\n[MAKE build] >>>  Uploading package."
 	. .venv/bin/activate && twine upload dist/*
 
 ## Delete all generated files (e.g. virtual environment)
@@ -37,20 +37,20 @@ clean:
 ## Set up python virtual environment and install python dependencies
 environment:
 ifneq ($(wildcard .venv/.*),)
-	@echo "[MAKE environment]>>> Found .venv, skipping virtual environment creation."
-	@echo "[MAKE environment]>>> Activating virtual environment."
-	@echo "[MAKE environment]>>> Installing packages from requirements.txt."
+	@echo "\n[MAKE environment] >>>  Found .venv, skipping virtual environment creation."
+	@echo "\n[MAKE environment] >>>  Activating virtual environment."
+	@echo "\n[MAKE environment] >>>  Installing packages from requirements.txt."
 	. .venv/bin/activate && pip install -q -r requirements.txt
 else
-	@echo "[MAKE environment]>>> Did not find .venv, creating virtual environment."
+	@echo "\n[MAKE environment] >>>  Did not find .venv, creating virtual environment."
 	python -m pip install --upgrade pip
 	python -m pip install -q virtualenv
-	@echo "[MAKE environment]>>> Installing virtualenv."
+	@echo "\n[MAKE environment] >>>  Installing virtualenv."
 	virtualenv .venv --python=$(PYTHON_INTERPRETER)
-	@echo "[MAKE environment]>>> NOTE: Creating environment at .venv."
-	@echo "[MAKE environment]>>> NOTE: To activate virtual environment, run: 'source .venv/bin/activate'."
-	@echo "[MAKE environment]>>> Activating virtual environment."
-	@echo "[MAKE environment]>>> Installing packages from requirements.txt."
+	@echo "\n[MAKE environment] >>>  NOTE: Creating environment at .venv."
+	@echo "\n[MAKE environment] >>>  NOTE: To activate virtual environment, run: 'source .venv/bin/activate'."
+	@echo "\n[MAKE environment] >>>  Activating virtual environment."
+	@echo "\n[MAKE environment] >>>  Installing packages from requirements.txt."
 	. .venv/bin/activate && $(PYTHON_INTERPRETER) -m pip install --upgrade pip
 	. .venv/bin/activate && $(PYTHON_INTERPRETER) -m pip install --upgrade build
 	. .venv/bin/activate && $(PYTHON_INTERPRETER) -m pip install --upgrade twine
