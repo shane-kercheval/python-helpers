@@ -15,10 +15,15 @@ Helper package for python.
 
 The unit tests in this project are all found in the `tests` directory.
 
-In the terminal, run the following in the root project directory:
+In the terminal, in the project directory, either run the Makefile command,
 
 ```commandline
-cd python-helpers
+make tests
+```
+
+or the python command for running all tests
+
+```commandline
 python -m unittest discover ./tests
 ```
 
