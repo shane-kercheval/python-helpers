@@ -77,9 +77,9 @@ class BayesianSearchSpace(SearchSpaceBase):
     def pipeline(self):
         return super().pipeline(self._data)
 
-    def search_spaces(self) -> List[tuple]:
+    def parameter_space(self) -> List[tuple]:
         all_spaces = []
         for space in self._model_search_spaces:  # each `space.search_spaces()` is a list of tuples
-            all_spaces = all_spaces + space.search_spaces()
+            all_spaces = all_spaces + space.parameter_space()
 
         return all_spaces

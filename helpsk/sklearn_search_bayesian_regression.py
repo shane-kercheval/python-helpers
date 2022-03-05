@@ -54,7 +54,7 @@ class ElasticNetBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             random_state=self._random_state
         )
 
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
@@ -106,7 +106,7 @@ class LinearSVRBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             random_state=self._random_state
         )
 
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
@@ -168,7 +168,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
             criterion=Categorical(['squared_error']) if isinstance(criterion, DefaultValue) else criterion,
         )
 
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
@@ -274,7 +274,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             random_state=self._random_state,
         )
 
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),

@@ -11,7 +11,7 @@ from sklearn.svm import LinearSVC
 from helpsk.sklearn_search_bayesian_base import *
 
 
-class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
+class LogisticBayesianSearchSpace(BayesianModelSearchSpaceBase):
     """Defines the BayesSearchCV search space for Logistic Regression."""
     def __init__(self,
                  C: Union[Real, None] = DefaultReal(),  # noqa
@@ -22,21 +22,18 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
                  iterations: int = 50,
                  include_default_model: bool = True,
                  # transformation search space options
-                 imputers: Union[Categorical, None] = DefaultCategorical(),
-                 scalers: Union[Categorical, None] = DefaultCategorical(),
-                 pca: Union[Categorical, None] = DefaultCategorical(),
-                 encoders: Union[Categorical, None] = DefaultCategorical(),
+                 transformation_pipeline: Pipeline = None,
+                 transformation_space: list = None,
                  random_state: int = None):
         """Defines the model/transformation parameters that can be tuned."""
 
-        if isinstance(imputers, DefaultValue):
-            imputers = self._create_default_imputers()
-        if isinstance(scalers, DefaultValue):
-            scalers = self._create_default_scalers()
-        if isinstance(pca, DefaultValue):
-            pca = self._create_default_pca()
-        if isinstance(encoders, DefaultValue):
-            encoders = self._create_default_encoders()
+
+        if transformation_pipeline is None:
+            transformation_pipeline = Pipeline()
+
+        if transformation_space is None:
+            transformation_space = []
+
 
         super().__init__(iterations=iterations,
                          include_default_model=include_default_model,
@@ -60,7 +57,7 @@ class LogisticBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             random_state=self._random_state
         )
 
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
@@ -112,7 +109,7 @@ class LinearSVCBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             random_state=self._random_state
         )
 
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
@@ -171,7 +168,7 @@ class TreesBayesianSearchSpaceBase(ModelBayesianSearchSpaceBase, ABC):
             criterion=Categorical(['gini', 'entropy']) if isinstance(criterion, DefaultValue) else criterion,
         )
 
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),
@@ -277,7 +274,7 @@ class XGBoostBayesianSearchSpace(ModelBayesianSearchSpaceBase):
             random_state=self._random_state,
         )
 
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """Defines the default transformation search space for a model with default parameters."""
         return self._build_transformer_search_space(
             imputers=self._create_single_imputer(),

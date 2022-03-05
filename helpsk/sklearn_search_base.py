@@ -3,45 +3,49 @@ This module contains classes that define search spaces compatible with GridSearc
 BayesSearchCV for classification models.
 """
 from abc import abstractmethod, ABC
-from typing import List
+from typing import List, Union, Callable
 
 import pandas as pd
+from sklearn.base import BaseEstimator
 from sklearn.compose import ColumnTransformer
 from sklearn.decomposition import PCA
 from sklearn.dummy import DummyClassifier
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, OneHotEncoder
+from skopt.space import Categorical
 
 import helpsk as hlp
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 
 
-class SearchSpaceBase(ABC):
-    """
-    Base class for defining a hyper-parameter "search space" for e.g. GridSearchCV, BayesianSearchCV, etc.
+# search space has to return a pipeline (transformations and model) and a parameter space (transformations and model)
 
-    This class defines the default pipeline to search over (e.g. imputing/scaling values, encoding, etc.) that
-    will need to happen regardless of search space type (e.g. Grid vs Random vs Bayesian) or model type (e.g.
-    classification vs regression).
-    """
-    def __init__(self, random_state: int = None):
-        """initialization"""
-        self._random_state = random_state
+# You have a transfomrer search space which defines which transformations are going to happen
+# and a model search space.  the model pipeline
+# we need to differentiate between the **pipeline** which is the skeleton/recipe and the search space,
+# which is the range of values for each item in the recipe
+# recipe / map / pipeline
+# ingredients / pipeline-space / param_grid / parameter_space
+# search space
+
+# both the transformations
+
+class StandardTransformationPipelineBuilder:
 
     @staticmethod
-    def pipeline(data: pd.DataFrame) -> Pipeline:
+    def default_transformation_pipeline(data: pd.DataFrame):
         """
-        This function defines the default pipeline to search over (e.g. imputing/scaling values, encoding,
-        etc.) that will need to happen regardless of search space type (e.g. Grid vs Random vs Bayesian) or
-        model type (e.g. classification vs regression).
+            This function defines the default pipeline to search over (e.g. imputing/scaling values, encoding,
+            etc.) that will need to happen regardless of search space type (e.g. Grid vs Random vs Bayesian) or
+            model type (e.g. classification vs regression).
 
-        Args:
-            data:
-                a dataset (pd.DataFrame) that is going to be used to train the mode. This is used, for
-                example, to determine which columns are numeric vs non-numeric, in order to build and return
-                the pipeline.
-        """
+            Args:
+                data:
+                    a dataset (pd.DataFrame) that is going to be used to train the mode. This is used, for
+                    example, to determine which columns are numeric vs non-numeric, in order to build and return
+                    the pipeline.
+            """
         numeric_column_names = hlp.pandas.get_numeric_columns(data)
         non_numeric_column_names = hlp.pandas.get_non_numeric_columns(data)
 
@@ -64,27 +68,104 @@ class SearchSpaceBase(ABC):
             ('numeric', numeric_pipeline, numeric_column_names),
             ('non_numeric', non_numeric_pipeline, non_numeric_column_names)
         ])
-        # add model to create the full pipeline
-        full_pipeline = Pipeline([
-            ('prep', transformations_pipeline),
-            ('model', DummyClassifier())
-        ])
 
-        return full_pipeline
+        return transformations_pipeline
+
+
+class ModelSearchSpaceBase(ABC):
+    """
+    Base class for defining a hyper-parameter "search space" for e.g. GridSearchCV, BayesianSearchCV, etc.
+
+    This class defines the interface/requirements for tuning a hyper-parameter space. Specifically, it
+    combines the concepts of a `pipeline` (which is the outline/recipe of the transformations and model) and
+    `parameter space` (which is the range of values to tune).
+    """
+    def __init__(self,
+                 transformation_pipeline: Callable,
+                 transformation_space: dict,
+                 model_space: dict,
+                 include_default_space: bool = True,
+                 random_state: int = None):
+        """initialization
+        
+            Args:
+                transformation_pipeline:
+                    This is a function that returns a Pipeline object that defines the components of the
+                    transformations. A function needs to be passed to build the Pipeline object because
+                    the pipeline might depend on information not available when we want to create the space,
+                    e.g. we might need to know the numeric/non-numeric column names.
+                transformation_space:
+                    A dictionary that contain keys that correspond to the path of the
+                    transformation pipeline and values that correspond to the range of values to search.
+
+                    Note that the transformation and model pipelines will be combined, and the transformation
+                    paths should be prefixed with `transformations__` and the model paths should be prefixed
+                    with `model__`. For example, for GridSearchCV:
+
+                        'transformations__non_numeric_pipeline__encoder_chooser__transformer': [
+                            OneHotEncoder(),
+                            CustomOrdinalEncoder()
+                        ],
+
+                model_space:
+                    A dictionary that contain keys that correspond to the path of the
+                    model parameters to tune..
+
+                    Note that the transformation and model pipelines will be combined, and the transformation
+                    paths should be prefixed with `transformations__` and the model paths should be prefixed
+                    with `model__`. For example, for GridSearchCV:
+
+                        'model__max_features': [100, 'auto'],
+
+                include_default_space:
+                    if True, `parameter_space` property returns an additional search space (that only contains
+                    a single combination of parameters) corresponding to the default transformation space
+                    defined for that model
+                    default transformation space (single combination) and no
+                random_state:
+                    a random seed
+        """
+        self._transformation_pipeline = transformation_pipeline
+        self._transformation_space = transformation_space
+        self._model_space = model_space
+        self._include_default_space = include_default_space
+        self._random_state = random_state
 
     @abstractmethod
-    def search_spaces(self) -> list:
+    def create_model_object(self) -> BaseEstimator:
+        """Define the model object (BaseEstimator)."""
+
+    @property
+    @abstractmethod
+    def default_transformation_space(self) -> dict:
+        """Define the transformation space (single combination/iteration) corresponding to the
+        default/standard transformations to apply to the model. Used to gauge baseline performance of the
+        model."""
+
+    @property
+    @abstractmethod
+    def parameter_space(self) -> Union[dict, list]:
         """
-        This method should return the search spaces based into the SearchCV object. For example, it should
-        return a list of dictionaries if being passed to the `param_grid` parameter in the GridSearchCV's
-        `__init__` function, or should return a list of tuples if being passed to the `search_spaces`
-        parameter in the BayesSearchCV's `__init__` function.
+        This function combines the transformation and model search space and returns the full parameter
+        spaces passed into the SearchCV object. It either returns dictionary if searching one search space
+        or a list of dictionaries if searching multiple search spaces (e.g. include_default_model is True).
+        Each search space corresponds to the single pipeline object return by `pipeline()`.
         """
 
+    @property
+    def pipeline(self, data: pd.DataFrame) -> Pipeline:
+
+        full_pipeline = Pipeline([
+            ('transformations', self._transformation_pipeline(data)),
+            ('model', self.create_model_object)
+        ])
+        return full_pipeline
+
+    @property
     def param_name_mappings(self) -> dict:
         """
         This function returns a dictionary, with the keys being the paths from the `sklearn.pipeline.Pipeline`
-        returned by the `pipeline()` function (e.g. "prep__numeric__imputer") and transforms the
+        returned by the `pipeline()` function (e.g. "transformations__numeric__imputer") and transforms the
         path into a 'friendlier' value (e.g. "imputer"), returned as the value in the dictionary.
 
         The dictionary returned by this function can be used, for example, by passing it to the
@@ -93,7 +174,7 @@ class SearchSpaceBase(ABC):
         graphs) and will make the output more readable.
         """
         mappings = {}
-        for space in self.search_spaces():
+        for space in self.parameter_space:
             params = list(space[0].keys())
             for param in params:
                 if param not in mappings:
@@ -104,17 +185,49 @@ class SearchSpaceBase(ABC):
                     elif param.endswith('__transformer'):
                         mappings[param] = param.\
                             removesuffix('__transformer').\
-                            removeprefix('prep__numeric__').\
-                            removeprefix('prep__non_numeric__')
+                            removeprefix('transformations__numeric__').\
+                            removeprefix('transformations__non_numeric__')
                     else:
                         mappings[param] = param
 
-        ordered_mappings = {key: value for key, value in mappings.items() if not key.startswith('prep__')}
-        ordered_mappings.update({key: value for key, value in mappings.items() if key.startswith('prep__')})
+        ordered_mappings = {key: value for key, value in mappings.items() if not key.startswith('transformations__')}
+        ordered_mappings.update({key: value for key, value in mappings.items() if key.startswith('transformations__')})
         return ordered_mappings
 
 
-class ModelSearchSpaceBase(SearchSpaceBase, ABC):
+class BayesianModelSearchSpaceBase(ModelSearchSpaceBase, ABC):
+
+    def __init__(self,
+                 transformation_pipeline: Pipeline = None,
+                 transformation_space: dict = None,
+                 model_space: dict = None,
+                 include_default_space: bool = True,
+                 iterations: int = 50,
+                 random_state: int = None):
+        super().__init__(
+            transformation_pipeline=transformation_pipeline,
+            transformation_space=transformation_space,
+            model_space=model_space,
+            include_default_space=include_default_space,
+            random_state=random_state,
+        )
+        self._iterations = iterations
+
+    @property
+    def parameter_space(self) -> Union[dict, list]:
+        # combine transformation and model space dictionaries and then create tuple with number of iterations
+        param_space = {key: value for key, value in self._model_space.items()}
+        param_space.update(self._transformation_space)
+        search_spaces = (param_space, self._iterations)
+        if self._include_default_space:
+            default_space = {'model': Categorical([self.create_model_object])}
+            default_space.update(self.default_transformation_space)
+            search_spaces = [search_spaces,  (default_space, 1)]
+
+        return search_spaces
+
+
+class ModelSearchSpaceBaseArchive(ABC):
     """
     Base class for defining model specific search spaces, regardless of search type (e.g. GridSearchCV,
     BayesSearchCV, etc.) or model type (e.g. classification, regression)
@@ -124,10 +237,6 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
     def __init__(self,
                  iterations: int = 50,
                  include_default_model: bool = True,
-                 imputers=None,
-                 scalers=None,
-                 pca=None,
-                 encoders=None,
                  random_state: int = None):
         """
         Args:
@@ -147,10 +256,6 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
 
         self._iterations = iterations
         self._include_default_model = include_default_model
-        self._imputers = imputers
-        self._scalers = scalers
-        self._pca = pca
-        self._encoders = encoders
         self._model_parameters = None
 
     @staticmethod
@@ -208,10 +313,10 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
                                         encoders) -> dict:
         """Takes imputers, scalers, etc., and constructions the transformation search space."""
         return {
-            'prep__numeric__imputer__transformer': imputers,
-            'prep__numeric__scaler__transformer': scalers,
-            'prep__numeric__pca__transformer': pca,
-            'prep__non_numeric__encoder__transformer': encoders,
+            'transformations__numeric__imputer__transformer': imputers,
+            'transformations__numeric__scaler__transformer': scalers,
+            'transformations__numeric__pca__transformer': pca,
+            'transformations__non_numeric__encoder__transformer': encoders,
         }
 
     @abstractmethod
@@ -219,7 +324,7 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
         """This method returns a model object with whatever default values should be set."""
 
     @abstractmethod
-    def _default_model_transformer_search_space(self) -> dict:
+    def _default_transformation_space(self) -> dict:
         """This method returns a dictionary of the default transformations to apply if including the default
         model in the search spaces (i.e. if `_include_default_model` is True). This can be accomplished by
         calling the `_build_transformer_search_space` function."""
@@ -249,7 +354,7 @@ class ModelSearchSpaceBase(SearchSpaceBase, ABC):
         return parameters
 
     @abstractmethod
-    def search_spaces(self) -> List[tuple]:
+    def parameter_space(self) -> List[tuple]:
         """Returns a list of search spaces (e.g. 2 items if `include_default_model` is True; one for the
         model with default params, and one for searching across all params.)
         Each space is a tuple with a dictionary (hyper-param search space) as the first item and an integer

@@ -110,7 +110,7 @@ class ModelBayesianSearchSpaceBase(ModelSearchSpaceBase, ABC):
         """Return empty categorical to be used in the search space"""
         return Categorical([None])
 
-    def search_spaces(self) -> List[tuple]:
+    def parameter_space(self) -> List[tuple]:
         """Returns a list of search spaces (e.g. 2 items if `include_default_model` is True; one for the
         model with default params, and one for searching across all params.)
         Each space is a tuple with a dictionary (hyper-param search space) as the first item and an integer
@@ -127,7 +127,7 @@ class ModelBayesianSearchSpaceBase(ModelSearchSpaceBase, ABC):
 
         if self._include_default_model:
             default_space = {'model': Categorical([self._create_model()])}
-            default_space.update(self._default_model_transformer_search_space())
+            default_space.update(self._default_transformation_space())
             search_spaces = search_spaces + [(default_space, 1)]
 
         return search_spaces

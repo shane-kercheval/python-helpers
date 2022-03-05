@@ -50,7 +50,7 @@ class TestSklearnSearch(unittest.TestCase):
         search_space = LogisticBayesianSearchSpace(
             C=None,
         )
-        model_space = search_space.search_spaces()[0][0]
+        model_space = search_space.parameter_space()[0][0]
         model_params = [x for x in model_space.keys() if x.startswith('model__')]
         self.assertEqual(len(model_params), 0)
 
@@ -61,7 +61,7 @@ class TestSklearnSearch(unittest.TestCase):
         search_space = LinearSVCBayesianSearchSpace(
             C=None,
         )
-        model_space = search_space.search_spaces()[0][0]
+        model_space = search_space.parameter_space()[0][0]
         model_params = [x for x in model_space.keys() if x.startswith('model__')]
         self.assertEqual(len(model_params), 0)
 
@@ -78,7 +78,7 @@ class TestSklearnSearch(unittest.TestCase):
             max_samples=None,
             criterion=None,
         )
-        model_space = search_space.search_spaces()[0][0]
+        model_space = search_space.parameter_space()[0][0]
         model_params = [x for x in model_space.keys() if x.startswith('model__')]
         self.assertEqual(len(model_params), 0)
 
@@ -94,7 +94,7 @@ class TestSklearnSearch(unittest.TestCase):
             max_samples=None,
             criterion=None,
         )
-        model_space = search_space.search_spaces()[0][0]
+        model_space = search_space.parameter_space()[0][0]
         model_params = [x for x in model_space.keys() if x.startswith('model__')]
         self.assertEqual(len(model_params), 0)
 
@@ -112,7 +112,7 @@ class TestSklearnSearch(unittest.TestCase):
             reg_alpha=None,
             reg_lambda=None,
         )
-        model_space = search_space.search_spaces()[0][0]
+        model_space = search_space.parameter_space()[0][0]
         model_params = [x for x in model_space.keys() if x.startswith('model__')]
         self.assertEqual(len(model_params), 0)
 
@@ -126,24 +126,24 @@ class TestSklearnSearch(unittest.TestCase):
             class_name = default_space.__class__.__name__
 
             with open(get_test_path() + f'/test_files/sklearn_search/{class_name}_search_spaces__default.txt', 'w') as file:
-                file.write(TestSklearnSearch.to_string(default_space.search_spaces()))
+                file.write(TestSklearnSearch.to_string(default_space.parameter_space()))
 
             default_mappings = default_space.param_name_mappings()
-            self.assertEqual(default_space.search_spaces()[0][0].keys(), default_mappings.keys())
+            self.assertEqual(default_space.parameter_space()[0][0].keys(), default_mappings.keys())
             with open(get_test_path() + f'/test_files/sklearn_search/{class_name}_param_name_mappings.txt', 'w') as file:
                 file.write(TestSklearnSearch.to_string(default_mappings))
 
-            self.assertIsInstance(default_space.search_spaces(), list)
-            self.assertEqual(len(default_space.search_spaces()), 2)
-            self.assertIsInstance(default_space.search_spaces()[0], tuple)
-            self.assertIsInstance(default_space.search_spaces()[1], tuple)
-            self.assertIsInstance(default_space.search_spaces()[0][0], dict)
-            self.assertIsInstance(default_space.search_spaces()[0][1], int)
-            self.assertIsInstance(default_space.search_spaces()[1][0], dict)
-            self.assertIsInstance(default_space.search_spaces()[1][1], int)
+            self.assertIsInstance(default_space.parameter_space(), list)
+            self.assertEqual(len(default_space.parameter_space()), 2)
+            self.assertIsInstance(default_space.parameter_space()[0], tuple)
+            self.assertIsInstance(default_space.parameter_space()[1], tuple)
+            self.assertIsInstance(default_space.parameter_space()[0][0], dict)
+            self.assertIsInstance(default_space.parameter_space()[0][1], int)
+            self.assertIsInstance(default_space.parameter_space()[1][0], dict)
+            self.assertIsInstance(default_space.parameter_space()[1][1], int)
 
             from skopt.space import Categorical
-            categorical = default_space.search_spaces()[0][0]['model']
+            categorical = default_space.parameter_space()[0][0]['model']
             self.assertIsInstance(categorical, Categorical)
             del default_space, categorical
 
@@ -159,18 +159,18 @@ class TestSklearnSearch(unittest.TestCase):
             )
 
             with open(get_test_path() + f'/test_files/sklearn_search/{class_name}_search_spaces__modified.txt', 'w') as file:
-                file.write(TestSklearnSearch.to_string(modified_space.search_spaces()))
+                file.write(TestSklearnSearch.to_string(modified_space.parameter_space()))
 
             self.assertEqual(default_mappings, modified_space.param_name_mappings())
 
-            self.assertIsInstance(modified_space.search_spaces(), list)
-            self.assertEqual(len(modified_space.search_spaces()), 1)
-            self.assertIsInstance(modified_space.search_spaces()[0], tuple)
-            self.assertIsInstance(modified_space.search_spaces()[0][0], dict)
-            self.assertIsInstance(modified_space.search_spaces()[0][1], int)
-            self.assertEqual(modified_space.search_spaces()[0][1], 30)
+            self.assertIsInstance(modified_space.parameter_space(), list)
+            self.assertEqual(len(modified_space.parameter_space()), 1)
+            self.assertIsInstance(modified_space.parameter_space()[0], tuple)
+            self.assertIsInstance(modified_space.parameter_space()[0][0], dict)
+            self.assertIsInstance(modified_space.parameter_space()[0][1], int)
+            self.assertEqual(modified_space.parameter_space()[0][1], 30)
 
-            categorical = modified_space.search_spaces()[0][0]['model']
+            categorical = modified_space.parameter_space()[0][0]['model']
             self.assertIsInstance(categorical, Categorical)
             del modified_space, categorical
 
@@ -226,11 +226,11 @@ class TestSklearnSearch(unittest.TestCase):
         self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)), str(search_space.pipeline()))
 
         with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_search_spaces.txt', 'w') as file:
-            file.write(TestSklearnSearch.to_string(search_space.search_spaces()))
+            file.write(TestSklearnSearch.to_string(search_space.parameter_space()))
 
-        self.assertIsInstance(search_space.search_spaces(), list)
+        self.assertIsInstance(search_space.parameter_space(), list)
 
-        for space in search_space.search_spaces():
+        for space in search_space.parameter_space():
             self.assertIsInstance(space, tuple)
             self.assertIsInstance(space[0], dict)
             self.assertIsInstance(space[1], int)
@@ -245,11 +245,11 @@ class TestSklearnSearch(unittest.TestCase):
         self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)), str(search_space.pipeline()))
 
         with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_search_spaces__regression.txt', 'w') as file:
-            file.write(TestSklearnSearch.to_string(search_space.search_spaces()))
+            file.write(TestSklearnSearch.to_string(search_space.parameter_space()))
 
-        self.assertIsInstance(search_space.search_spaces(), list)
+        self.assertIsInstance(search_space.parameter_space(), list)
 
-        for space in search_space.search_spaces():
+        for space in search_space.parameter_space():
             self.assertIsInstance(space, tuple)
             self.assertIsInstance(space[0], dict)
             self.assertIsInstance(space[1], int)
@@ -279,11 +279,11 @@ class TestSklearnSearch(unittest.TestCase):
         self.assertEqual(str(SearchSpaceBase.pipeline(data=self.X_train)), str(search_space.pipeline()))
 
         with open(get_test_path() + '/test_files/sklearn_search/BayesianSearchSpace_search_spaces__regression_custom.txt', 'w') as file:
-            file.write(TestSklearnSearch.to_string(search_space.search_spaces()))
+            file.write(TestSklearnSearch.to_string(search_space.parameter_space()))
 
-        self.assertIsInstance(search_space.search_spaces(), list)
+        self.assertIsInstance(search_space.parameter_space(), list)
 
-        for space in search_space.search_spaces():
+        for space in search_space.parameter_space():
             self.assertIsInstance(space, tuple)
             self.assertIsInstance(space[0], dict)
             self.assertIsInstance(space[1], int)
@@ -301,7 +301,7 @@ class TestSklearnSearch(unittest.TestCase):
 
         bayes_search = BayesSearchCV(
                 estimator=search_space.pipeline(),  # noqa
-                search_spaces=search_space.search_spaces(),  # noqa
+                search_spaces=search_space.parameter_space(),  # noqa
                 cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
                 scoring='roc_auc',
                 refit=False,  # required if passing in multiple scorers
@@ -523,7 +523,7 @@ class TestSklearnSearch(unittest.TestCase):
         )
         bayes_search = BayesSearchCV(
             estimator=search_space.pipeline(),  # noqa
-            search_spaces=search_space.search_spaces(),  # noqa
+            search_spaces=search_space.parameter_space(),  # noqa
             cv=RepeatedKFold(n_splits=3, n_repeats=1, random_state=42),  # 3 fold 1 repeat CV
             scoring='roc_auc',
             refit=False,  # required if use_label_encoder passing in multiple scorers
