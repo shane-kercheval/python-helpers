@@ -180,7 +180,7 @@ def replace_all_bools_with_strings(series: pd.Series,
     series = series.where(mask, series.replace(replacements))
 
     if is_series:
-        series = pd.Categorical(series, categories=categories)
+        series = pd.Categorical(series, categories=categories)  # noqa
 
     return series
 
