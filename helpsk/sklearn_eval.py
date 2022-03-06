@@ -75,10 +75,6 @@ class MLExperimentResults:
             - `score_names`: the names of the score(s)
             - `parameter_names`: the names of the parameters
             - `parameter_names_mapping`: a mapping between actual parameters and friendlier names
-            - `test_score_rankings`: for each score, a list of rankings. For example, if a list with the
-                values of `[5, 6, 7, 8, 3, 4, 1, 2]` means that the first trial (index 0) ranked 5. The
-                seventh trial (index 6) was the best score (highest or lowest score depending on the value of
-                `higher_score_is_better`)
             - `test_score_averages`: for each score, the average score value among all splits (i.e. across the
                 cross-validation run) for a single trial
             - `test_score_standard_deviations`: for each score, the standard deviation score among all splits
@@ -105,12 +101,6 @@ class MLExperimentResults:
                     'model__max_features': 'max_features',
                     'model__n_estimators': 'n_estimators',
                     'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'encoder'
-                },
-                'test_score_rankings': {
-                    'ROC/AUC': [5, 6, 7, 8, 3, 4, 1, 2],
-                    'F1': [5, 6, 7, 8, 3, 4, 2, 1],
-                    'Pos. Pred. Val': [5, 6, 7, 8, 1, 4, 3, 2],
-                    'True Pos. Rate': [5, 6, 7, 8, 3, 4, 2, 1]
                 },
                 'test_score_averages': {
                     'ROC/AUC': [nan, nan, nan, nan, 0.7163279567387703, 0.7072491564040325,
@@ -338,36 +328,28 @@ class MLExperimentResults:
 
         # convert test scores to dictionaries
         if len(score_names) == 1:
-            test_score_ranking = searcher.cv_results_['rank_test_score'].tolist()
             test_score_averages = searcher.cv_results_['mean_test_score'].tolist()
             test_score_standard_deviations = searcher.cv_results_['std_test_score'].tolist()
 
-            assert_true(len(test_score_ranking) == number_of_trials)
             assert_true(len(test_score_averages) == number_of_trials)
             assert_true(len(test_score_standard_deviations) == number_of_trials)
 
-            cv_results_dict['test_score_rankings'] = {score_names[0]: test_score_ranking}
             cv_results_dict['test_score_averages'] = {score_names[0]: test_score_averages}
             cv_results_dict['test_score_standard_deviations'] = {score_names[0]:
                                                                      test_score_standard_deviations}
         else:
-            ranking_dict = {}
             averages_dict = {}
             standard_deviations_dict = {}
             for score in score_names:
-                rankings = searcher.cv_results_['rank_test_' + score].tolist()
                 averages = searcher.cv_results_['mean_test_' + score].tolist()
                 standard_deviations = searcher.cv_results_['std_test_' + score].tolist()
 
-                assert_true(len(rankings) == number_of_trials)
                 assert_true(len(averages) == number_of_trials)
                 assert_true(len(standard_deviations) == number_of_trials)
 
-                ranking_dict[score] = rankings
                 averages_dict[score] = averages
                 standard_deviations_dict[score] = standard_deviations
 
-            cv_results_dict['test_score_rankings'] = ranking_dict
             cv_results_dict['test_score_averages'] = averages_dict
             cv_results_dict['test_score_standard_deviations'] = standard_deviations_dict
 
@@ -706,8 +688,16 @@ class MLExperimentResults:
 
     @property
     def test_score_rankings(self) -> dict:
-        """The rankings of each of the test scores, from the searcher.cv_results_ object."""
-        return self._dict['test_score_rankings']
+        """The rankings of each of the test scores. See `trial_rankings` documentation for explanation."""
+
+        def get_rankings(score_averages: list):
+            if self.higher_score_is_better:
+                multiplier = -1
+            else:
+                multiplier = 1
+            return list(st.rankdata(np.array(score_averages) * multiplier).astype(int))
+
+        return {score: get_rankings(averages) for score, averages in self._dict['test_score_averages'].items()}
 
     @property
     def test_score_averages(self) -> dict:
