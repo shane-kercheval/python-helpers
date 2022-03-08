@@ -2132,7 +2132,7 @@ class TwoClassEvaluator:
             gain_lift_data.format(precision=2). \
                 bar(subset='Gain', color=hcolor.Colors.PASTEL_BLUE.value,
                     vmin=0, vmax=1). \
-                bar(subset='Lift', color=hcolor.Colors.PASTEL_BLUE.value)
+                bar(subset='Lift', color=hcolor.Colors.PASTEL_BLUE.value, vmin=1)
 
         return gain_lift_data
 
