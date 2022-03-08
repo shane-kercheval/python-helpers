@@ -574,6 +574,7 @@ class MLExperimentResults:
             cv_dataframe = cv_dataframe[final_columns]
 
         if return_style:
+            original_df = cv_dataframe
             cv_dataframe = cv_dataframe.style
 
             for score in self.score_names:
@@ -581,14 +582,26 @@ class MLExperimentResults:
                 ci_low_key = score + ' 95CI.LO'
                 ci_high_key = score + ' 95CI.HI'
 
+                if self.higher_score_is_better:
+                    mean_color = hcolor.Colors.PIGMENT_GREEN.value
+                else:
+                    mean_color = hcolor.Colors.CADMIUM_ORANGE.value
+
                 if mean_key in final_columns:
                     cv_dataframe. \
-                        bar(subset=[mean_key], color=hcolor.Colors.PIGMENT_GREEN.value)
+                        bar(subset=[mean_key],
+                            color=mean_color,
+                            vmin=original_df[mean_key].min())
 
                 if ci_low_key in final_columns:
                     cv_dataframe. \
-                        bar(subset=[ci_high_key], color=hcolor.GRAY). \
-                        pipe(hstyle.bar_inverse, subset=[ci_low_key], color=hcolor.GRAY)
+                        bar(subset=[ci_high_key],
+                            color=hcolor.GRAY,  # noqa
+                            vmin=original_df[ci_high_key].min()). \
+                        pipe(hstyle.bar_inverse,
+                             subset=[ci_low_key],
+                             color=hcolor.GRAY,
+                             min_value=original_df[ci_low_key].min())
 
                 cv_dataframe.pipe(hstyle.format, round_by=round_by, hide_index=True)
 
