@@ -2152,19 +2152,35 @@ class TwoClassEvaluator:
     # pylint: disable=inconsistent-return-statements
     def plot_actual_vs_predict_histogram(self):
         """Return a histogram of the actual vs predicted scores"""
-        actual_categories = pd.Series(self._actual_values).\
-            replace({0: self._negative_class, 1: self._positive_class})
-        axes = sns.displot(
-            pd.DataFrame({
-                'Predicted Score': self._predicted_scores,
-                'Actual Value': actual_categories
-            }),
-            x='Predicted Score',
-            col='Actual Value'
+        # actual_categories = pd.Series(self._actual_values).\
+        #     replace({0: self._negative_class, 1: self._positive_class})
+        # axes = sns.displot(
+        #     pd.DataFrame({
+        #         'Predicted Score': self._predicted_scores,
+        #         'Actual Value': actual_categories
+        #     }),
+        #     x='Predicted Score',
+        #     col='Actual Value'
+        # )
+        # for axis in axes.axes.flat:
+        #     axis.axvline(x=0.5, ymin=0, ymax=100, color='red')
+        # plt.tight_layout()
+        df = pd.DataFrame({
+            'Predicted Scores': self._predicted_scores,
+            'Labels': [self._positive_class if x == 1 else self._negative_class for x in self._actual_values]}
         )
-        for axis in axes.axes.flat:
-            axis.axvline(x=0.5, ymin=0, ymax=100, color='red')
-        plt.tight_layout()
+        fig = px.box(
+            df,
+            x="Predicted Scores",
+            y='Labels',
+            color="Labels",
+            points='all',
+            labels={'Labels': ''},
+            title="Distribution of Prediction Scores"
+        )
+        fig.add_vline(x=0.5)
+        fig.update_layout(showlegend=False)
+        return fig
 
 
 class RegressionEvaluator:
