@@ -1028,6 +1028,7 @@ class MLExperimentResults:
                    if x is not None]
         labeled_df = labeled_df[columns]
         labeled_df.dropna(axis=0, how='any', inplace=True)
+        labeled_df.reset_index(drop=True, inplace=True)
 
         fig = px.scatter(
             data_frame=labeled_df,
@@ -1078,7 +1079,7 @@ class MLExperimentResults:
 
         score_column = self.primary_score_name + " Mean"
 
-        labeled_df = self.to_labeled_dataframe(query=query)    
+        labeled_df = self.to_labeled_dataframe(query=query)
         labeled_long = pd.melt(labeled_df,
                                id_vars=['Trial Index', score_column, 'label'],
                                value_vars=[x for x in self.numeric_parameters if x in labeled_df.columns],
@@ -1151,8 +1152,10 @@ class MLExperimentResults:
         # https://github.com/plotly/plotly.py/issues/3577
         df = self.to_dataframe(sort_by_score=False, query=query)
         numeric_columns = [x for x in self.numeric_parameters if x in df.columns]
+        df = df[numeric_columns + score_columns].dropna(axis=0)
+        df.reset_index(drop=True, inplace=True)
         fig = px.parallel_coordinates(
-            df[numeric_columns + score_columns].dropna(axis=0),
+            df,
             color=primary_score_column,
             color_continuous_scale=color_continuous_scale,
             height=height,
@@ -1198,7 +1201,9 @@ class MLExperimentResults:
         # https://github.com/plotly/plotly.py/issues/3577
         df = self.to_dataframe(sort_by_score=False, query=query)
         columns = [x for x in self.parameter_names if x in df.columns]
-        fig = px.scatter_matrix(df[score_columns + columns],
+        df = df[score_columns + columns]
+        df.reset_index(drop=True, inplace=True)
+        fig = px.scatter_matrix(df,
                                 color=primary_score_column,
                                 color_continuous_scale=color_continuous_scale,
                                 height=height,
@@ -1375,6 +1380,7 @@ class MLExperimentResults:
         columns = [x for x in [parameter, primary_score_column, size, color, 'label'] if x is not None]
         df = df[columns]
         df.dropna(axis=0, how='any', inplace=True)
+        df.reset_index(drop=True, inplace=True)
         fig = px.scatter(
             data_frame=df,
             x=parameter,
@@ -1441,6 +1447,7 @@ class MLExperimentResults:
                    if x is not None]
         labeled_df = labeled_df[columns]
         labeled_df.dropna(axis=0, how='any', inplace=True)
+        labeled_df.reset_index(drop=True, inplace=True)
 
         if size:
             title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
@@ -2574,8 +2581,10 @@ class TwoClassModelComparison:
                 scatter_1.data[index]
             )
             query = f"threshold == 0.5 & Model == '{list(self._evaluators.keys())[index]}'"
+            matches = result.query(query)
+            matches.reset_index(drop=True, inplace=True)
             scatter_2 = px.scatter(
-                data_frame=result.query(query),
+                data_frame=matches,
                 x='False Positive Rate',
                 y='True Positive Rate',
                 color='Model',
