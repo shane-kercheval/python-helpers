@@ -1029,9 +1029,6 @@ class TestSklearnEval(unittest.TestCase):
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_predicted_scores_histogram.png',
                    plot_function=lambda: evaluator.plot_predicted_scores_histogram())
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_actual_vs_predict_histogram.png',
-                   plot_function=lambda: evaluator.plot_actual_vs_predict_histogram())
-
         self.assertIsInstance(evaluator.all_metrics, dict)
         self.assertIsInstance(evaluator.all_metrics_df(return_style=False), pd.DataFrame)
 
