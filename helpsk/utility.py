@@ -4,7 +4,35 @@ import inspect
 import warnings
 import sys
 import os
+import pickle
 from contextlib import contextmanager, redirect_stdout
+
+
+def read_pickle(path):
+    """
+    Simple helper function that read's from a pickled object.
+
+    Args:
+        path:
+            File path where the pickled object will be stored.
+    """
+    with open(path, 'rb') as handle:
+        unpickled_object = pickle.load(handle)
+    return unpickled_object
+
+
+def to_pickle(obj, path):
+    """
+    Simple helper function that saves a pickled object.
+
+    Args:
+        obj:
+            the object to save
+        path:
+            File path where the pickled object will be read from.
+    """
+    with open(path, 'wb') as handle:
+        pickle.dump(obj, handle)
 
 
 @contextmanager
