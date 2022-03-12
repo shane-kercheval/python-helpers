@@ -2,6 +2,8 @@ import os
 import unittest
 from enum import unique, auto
 
+import pandas as pd
+
 from helpsk import validation as hv
 from helpsk.pandas import *
 from helpsk.utility import redirect_stdout_to_file
@@ -570,6 +572,15 @@ class TestPandas(unittest.TestCase):
 
         self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__style__credit__all_missing__sorted.html',
                                  clean_formatted_dataframe(non_numeric_summary(test_data, return_style=True, sort_by_columns=True).render()))
+
+    def test_non_numeric_summary__list_column(self):
+        test_data = pd.DataFrame({
+            'list_column': [['a', 'b'], [1, 2], []],
+            'list_column2': [['a', 'b'], [1, 2], np.nan],
+        })
+
+        self.helper_test_summary(get_test_path() + '/test_files/pandas/test_non_numeric_summary__list_column.txt',
+                                 non_numeric_summary(test_data, return_style=False, sort_by_columns=False))
 
     def test_non_numeric_summary2(self):
         test_data = self.credit_data.copy()

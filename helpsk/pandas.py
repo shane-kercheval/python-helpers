@@ -586,10 +586,17 @@ def non_numeric_summary(dataframe: pd.DataFrame,
 
     most_frequent_value = [chop_string(get_top_value(dataframe[x])) for x in non_numeric_columns]
 
-    num_unique = [len(dataframe[x].dropna().unique()) for x in non_numeric_columns]
+    def get_number_of_unique_values(series):
+        try:
+            number_of_uniques = len(series.dropna().unique())
+        except TypeError:  # this happens, for example, with lists
+            number_of_uniques = len(series.dropna().apply(str).unique())
+        return number_of_uniques
 
-    perc_unique = [np.nan if num_non_null == 0 else len(dataframe[col_name].dropna().unique()) / num_non_null
-                   for col_name, num_non_null in zip(non_numeric_columns, num_non_nulls)]
+    num_unique = [get_number_of_unique_values(dataframe[x]) for x in non_numeric_columns]
+
+    perc_unique = [np.nan if n_non_nulls == 0 else n_unique / n_non_nulls
+                   for n_unique, n_non_nulls in zip(num_unique, num_non_nulls)]
     perc_unique = np.round(perc_unique, 3)
     results = pd.DataFrame({'# of Non-Nulls': num_non_nulls,
                             '# of Nulls': num_nulls,
