@@ -580,7 +580,10 @@ def non_numeric_summary(dataframe: pd.DataFrame,
         return counts.index[0] if len(counts) > 0 else None
 
     def chop_string(value):
-        if isinstance(value, str) and len(value) > unique_freq_value_max_chars:
+        if not isinstance(value, str):
+            value = str(value)
+
+        if len(value) > unique_freq_value_max_chars:
             value = value[0:unique_freq_value_max_chars] + '[...]'
         return value
 
