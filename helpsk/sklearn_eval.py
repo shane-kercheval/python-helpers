@@ -1926,7 +1926,6 @@ class TwoClassEvaluator:
             plot_threshold:
                 If True, indicate the score threshold (e.g. 0.5) as a large point.
         """
-        plt.figure(figsize=figure_size)
         auc_curve = self._get_auc_curve_dataframe()
         title = f"ROC AUC: {self.auc:.3f}"
 
@@ -1962,6 +1961,7 @@ class TwoClassEvaluator:
                 )
             return fig
 
+        plt.figure(figsize=figure_size)
         axis = sns.lineplot(data=auc_curve, x='False Positive Rate', y='True Positive Rate', ci=None)
         axis.set_title(title)
         for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],  # pylint: disable=invalid-name
