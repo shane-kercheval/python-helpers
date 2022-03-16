@@ -1912,7 +1912,7 @@ class TwoClassEvaluator:
     def plot_roc_auc_curve(self,
                            figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                            return_plotly: bool = True,
-                           plot_threshold: bool = False) -> Union[None, _figure.Figure]:
+                           plot_threshold: bool = True) -> Union[None, _figure.Figure]:
         """Plots the ROC AUC
 
         Args:
@@ -1928,9 +1928,9 @@ class TwoClassEvaluator:
         """
         plt.figure(figsize=figure_size)
         auc_curve = self._get_auc_curve_dataframe()
+        title = f"ROC AUC: {self.auc:.3f}"
 
         if return_plotly:
-            title = f"AUC: {self.auc:.3f}"
             if plot_threshold:
                 title += f"<br><sub>The threshold of {round(self.score_threshold, 2)} is indicated with a large point.</sub>"
 
@@ -1963,7 +1963,7 @@ class TwoClassEvaluator:
             return fig
 
         axis = sns.lineplot(data=auc_curve, x='False Positive Rate', y='True Positive Rate', ci=None)
-        axis.set_title(f"AUC: {round(self.auc, 3)}")
+        axis.set_title(title)
         for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],  # pylint: disable=invalid-name
                                           auc_curve['True Positive Rate'],
                                           auc_curve['threshold'])):
@@ -1980,7 +1980,7 @@ class TwoClassEvaluator:
                                         threshold_interval: float = 0.025,
                                         figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                                         return_plotly: bool = True,
-                                        plot_threshold: bool = False) -> Union[None, _figure.Figure]:
+                                        plot_threshold: bool = True) -> Union[None, _figure.Figure]:
         """Plots the ROC AUC
 
         Args:
@@ -2108,7 +2108,8 @@ class TwoClassEvaluator:
                 width=550 * GOLDEN_RATIO,
                 title=title
             )
-            fig = fig.add_vline(x=round(self.score_threshold, 2), line_color=hcolor.Colors.BLACK_SHADOW.value)
+            if plot_threshold:
+                fig = fig.add_vline(x=round(self.score_threshold, 2), line_color=hcolor.Colors.BLACK_SHADOW.value)
             return fig
 
         plt.figure(figsize=figure_size)
