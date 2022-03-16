@@ -62,23 +62,31 @@
 }
 #T_99999_row8_col0 {
   width: 10em;
+  background: linear-gradient(90deg, #1AAF54 58.7%, transparent 58.7%);
+}
+#T_99999_row8_col1 {
+  width: 10em;
+  background: linear-gradient(90deg, #1AAF54 29.5%, transparent 29.5%);
+}
+#T_99999_row9_col0 {
+  width: 10em;
   background: linear-gradient(90deg, #1AAF54 76.0%, transparent 76.0%);
   width: 10em;
   background: linear-gradient(90deg, #B4B7B9 76.0%, transparent 76.0%);
 }
-#T_99999_row8_col1 {
+#T_99999_row9_col1 {
   width: 10em;
   background: linear-gradient(90deg, #1AAF54 70.5%, transparent 70.5%);
   width: 10em;
   background: linear-gradient(90deg, #B4B7B9 70.5%, transparent 70.5%);
 }
-#T_99999_row9_col0 {
+#T_99999_row10_col0 {
   width: 10em;
   background: linear-gradient(90deg, #1AAF54 24.0%, transparent 24.0%);
   width: 10em;
   background: linear-gradient(90deg, #B4B7B9 24.0%, transparent 24.0%);
 }
-#T_99999_row9_col1, #T_99999_row10_col0, #T_99999_row10_col1 {
+#T_99999_row10_col1, #T_99999_row11_col0, #T_99999_row11_col1 {
   width: 10em;
   background: linear-gradient(90deg, #1AAF54 29.5%, transparent 29.5%);
   width: 10em;
@@ -144,28 +152,34 @@
       <td id="T_99999_row7_col2" class="data row7 col2" >The F1 score can be interpreted as a weighted average of the precision and recall, where an F1 score reaches its best value at 1 and worst score at 0.</td>
     </tr>
     <tr>
-      <th id="T_99999_level0_row8" class="row_heading level0 row8" >Accuracy</th>
-      <td id="T_99999_row8_col0" class="data row8 col0" >0.760</td>
-      <td id="T_99999_row8_col1" class="data row8 col1" >0.705</td>
-      <td id="T_99999_row8_col2" class="data row8 col2" >76.0% of instances were correctly identified</td>
+      <th id="T_99999_level0_row8" class="row_heading level0 row8" >Precision/Recall AUC</th>
+      <td id="T_99999_row8_col0" class="data row8 col0" >0.587</td>
+      <td id="T_99999_row8_col1" class="data row8 col1" >0.295</td>
+      <td id="T_99999_row8_col2" class="data row8 col2" >Precision/Recall AUC is calculated with `average_precision` which summarizes a precision-recall curve as the weighted mean of precisions achieved at each threshold. See sci-kit learn documentation for caveats.</td>
     </tr>
     <tr>
-      <th id="T_99999_level0_row9" class="row_heading level0 row9" >Error Rate</th>
-      <td id="T_99999_row9_col0" class="data row9 col0" >0.240</td>
-      <td id="T_99999_row9_col1" class="data row9 col1" >0.295</td>
-      <td id="T_99999_row9_col2" class="data row9 col2" >24.0% of instances were incorrectly identified</td>
+      <th id="T_99999_level0_row9" class="row_heading level0 row9" >Accuracy</th>
+      <td id="T_99999_row9_col0" class="data row9 col0" >0.760</td>
+      <td id="T_99999_row9_col1" class="data row9 col1" >0.705</td>
+      <td id="T_99999_row9_col2" class="data row9 col2" >76.0% of instances were correctly identified</td>
     </tr>
     <tr>
-      <th id="T_99999_level0_row10" class="row_heading level0 row10" >% Positive</th>
-      <td id="T_99999_row10_col0" class="data row10 col0" >0.295</td>
+      <th id="T_99999_level0_row10" class="row_heading level0 row10" >Error Rate</th>
+      <td id="T_99999_row10_col0" class="data row10 col0" >0.240</td>
       <td id="T_99999_row10_col1" class="data row10 col1" >0.295</td>
-      <td id="T_99999_row10_col2" class="data row10 col2" >29.5% of the data are positive; i.e. out of 200 total observations; 59 are labeled as "Defaulted"</td>
+      <td id="T_99999_row10_col2" class="data row10 col2" >24.0% of instances were incorrectly identified</td>
     </tr>
     <tr>
-      <th id="T_99999_level0_row11" class="row_heading level0 row11" >Total Observations</th>
-      <td id="T_99999_row11_col0" class="data row11 col0" >200</td>
-      <td id="T_99999_row11_col1" class="data row11 col1" >200</td>
-      <td id="T_99999_row11_col2" class="data row11 col2" >There are 200 total observations; i.e. sample size</td>
+      <th id="T_99999_level0_row11" class="row_heading level0 row11" >% Positive</th>
+      <td id="T_99999_row11_col0" class="data row11 col0" >0.295</td>
+      <td id="T_99999_row11_col1" class="data row11 col1" >0.295</td>
+      <td id="T_99999_row11_col2" class="data row11 col2" >29.5% of the data are positive; i.e. out of 200 total observations; 59 are labeled as "Defaulted"</td>
+    </tr>
+    <tr>
+      <th id="T_99999_level0_row12" class="row_heading level0 row12" >Total Observations</th>
+      <td id="T_99999_row12_col0" class="data row12 col0" >200</td>
+      <td id="T_99999_row12_col1" class="data row12 col1" >200</td>
+      <td id="T_99999_row12_col2" class="data row12 col2" >There are 200 total observations; i.e. sample size</td>
     </tr>
   </tbody>
 </table>

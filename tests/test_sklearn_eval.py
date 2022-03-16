@@ -1123,7 +1123,7 @@ class TestSklearnEval(unittest.TestCase):
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_confusion_matrix.png',
                    plot_function=lambda: evaluator.plot_confusion_matrix())
 
-    def test_plot_auc_curve(self):
+    def test_plot_roc_auc_curve(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
                                       predicted_scores=self.credit_data__y_scores,
                                       positive_class='Defaulted',
@@ -1131,7 +1131,17 @@ class TestSklearnEval(unittest.TestCase):
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_auc_curve.png',
-                   plot_function=lambda: evaluator.plot_auc_curve())
+                   plot_function=lambda: evaluator.plot_roc_auc_curve(return_plotly=False))
+
+    def test_plot_precision_recall_auc_curve(self):
+        evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
+                                      predicted_scores=self.credit_data__y_scores,
+                                      positive_class='Defaulted',
+                                      negative_class='Not Defaulted',
+                                      score_threshold=0.5)
+
+        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_precision_recall_auc_curve.png',
+                   plot_function=lambda: evaluator.plot_precision_recall_auc_curve(return_plotly=False))
 
     def test_plot_threshold_curves(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
@@ -1141,7 +1151,7 @@ class TestSklearnEval(unittest.TestCase):
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_threshold_curves.png',
-                   plot_function=lambda: evaluator.plot_threshold_curves())
+                   plot_function=lambda: evaluator.plot_threshold_curves(return_plotly=False))
 
     def test_plot_precision_recall_tradeoff(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
@@ -1151,7 +1161,7 @@ class TestSklearnEval(unittest.TestCase):
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_precision_recall_tradeoff.png',
-                   plot_function=lambda: evaluator.plot_precision_recall_tradeoff())
+                   plot_function=lambda: evaluator.plot_precision_recall_tradeoff(return_plotly=False))
 
     def test_calculate_lift_gain(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
