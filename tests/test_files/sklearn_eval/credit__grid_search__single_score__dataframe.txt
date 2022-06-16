@@ -1,8 +1,8 @@
    roc_auc Mean  roc_auc 95CI.LO  roc_auc 95CI.HI model__max_features  model__n_estimators preparation__non_numeric_pipeline__encoder_chooser__transformer
-6      0.745863         0.692806         0.798920                auto                   50                                    OneHotEncoder()             
-7      0.745195         0.740455         0.749935                auto                   50                             CustomOrdinalEncoder()             
-4      0.716328         0.677244         0.755412                auto                   10                                    OneHotEncoder()             
-5      0.707249         0.662644         0.751855                auto                   10                             CustomOrdinalEncoder()             
+6      0.746879         0.695155         0.798602                auto                   50                                    OneHotEncoder()             
+7      0.744782         0.737888         0.751676                auto                   50                             CustomOrdinalEncoder()             
+4      0.717289         0.678189         0.756390                auto                   10                                    OneHotEncoder()             
+5      0.705353         0.659592         0.751113                auto                   10                             CustomOrdinalEncoder()             
 0           NaN              NaN              NaN                 100                   10                                    OneHotEncoder()             
 1           NaN              NaN              NaN                 100                   10                             CustomOrdinalEncoder()             
 2           NaN              NaN              NaN                 100                   50                                    OneHotEncoder()             
