@@ -5,9 +5,11 @@ docker_build:
 docker_run:
 	docker exec -it python-helpers-bash-1 /bin/zsh
 
-## Run unit-tests
-tests:
+unittests:
 	python -m unittest discover tests
+
+linting:
+	flake8 --max-line-length 110 --ignore=E127 helpsk
 
 ## Build package
 build:

@@ -203,8 +203,6 @@ class MLExperimentResults:
         self._dataframe = None
         self._labeled_dataframe = None
 
-    # pylint: disable=too-many-branches
-    # pylint: disable=too-many-statements
     @classmethod
     def from_sklearn_search_cv(cls,
                                searcher: BaseSearchCV,
@@ -264,7 +262,7 @@ class MLExperimentResults:
             string_value = re.sub(r'Regressor\(.+\)', 'Regressor()', string_value)
             string_value = re.sub(r'Regression\(.+\)', 'Regression()', string_value)
             string_value = re.sub(r'LinearSVC\(.+\)', 'LinearSVC()', string_value)
-            
+
             string_value = string_value.replace("PCA(n_components='mle')", "PCA('mle')")
             string_value = string_value.replace("OneHotEncoder(handle_unknown='ignore')", "OneHotEncoder()")
             return string_value
@@ -361,7 +359,8 @@ class MLExperimentResults:
 
         # convert training scores to dictionaries, if training scores exists
         # i.e. if return_train_score=True for the SearchCV object
-        if 'mean_train_score' in searcher.cv_results_ or 'mean_train_'+score_names[0] in searcher.cv_results_:
+        if ('mean_train_score' in searcher.cv_results_) or \
+           ('mean_train_' + score_names[0] in searcher.cv_results_):
             if len(score_names) == 1:
                 train_score_averages = searcher.cv_results_['mean_train_score'].tolist()
                 train_score_standard_deviations = searcher.cv_results_['std_train_score'].tolist()
@@ -467,7 +466,8 @@ class MLExperimentResults:
                                                      scale=self.score_standard_errors(score_name=score_name))
 
                 # only give confidence intervals for the primary score
-                self._dataframe = pd.concat([
+                self._dataframe = pd.concat(
+                    [
                         self._dataframe,
                         pd.DataFrame({score_name + " Mean": self.test_score_averages[score_name],
                                       score_name + " 95CI.LO": confidence_intervals[0],
@@ -502,7 +502,6 @@ class MLExperimentResults:
 
         return copy
 
-    # pylint: disable=too-many-arguments
     def to_formatted_dataframe(self,
                                round_by: int = 3,
                                num_rows: int = 500,
@@ -607,16 +606,17 @@ class MLExperimentResults:
 
             # highlight trials whose primary score (i.e. first column of `results` dataframe) is within
             # 1 standard error of the top primary score (i.e. first column first row).
-            # pylint: disable=invalid-name, unused-argument
+
             def highlight_cols(s):   # noqa
                 return 'background-color: %s' % hcolor.Colors.PASTEL_BLUE.value
 
             # we might have removed columns (e.g. that don't have any variance) so check that the columns
             # were in the final set
             columns_to_highlight = [x for x in self.parameter_names if x in final_columns]
-            cv_dataframe.applymap(highlight_cols,
-                             subset=pd.IndexSlice[indexes_within_1_standard_error,
-                                                  columns_to_highlight])
+            cv_dataframe.applymap(
+                highlight_cols,
+                subset=pd.IndexSlice[indexes_within_1_standard_error, columns_to_highlight]
+            )
 
         return cv_dataframe
 
@@ -710,7 +710,8 @@ class MLExperimentResults:
                 multiplier = 1
             return list(st.rankdata(np.array(score_averages) * multiplier).astype(int))
 
-        return {score: get_rankings(averages) for score, averages in self._dict['test_score_averages'].items()}
+        return {score: get_rankings(averages)
+                for score, averages in self._dict['test_score_averages'].items()}
 
     @property
     def test_score_averages(self) -> dict:
@@ -753,7 +754,7 @@ class MLExperimentResults:
         """
         def create_hyper_param_labels(trial) -> list:
             """Creates a list of strings that represent the name/value pair for each hyper-parameter."""
-            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping and x in self.parameter_names_mapping else x}: {trial[x]}"  # pylint: disable=line-too-long  # noqa
+            return [f"{self.parameter_names_mapping[x] if self.parameter_names_mapping and x in self.parameter_names_mapping else x}: {trial[x]}"  # noqa
                     # for parameter spaces that have multiple models (and different parameters per model),
                     # we need to make sure that the parameter name is actually in the trial
                     # e.g. the parameter name could correspond to the logistic regression space but we could
@@ -889,11 +890,9 @@ class MLExperimentResults:
         cv_dataframe = self.to_dataframe(sort_by_score=True)
 
         if self.higher_score_is_better:
-            return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] >=
-                                           self.best_score - self.best_standard_error])
+            return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] >= self.best_score - self.best_standard_error])  # noqa
 
-        return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] <=
-                                       self.best_score + self.best_standard_error])
+        return list(cv_dataframe.index[cv_dataframe.iloc[:, 0] <= self.best_score + self.best_standard_error])
 
     @property
     def fit_time_averages(self) -> np.array:
@@ -977,7 +976,6 @@ class MLExperimentResults:
         """Total time it took across all trials"""
         return self.fit_time_total + self.score_time_total
 
-    # pylint: disable=dangerous-default-value
     def plot_performance_across_trials(self,
                                        size: str = None,
                                        color: str = None,
@@ -1016,7 +1014,7 @@ class MLExperimentResults:
         title = "Performance Over Time (Across Trials)<br>" \
                 "<sup>This graph shows the average CV score across all trials, in order of execution.</sup>"
         if size is not None:
-            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
+            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"  # noqa
 
         labeled_df = self.to_labeled_dataframe(query=query)
         if facet_by:
@@ -1372,7 +1370,7 @@ class MLExperimentResults:
         primary_score_column = self.primary_score_name + " Mean"
         title = f"Primary Score ({self.primary_score_name}) vs <b>{parameter}</b>"
         if size:
-            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
+            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"  # noqa
 
         df = self.to_labeled_dataframe(query=query)
         # only include the columns we need, so that we don't unnecessarily drop rows with NA (i.e. NAs in
@@ -1450,11 +1448,12 @@ class MLExperimentResults:
         labeled_df.reset_index(drop=True, inplace=True)
 
         if size:
-            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"
+            title = title + f"<br><sup>The size of the point corresponds to the value of <b>'{size}'</b>.</sup>"  # noqa
             if size in self.numeric_parameters:
                 # need to do this or else the points are all the same size
                 # but only if size has numeric values
-                scaled_size = MinMaxScaler(feature_range=(0.1, 0.9)).fit_transform(labeled_df[[size]]).reshape(1, -1)
+                scaled_size = MinMaxScaler(feature_range=(0.1, 0.9)).\
+                    fit_transform(labeled_df[[size]]).reshape(1, -1)
                 scaled_size = scaled_size.tolist()[0]
 
         fig = px.scatter(
@@ -1486,7 +1485,6 @@ class MLExperimentResults:
 # pylint: disable=too-many-instance-attributes,too-many-public-methods
 class TwoClassEvaluator:
     """This class calculates various metrics for Two Class (i.e. 0's/1's) prediction scenarios."""
-    # pylint: disable=too-many-arguments
     def __init__(self,
                  actual_values: np.ndarray,
                  predicted_scores: np.ndarray,
@@ -1726,7 +1724,6 @@ class TwoClassEvaluator:
                 '% Positive': (self.prevalence, prevalence_message),
                 'Total Observations': (self.sample_size, total_obs_message)}
 
-    # pylint: disable=too-many-arguments
     def all_metrics_df(self,
                        return_explanations: bool = True,
                        dummy_classifier_strategy: Union[str, list, None] = 'prior',
@@ -1828,10 +1825,10 @@ class TwoClassEvaluator:
 
     def plot_confusion_matrix(self):
         """Plots a heatmap of the confusion matrix."""
-        labels = np.array([[f'True Negatives\n{self._true_negatives}\n{self._true_negatives / self.sample_size:.1%}',  # pylint: disable=line-too-long  # noqa
-                            f'False Positives\n{self._false_positives}\n{self._false_positives / self.sample_size:.1%}'],  # pylint: disable=line-too-long  # noqa
-                           [f'False Negatives\n{self._false_negatives}\n{self._false_negatives / self.sample_size:.1%}',  # pylint: disable=line-too-long  # noqa
-                            f'True Positives\n{self._true_positives}\n{self._true_positives / self.sample_size:.1%}']])  # pylint: disable=line-too-long  # noqa
+        labels = np.array([[f'True Negatives\n{self._true_negatives}\n{self._true_negatives / self.sample_size:.1%}',  # noqa
+                            f'False Positives\n{self._false_positives}\n{self._false_positives / self.sample_size:.1%}'],  # noqa
+                           [f'False Negatives\n{self._false_negatives}\n{self._false_negatives / self.sample_size:.1%}',  # noqa
+                            f'True Positives\n{self._true_positives}\n{self._true_positives / self.sample_size:.1%}']])  # noqa
 
         axis = plt.subplot()
         sns.heatmap(self._confusion_matrix, annot=labels, cmap='Blues', ax=axis, fmt='')
@@ -1908,7 +1905,6 @@ class TwoClassEvaluator:
                                                  'True Neg. Rate (Specificity)'])
         return threshold_curves
 
-    # pylint: disable=inconsistent-return-statements
     def plot_roc_auc_curve(self,
                            figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                            return_plotly: bool = True,
@@ -1931,7 +1927,8 @@ class TwoClassEvaluator:
 
         if return_plotly:
             if plot_threshold:
-                title += f"<br><sub>The threshold of {round(self.score_threshold, 2)} is indicated with a large point.</sub>"
+                title += f"<br><sub>The threshold of {round(self.score_threshold, 2)} is indicated with a " \
+                         "large point.</sub>"
 
             fig = px.line(
                 data_frame=auc_curve,
@@ -1964,7 +1961,7 @@ class TwoClassEvaluator:
         plt.figure(figsize=figure_size)
         axis = sns.lineplot(data=auc_curve, x='False Positive Rate', y='True Positive Rate', ci=None)
         axis.set_title(title)
-        for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],  # pylint: disable=invalid-name
+        for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],
                                           auc_curve['True Positive Rate'],
                                           auc_curve['threshold'])):
             if i % 5 == 0:
@@ -1974,7 +1971,6 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
-    # pylint: disable=inconsistent-return-statements
     def plot_precision_recall_auc_curve(self,
                                         score_threshold_range: Tuple[float, float] = (0.1, 0.9),
                                         threshold_interval: float = 0.025,
@@ -1999,13 +1995,21 @@ class TwoClassEvaluator:
             plot_threshold:
                 If True, indicate the score threshold (e.g. 0.5) as a large point.
         """
-        precision_recall_df = self._get_threshold_curve_dataframe(score_threshold_range=score_threshold_range, threshold_interval=threshold_interval)
-        precision_recall = precision_recall_df[['Score Threshold', 'Pos. Predictive Value (Precision)', 'True Pos. Rate (Recall)']]
+        precision_recall_df = self._get_threshold_curve_dataframe(
+            score_threshold_range=score_threshold_range,
+            threshold_interval=threshold_interval
+        )
+        precision_recall = precision_recall_df[[
+            'Score Threshold',
+            'Pos. Predictive Value (Precision)',
+            'True Pos. Rate (Recall)'
+        ]]
         title = f"Precision/Recall AUC: {self.average_precision_score:.3f}"
 
         if return_plotly:
             if plot_threshold:
-                title += f"<br><sub>The threshold of {round(self.score_threshold, 2)} is indicated with a large point.</sub>"
+                title += f"<br><sub>The threshold of {round(self.score_threshold, 2)} is indicated with a " \
+                         "large point.</sub>"
 
             fig = px.line(
                 data_frame=precision_recall,
@@ -2027,7 +2031,9 @@ class TwoClassEvaluator:
             if plot_threshold:
                 fig.add_trace(
                     px.scatter(
-                        data_frame=precision_recall.query(f'`Score Threshold` == {round(self.score_threshold, 2)}'),
+                        data_frame=precision_recall.query(
+                            f'`Score Threshold` == {round(self.score_threshold, 2)}'
+                        ),
                         x='True Pos. Rate (Recall)',
                         y='Pos. Predictive Value (Precision)',
                         size=[2],
@@ -2036,9 +2042,14 @@ class TwoClassEvaluator:
             return fig
 
         plt.figure(figsize=figure_size)
-        axis = sns.lineplot(data=precision_recall, x='True Pos. Rate (Recall)', y='Pos. Predictive Value (Precision)', ci=None)
+        axis = sns.lineplot(
+            data=precision_recall,
+            x='True Pos. Rate (Recall)',
+            y='Pos. Predictive Value (Precision)',
+            ci=None
+        )
         axis.set_title(title)
-        for i, (x, y, s) in enumerate(zip(precision_recall['True Pos. Rate (Recall)'],  # pylint: disable=invalid-name
+        for i, (x, y, s) in enumerate(zip(precision_recall['True Pos. Rate (Recall)'],
                                           precision_recall['Pos. Predictive Value (Precision)'],
                                           precision_recall['Score Threshold'])):
             if i % 5 == 0:
@@ -2048,14 +2059,12 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
-    # pylint: disable=inconsistent-return-statements
     def plot_threshold_curves(self,
                               score_threshold_range: Tuple[float, float] = (0.1, 0.9),
                               threshold_interval: float = 0.025,
                               figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                               return_plotly: bool = True,
-                              plot_threshold: bool = False) -> Union[None,
-                                                                    _figure.Figure]:
+                              plot_threshold: bool = False) -> Union[None, _figure.Figure]:
         """Plots various scores (e.g. True Positive Rate, False Positive Rate, etc.) for various score
         thresholds. (A score threshold is the value for which you would predict a positive label if the
         value of the score is above the threshold (e.g. usually 0.5).
@@ -2109,7 +2118,10 @@ class TwoClassEvaluator:
                 title=title
             )
             if plot_threshold:
-                fig = fig.add_vline(x=round(self.score_threshold, 2), line_color=hcolor.Colors.BLACK_SHADOW.value)
+                fig = fig.add_vline(
+                    x=round(self.score_threshold, 2),
+                    line_color=hcolor.Colors.BLACK_SHADOW.value
+                )
             return fig
 
         plt.figure(figsize=figure_size)
@@ -2123,14 +2135,12 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
-    # pylint: disable=inconsistent-return-statements
     def plot_precision_recall_tradeoff(self,
                                        score_threshold_range: Tuple[float, float] = (0.1, 0.9),
                                        threshold_interval: float = 0.025,
                                        figure_size: tuple = STANDARD_WIDTH_HEIGHT,
                                        return_plotly: bool = True,
-                                       plot_threshold: bool = False) -> Union[None,
-                                                                             _figure.Figure]:
+                                       plot_threshold: bool = False) -> Union[None, _figure.Figure]:
         """Plots the tradeoff between precision (i.e. positive predict value) and recall (i.e. True Positive
         Rate) for various score thresholds. (A score threshold is the value for which you would predict a
         positive label if the value of the score is above the threshold (e.g. usually 0.5).
@@ -2166,7 +2176,7 @@ class TwoClassEvaluator:
             ]
             title = "Precision Recall Tradeoff"
             if plot_threshold:
-                title += f"<br><sub>Black line is default threshold of {round(self.score_threshold, 2)}.</sub>"
+                title += f"<br><sub>Black line is default threshold of {round(self.score_threshold, 2)}.</sub>"  # noqa
 
             fig = px.line(
                 data_frame=pd.melt(frame=threshold_curves[['Score Threshold',
@@ -2186,7 +2196,10 @@ class TwoClassEvaluator:
                 title=title
             )
             if plot_threshold:
-                fig = fig.add_vline(x=round(self.score_threshold, 2), line_color=hcolor.Colors.BLACK_SHADOW.value)
+                fig = fig.add_vline(
+                    x=round(self.score_threshold, 2),
+                    line_color=hcolor.Colors.BLACK_SHADOW.value
+                )
             return fig
 
         plt.figure(figsize=figure_size)
@@ -2200,7 +2213,6 @@ class TwoClassEvaluator:
         plt.grid()
         plt.tight_layout()
 
-    # pylint: disable=inconsistent-return-statements
     def calculate_lift_gain(self,
                             num_buckets: int = 20,
                             return_style: bool = False,
@@ -2265,13 +2277,11 @@ class TwoClassEvaluator:
 
         return gain_lift_data
 
-    # pylint: disable=inconsistent-return-statements
     def plot_predicted_scores_histogram(self):
         """Return a histogram of the predicted scores"""
         sns.histplot(self._predicted_scores)
         plt.tight_layout()
 
-    # pylint: disable=inconsistent-return-statements
     def plot_actual_vs_predict_histogram(self, plot_threshold: bool = False):
         """Return a histogram of the actual vs predicted scores
 
@@ -2516,7 +2526,6 @@ class RegressionEvaluator:
 class TwoClassModelComparison:
     """This class compares multiple models trained on Two Class (i.e. 0's/1's) prediction scenarios."""
 
-    # pylint: disable=too-many-arguments
     def __init__(self,
                  actual_values: np.ndarray,
                  predicted_scores: Dict[str, np.ndarray],
@@ -2681,7 +2690,7 @@ class TwoClassModelComparison:
         result = None
 
         for key, value in self._evaluators.items():
-            auc_df = value._get_auc_curve_dataframe()  # pylint: disable=protected-access # noqa
+            auc_df = value._get_auc_curve_dataframe()
             auc_df['Model'] = key
             result = pd.concat([result, auc_df], axis=0)
 

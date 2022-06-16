@@ -64,8 +64,8 @@ def format_number(value: float,
         the formatted number as a string
     """
     granularity_lookup = {RoundTo.THOUSANDS: 1000,
-                          RoundTo.MILLIONS:  1000000,
-                          RoundTo.BILLIONS:  1000000000,
+                          RoundTo.MILLIONS: 1000000,
+                          RoundTo.BILLIONS: 1000000000,
                           RoundTo.TRILLIONS: 1000000000000}
 
     if granularity == RoundTo.NONE:

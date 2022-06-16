@@ -16,7 +16,7 @@ class TransformerChooser(BaseEstimator, TransformerMixin):
         """
         self.transformer = transformer
 
-    def fit(self, X, y=None):  # pylint: disable=invalid-name # noqa
+    def fit(self, X, y=None):
         """fit implementation
         """
         if self.transformer is None:
@@ -24,7 +24,7 @@ class TransformerChooser(BaseEstimator, TransformerMixin):
 
         return self.transformer.fit(X, y)
 
-    def transform(self, X):  # pylint: disable=invalid-name # noqa
+    def transform(self, X):
         """transform implementation
         """
         if self.transformer is None:
@@ -44,7 +44,7 @@ class CustomOrdinalEncoder(BaseEstimator, TransformerMixin):
         self.handle_unknown = handle_unknown
         self._missing_value = '<missing>'
 
-    def _fill_na(self, X):  # pylint: disable=invalid-name # noqa
+    def _fill_na(self, X):
         """Helper function that fills missing values with strings before calling OrdinalEncoder"""
         for column in X.columns.values:
             if X[column].dtype.name == 'category':
@@ -54,13 +54,13 @@ class CustomOrdinalEncoder(BaseEstimator, TransformerMixin):
 
         return X
 
-    def fit(self, X, y=None):  # pylint: disable=invalid-name,unused-argument # noqa
+    def fit(self, X, y=None):
         """fit implementation"""
-        X = self._fill_na(X)  # pylint: disable=invalid-name # noqa
+        X = self._fill_na(X)
         self._ordinal_encoder.fit(X)
         return self
 
-    def transform(self, X):  # pylint: disable=invalid-name # noqa
+    def transform(self, X):
         """transform implementation"""
-        X = self._fill_na(X)  # pylint: disable=invalid-name # noqa
+        X = self._fill_na(X)
         return self._ordinal_encoder.transform(X)
