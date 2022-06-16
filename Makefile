@@ -18,3 +18,4 @@ build:
 ## Delete all generated files
 clean:
 	rm -rf dist
+	rm -f .pypirc
