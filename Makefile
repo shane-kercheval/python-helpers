@@ -12,7 +12,7 @@ linting:
 	flake8 --max-line-length 110 --ignore=E127 helpsk
 
 ## Build package
-build:
+build: unittests linting
 	rm -fr dist
 	python -m build
 	twine upload dist/*
