@@ -711,3 +711,6 @@ class TestValidation(unittest.TestCase):
         # should return False since my_function_exception raises ValueError, not TypeError
         self.assertFalse(hv.raises_exception(my_function_exception, TypeError))
         self.assertFalse(hv.raises_exception(my_function_runs))
+
+if __name__ == '__main__':
+    unittest.main()

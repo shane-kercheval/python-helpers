@@ -1183,3 +1183,6 @@ class TestSklearnEval(unittest.TestCase):
         with open(get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain__10_buckets.html', 'w') as file:
             table_html = evaluator.calculate_lift_gain(return_style=True, num_buckets=10).render()
             file.write(clean_formatted_dataframe(table_html))
+
+if __name__ == '__main__':
+    unittest.main()

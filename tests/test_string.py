@@ -108,3 +108,6 @@ class TestStrings(unittest.TestCase):
                                        '/test_files/string/string__format_number__expected_values.csv')
 
         hv.assert_dataframes_match([results, expected_results])
+
+if __name__ == '__main__':
+    unittest.main()
