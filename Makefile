@@ -1,7 +1,8 @@
-#################################################################################
-# File adapted from https://github.com/drivendata/cookiecutter-data-science
-#################################################################################
-.PHONY: environment tests clean build
+docker_build:
+	docker build -t helpsk .
+
+docker_run:
+	docker run -d helpsk
 
 #################################################################################
 # GLOBALS
