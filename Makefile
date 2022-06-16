@@ -1,4 +1,5 @@
 docker_build:
+	cp ~/.pypirc ./.pypirc
 	docker compose -f docker-compose.yml up --build
 
 docker_run:
