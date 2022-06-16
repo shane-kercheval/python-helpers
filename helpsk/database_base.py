@@ -8,7 +8,7 @@ import pandas as pd
 from helpsk.utility import suppress_stdout, suppress_warnings
 
 
-class Configuration(metaclass=ABCMeta):  # pylint: disable=too-few-public-methods
+class Configuration(metaclass=ABCMeta):
     """A basic configuration object will product a dictionary representing the keyword parameters that can
     be passed to a Database object.
     """
@@ -24,7 +24,7 @@ class Database(metaclass=ABCMeta):
     """
     Base class that wraps the connection/querying logic of various databases.
     """
-    def __init__(self, **kwargs):  # pylint: disable=unused-argument
+    def __init__(self, **kwargs):
         self.connection_object = None
 
     @classmethod

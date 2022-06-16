@@ -877,3 +877,6 @@ class TestPandas(unittest.TestCase):
         results = count_groups(dataframe=data, group_1='target', group_2='checking_status', group_sum='credit_amount', return_style=True)
         with open(get_test_path() + '/test_files/pandas/count_groups_group_1_na_sum.html', 'w') as file:
             file.write(clean_formatted_dataframe(results.render()))
+
+if __name__ == '__main__':
+    unittest.main()

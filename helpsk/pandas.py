@@ -50,7 +50,7 @@ def is_series_bool(series: pd.Series) -> bool:
     if is_bool_dtype(series):
         return True
 
-    def is_nan(value):  # pylint: disable=inconsistent-return-statements
+    def is_nan(value):
         try:
             if np.isnan(value):
                 return True
@@ -521,7 +521,7 @@ def numeric_summary(dataframe: pd.DataFrame,
             bar(subset=['% Nulls'], color=color.BAD, vmin=0, vmax=1). \
             bar(subset=['% Zeros'], color=color.GRAY, vmin=0, vmax=1). \
             bar(subset=['Coef of Var'], color=color.GRAY, vmin=0, vmax=1). \
-            bar(subset=['Skewness'], color=color.GRAY,  align='mid', vmin=-2, vmax=2)
+            bar(subset=['Skewness'], color=color.GRAY, align='mid', vmin=-2, vmax=2)
 
     return results
 
@@ -615,9 +615,10 @@ def non_numeric_summary(dataframe: pd.DataFrame,
     if return_style:
         results = pstyle.html_escape_dataframe(results)
         results = results.style.format({
-                '% Nulls': '{:,.1%}'.format,
-                '% Unique': '{:,.1%}'.format
-            }). \
+            '% Nulls': '{:,.1%}'.format,
+            '% Unique': '{:,.1%}'.format
+        })
+        results = results. \
             pipe(pstyle.format,
                  subset=['# of Non-Nulls', '# of Nulls'],
                  round_by=0). \

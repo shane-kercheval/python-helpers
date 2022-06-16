@@ -14,8 +14,7 @@ from seaborn import color_palette
 from helpsk import color
 
 
-# pylint: disable=redefined-builtin,too-many-arguments
-import helpsk.pandas as pandas  # pylint: disable=consider-using-from-import
+import helpsk.pandas as pandas
 from helpsk.validation import any_none_nan
 
 
@@ -112,7 +111,6 @@ def __bar_inverse(style_object, align: str, colors: list[str], width: float = 10
     normed = width * (style_object.to_numpy(dtype=float) - object_min) / (object_max - object_min + 1e-12)
     zero = -width * object_min / (object_max - object_min + 1e-12)
 
-    # pylint: disable=redefined-outer-name
     def css_bar(start: float, end: float, color: str) -> str:  # noqa
         """
         Generate CSS code to draw a bar from start to end.
@@ -157,12 +155,11 @@ def bar_inverse(
         styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
         subset: "Subset" = None,  # noqa
         axis: Axis = 0,
-        color="#d65f5f",  # pylint: disable=redefined-outer-name  # noqa
+        color="#d65f5f",
         width: float = 100,
         align: str = "left",
         min_value: float = None,
-        max_value: float = None,
-    ) -> Styler:
+        max_value: float = None) -> Styler:
     """
     CODE MODIFIED FROM
         https://github.com/pandas-dev/pandas/blob/v1.3.2/pandas/io/formats/style.py#L2178-L2258
@@ -264,13 +261,13 @@ def html_escape_dataframe(dataframe: pd.DataFrame):
         dataframe[column] = dataframe[column].apply(__escape)
 
     if isinstance(dataframe.index, pd.MultiIndex):
-        index_tuples = [tuple([__escape(x) for x in index]) for index in dataframe.index]  # pylint: disable=consider-using-generator
+        index_tuples = [tuple([__escape(x) for x in index]) for index in dataframe.index]
         dataframe.index = pd.MultiIndex.from_tuples(index_tuples)
     else:
         dataframe.index = [__escape(x) for x in dataframe.index.values]
 
     if isinstance(dataframe.columns, pd.MultiIndex):
-        index_tuples = [tuple([__escape(x) for x in columns]) for columns in dataframe.columns]  # pylint: disable=consider-using-generator
+        index_tuples = [tuple([__escape(x) for x in columns]) for columns in dataframe.columns]
         dataframe.columns = pd.MultiIndex.from_tuples(index_tuples)
     else:
         dataframe.columns = [__escape(x) for x in dataframe.columns.values]

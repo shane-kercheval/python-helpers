@@ -121,3 +121,6 @@ class TestPlot(unittest.TestCase):
         hplot.plot_histogram_with_categorical(dataframe=credit_data,
                                               numeric_column='credit_amount',
                                               categorical_column='target')
+
+if __name__ == '__main__':
+    unittest.main()

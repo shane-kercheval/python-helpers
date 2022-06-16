@@ -21,7 +21,7 @@ import pandas as pd
 from helpsk.database_base import Configuration, Database
 
 
-class GenericConfigFile(Configuration):  # pylint: disable=too-few-public-methods
+class GenericConfigFile(Configuration):
     """Class that is used to map a configuration file in the format below, to a dictionary that will be passed
     into the corresponding Database object.
 
@@ -92,7 +92,7 @@ class GenericConfigFile(Configuration):  # pylint: disable=too-few-public-method
                 if value in config[self._config_key]}
 
 
-class RedshiftConfigFile(GenericConfigFile):  # pylint: disable=too-few-public-methods
+class RedshiftConfigFile(GenericConfigFile):
     """Supplies a standard config_key and config_mapping to the GenericConfigFile object.
 
     Corresponds to a configuration file in the format of:
@@ -124,7 +124,7 @@ class RedshiftConfigFile(GenericConfigFile):  # pylint: disable=too-few-public-m
         super().__init__(config_file=config_file, config_key=config_key, config_mapping=config_mapping)
 
 
-class SnowflakeConfigFile(GenericConfigFile):  # pylint: disable=too-few-public-methods
+class SnowflakeConfigFile(GenericConfigFile):
     """Supplies a standard config_key and config_mapping to the GenericConfigFile object.
 
     Corresponds to a configuration file in the format of:
@@ -158,7 +158,8 @@ class SnowflakeConfigFile(GenericConfigFile):  # pylint: disable=too-few-public-
 
 
 class Redshift(Database):
-    """Wraps logic for connecting to Redshift and querying.
+    """
+    Wraps logic for connecting to Redshift and querying.
 
     Example:
         config = RedshiftConfigFile('/path/to/redshift.config')
@@ -167,7 +168,7 @@ class Redshift(Database):
     """
 
     def __init__(self, *,
-                 user: str, password: str, database: str, host: str, port: Union[str, int]):  # pylint: disable=too-many-arguments
+                 user: str, password: str, database: str, host: str, port: Union[str, int]):
         """Initialization"""
         super().__init__()
         self._connection_string = "dbname={} host={} port={} user={} password={}". \
@@ -176,7 +177,7 @@ class Redshift(Database):
     def _open_connection_object(self) -> object:
         """Wraps logic for connecting to redshift
         """
-        from psycopg2 import connect  # pylint: disable=import-outside-toplevel
+        from psycopg2 import connect
         return connect(self._connection_string)
 
     def _close_connection_object(self):
@@ -199,7 +200,9 @@ class Redshift(Database):
     def execute_statement(self, statement: str):
         raise NotImplementedError()
 
-    def insert_records(self, dataframe: pd.DataFrame, table: str, create_table: bool = False, overwrite: bool = True, schema: str = None,
+    def insert_records(self,
+                       dataframe: pd.DataFrame, table: str, create_table: bool = False,
+                       overwrite: bool = True, schema: str = None,
                        database: str = None):
         raise NotImplementedError()
 
@@ -232,8 +235,6 @@ class Snowflake(Database):
     pip install snowflake-connector-python[pandas]
     ```
     """
-
-    # pylint: disable=too-many-arguments
     def __init__(self, *,
                  user: str, account: str, authenticator: str, warehouse: str, database: str,
                  autocommit: bool = True):
@@ -258,7 +259,7 @@ class Snowflake(Database):
     def _open_connection_object(self) -> object:
         """Wraps logic for connecting to snowflake
         """
-        from snowflake.connector import connect  # pylint: disable=import-outside-toplevel
+        from snowflake.connector import connect
         return connect(
             user=self.user,
             account=self.account,
@@ -361,7 +362,8 @@ class Snowflake(Database):
         from snowflake.connector.pandas_tools import write_pandas
 
         dataframe = dataframe.copy()
-        dataframe.columns = dataframe.columns.str.upper()  # snowflake is case sensitive and converts everything to upper-case
+        # snowflake is case sensitive and converts everything to upper-case
+        dataframe.columns = dataframe.columns.str.upper()
 
         if create_table:
             create_table_sql = Snowflake._generate_sql_create_table(

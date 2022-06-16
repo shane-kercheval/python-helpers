@@ -308,3 +308,6 @@ class TestDatabase(unittest.TestCase):
             database.connect()
         self.assertFalse(database.is_connected())
         self.assertIsNone(database.connection_object)
+
+if __name__ == '__main__':
+    unittest.main()

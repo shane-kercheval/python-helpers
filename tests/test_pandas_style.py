@@ -115,3 +115,6 @@ class TestPandasStyle(unittest.TestCase):
                                             ('&lt;3&gt;', 'z')]))
         expected_dataframe['&lt;C&gt;'] = expected_dataframe['&lt;C&gt;'].astype('category')
         self.assertTrue(dataframes_match([html_escape_dataframe(dataframe), expected_dataframe]))
+
+if __name__ == '__main__':
+    unittest.main()

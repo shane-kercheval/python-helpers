@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from pandas.core.dtypes.common import is_categorical
 
-from helpsk.exceptions import *  # pylint: disable=wildcard-import,unused-wildcard-import
+from helpsk.exceptions import HelpskAssertionError, HelpskParamTypeError, HelpskParamValueError
 from helpsk.utility import suppress_warnings
 
 
@@ -22,8 +22,7 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame, object
     Returns:
         bool - True if any item in `values` are None/np.NaN
     """
-    # pylint: disable=too-many-return-statements
-    if values is None or values is np.NaN or values is pd.NA or values is pd.NaT:  # pylint: disable=nan-comparison
+    if values is None or values is np.NaN or values is pd.NA or values is pd.NaT:
         return True
 
     if isinstance(values, Sized) and not isinstance(values, str) and len(values) == 0:
@@ -44,7 +43,7 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame, object
     try:
         if not isinstance(values, str) and None in values:
             return True
-    except Exception:  # pylint: disable=broad-except # noqa
+    except Exception:
         pass
 
     try:
@@ -382,7 +381,7 @@ def raises_exception(function: Callable, exception_type: Type = None) -> bool:
     try:
         function()
         return False
-    except Exception as exception:  # pylint: disable=broad-except
+    except Exception as exception:
         if exception_type:
             return isinstance(exception, exception_type)
 
