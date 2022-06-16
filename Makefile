@@ -18,4 +18,5 @@ build:
 ## Delete all generated files
 clean:
 	rm -rf dist
+	rm -rf helpsk.egg-info
 	rm -f .pypirc
