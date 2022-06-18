@@ -98,3 +98,33 @@ def is_debugging():
             return True
 
     return False
+
+
+class Timer:
+    """
+    This class provides way to time the duration of code within the context manager.
+    """
+    def __init__(self, message, use_logging=False):
+        self._message = message
+        self._use_logging = use_logging
+
+    def __enter__(self):
+        message = f'Timer Started: {self._message}'
+
+        if self._use_logging:
+            logging.basicConfig()
+            log_info(message)
+        else:
+            print(message)
+        self._start = datetime.datetime.now()
+
+        return self
+
+    def __exit__(self, *args):
+        self._end = datetime.datetime.now()
+        self._interval = self._end - self._start
+        message = f'Timer Finished ({self._interval.total_seconds():.2f} seconds)'
+        if self._use_logging:
+            log_info(message)
+        else:
+            print(message)
