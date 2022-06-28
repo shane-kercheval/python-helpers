@@ -15,7 +15,8 @@ def get_test_path(file) -> str:
     """Returns the path to /tests folder, adjusting for the difference in the current working directory when
     debugging vs not debugging.
     """
-    return os.path.join('/code/tests/test_files', file)
+    path = os.getcwd()
+    return os.path.join(path, 'tests/test_files', file)
 
 
 def subtests_expected_vs_actual(test_case: TestCase,
