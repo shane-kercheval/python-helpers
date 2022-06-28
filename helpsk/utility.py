@@ -2,6 +2,8 @@
 """
 import inspect
 import warnings
+import logging
+import datetime
 import sys
 import os
 import pickle
@@ -113,7 +115,7 @@ class Timer:
 
         if self._use_logging:
             logging.basicConfig()
-            log_info(message)
+            logging.info(message)
         else:
             print(message)
         self._start = datetime.datetime.now()
@@ -125,6 +127,6 @@ class Timer:
         self._interval = self._end - self._start
         message = f'Timer Finished ({self._interval.total_seconds():.2f} seconds)'
         if self._use_logging:
-            log_info(message)
+            logging.info(message)
         else:
             print(message)

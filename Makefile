@@ -1,3 +1,5 @@
+.PHONY: tests
+
 docker_build:
 	cp ~/.pypirc ./.pypirc
 	docker compose -f docker-compose.yml up --build
@@ -5,14 +7,14 @@ docker_build:
 docker_run:
 	docker exec -it python-helpers-bash-1 /bin/zsh
 
-unittests:
+tests:
 	python -m unittest discover tests
 
 linting:
 	flake8 --max-line-length 110 --ignore=E127 helpsk
 
 ## Build package
-build: unittests linting
+build: tests linting
 	rm -fr dist
 	python -m build
 	twine upload dist/*
