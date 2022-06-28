@@ -14,6 +14,7 @@ linting:
 	flake8 --max-line-length 110 --ignore=E127 helpsk
 
 tests: linting
+	rm -f tests/test_files/logging/log.log
 	python -m unittest discover tests
 
 ## Build package
