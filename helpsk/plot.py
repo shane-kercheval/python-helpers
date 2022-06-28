@@ -61,7 +61,6 @@ def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
     plt.tight_layout()
 
 
-# pylint: disable=too-many-arguments
 def plot_correlation_heatmap(dataframe: pd.DataFrame,
                              threshold: Optional[float] = None,
                              title: Optional[str] = None,
@@ -140,7 +139,6 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
     plt.tight_layout()
 
 
-# pylint: disable=too-many-locals
 def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
                          figure_size: Tuple[int, int] = STANDARD_WIDTH_HEIGHT,
                          missing_value_replacement: str = '<Missing>'):
