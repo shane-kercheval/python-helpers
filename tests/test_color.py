@@ -77,9 +77,10 @@ class TestColors(unittest.TestCase):
         color_names = [e.name for e in Colors]
         color_values = [e.value for e in Colors]
 
-        check_plot(file_name=get_test_path() + '/test_files/color/colors.png',
+        check_plot(file_name=get_test_path('color/colors.png'),
                    plot_function=lambda: plot_colors(dict(zip(color_names, color_values)),
                                                      title="Colors Enum", sort_colors=False))
+
 
 if __name__ == '__main__':
     unittest.main()

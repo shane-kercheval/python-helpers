@@ -20,7 +20,6 @@ class Granularity(Enum):
     QUARTER = auto()
 
 
-# pylint: disable=too-many-return-statements
 def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
           granularity: Granularity = Granularity.DAY,
           fiscal_start: int = 1) -> [datetime.date, pd.Series]:

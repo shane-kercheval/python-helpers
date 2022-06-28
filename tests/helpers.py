@@ -1,7 +1,6 @@
 import os
 import re
 from importlib import reload
-from os import getcwd
 from typing import Callable, Union
 from unittest import TestCase
 
@@ -9,18 +8,15 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from helpsk.pandas import print_dataframe
-from helpsk.utility import is_debugging, redirect_stdout_to_file
+from helpsk.utility import redirect_stdout_to_file
 
 
-def get_test_path() -> str:
+def get_test_path(file) -> str:
     """Returns the path to /tests folder, adjusting for the difference in the current working directory when
     debugging vs not debugging.
     """
-    path = getcwd()
-    if not is_debugging():
-        path = path + '/tests'
-
-    return path
+    path = os.getcwd()
+    return os.path.join(path, 'tests/test_files', file)
 
 
 def subtests_expected_vs_actual(test_case: TestCase,
@@ -95,7 +91,7 @@ def check_plot(file_name: str, plot_function: Callable, set_size_w_h: Union[tupl
 
 def clean_formatted_dataframe(rendered):
     """`This dataframe changes the random code generated when saving formatted dataframes
-    (i.e df.style.render()). This is necessary because it each time unit tests are ran, the html changes,
+    (i.e df.style.to_html()). This is necessary because it each time unit tests are ran, the html changes,
     and it is difficult to know if the change/diff occurred because of the random code, or because something
     actually changed.
 
@@ -130,8 +126,8 @@ def get_data_credit() -> pd.DataFrame:
     # credit_g = fetch_openml('credit-g', version=1)
     # data = credit_g['data']
     # data['target'] = credit_g['target']
-    # data.to_pickle(get_test_path() + '/test_data/credit.pkl')
-    return pd.read_pickle(get_test_path() + '/test_data/credit.pkl')
+    # data.to_pickle(get_test_path('../test_data/credit.pkl'))
+    return pd.read_pickle(get_test_path('../test_data/credit.pkl'))
 
 
 def get_data_titanic() -> pd.DataFrame:
@@ -140,8 +136,8 @@ def get_data_titanic() -> pd.DataFrame:
     # titanic = fetch_openml('titanic', version=1)
     # data = titanic['data']
     # data['survived'] = titanic['target']
-    # data.to_pickle(get_test_path() + '/test_data/titanic.pkl')
-    return pd.read_pickle(get_test_path() + '/test_data/titanic.pkl')
+    # data.to_pickle(get_test_path('../test_data/titanic.pkl'))
+    return pd.read_pickle(get_test_path('../test_data/titanic.pkl'))
 
 
 def get_data_housing() -> pd.DataFrame:
@@ -151,8 +147,8 @@ def get_data_housing() -> pd.DataFrame:
     # housing = fetch_openml('houses', version=1)
     # data = housing['data']
     # data['target'] = housing['target']
-    # data.to_pickle(get_test_path() + '/test_data/housing.pkl')
-    return pd.read_pickle(get_test_path() + '/test_data/housing.pkl')
+    # data.to_pickle(get_test_path('../test_data/housing.pkl'))
+    return pd.read_pickle(get_test_path('../test_data/housing.pkl'))
 
 
 def helper_test_dataframe(file_name, dataframe):

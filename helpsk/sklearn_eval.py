@@ -1,6 +1,5 @@
 """This module contains helper functions when working with sklearn (scikit-learn) objects;
 in particular, for evaluating models"""
-# pylint: disable=too-many-lines
 import math
 import warnings
 from re import match
@@ -25,7 +24,6 @@ from sklearn.preprocessing import MinMaxScaler
 import helpsk.color as hcolor
 import helpsk.pandas_style as hstyle
 import helpsk.string as hstring
-# pylint: disable=too-many-locals
 from helpsk.pandas import get_numeric_columns, get_non_numeric_columns
 from helpsk.exceptions import HelpskParamValueError
 from helpsk.plot import STANDARD_WIDTH_HEIGHT, GOLDEN_RATIO
@@ -36,8 +34,6 @@ with warnings.catch_warnings():
     from statsmodels import api as sm  # https://github.com/statsmodels/statsmodels/issues/3814
 
 
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=too-many-public-methods
 class MLExperimentResults:
     """
     This class contains the logic to explore the results of a machine learning experiment. There are also
@@ -1480,9 +1476,6 @@ class MLExperimentResults:
         return fig
 
 
-# pylint: disable=too-many-instance-attributes
-# pylint: disable=too-many-public-methods
-# pylint: disable=too-many-instance-attributes,too-many-public-methods
 class TwoClassEvaluator:
     """This class calculates various metrics for Two Class (i.e. 0's/1's) prediction scenarios."""
     def __init__(self,

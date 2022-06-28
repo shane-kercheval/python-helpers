@@ -44,11 +44,11 @@ class TestPlot(unittest.TestCase):
         from helpsk.pandas import value_frequency
         value_frequency(series=test_series)
 
-        check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_value_frequency__sort_true.png',
+        check_plot(file_name=get_test_path('plot/test_plot_value_frequency__sort_true.png'),
                    plot_function=lambda: hplot.plot_value_frequency(series=test_series,
                                                                     sort_by_frequency=True))
 
-        check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_value_frequency__sort_false.png',
+        check_plot(file_name=get_test_path('plot/test_plot_value_frequency__sort_false.png'),
                    plot_function=lambda: hplot.plot_value_frequency(series=test_series,
                                                                     sort_by_frequency=False))
 
@@ -57,16 +57,20 @@ class TestPlot(unittest.TestCase):
         test_series.loc[0:10, 'credit_amount'] = np.nan
         test_series.loc[0:10, 'num_dependents'] = np.nan
 
-        check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_correlation_heatmap__default.png',
+        check_plot(file_name=get_test_path('plot/test_plot_correlation_heatmap__default.png'),
                    plot_function=lambda: hplot.plot_correlation_heatmap(test_series))
 
-        check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_correlation_heatmap__params.png',
-                   plot_function=lambda: hplot.plot_correlation_heatmap(test_series, threshold=0.2,
-                                                                        title='Credit Data: Correlations Above 0.2',
-                                                                        figure_size=(6, 6),
-                                                                        round_by=3,
-                                                                        features_to_highlight=['credit_amount',
-                                                                                               'num_dependents']))
+        check_plot(
+            file_name=get_test_path('plot/test_plot_correlation_heatmap__params.png'),
+            plot_function=lambda: hplot.plot_correlation_heatmap(
+                test_series,
+                threshold=0.2,
+                title='Credit Data: Correlations Above 0.2',
+                figure_size=(6, 6),
+                round_by=3,
+                features_to_highlight=['credit_amount', 'num_dependents']
+            )
+        )
 
     def test_plot_dodged_barchart(self):
         test_series = self.credit_data.copy()
@@ -75,7 +79,7 @@ class TestPlot(unittest.TestCase):
 
         original = test_series.copy()
 
-        check_plot(file_name=get_test_path() + '/test_files/plot/plot_dodged_barchart__default.png',
+        check_plot(file_name=get_test_path('plot/plot_dodged_barchart__default.png'),
                    plot_function=lambda: hplot.plot_dodged_barchart(dataframe=test_series,
                                                                     outer_column='own_telephone',
                                                                     inner_column='credit_history'))
@@ -93,7 +97,7 @@ class TestPlot(unittest.TestCase):
 
         original = test_series.copy()
 
-        check_plot(file_name=get_test_path() + '/test_files/plot/plot_dodged_barchart__booleans.png',
+        check_plot(file_name=get_test_path('plot/plot_dodged_barchart__booleans.png'),
                    plot_function=lambda: hplot.plot_dodged_barchart(dataframe=test_series,
                                                                     outer_column='own_telephone',
                                                                     inner_column='all_paid'))
@@ -107,20 +111,25 @@ class TestPlot(unittest.TestCase):
 
         original = test_series.copy()
 
-        check_plot(file_name=get_test_path() + '/test_files/plot/test_plot_histogram_with_categorical__default.png',
-                   plot_function=lambda: hplot.plot_histogram_with_categorical(dataframe=test_series,
-                                                                               numeric_column='credit_amount',
-                                                                               categorical_column='credit_history'))
+        check_plot(
+            file_name=get_test_path('plot/test_plot_histogram_with_categorical__default.png'),
+            plot_function=lambda: hplot.plot_histogram_with_categorical(
+                dataframe=test_series,
+                numeric_column='credit_amount',
+                categorical_column='credit_history'
+            )
+        )
 
         self.assertTrue(hval.dataframes_match([original, test_series]))
 
-    def test_plot_histogram_with_categorical(self):
+    def test_plot_histogram_with_categorical_bug(self):
         # bug found when no missing values are found in target because we added a <missing> category but
         # we get an error when calling reorder_categories with extra categories
         credit_data = self.credit_data.copy()
         hplot.plot_histogram_with_categorical(dataframe=credit_data,
                                               numeric_column='credit_amount',
                                               categorical_column='target')
+
 
 if __name__ == '__main__':
     unittest.main()

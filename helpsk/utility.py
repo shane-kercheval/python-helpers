@@ -2,10 +2,21 @@
 """
 import inspect
 import warnings
+import datetime
 import sys
 import os
 import pickle
+from pathlib import Path
+import pandas as pd
+
+from yaml import safe_load
 from contextlib import contextmanager, redirect_stdout
+
+
+def open_yaml(file_path):
+    """Open a yaml file via yaml.safe_load."""
+    with open(file_path, "r") as f:
+        return safe_load(f)
 
 
 def read_pickle(path):
@@ -33,6 +44,54 @@ def to_pickle(obj, path):
     """
     with open(path, 'wb') as handle:
         pickle.dump(obj, handle)
+
+
+def dataframe_to_pickle(df: pd.DataFrame, output_directory: str, file_name: str) -> str:
+    """
+    This function takes a Pandas DataFrame and saves it as a pickled object to the directory with the file
+    name specified. The output directory is created if it does not yet exist.
+
+    Args:
+        df: the Pandas DataFrame to pickle
+        output_directory: the directory to save the pickled object
+        file_name: the name of the file
+    """
+    Path(output_directory).mkdir(exist_ok=True)
+    file_path = os.path.join(output_directory, file_name)
+    df.to_pickle(file_path)
+    return file_path
+
+
+def dataframe_to_csv(df: pd.DataFrame, output_directory: str, file_name: str) -> str:
+    """
+    This function takes a Pandas DataFrame and saves it as a csv file to the directory with the file
+    name specified. The output directory is created if it does not yet exist.
+
+    Args:
+        df: the Pandas DataFrame to pickle
+        output_directory: the directory to save the csv file
+        file_name: the name of the file
+    """
+    Path(output_directory).mkdir(exist_ok=True)
+    file_path = os.path.join(output_directory, file_name)
+    df.to_csv(file_path, index=False)
+    return file_path
+
+
+def object_to_pickle(obj: object, output_directory: str, file_name: str) -> str:
+    """
+    This function takes a generic object and saves it as a pickled object to the directory with the file
+    name specified. The output directory is created if it does not yet exist.
+
+    Args:
+        obj: the object to pickle
+        output_directory: the directory to save the pickled object
+        file_name: the name of the file
+    """
+    Path(output_directory).mkdir(exist_ok=True)
+    file_path = os.path.join(output_directory, file_name)
+    to_pickle(obj=obj, path=file_path)
+    return file_path
 
 
 @contextmanager
@@ -98,3 +157,21 @@ def is_debugging():
             return True
 
     return False
+
+
+class Timer:
+    """
+    This class provides way to time the duration of code within the context manager.
+    """
+    def __init__(self, message):
+        self._message = message
+
+    def __enter__(self):
+        print(f'Timer Started: {self._message}')
+        self._start = datetime.datetime.now()
+        return self
+
+    def __exit__(self, *args):
+        self._end = datetime.datetime.now()
+        self._interval = self._end - self._start
+        print(f'Timer Finished ({self._interval.total_seconds():.2f} seconds)')

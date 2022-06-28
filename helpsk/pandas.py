@@ -295,7 +295,6 @@ def reorder_categories(categorical: Union[pd.Series, pd.Categorical],
     return results
 
 
-# pylint: disable=too-many-arguments
 def top_n_categories(categorical: Union[pd.Series, pd.Categorical],
                      top_n: int = 5,
                      other_category: str = 'Other',
@@ -679,7 +678,6 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
     return results
 
 
-# pylint: disable=too-many-locals, too-many-branches, too-many-statements
 def count_groups(dataframe: pd.DataFrame,
                  group_1: str,
                  group_2: Optional[str] = None,
@@ -857,6 +855,6 @@ def count_groups(dataframe: pd.DataFrame,
                 format(subset=idx[:, idx[(group_2, 'Sum Perc')]], precision=4, formatter='{:,.2%}'.format). \
                 bar(subset=idx[:, idx[(group_2, 'Sum Perc')]], vmin=0, vmax=1, color=color.GRAY)
 
-    final = final.hide_index()
+    final = final.hide(axis='index')
 
     return final

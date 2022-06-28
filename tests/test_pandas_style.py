@@ -1,8 +1,10 @@
 import unittest
-from enum import unique, auto
+from enum import Enum, unique, auto
+import pandas as pd
+import numpy as np
+import datetime
 
-from helpsk.pandas import *
-from helpsk.pandas_style import html_escape_dataframe
+import helpsk.pandas_style as hps
 from helpsk.utility import suppress_warnings
 from helpsk.validation import dataframes_match
 from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
@@ -35,13 +37,13 @@ class TestPandasStyle(unittest.TestCase):
         cls.sample_data = sample_data
 
     def test_format(self):
-        with open(get_test_path() + '/test_files/pandas_style/format__default.html', 'w') as file:
-            file.write(clean_formatted_dataframe(pstyle.format(self.sample_data).render()))
+        with open(get_test_path('pandas_style/format__default.html'), 'w') as file:
+            file.write(clean_formatted_dataframe(hps.format(self.sample_data).to_html()))
 
     def test_background_color(self):
         with suppress_warnings():
-            with open(get_test_path() + '/test_files/pandas_style/background_color__default.html', 'w') as file:
-                file.write(clean_formatted_dataframe(pstyle.background_color(self.sample_data).render()))
+            with open(get_test_path('pandas_style/background_color__default.html'), 'w') as file:
+                file.write(clean_formatted_dataframe(hps.background_color(self.sample_data).to_html()))
 
     def test_bar_inverse(self):
         # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
@@ -54,13 +56,13 @@ class TestPandasStyle(unittest.TestCase):
                          column='bar_inverse',
                          value=test_data['col_f'].copy())
 
-        with open(get_test_path() + '/test_files/pandas_style/inverse_bar.html', 'w') as file:
+        with open(get_test_path('pandas_style/inverse_bar.html'), 'w') as file:
             table_html = test_data.style. \
                 bar(subset=['col_a'], color='pink', vmin=2). \
-                pipe(pstyle.bar_inverse, subset='col_a_copy', color='pink', min_value=2). \
+                pipe(hps.bar_inverse, subset='col_a_copy', color='pink', min_value=2). \
                 bar(subset=['col_f'], color='green'). \
-                pipe(pstyle.bar_inverse, subset='bar_inverse', color='green'). \
-                render()
+                pipe(hps.bar_inverse, subset='bar_inverse', color='green'). \
+                to_html()
 
             file.write(clean_formatted_dataframe(table_html))
 
@@ -72,12 +74,12 @@ class TestPandasStyle(unittest.TestCase):
         test_data.insert(loc=5,
                          column='credit_amount_copy',
                          value=test_data['credit_amount'].copy())
-        with open(get_test_path() + '/test_files/pandas_style/all_styles.html', 'w') as file:
+        with open(get_test_path('pandas_style/all_styles.html'), 'w') as file:
             table_html = test_data. \
                 head(20). \
-                pipe(pstyle.bar_inverse, subset='credit_amount_copy', color='gray'). \
+                pipe(hps.bar_inverse, subset='credit_amount_copy', color='gray'). \
                 bar(subset=['credit_amount'], color='grey'). \
-                render()
+                to_html()
             file.write(clean_formatted_dataframe(table_html))
 
     def test_html_escape_dataframe(self):
@@ -94,7 +96,7 @@ class TestPandasStyle(unittest.TestCase):
             '&lt;C&gt;': [np.nan, np.nan, '&lt;asdf&gt;']
         }, index=['&lt;1&gt;', '2', '&lt;3&gt;'])
         expected_dataframe['&lt;C&gt;'] = expected_dataframe['&lt;C&gt;'].astype('category')
-        self.assertTrue(dataframes_match([html_escape_dataframe(dataframe), expected_dataframe]))
+        self.assertTrue(dataframes_match([hps.html_escape_dataframe(dataframe), expected_dataframe]))
 
         # multi-index
         dataframe = pd.DataFrame({
@@ -114,7 +116,8 @@ class TestPandasStyle(unittest.TestCase):
                                             ('2', '&lt;y&gt;'),
                                             ('&lt;3&gt;', 'z')]))
         expected_dataframe['&lt;C&gt;'] = expected_dataframe['&lt;C&gt;'].astype('category')
-        self.assertTrue(dataframes_match([html_escape_dataframe(dataframe), expected_dataframe]))
+        self.assertTrue(dataframes_match([hps.html_escape_dataframe(dataframe), expected_dataframe]))
+
 
 if __name__ == '__main__':
     unittest.main()
