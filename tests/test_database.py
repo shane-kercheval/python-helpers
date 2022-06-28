@@ -51,16 +51,16 @@ def mock_snowflake():
 class TestDatabase(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.sample_redshift_file = get_test_path() + '/test_files/database/sample_redshift.config'
+        self.sample_redshift_file = get_test_path('database/sample_redshift.config')
         self.assertTrue(path.isfile(self.sample_redshift_file))
 
-        self.sample_snowflake_file = get_test_path() + '/test_files/database/sample_snowflake.config'
+        self.sample_snowflake_file = get_test_path('database/sample_snowflake.config')
         self.assertTrue(path.isfile(self.sample_snowflake_file))
 
-        self.sample_snowflake_autocommit_true_file = get_test_path() + '/test_files/database/sample_snowflake_autocommit_true.config'
+        self.sample_snowflake_autocommit_true_file = get_test_path('database/sample_snowflake_autocommit_true.config')  # noqa
         self.assertTrue(path.isfile(self.sample_snowflake_autocommit_true_file))
 
-        self.sample_snowflake_autocommit_false_file = get_test_path() + '/test_files/database/sample_snowflake_autocommit_false.config'
+        self.sample_snowflake_autocommit_false_file = get_test_path('database/sample_snowflake_autocommit_false.config')  # noqa
         self.assertTrue(path.isfile(self.sample_snowflake_autocommit_false_file))
 
     def test_GenericConfigFile(self):
@@ -308,6 +308,7 @@ class TestDatabase(unittest.TestCase):
             database.connect()
         self.assertFalse(database.is_connected())
         self.assertIsNone(database.connection_object)
+
 
 if __name__ == '__main__':
     unittest.main()

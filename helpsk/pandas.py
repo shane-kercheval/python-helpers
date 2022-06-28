@@ -855,6 +855,6 @@ def count_groups(dataframe: pd.DataFrame,
                 format(subset=idx[:, idx[(group_2, 'Sum Perc')]], precision=4, formatter='{:,.2%}'.format). \
                 bar(subset=idx[:, idx[(group_2, 'Sum Perc')]], vmin=0, vmax=1, color=color.GRAY)
 
-    final = final.hide_index()
+    final = final.hide(axis='index')
 
     return final

@@ -2,7 +2,6 @@
 """
 import inspect
 import warnings
-import logging
 import datetime
 import sys
 import os

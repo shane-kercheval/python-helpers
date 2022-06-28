@@ -6,7 +6,7 @@ import pandas as pd
 
 from helpsk import string as hs
 from helpsk import validation as hv
-from helpsk.exceptions import *
+from helpsk import exceptions as he
 
 
 # noinspection PyMethodMayBeStatic
@@ -82,78 +82,78 @@ class TestValidation(unittest.TestCase):
 
     def test_assert_not_none_nan(self):
 
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(None)
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(np.NaN)
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.NA)
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.NaT)
 
         hv.assert_not_none_nan(0)
         hv.assert_not_none_nan('')
 
         # test list
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan([1, np.nan, None])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan([1, np.nan])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan([1, None])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan([np.nan])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan([None])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan([])
         hv.assert_not_none_nan([1])
         hv.assert_not_none_nan([''])
 
         # test numpy array
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(np.array([1, np.nan, None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(np.array([1, np.nan]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(np.array([1, None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(np.array([np.nan]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(np.array([None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(np.array([]))
         hv.assert_not_none_nan(np.array([1]))
         hv.assert_not_none_nan(np.array(['']))
 
         # test pandas series
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.Series([1, np.nan, None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.Series([1, np.nan]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.Series([1, None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.Series([np.nan]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.Series([None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.Series([], dtype=float))
         hv.assert_not_none_nan(pd.Series([1]))
         hv.assert_not_none_nan(pd.Series(['']))
 
         # test pandas data.frame
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.DataFrame([[1, np.nan, None], [1, 2, 3]]))  # noqa
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.DataFrame([[1, np.nan], [1, 2]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.DataFrame([[1, None], [1, 2]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.DataFrame([[np.nan], [1]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.DataFrame([[None], [1]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_none_nan(pd.DataFrame([], dtype=float))
         hv.assert_not_none_nan(pd.DataFrame([1]))
         hv.assert_not_none_nan(pd.DataFrame([[1], [1]]))
@@ -219,79 +219,79 @@ class TestValidation(unittest.TestCase):
         self.assertFalse(hv.any_missing(pd.DataFrame([[1], [1]])))
 
     def test_assert_not_any_missing(self):
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(None)
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(np.NaN)
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.NA)
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.NaT)
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing('')
 
         hv.assert_not_any_missing(0)
 
         # test list
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing([1, np.nan, None])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing([1, np.nan])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing([1, None])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing([np.nan])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing([None])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing([])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing([''])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(['abc', ''])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing([1, ''])
         hv.assert_not_any_missing([1])
         hv.assert_not_any_missing(['a'])
 
         # test pandas series
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series([1, np.nan, None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series([1, np.nan]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series([1, None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series([np.nan]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series([None]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series([], dtype=float))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series(['']))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series(['abc', '']))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.Series([1, '']))
         hv.assert_not_any_missing(pd.Series([1]))
         hv.assert_not_any_missing(pd.Series(['a']))
 
         # test pandas data.frame
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.DataFrame([[1, np.nan, None], [1, 2, 3]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.DataFrame([[1, np.nan], [1, 2]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.DataFrame([[1, None], [1, 2]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.DataFrame([[np.nan], [1]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.DataFrame([[None], [1]]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.DataFrame([], dtype=float))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.DataFrame([['abc', ''], ['abc', 'abc']]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_any_missing(pd.DataFrame(['']))
         hv.assert_not_any_missing(pd.DataFrame([1]))
         hv.assert_not_any_missing(pd.DataFrame([[1], [1]]))
@@ -321,11 +321,11 @@ class TestValidation(unittest.TestCase):
         hv.assert_not_duplicated(['', 1])
         hv.assert_not_duplicated(['', 1, None])
 
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_duplicated(['', 1, ''])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_duplicated(['', 1, 1])
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_duplicated(['', 1, None, None])
 
         # test pd.Series
@@ -333,11 +333,11 @@ class TestValidation(unittest.TestCase):
         hv.assert_not_duplicated(pd.Series(['', 1]))
         hv.assert_not_duplicated(pd.Series(['', 1, None]))
 
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_duplicated(pd.Series(['', 1, '']))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_duplicated(pd.Series(['', 1, 1]))
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_not_duplicated(pd.Series(['', 1, None, None]))
 
     def test_assert_true(self):
@@ -345,15 +345,15 @@ class TestValidation(unittest.TestCase):
         self.assertTrue(isinstance(np.bool_(True), np.bool_))
         hv.assert_true(np.bool_(True))
 
-        with self.assertRaises(HelpskParamTypeError):
+        with self.assertRaises(he.HelpskParamTypeError):
             hv.assert_true([])  # noqa
-        with self.assertRaises(HelpskParamTypeError):
+        with self.assertRaises(he.HelpskParamTypeError):
             hv.assert_true([True])  # noqa
 
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_true(False)
 
-        with self.assertRaises(HelpskAssertionError) as cm:
+        with self.assertRaises(he.HelpskAssertionError) as cm:
             hv.assert_true(False, message='my message')
         self.assertEqual(cm.exception.args[0], 'my message')
 
@@ -362,15 +362,15 @@ class TestValidation(unittest.TestCase):
         self.assertTrue(isinstance(np.bool_(False), np.bool_))
         hv.assert_false(np.bool_(False))
 
-        with self.assertRaises(HelpskParamTypeError):
+        with self.assertRaises(he.HelpskParamTypeError):
             hv.assert_false([])  # noqa
-        with self.assertRaises(HelpskParamTypeError):
+        with self.assertRaises(he.HelpskParamTypeError):
             hv.assert_false([False])  # noqa
 
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_false(True)
 
-        with self.assertRaises(HelpskAssertionError) as cm:
+        with self.assertRaises(he.HelpskAssertionError) as cm:
             hv.assert_false(True, message='my message')
         self.assertEqual(cm.exception.args[0], 'my message')
 
@@ -403,7 +403,7 @@ class TestValidation(unittest.TestCase):
         ]
         for index, case in enumerate(cases):
             with self.subTest(index=index):
-                with self.assertRaises(HelpskAssertionError):
+                with self.assertRaises(he.HelpskAssertionError):
                     hv.assert_all(case)
 
     def test_assert_not_any(self):
@@ -435,7 +435,7 @@ class TestValidation(unittest.TestCase):
         ]
         for index, case in enumerate(cases):
             with self.subTest(index=index):
-                with self.assertRaises(HelpskAssertionError):
+                with self.assertRaises(he.HelpskAssertionError):
                     hv.assert_not_any(case)
 
     def test_iterables_are_equal(self):
@@ -445,7 +445,10 @@ class TestValidation(unittest.TestCase):
             if dtype != str:
                 assert hv.iterables_are_equal(np.array(iterable_a), np.array(iterable_b))
                 assert hv.iterables_are_equal(np.array(iterable_a), iterable_b)
-            assert hv.iterables_are_equal(pd.Series(iterable_a, dtype=dtype), pd.Series(iterable_b, dtype=dtype))
+            assert hv.iterables_are_equal(
+                pd.Series(iterable_a, dtype=dtype),
+                pd.Series(iterable_b, dtype=dtype)
+            )
 
         subtest_iterables_are_equal([], [], dtype=np.float64)
         subtest_iterables_are_equal([np.nan], [np.nan], np.float64)
@@ -453,18 +456,18 @@ class TestValidation(unittest.TestCase):
         subtest_iterables_are_equal([np.nan, 1, 2, 3, 4], [np.nan, 1, 2, 3, 4], np.float64)
         subtest_iterables_are_equal([np.nan, 1, 2, 3, 4, np.nan], [np.nan, 1, 2, 3, 4, np.nan], np.float64)
 
-        subtest_iterables_are_equal(iterable_a=['a', 'b', 'c', 'd'], iterable_b=['a', 'b', 'c', 'd'], dtype=str)
+        subtest_iterables_are_equal(iterable_a=['a', 'b', 'c', 'd'], iterable_b=['a', 'b', 'c', 'd'], dtype=str)  # noqa
         subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 'd'], [np.nan, 'a', 'b', 'c', 'd'], str)
-        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 'd', np.nan], [np.nan, 'a', 'b', 'c', 'd', np.nan], str)
+        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 'd', np.nan], [np.nan, 'a', 'b', 'c', 'd', np.nan], str)  # noqa
 
         subtest_iterables_are_equal(['a', 'b', 'c', 4], ['a', 'b', 'c', 4], str)
         subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 4], [np.nan, 'a', 'b', 'c', 4], str)
-        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 4, np.nan], [np.nan, 'a', 'b', 'c', 4, np.nan], str)
+        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 4, np.nan], [np.nan, 'a', 'b', 'c', 4, np.nan], str)  # noqa
 
         def subtest_iterables_are_not_equal(iterable_a, iterable_b, dtype):
             assert not hv.iterables_are_equal(iterable_a, iterable_b)
             assert not hv.iterables_are_equal(np.array(iterable_a), np.array(iterable_b))
-            assert not hv.iterables_are_equal(pd.Series(iterable_a, dtype=dtype), pd.Series(iterable_b, dtype=dtype))
+            assert not hv.iterables_are_equal(pd.Series(iterable_a, dtype=dtype), pd.Series(iterable_b, dtype=dtype))  # noqa
 
         subtest_iterables_are_not_equal(iterable_a=[], iterable_b=[1], dtype=np.float64)
         subtest_iterables_are_not_equal(iterable_a=[1], iterable_b=[], dtype=np.float64)
@@ -510,23 +513,25 @@ class TestValidation(unittest.TestCase):
 
     def test_dataframes_match(self):
 
-        dataframe_1 = pd.DataFrame({'col_floats': [1.123456789, 2.123456789, 3.123456789, np.nan],
-                                    'col_strings': [np.nan, 'a', 'b', 'c'],
-                                    'col_enums': [np.nan, hs.RoundTo.NONE, hs.RoundTo.AUTO, hs.RoundTo.THOUSANDS],
-                                    'col_dates': pd.date_range('2021-01-01', periods=4),
-                                    'col_missing': [np.nan, np.nan, np.nan, np.nan]})
+        dataframe_1 = pd.DataFrame({
+            'col_floats': [1.123456789, 2.123456789, 3.123456789, np.nan],
+            'col_strings': [np.nan, 'a', 'b', 'c'],
+            'col_enums': [np.nan, hs.RoundTo.NONE, hs.RoundTo.AUTO, hs.RoundTo.THOUSANDS],
+            'col_dates': pd.date_range('2021-01-01', periods=4),
+            'col_missing': [np.nan, np.nan, np.nan, np.nan]}
+        )
         dataframe_1.loc[0, 'col_dates'] = np.nan
 
-        with self.assertRaises(HelpskParamTypeError):
+        with self.assertRaises(he.HelpskParamTypeError):
             hv.dataframes_match(dataframes=None)  # noqa
 
-        with self.assertRaises(HelpskParamTypeError):
+        with self.assertRaises(he.HelpskParamTypeError):
             hv.dataframes_match(dataframes=dataframe_1)  # noqa
 
-        with self.assertRaises(HelpskParamValueError):
+        with self.assertRaises(he.HelpskParamValueError):
             hv.dataframes_match(dataframes=[])
 
-        with self.assertRaises(HelpskParamValueError):
+        with self.assertRaises(he.HelpskParamValueError):
             hv.dataframes_match(dataframes=[dataframe_1])
 
         # test that there are no side effects; e.g. we set the index/column values if we ignore them
@@ -642,16 +647,16 @@ class TestValidation(unittest.TestCase):
         dataframe_1 = pd.DataFrame({'col': [1.123456789, 2.123456789, 3.123456789]})
 
         # test assertion errors when passing in invalid data
-        with self.assertRaises(HelpskParamTypeError):
+        with self.assertRaises(he.HelpskParamTypeError):
             hv.assert_dataframes_match(dataframes=None)  # noqa
 
-        with self.assertRaises(HelpskParamTypeError):
+        with self.assertRaises(he.HelpskParamTypeError):
             hv.assert_dataframes_match(dataframes=dataframe_1)  # noqa
 
-        with self.assertRaises(HelpskParamValueError):
+        with self.assertRaises(he.HelpskParamValueError):
             hv.assert_dataframes_match(dataframes=[])
 
-        with self.assertRaises(HelpskParamValueError):
+        with self.assertRaises(he.HelpskParamValueError):
             hv.assert_dataframes_match(dataframes=[dataframe_1])
 
         self.assertTrue(hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_1]) is None)
@@ -659,7 +664,7 @@ class TestValidation(unittest.TestCase):
         dataframe_2 = dataframe_1.copy()
         dataframe_2.iat[0, 0] = np.nan
 
-        with self.assertRaises(HelpskAssertionError):
+        with self.assertRaises(he.HelpskAssertionError):
             hv.assert_dataframes_match(dataframes=[dataframe_1, dataframe_2])
 
     def test_is_close(self):
@@ -683,13 +688,13 @@ class TestValidation(unittest.TestCase):
             hv.assert_is_close(-value, -value - tolerance)
             hv.assert_is_close(-value - tolerance, -value)
 
-            with self.assertRaises(HelpskAssertionError):
+            with self.assertRaises(he.HelpskAssertionError):
                 hv.assert_is_close(value, value + failure_tolerance)
-            with self.assertRaises(HelpskAssertionError):
+            with self.assertRaises(he.HelpskAssertionError):
                 hv.assert_is_close(value + failure_tolerance, value)
-            with self.assertRaises(HelpskAssertionError):
+            with self.assertRaises(he.HelpskAssertionError):
                 hv.assert_is_close(-value, -value - failure_tolerance)
-            with self.assertRaises(HelpskAssertionError):
+            with self.assertRaises(he.HelpskAssertionError):
                 hv.assert_is_close(-value + -failure_tolerance, -value)
 
         sub_test(value=0, tolerance=0.000001, failure_tolerance=0.0000011)
@@ -711,6 +716,7 @@ class TestValidation(unittest.TestCase):
         # should return False since my_function_exception raises ValueError, not TypeError
         self.assertFalse(hv.raises_exception(my_function_exception, TypeError))
         self.assertFalse(hv.raises_exception(my_function_runs))
+
 
 if __name__ == '__main__':
     unittest.main()

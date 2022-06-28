@@ -7,7 +7,8 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import make_scorer, f1_score, precision_score, recall_score, SCORERS, roc_auc_score, fbeta_score, cohen_kappa_score, \
+from sklearn.metrics import make_scorer, f1_score, precision_score, recall_score, SCORERS, roc_auc_score, \
+    fbeta_score, cohen_kappa_score, \
     confusion_matrix, mean_squared_error, mean_absolute_error
 from sklearn.model_selection import train_test_split, GridSearchCV, RepeatedKFold
 from sklearn.pipeline import Pipeline
@@ -19,7 +20,8 @@ from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults, TwoClassEvaluator, RegressionEvaluator
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
 from helpsk.utility import redirect_stdout_to_file
-from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, get_data_housing, clean_formatted_dataframe
+from tests.helpers import get_data_credit, get_test_path, check_plot, helper_test_dataframe, \
+    get_data_housing, clean_formatted_dataframe
 
 
 def warn(*args, **kwargs):  # noqa
@@ -180,7 +182,7 @@ class TestSklearnEval(unittest.TestCase):
                                                             description="test description",
                                                             parameter_name_mappings=new_param_column_names)
 
-        yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search.yaml'
+        yaml_file = get_test_path('sklearn_eval/credit_data__grid_search.yaml')
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)
         parser_from_dict = MLExperimentResults(parser._dict)
@@ -221,17 +223,17 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.test_score_rankings, parser_from_dict.test_score_rankings)
         self.assertEqual(parser.test_score_rankings, parser_from_yaml.test_score_rankings)
         for score in parser.score_names:
-            self.assertTrue(all(np.array(parser.test_score_rankings[score]) == grid_search_credit.cv_results_[f'rank_test_{score}']))
+            self.assertTrue(all(np.array(parser.test_score_rankings[score]) == grid_search_credit.cv_results_[f'rank_test_{score}']))  # noqa
 
         self.assertEqual(
             parser.trial_labels(order_from_best_to_worst=True),
             [
                 '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',
+                '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
                 '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',
+                '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
                 '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',
+                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
                 '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',
                 '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'
             ]
@@ -240,13 +242,13 @@ class TestSklearnEval(unittest.TestCase):
             parser.trial_labels(order_from_best_to_worst=False),
             [
                 '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',
+                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
                 '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',
+                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
                 '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',
+                '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
                 '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'
+                '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'  # noqa
              ]
         )
 
@@ -268,7 +270,7 @@ class TestSklearnEval(unittest.TestCase):
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
 
         cv_dataframe = parser.to_dataframe(exclude_zero_variance_params=False)
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores__dataframe__no_exclude.txt'):
+        with redirect_stdout_to_file(get_test_path('sklearn_eval/credit__grid_search__all_scores__dataframe__no_exclude.txt')):  # noqa
             print_dataframe(cv_dataframe)
         # ensure the hyper-param columns (last 4 columns) are in the same order as the mapping.
         self.assertEqual(list(cv_dataframe.columns[-4:]), list(new_param_column_names.values()))
@@ -277,7 +279,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertTrue(all(cv_dataframe['min_samples_split'] == [2, 2, 2, 2, 2, 2, 2, 2]))
         del cv_dataframe
 
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores__dataframe__exclude.txt'):
+        with redirect_stdout_to_file(get_test_path('sklearn_eval/credit__grid_search__all_scores__dataframe__exclude.txt')):  # noqa
             print_dataframe(parser.to_dataframe(exclude_zero_variance_params=True))
 
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
@@ -311,14 +313,14 @@ class TestSklearnEval(unittest.TestCase):
         encoder_values = [str(x) for x in list(grid_search_credit.cv_results_[encoder_param_name].data)]
         self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[3]].tolist())
 
-        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores.html', 'w') as file:
-            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().render()))
+        with open(get_test_path('sklearn_eval/credit__grid_search__all_scores.html'), 'w') as file:
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().to_html()))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__all_scores_2.html', 'w') as file:
-            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(exclude_zero_variance_params=False).render()))
+        with open(get_test_path('sklearn_eval/credit__grid_search__all_scores_2.html'), 'w') as file:
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(exclude_zero_variance_params=False).to_html()))  # noqa
 
-        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__primary_score_only.html', 'w') as file:
-            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).render()))
+        with open(get_test_path('sklearn_eval/credit__grid_search__primary_score_only.html'), 'w') as file:
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).to_html()))  # noqa
 
         assert_np_arrays_are_close(parser.primary_score_averages,
                                    np.array(parser.test_score_averages[parser.primary_score_name]))
@@ -440,7 +442,7 @@ class TestSklearnEval(unittest.TestCase):
                           'min_samples_split': 2,
                           'encoder': 'OneHotEncoder()'})
 
-        self.assertTrue(all([parser.to_dataframe(exclude_zero_variance_params=False).loc[parser.best_score_index, key] == value
+        self.assertTrue(all([parser.to_dataframe(exclude_zero_variance_params=False).loc[parser.best_score_index, key] == value  # noqa
                              for key, value in parser.best_params.items()]))
 
         self.assertEqual(parser.best_score, parser_from_dict.best_score)
@@ -454,7 +456,7 @@ class TestSklearnEval(unittest.TestCase):
                                                             higher_score_is_better=True,
                                                             description="test description",
                                                             parameter_name_mappings=None)
-        yaml_file = get_test_path() + '/test_files/sklearn_eval/credit_data__grid_search_roc.yaml'
+        yaml_file = get_test_path('sklearn_eval/credit_data__grid_search_roc.yaml')
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)
         parser_from_dict = MLExperimentResults(parser._dict)
@@ -494,7 +496,7 @@ class TestSklearnEval(unittest.TestCase):
 
         self.assertTrue(isinstance(parser.test_score_rankings, dict))
         self.assertEqual(list(parser.test_score_rankings.keys()), parser.score_names)
-        self.assertTrue(all(np.array(parser.test_score_rankings['roc_auc']) == grid_search_credit.cv_results_['rank_test_score']))
+        self.assertTrue(all(np.array(parser.test_score_rankings['roc_auc']) == grid_search_credit.cv_results_['rank_test_score']))  # noqa
         self.assertEqual(parser.test_score_rankings, parser_from_dict.test_score_rankings)
         self.assertEqual(parser.test_score_rankings, parser_from_yaml.test_score_rankings)
 
@@ -532,7 +534,7 @@ class TestSklearnEval(unittest.TestCase):
                                    np.array(parser_from_yaml.test_score_averages[parser.primary_score_name]))
 
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__single_score__dataframe.txt'):
+        with redirect_stdout_to_file(get_test_path('sklearn_eval/credit__grid_search__single_score__dataframe.txt')):  # noqa
             print_dataframe(parser.to_dataframe())
         cv_dataframe = parser.to_dataframe().sort_index()
         hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
@@ -546,17 +548,17 @@ class TestSklearnEval(unittest.TestCase):
                                                            labeled_dataframe.drop(columns=['Trial Index',
                                                                                            'label'])])
 
-        self.assertEqual(list(grid_search_credit.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())
-        self.assertEqual(list(grid_search_credit.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
+        self.assertEqual(list(grid_search_credit.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())  # noqa
+        self.assertEqual(list(grid_search_credit.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())  # noqa
         encoder_values = [str(x) for x in
-                          list(grid_search_credit.cv_results_['param_preparation__non_numeric_pipeline__encoder_chooser__transformer'].data)]
+                          list(grid_search_credit.cv_results_['param_preparation__non_numeric_pipeline__encoder_chooser__transformer'].data)]  # noqa
         self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[2]].tolist())
 
-        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__single_score_all_scores.html', 'w') as file:
-            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().render()))
+        with open(get_test_path('sklearn_eval/credit__grid_search__single_score_all_scores.html'), 'w') as file:  # noqa
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().to_html()))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/credit__grid_search__single_score_primary_score_only.html', 'w') as file:
-            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).render()))
+        with open(get_test_path('sklearn_eval/credit__grid_search__single_score_primary_score_only.html'), 'w') as file:  # noqa
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).to_html()))  # noqa
 
         self.assertTrue(isinstance(parser.test_score_averages, dict))
         self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
@@ -581,8 +583,10 @@ class TestSklearnEval(unittest.TestCase):
                          parser.number_of_trials)
 
         self.assertEqual(parser.numeric_parameters, ['model__n_estimators'])
-        self.assertEqual(parser.non_numeric_parameters, ['model__max_features',
-                                                         'preparation__non_numeric_pipeline__encoder_chooser__transformer'])
+        self.assertEqual(
+            parser.non_numeric_parameters,
+            ['model__max_features', 'preparation__non_numeric_pipeline__encoder_chooser__transformer']
+        )
 
         assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
                                    grid_search_credit.cv_results_['mean_test_score'])
@@ -597,9 +601,9 @@ class TestSklearnEval(unittest.TestCase):
         assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
                                    grid_search_credit.cv_results_['std_test_score'])
         assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
-                                   np.array(parser_from_dict.test_score_standard_deviations[parser.primary_score_name]))
+                                   np.array(parser_from_dict.test_score_standard_deviations[parser.primary_score_name]))  # noqa
         assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
-                                   np.array(parser_from_yaml.test_score_standard_deviations[parser.primary_score_name]))
+                                   np.array(parser_from_yaml.test_score_standard_deviations[parser.primary_score_name]))  # noqa
 
         self.assertIsNone(parser.train_score_averages)
         self.assertIsNone(parser.train_score_standard_deviations)
@@ -656,8 +660,10 @@ class TestSklearnEval(unittest.TestCase):
                          grid_search_credit.best_params_['model__max_features'])
         self.assertEqual(parser.best_params['model__n_estimators'],
                          grid_search_credit.best_params_['model__n_estimators'])
-        self.assertEqual(parser.best_params['preparation__non_numeric_pipeline__encoder_chooser__transformer'],
-                         str(grid_search_credit.best_params_['preparation__non_numeric_pipeline__encoder_chooser__transformer']))
+        self.assertEqual(
+            parser.best_params['preparation__non_numeric_pipeline__encoder_chooser__transformer'],
+            str(grid_search_credit.best_params_['preparation__non_numeric_pipeline__encoder_chooser__transformer'])  # noqa
+        )
 
         self.assertEqual(parser.best_score, parser_from_dict.best_score)
         self.assertEqual(parser.best_score, parser_from_yaml.best_score)
@@ -669,7 +675,7 @@ class TestSklearnEval(unittest.TestCase):
         parser = MLExperimentResults.from_sklearn_search_cv(searcher=grid_search_housing,
                                                             higher_score_is_better=False,
                                                             description="test description")
-        yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search.yaml'
+        yaml_file = get_test_path('sklearn_eval/housing_data__grid_search.yaml')
         os.remove(yaml_file)
         parser.to_yaml_file(yaml_file)
         parser_from_dict = MLExperimentResults(parser._dict)
@@ -710,7 +716,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.test_score_rankings, parser_from_dict.test_score_rankings)
         self.assertEqual(parser.test_score_rankings, parser_from_yaml.test_score_rankings)
         for score in parser.score_names:
-            self.assertTrue(all(np.array(parser.test_score_rankings[score]) == grid_search_housing.cv_results_[f'rank_test_{score}']))
+            self.assertTrue(all(np.array(parser.test_score_rankings[score]) == grid_search_housing.cv_results_[f'rank_test_{score}']))  # noqa
 
         self.assertEqual(parser.trial_labels(order_from_best_to_worst=True),
                          ['{model__max_features: auto, model__n_estimators: 50}',
@@ -741,7 +747,7 @@ class TestSklearnEval(unittest.TestCase):
                           lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
 
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
-        with redirect_stdout_to_file(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__dataframe.txt'):
+        with redirect_stdout_to_file(get_test_path('sklearn_eval/housing__grid_search__dataframe.txt')):
             print_dataframe(parser.to_dataframe())
         cv_dataframe = parser.to_dataframe().sort_index()
         hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
@@ -757,14 +763,14 @@ class TestSklearnEval(unittest.TestCase):
                                                            labeled_dataframe.drop(columns=['Trial Index',
                                                                                            'label'])])
 
-        self.assertEqual(list(grid_search_housing.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())
-        self.assertEqual(list(grid_search_housing.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())
+        self.assertEqual(list(grid_search_housing.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())  # noqa
+        self.assertEqual(list(grid_search_housing.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())  # noqa
 
-        with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__all_scores.html', 'w') as file:
-            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().render()))
+        with open(get_test_path('sklearn_eval/housing__grid_search__all_scores.html'), 'w') as file:
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().to_html()))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/housing__grid_search__primary_score_only.html', 'w') as file:
-            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).render()))
+        with open(get_test_path('sklearn_eval/housing__grid_search__primary_score_only.html'), 'w') as file:
+            file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).to_html()))  # noqa
 
         self.assertTrue(isinstance(parser.test_score_averages, dict))
         self.assertEqual(list(parser.test_score_averages.keys()), parser.score_names)
@@ -909,15 +915,14 @@ class TestSklearnEval(unittest.TestCase):
         _ = parser.plot_parameter_values_across_trials()
         _ = parser.plot_parallel_coordinates()
         _ = parser.plot_scatter_matrix()
-        # plotly.offline.plot(_, filename=get_test_path() + '/test_files/sklearn_eval/temp.html', auto_open=True)
 
     def test_MLExperimentResults_gridsearch_regression_single_score(self):
         ####
         # set up grid-search on regression model for housing data
         # this will have the same search parameters as the self.housing_data__grid_search in the setUpClass,
-        # except a single score (rmse, which is the same primary score as the other) rather than multiple scores
-        # therefore, most of the values (e.g. best_score, best_params, should be the same between the two
-        # objects)
+        # except a single score (rmse, which is the same primary score as the other) rather than multiple
+        # scores therefore, most of the values (e.g. best_score, best_params, should be the same between the
+        # two objects)
         ####
         housing_data = get_data_housing()
         housing_data.loc[0:46, ['median_income']] = np.nan
@@ -949,10 +954,12 @@ class TestSklearnEval(unittest.TestCase):
             return_train_score=True
         )
         grid_search_housing.fit(X_train, y_train)
-        results_single_score = MLExperimentResults.from_sklearn_search_cv(searcher=grid_search_housing,
-                                                            higher_score_is_better=False,
-                                                            description="test description")
-        yaml_file = get_test_path() + '/test_files/sklearn_eval/housing_data__grid_search__single_score.yaml'
+        results_single_score = MLExperimentResults.from_sklearn_search_cv(
+            searcher=grid_search_housing,
+            higher_score_is_better=False,
+            description="test description"
+        )
+        yaml_file = get_test_path('sklearn_eval/housing_data__grid_search__single_score.yaml')
         os.remove(yaml_file)
         results_single_score.to_yaml_file(yaml_file)
 
@@ -964,12 +971,12 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(results_multi_score.best_score, results_single_score.best_score)
         self.assertEqual(results_multi_score.best_params, results_single_score.best_params)
         self.assertEqual(results_multi_score.best_score_index, results_single_score.best_score_index)
-        self.assertEqual(list(results_multi_score.best_trial_indexes), list(results_single_score.best_trial_indexes))
+        self.assertEqual(list(results_multi_score.best_trial_indexes), list(results_single_score.best_trial_indexes))  # noqa
         self.assertEqual(list(results_multi_score.trial_rankings), list(results_single_score.trial_rankings))
         self.assertEqual(results_multi_score.best_standard_error, results_single_score.best_standard_error)
         self.assertEqual(results_multi_score.parameter_names, results_single_score.parameter_names)
-        self.assertEqual(results_multi_score.parameter_names_original, results_single_score.parameter_names_original)
-        self.assertEqual(results_multi_score.parameter_names_mapping, results_single_score.parameter_names_mapping)
+        self.assertEqual(results_multi_score.parameter_names_original, results_single_score.parameter_names_original)  # noqa
+        self.assertEqual(results_multi_score.parameter_names_mapping, results_single_score.parameter_names_mapping)  # noqa
 
         self.assertEqual(results_multi_score.test_score_averages['RMSE'],
                          results_single_score.test_score_averages['neg_root_mean_squared_error'])
@@ -986,7 +993,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertTrue(all(results_multi_score.primary_score_averages == results_single_score.primary_score_averages))  # noqa
 
         self.assertEqual(results_multi_score.trial_labels(), results_single_score.trial_labels())
-        self.assertEqual(results_multi_score.indexes_within_1_standard_error, results_single_score.indexes_within_1_standard_error)
+        self.assertEqual(results_multi_score.indexes_within_1_standard_error, results_single_score.indexes_within_1_standard_error)  # noqa
         self.assertTrue(all(results_multi_score.score_standard_errors('RMSE') == results_single_score.score_standard_errors('neg_root_mean_squared_error')))  # noqa
 
     def test_TwoClassEvaluator(self):
@@ -1020,50 +1027,50 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(evaluator.fbeta_score(beta=2), fbeta_score(y_true=y_true, y_pred=y_pred, beta=2))
         self.assertEqual(round(evaluator.kappa, 9), round(cohen_kappa_score(y1=y_true, y2=y_pred), 9))
 
-        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/get_auc_curve_dataframe.txt',
+        helper_test_dataframe(file_name=get_test_path('sklearn_eval/get_auc_curve_dataframe.txt'),
                               dataframe=evaluator._get_auc_curve_dataframe())
 
-        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/get_threshold_curve_dataframe.txt',
+        helper_test_dataframe(file_name=get_test_path('sklearn_eval/get_threshold_curve_dataframe.txt'),
                               dataframe=evaluator._get_threshold_curve_dataframe())
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_predicted_scores_histogram.png',
+        check_plot(file_name=get_test_path('sklearn_eval/plot_predicted_scores_histogram.png'),
                    plot_function=lambda: evaluator.plot_predicted_scores_histogram())
 
         self.assertIsInstance(evaluator.all_metrics, dict)
         self.assertIsInstance(evaluator.all_metrics_df(return_style=False), pd.DataFrame)
 
-        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df.html', 'w') as file:
+        with open(get_test_path('sklearn_eval/all_metrics_df.html'), 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   dummy_classifier_strategy=None,
-                                                  return_style=True).render()
+                                                  return_style=True).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__dummy.html', 'w') as file:
+        with open(get_test_path('sklearn_eval/all_metrics_df__dummy.html'), 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   dummy_classifier_strategy='prior',
-                                                  return_style=True).render()
+                                                  return_style=True).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__dummies.html', 'w') as file:
+        with open(get_test_path('sklearn_eval/all_metrics_df__dummies.html'), 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   dummy_classifier_strategy=['prior', 'constant'],
-                                                  return_style=True).render()
+                                                  return_style=True).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__round_3.html', 'w') as file:
+        with open(get_test_path('sklearn_eval/all_metrics_df__round_3.html'), 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=False,
                                                   return_style=True,
-                                                  round_by=3).render()
+                                                  round_by=3).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__with_details.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_explanations=True, return_style=True).render()
+        with open(get_test_path('sklearn_eval/all_metrics_df__with_details.html'), 'w') as file:
+            table_html = evaluator.all_metrics_df(return_explanations=True, return_style=True).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/all_metrics_df__with_details__round_3.html', 'w') as file:
+        with open(get_test_path('sklearn_eval/all_metrics_df__with_details__round_3.html'), 'w') as file:
             table_html = evaluator.all_metrics_df(return_explanations=True,
                                                   return_style=True,
-                                                  round_by=3).render()
+                                                  round_by=3).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
     def test_RegressionEvaluator(self):
@@ -1081,36 +1088,36 @@ class TestSklearnEval(unittest.TestCase):
         self.assertIsInstance(evaluator.all_metrics, dict)
         self.assertIsInstance(evaluator.all_metrics_df(), pd.DataFrame)
 
-        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df.html', 'w') as file:
+        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df.html'), 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True,
-                                                  dummy_regressor_strategy=None).render()
+                                                  dummy_regressor_strategy=None).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__dummy.html', 'w') as file:
+        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__dummy.html'), 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True,
-                                                  dummy_regressor_strategy='mean').render()
+                                                  dummy_regressor_strategy='mean').to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__dummies.html', 'w') as file:
+        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__dummies.html'), 'w') as file:
             table_html = evaluator.all_metrics_df(return_style=True,
-                                                  dummy_regressor_strategy=['mean', 'median']).render()
+                                                  dummy_regressor_strategy=['mean', 'median']).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__round_3.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_style=True, round_by=3).render()
+        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__round_3.html'), 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True, round_by=3).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/reg_eval__all_metrics_df__round_0.html', 'w') as file:
-            table_html = evaluator.all_metrics_df(return_style=True, round_by=0).render()
+        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__round_0.html'), 'w') as file:
+            table_html = evaluator.all_metrics_df(return_style=True, round_by=0).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/reg_eval__plot_residuals_vs_fits.png',
+        check_plot(file_name=get_test_path('sklearn_eval/reg_eval__plot_residuals_vs_fits.png'),
                    plot_function=lambda: evaluator.plot_residuals_vs_fits())
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/reg_eval__plot_residuals_vs_actuals.png',
+        check_plot(file_name=get_test_path('sklearn_eval/reg_eval__plot_residuals_vs_actuals.png'),
                    plot_function=lambda: evaluator.plot_residuals_vs_actuals())
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/reg_eval__plot_predictions_vs_actuals.png',
+        check_plot(file_name=get_test_path('sklearn_eval/reg_eval__plot_predictions_vs_actuals.png'),
                    plot_function=lambda: evaluator.plot_predictions_vs_actuals())
 
     def test_plot_confusion_matrix(self):
@@ -1120,7 +1127,7 @@ class TestSklearnEval(unittest.TestCase):
                                       negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_confusion_matrix.png',
+        check_plot(file_name=get_test_path('sklearn_eval/plot_confusion_matrix.png'),
                    plot_function=lambda: evaluator.plot_confusion_matrix())
 
     def test_plot_roc_auc_curve(self):
@@ -1130,7 +1137,7 @@ class TestSklearnEval(unittest.TestCase):
                                       negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_auc_curve.png',
+        check_plot(file_name=get_test_path('sklearn_eval/plot_auc_curve.png'),
                    plot_function=lambda: evaluator.plot_roc_auc_curve(return_plotly=False))
 
     def test_plot_precision_recall_auc_curve(self):
@@ -1140,7 +1147,7 @@ class TestSklearnEval(unittest.TestCase):
                                       negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_precision_recall_auc_curve.png',
+        check_plot(file_name=get_test_path('sklearn_eval/plot_precision_recall_auc_curve.png'),
                    plot_function=lambda: evaluator.plot_precision_recall_auc_curve(return_plotly=False))
 
     def test_plot_threshold_curves(self):
@@ -1150,7 +1157,7 @@ class TestSklearnEval(unittest.TestCase):
                                       negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_threshold_curves.png',
+        check_plot(file_name=get_test_path('sklearn_eval/plot_threshold_curves.png'),
                    plot_function=lambda: evaluator.plot_threshold_curves(return_plotly=False))
 
     def test_plot_precision_recall_tradeoff(self):
@@ -1160,7 +1167,7 @@ class TestSklearnEval(unittest.TestCase):
                                       negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
-        check_plot(file_name=get_test_path() + '/test_files/sklearn_eval/plot_precision_recall_tradeoff.png',
+        check_plot(file_name=get_test_path('sklearn_eval/plot_precision_recall_tradeoff.png'),
                    plot_function=lambda: evaluator.plot_precision_recall_tradeoff(return_plotly=False))
 
     def test_calculate_lift_gain(self):
@@ -1170,19 +1177,20 @@ class TestSklearnEval(unittest.TestCase):
                                       negative_class='Not Defaulted',
                                       score_threshold=0.5)
 
-        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain.txt',
+        helper_test_dataframe(file_name=get_test_path('sklearn_eval/calculate_lift_gain.txt'),
                               dataframe=evaluator.calculate_lift_gain())
 
-        helper_test_dataframe(file_name=get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain__10_buckets.txt',
+        helper_test_dataframe(file_name=get_test_path('sklearn_eval/calculate_lift_gain__10_buckets.txt'),
                               dataframe=evaluator.calculate_lift_gain(num_buckets=10))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain.html', 'w') as file:
-            table_html = evaluator.calculate_lift_gain(return_style=True).render()
+        with open(get_test_path('sklearn_eval/calculate_lift_gain.html'), 'w') as file:
+            table_html = evaluator.calculate_lift_gain(return_style=True).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path() + '/test_files/sklearn_eval/calculate_lift_gain__10_buckets.html', 'w') as file:
-            table_html = evaluator.calculate_lift_gain(return_style=True, num_buckets=10).render()
+        with open(get_test_path('sklearn_eval/calculate_lift_gain__10_buckets.html'), 'w') as file:
+            table_html = evaluator.calculate_lift_gain(return_style=True, num_buckets=10).to_html()
             file.write(clean_formatted_dataframe(table_html))
+
 
 if __name__ == '__main__':
     unittest.main()

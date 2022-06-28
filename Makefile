@@ -10,14 +10,14 @@ docker_rebuild:
 docker_zsh:
 	docker exec -it python-helpers-bash-1 /bin/zsh
 
-tests:
-	python -m unittest discover tests
-
 linting:
 	flake8 --max-line-length 110 --ignore=E127 helpsk
 
+tests: linting
+	python -m unittest discover tests
+
 ## Build package
-build: tests linting
+build: tests
 	rm -fr dist
 	python -m build
 	twine upload dist/*
