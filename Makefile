@@ -5,7 +5,6 @@ docker_build:
 	docker compose -f docker-compose.yml build
 	rm -f .pypirc
 
-
 docker_run: docker_build
 	docker compose -f docker-compose.yml up
 
