@@ -1,10 +1,13 @@
 .PHONY: tests
 
-docker_build:
+docker_run:
 	cp ~/.pypirc ./.pypirc
 	docker compose -f docker-compose.yml up --build
 
-docker_run:
+docker_rebuild:
+	docker compose -f docker-compose.yml build --no-cache
+
+docker_zsh:
 	docker exec -it python-helpers-bash-1 /bin/zsh
 
 tests:
