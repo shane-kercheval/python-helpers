@@ -1,7 +1,6 @@
 import os
 import re
 from importlib import reload
-from os import getcwd
 from typing import Callable, Union
 from unittest import TestCase
 
@@ -9,18 +8,14 @@ import pandas as pd
 from matplotlib import pyplot as plt
 
 from helpsk.pandas import print_dataframe
-from helpsk.utility import is_debugging, redirect_stdout_to_file
+from helpsk.utility import redirect_stdout_to_file
 
 
-def get_test_path() -> str:
+def get_test_path(file) -> str:
     """Returns the path to /tests folder, adjusting for the difference in the current working directory when
     debugging vs not debugging.
     """
-    path = getcwd()
-    if not is_debugging():
-        path = path + '/tests'
-
-    return path
+    return os.path.join('/code/tests/test_files', file)
 
 
 def subtests_expected_vs_actual(test_case: TestCase,
