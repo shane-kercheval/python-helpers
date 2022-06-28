@@ -70,7 +70,6 @@ class Timer:
         logging.basicConfig()
         log_info(f'Timer Started: {self._message}')
         self._start = datetime.datetime.now()
-
         return self
 
     def __exit__(self, *args):
@@ -79,7 +78,6 @@ class Timer:
         message = ''
         if self._include_message_at_finish:
             message = self._message + " "
-
         log_info(f'Timer Finished: {message}({self._interval.total_seconds():.2f} seconds)')
 
 
