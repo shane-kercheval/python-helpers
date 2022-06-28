@@ -16,4 +16,4 @@ RUN rm requirements.txt
 RUN pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
 RUN pip install snowflake-connector-python==v2.7.4
 
-COPY .pypirc $HOME/.pypirc
+COPY .pypirc /root/.pypirc

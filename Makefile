@@ -18,7 +18,7 @@ tests: linting
 	python -m unittest discover tests
 
 ## Build package
-build: tests
+build: tests clean
 	rm -fr dist
 	python -m build
 	twine upload dist/*
@@ -27,4 +27,3 @@ build: tests
 clean:
 	rm -rf dist
 	rm -rf helpsk.egg-info
-	rm -f .pypirc
