@@ -4,17 +4,6 @@ from typing import Callable, Union
 from functools import wraps
 
 
-def log_info(message: str):
-    """
-    Calls logging.info. Use this function rather than logging.info directly in case a production
-    environment requires a different library/setup.
-
-    Args:
-        message: the message to log
-    """
-    logging.info(message)
-
-
 def log_function_call(function: Callable) -> Callable:
     """
     This function should be used as a decorator to log the function name and paramters of the function when
@@ -41,7 +30,7 @@ def log_function_call(function: Callable) -> Callable:
 
 def _log_function(function_name: str, params: Union[dict, None] = None):
     """
-    This function is meant to be used at the start of the calling function; calls log_info and passes the
+    This function is meant to be used at the start of the calling function; calls logging.info and passes the
     name of the function and optional parameter names/values.
 
     Args:
@@ -51,11 +40,11 @@ def _log_function(function_name: str, params: Union[dict, None] = None):
             a dictionary containing the names of the function parameters (as dictionary keys) and the
             parameter values (as dictionary values).
     """
-    log_info(f"FUNCTION: {function_name.upper()}")
+    logging.info(f"FUNCTION: {function_name.upper()}")
     if params is not None:
-        log_info("PARAMS:")
+        logging.info("PARAMS:")
         for key, value in params.items():
-            log_info(f"    {key}: {value}")
+            logging.info(f"    {key}: {value}")
 
 
 class Timer:
@@ -68,7 +57,7 @@ class Timer:
 
     def __enter__(self):
         logging.basicConfig()
-        log_info(f'Timer Started: {self._message}')
+        logging.info(f'Timer Started: {self._message}')
         self._start = datetime.datetime.now()
         return self
 
@@ -78,7 +67,7 @@ class Timer:
         message = ''
         if self._include_message_at_finish:
             message = self._message + " "
-        log_info(f'Timer Finished: {message}({self._interval.total_seconds():.2f} seconds)')
+        logging.info(f'Timer Finished: {message}({self._interval.total_seconds():.2f} seconds)')
 
 
 def log_timer(function: Callable) -> Callable:
