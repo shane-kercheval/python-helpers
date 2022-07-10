@@ -1074,9 +1074,34 @@ class TestSklearnEval(unittest.TestCase):
             file.write(clean_formatted_dataframe(table_html))
 
     def test_RegressionEvaluator(self):
-        evaluator = RegressionEvaluator(actual_values=self.housing_data__y_test,
-                                        predicted_values=self.housing_data__y_predictions)
-
+        evaluator = RegressionEvaluator(
+            actual_values=self.housing_data__y_test,
+            predicted_values=self.housing_data__y_predictions.reshape((-1, 1))
+        )
+        self.assertEqual(
+            evaluator.mean_absolute_error,
+            mean_absolute_error(
+                y_true=self.housing_data__y_test,
+                y_pred=self.housing_data__y_predictions
+            )
+        )
+        self.assertEqual(
+            round(mean_squared_error(
+                y_true=self.housing_data__y_test,
+                y_pred=self.housing_data__y_predictions), 4
+            ),
+            round(evaluator.mean_squared_error, 4)
+        )
+        self.assertEqual(np.sqrt(evaluator.mean_squared_error), evaluator.root_mean_squared_error)
+        self.assertEqual(evaluator.total_observations, len(self.housing_data__y_test))
+        self.assertIsInstance(evaluator.all_metrics, dict)
+        self.assertIsInstance(evaluator.all_metrics_df(), pd.DataFrame)
+        
+        evaluator = RegressionEvaluator(
+            actual_values=self.housing_data__y_test,
+            predicted_values=self.housing_data__y_predictions
+        )
+        
         self.assertEqual(evaluator.mean_absolute_error,
                          mean_absolute_error(y_true=self.housing_data__y_test,
                                              y_pred=self.housing_data__y_predictions))
