@@ -329,10 +329,13 @@ def assert_dataframes_match(dataframes: List[pd.DataFrame],
         message:
             message to pass to HelpskAssertionError
     """
-    if not dataframes_match(dataframes=dataframes,
-                            float_tolerance=float_tolerance,
-                            ignore_indexes=ignore_indexes,
-                            ignore_column_names=ignore_column_names):
+    match = dataframes_match(
+        dataframes=dataframes,
+        float_tolerance=float_tolerance,
+        ignore_indexes=ignore_indexes,
+        ignore_column_names=ignore_column_names
+    )
+    if not match:
         raise HelpskAssertionError(message)
 
 

@@ -22,7 +22,7 @@ class Granularity(Enum):
 
 def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
           granularity: Granularity = Granularity.DAY,
-          fiscal_start: int = 1) -> [datetime.date, pd.Series]:
+          fiscal_start: int = 1) -> Union[datetime.date, pd.Series]:
 
     """"Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
 
@@ -48,9 +48,11 @@ def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
         date - the date rounded down to the nearest granularity
     """
     if isinstance(value, pd.Series):
-        return pd.Series([floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value],
-                         name=value.name,
-                         index=value.index)
+        return pd.Series(
+            [floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value],
+            name=value.name,
+            index=value.index
+        )
 
     if any_none_nan(value):
         return value

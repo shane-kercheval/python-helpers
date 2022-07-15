@@ -15,9 +15,7 @@ Examples:
 """
 import configparser
 from typing import Union
-
 import pandas as pd
-
 from helpsk.database_base import Configuration, Database
 
 
@@ -81,7 +79,7 @@ class GenericConfigFile(Configuration):
         self._config_mapping = config_mapping
 
     def get_dictionary(self) -> dict:
-        """ logic that builds the dictionary described in the __init__ docstring
+        """logic that builds the dictionary described in the __init__ docstring
 
         Returns:
              a dictionary to be passed to the Database object
@@ -115,11 +113,13 @@ class RedshiftConfigFile(GenericConfigFile):
                 The default value is `redshift`.
 
         """
-        config_mapping = {'user': 'username',
-                          'password': 'password',
-                          'database': 'database',
-                          'port': 'port',
-                          'host': 'host'}
+        config_mapping = {
+            'user': 'username',
+            'password': 'password',
+            'database': 'database',
+            'port': 'port',
+            'host': 'host'
+        }
 
         super().__init__(config_file=config_file, config_key=config_key, config_mapping=config_mapping)
 
@@ -158,8 +158,7 @@ class SnowflakeConfigFile(GenericConfigFile):
 
 
 class Redshift(Database):
-    """
-    Wraps logic for connecting to Redshift and querying.
+    """Wraps logic for connecting to Redshift and querying.
 
     Example:
         config = RedshiftConfigFile('/path/to/redshift.config')

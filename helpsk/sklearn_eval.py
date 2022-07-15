@@ -366,8 +366,9 @@ class MLExperimentResults:
                 assert_true(len(train_score_standard_deviations) == number_of_trials)
 
                 cv_results_dict['train_score_averages'] = {score_names[0]: train_score_averages}
-                cv_results_dict['train_score_standard_deviations'] = {score_names[0]:
-                                                                          train_score_standard_deviations}
+                cv_results_dict['train_score_standard_deviations'] = {
+                    score_names[0]: train_score_standard_deviations
+                }
             else:
                 averages_dict = {}
                 standard_deviations_dict = {}
@@ -1015,8 +1016,9 @@ class MLExperimentResults:
 
         labeled_df = self.to_labeled_dataframe(query=query)
         if facet_by:
-            labeled_df['Trial Index'] = labeled_df.groupby(facet_by)["Trial Index"].rank(method="first",
-                                                                                          ascending=True)
+            labeled_df['Trial Index'] = labeled_df.\
+                groupby(facet_by)["Trial Index"].\
+                rank(method="first", ascending=True)
         # only include the columns we need, so that we don't unnecessarily drop rows with NA (i.e. NAs in
         # columns not used in the graph)
         columns = [x for x in ['Trial Index', score_column, size, color, facet_by, 'label']
@@ -1721,7 +1723,7 @@ class TwoClassEvaluator:
     def all_metrics_df(self,
                        return_explanations: bool = True,
                        dummy_classifier_strategy: Union[str, list, None] = 'prior',
-                       dummy_classifier_constant: Union[int] = 1,
+                       dummy_classifier_constant: int = 1,
                        return_style: bool = False,
                        round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
         """All of the metrics are returned as a DataFrame.
@@ -2156,9 +2158,11 @@ class TwoClassEvaluator:
                 If True, indicate the score threshold (e.g. 0.5) with a vertical line.
         """
         threshold_curves = self._get_threshold_curve_dataframe(score_threshold_range=score_threshold_range)
-        threshold_curves = threshold_curves[['Score Threshold',
-                                                 'True Pos. Rate (Recall)',
-                                                 'Pos. Predictive Value (Precision)']]
+        threshold_curves = threshold_curves[[
+            'Score Threshold',
+            'True Pos. Rate (Recall)',
+            'Pos. Predictive Value (Precision)'
+        ]]
 
         if return_plotly:
             custom_colors = [
@@ -2380,7 +2384,7 @@ class RegressionEvaluator:
 
     def all_metrics_df(self,
                        dummy_regressor_strategy: Union[str, list, None] = 'mean',
-                       dummy_regressor_constant: Union[int] = 1,
+                       dummy_regressor_constant: int = 1,
                        return_style: bool = False,
                        round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
         """All of the metrics are returned as a DataFrame.
@@ -2574,7 +2578,7 @@ class TwoClassModelComparison:
 
     def all_metrics_df(self,
                        dummy_classifier_strategy: Union[str, list, None] = 'prior',
-                       dummy_classifier_constant: Union[int] = 1,
+                       dummy_classifier_constant: int = 1,
                        return_style: bool = False,
                        round_by: Optional[int] = None) -> Union[pd.DataFrame, Styler]:
         """All of the metrics are returned as a DataFrame.
@@ -2644,8 +2648,7 @@ class TwoClassModelComparison:
 
     def plot_metrics_comparison(self,
                                 dummy_classifier_strategy: Union[str, list, None] = 'prior',
-                                dummy_classifier_constant: Union[int] = 1,
-                                ) -> _figure.Figure:
+                                dummy_classifier_constant: int = 1) -> _figure.Figure:
         """
         Returns a Plotly object of a bar-chart of the metrics across all of the models.
 
