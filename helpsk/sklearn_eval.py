@@ -329,8 +329,9 @@ class MLExperimentResults:
             assert_true(len(test_score_standard_deviations) == number_of_trials)
 
             cv_results_dict['test_score_averages'] = {score_names[0]: test_score_averages}
-            cv_results_dict['test_score_standard_deviations'] = {score_names[0]:
-                                                                     test_score_standard_deviations}
+            cv_results_dict['test_score_standard_deviations'] = {
+                score_names[0]: test_score_standard_deviations
+            }
         else:
             averages_dict = {}
             standard_deviations_dict = {}
@@ -2314,6 +2315,17 @@ class RegressionEvaluator:
             predicted_values:
                 the predicted values
         """
+        if not isinstance(actual_values, np.ndarray):
+            actual_values = np.array(actual_values)
+
+        if not isinstance(predicted_values, np.ndarray):
+            predicted_values = np.array(predicted_values)
+
+        if actual_values.ndim == 2:
+            actual_values = actual_values.flatten()
+
+        if predicted_values.ndim == 2:
+            predicted_values = predicted_values.flatten()
 
         assert len(actual_values) == len(predicted_values)
 
