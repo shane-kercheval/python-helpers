@@ -185,6 +185,37 @@ def replace_all_bools_with_strings(series: pd.Series,
     return series
 
 
+def relocate(df: pd.DataFrame, column: str, before: str = None, after: str = None) -> pd.DataFrame:
+    """
+    This function relocates `column` to the position before the column specified in `before` or after the
+    column specified in `after`. It returns the DataFrame with the column order adjusted accordingly.
+
+    Args:
+        df: DataFrame that contains columns to relocate
+        column: column to relocate
+        before: name of relative column; if provided, `column` will be relocated to before the column name
+            specified in `before`
+        after: name of relative column; if provided, `column` will be relocated to after the column name
+            specified in `after`
+    """
+    match_column = before or after
+    assert match_column
+
+    columns_check = set(df.columns)
+    columns = list(df.columns)
+    assert column in columns
+    assert match_column in columns
+    columns.remove(column)
+
+    insertion_index = columns.index(match_column)
+    if after:
+        insertion_index += 1
+
+    columns.insert(insertion_index, column)
+    assert columns_check == set(columns)
+    return df[columns]
+
+
 def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
     """Returns the column names from the dataframe that are numeric (and not boolean).
 

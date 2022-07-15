@@ -262,6 +262,40 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(hp.is_series_categorical(results))
         self.assertTrue('<Missing>' in results.cat.categories)
 
+    def test_relocate(self):
+        df = pd.DataFrame({
+            'A': ['a', 'b', 'c'],
+            'X': ['x', 'y', 'z'],
+            '1': [1, 2, 3],
+        })
+        df_original = df.copy()
+
+        self.assertRaises(AssertionError, lambda: hp.relocate(df=df, column='A'))
+        self.assertRaises(AssertionError, lambda: hp.relocate(df=df, column='A', before='Z'))
+        self.assertRaises(AssertionError, lambda: hp.relocate(df=df, column='Z', before='A'))
+
+        def subtest_relocate(column, before, after, expected_order):
+            new = hp.relocate(df=df, column=column, before=before, after=after)
+            self.assertTrue(hv.dataframes_match([df_original, df]))
+            self.assertEqual(new.columns.tolist(), expected_order)
+            self.assertTrue((new['A'] == df_original['A']).all())
+            self.assertTrue((new['X'] == df_original['X']).all())
+            self.assertTrue((new['1'] == df_original['1']).all())
+
+        subtest_relocate(column='A', before='X', after=None, expected_order=['A', 'X', '1'])
+        subtest_relocate(column='A', before='1', after=None, expected_order=['X', 'A', '1'])
+        subtest_relocate(column='X', before='A', after=None, expected_order=['X', 'A', '1'])
+        subtest_relocate(column='X', before='1', after=None, expected_order=['A', 'X', '1'])
+        subtest_relocate(column='1', before='A', after=None, expected_order=['1', 'A', 'X'])
+        subtest_relocate(column='1', before='X', after=None, expected_order=['A', '1', 'X'])
+
+        subtest_relocate(column='A', before=None, after='X', expected_order=['X', 'A', '1'])
+        subtest_relocate(column='A', before=None, after='1', expected_order=['X', '1', 'A'])
+        subtest_relocate(column='X', before=None, after='A', expected_order=['A', 'X', '1'])
+        subtest_relocate(column='X', before=None, after='1', expected_order=['A', '1', 'X'])
+        subtest_relocate(column='1', before=None, after='A', expected_order=['A', '1', 'X'])
+        subtest_relocate(column='1', before=None, after='X', expected_order=['A', 'X', '1'])
+
     def test_get_numeric_columns(self):
         self.assertEqual(hp.get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])
         self.assertEqual(hp.get_numeric_columns(self.sample_data[['col_e']]), ['col_e'])
