@@ -21,8 +21,7 @@ class Configuration(metaclass=ABCMeta):
 
 
 class Database(metaclass=ABCMeta):
-    """
-    Base class that wraps the connection/querying logic of various databases.
+    """Base class that wraps the connection/querying logic of various databases.
     """
     def __init__(self, **kwargs):
         self.connection_object = None
@@ -160,12 +159,12 @@ class Database(metaclass=ABCMeta):
 
     @abstractmethod
     def insert_records(self,
-                        dataframe: pd.DataFrame,
-                        table: str,
-                        create_table: bool = False,
-                        overwrite: bool = True,
-                        schema: str = None,
-                        database: str = None):
+                       dataframe: pd.DataFrame,
+                       table: str,
+                       create_table: bool = False,
+                       overwrite: bool = True,
+                       schema: str = None,
+                       database: str = None):
         """
         This method inserts rows into a table from a pandas DataFrame.
 
