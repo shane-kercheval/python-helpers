@@ -86,6 +86,5 @@ class TestDiff(unittest.TestCase):
         self.assertEqual(html_a, html_c)
 
 
-
 if __name__ == '__main__':
     unittest.main()
