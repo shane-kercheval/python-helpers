@@ -15,7 +15,7 @@ class TestDiff(unittest.TestCase):
     def test__create_html_change_span(self):
         self.assertEqual(
             diff._create_html_change_span(value='x', is_change=True),
-            '<span style="background:#ffe6e6";>x</span>'
+            '<span style="background:#F1948A";>x</span>'
         )
         self.assertEqual(
             diff._create_html_change_span(value='x', is_change=False),
@@ -32,13 +32,13 @@ class TestDiff(unittest.TestCase):
         diff_list = diff._create_html_difference_list(value_a='TesT', value_b='test')
         self.assertEqual(
             diff._create_html_cell(difference_list=diff_list, is_first_value=True),
-            '<span style="background:#ffe6e6";>T</span><span>e</span><span>s</span><span style="background:'
-            '#ffe6e6";>T</span>'
+            '<span style="background:#F1948A";>T</span><span>e</span><span>s</span><span style="background:'
+            '#F1948A";>T</span>'
         )
         self.assertEqual(
             diff._create_html_cell(difference_list=diff_list, is_first_value=False),
-            '<span style="background:#ffe6e6";>t</span><span>e</span><span>s</span><span style="background:'
-            '#ffe6e6";>t</span>'
+            '<span style="background:#F1948A";>t</span><span>e</span><span>s</span><span style="background:'
+            '#F1948A";>t</span>'
         )
 
     def test_diff_dataframes(self):
