@@ -76,7 +76,7 @@ class TestDiff(unittest.TestCase):
         with open(get_test_path('diff/diff_dataframes.html'), 'w') as file:
             file.write(html)
 
-        html = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b, change_color='#2E2EFE')
+        html = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b, change_color='#85C1E9')
         with open(get_test_path('diff/diff_dataframes_blue.html'), 'w') as file:
             file.write(html)
 

@@ -17,7 +17,7 @@ def _create_html_difference_list(value_a: str, value_b: str) -> str:
     return diff
 
 
-def _create_html_change_span(value: str, is_change: bool, change_color: str = '#ffe6e6') -> str:
+def _create_html_change_span(value: str, is_change: bool, change_color: str = '#F1948A') -> str:
     """
     Args:
         value: a single character
@@ -32,7 +32,7 @@ def _create_html_change_span(value: str, is_change: bool, change_color: str = '#
     return f'<span{background_color}>{value}</span>'
 
 
-def _create_html_cell(difference_list: list, is_first_value: bool, change_color: str = '#ffe6e6'):
+def _create_html_cell(difference_list: list, is_first_value: bool, change_color: str = '#F1948A'):
     """
     Creates a single cell (e.g. name, domain, etc.) from one company's differences.
     Args:
@@ -51,7 +51,7 @@ def _create_html_cell(difference_list: list, is_first_value: bool, change_color:
 
 def diff_dataframes(dataframe_a: pd.DataFrame,
                     dataframe_b: pd.DataFrame,
-                    change_color: str = '#ffe6e6') -> str:
+                    change_color: str = '#F1948A') -> str:
     """
     Returns string as HTML containing highlighted differences between `dataframe_a` and `dataframe_b`.
 
