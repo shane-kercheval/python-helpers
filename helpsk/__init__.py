@@ -7,6 +7,7 @@ import helpsk.color
 import helpsk.database
 import helpsk.database_base
 import helpsk.date
+import helpsk.diff
 import helpsk.exceptions
 import helpsk.pandas
 import helpsk.pandas_style
