@@ -71,7 +71,7 @@ def diff_dataframes(dataframe_a: pd.DataFrame,
     html = '<html><head><style> table, th, td { border: 1px solid black; border-collapse: collapse; ' \
         'white-space: normal;} </style></head><body style="font-family: monospace">'
     html += '<table><tr>'
-    html += '<th></th>'
+    html += '<th>index</th>'
     for column in joint_columns:
         html += f'<th>{column}</th>'
     html += '</tr>'
@@ -87,6 +87,7 @@ def diff_dataframes(dataframe_a: pd.DataFrame,
 
     for index in range(len(dataframe_a)):
         html += '<tr>'
+        html += f"<td>{index}</td>"
         for column in joint_columns:
             # print(f"{index}:{column}")
             value_a = str(dataframe_a[column].iloc[index])
