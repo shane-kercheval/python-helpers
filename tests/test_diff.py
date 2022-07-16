@@ -72,18 +72,20 @@ class TestDiff(unittest.TestCase):
                 None, np.nan, datetime.datetime(2021, 4, 2, 1, 1, 1), datetime.datetime(2021, 4, 2, 0, 0, 0)
             ],
         })
-        html = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b)
+        html_a = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b)
         with open(get_test_path('diff/diff_dataframes.html'), 'w') as file:
-            file.write(html)
+            file.write(html_a)
 
-        html = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b, change_color='#85C1E9')
+        html_b = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b, change_color='#85C1E9')
         with open(get_test_path('diff/diff_dataframes_blue.html'), 'w') as file:
-            file.write(html)
-
-
-
+            file.write(html_b)
 
         # set index values to be different, shouldn't matter
+        df_b.index = ['a', 'b', 'c', 'd']
+        html_c = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b)
+        self.assertEqual(html_a, html_c)
+
+
 
 if __name__ == '__main__':
     unittest.main()
