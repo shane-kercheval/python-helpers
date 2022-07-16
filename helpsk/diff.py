@@ -28,7 +28,7 @@ def _create_html_change_span(value: str, is_change: bool, change_color: str = '#
     """
     background_color = ''
     if is_change:
-        background_color = ' style="background:{change_color}";'
+        background_color = f' style="background:{change_color}";'
     return f'<span{background_color}>{value}</span>'
 
 
