@@ -178,12 +178,15 @@ def to_string(value: Union[datetime.datetime, datetime.date],
 
     if granularity == Granularity.QUARTER:
         if fiscal_start == 1:
-            return str(fiscal_quarter(value,
-                                      include_year=True,
-                                      fiscal_start=fiscal_start)).replace('.', '-Q')
+            quarter_abbreviation = '-Q'
+        else:
+            quarter_abbreviation = '-FQ'
 
-        return str(fiscal_quarter(value,
-                                  include_year=True,
-                                  fiscal_start=fiscal_start)).replace('.', '-FQ')
+        result = fiscal_quarter(
+            value,
+            include_year=True,
+            fiscal_start=fiscal_start
+        )
+        return str(result).replace('.', quarter_abbreviation)
 
     raise TypeError('Unrecognized Granularity')
