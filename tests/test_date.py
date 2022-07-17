@@ -948,6 +948,44 @@ class TestDate(unittest.TestCase):
             np.NaN,
             '2021-10-01', '2021-10-01',
         ]), index=index_values)
+        expected_quarter_fiscal_2 = pd.Series(pd.to_datetime([
+            '2020-11-01', '2020-11-01',
+            np.NaN,
+            '2020-11-01', '2020-11-01',
+            '2021-02-01', '2021-02-01',
+            np.NaN,
+            '2021-02-01', '2021-02-01',
+            '2021-02-01', '2021-02-01',
+            np.NaN,
+            '2021-02-01', '2021-02-01',
+            '2021-02-01', '2021-02-01',
+            np.NaN,
+            '2021-02-01', '2021-02-01',
+            '2021-05-01', '2021-05-01',
+            np.NaN,
+            '2021-05-01', '2021-05-01',
+            '2021-05-01', '2021-05-01',
+            np.NaN,
+            '2021-05-01', '2021-05-01',
+            '2021-05-01', '2021-05-01',
+            np.NaN,
+            '2021-05-01', '2021-05-01',
+            '2021-08-01', '2021-08-01',
+            np.NaN,
+            '2021-08-01', '2021-08-01',
+            '2021-08-01', '2021-08-01',
+            np.NaN,
+            '2021-08-01', '2021-08-01',
+            '2021-08-01', '2021-08-01',
+            np.NaN,
+            '2021-08-01', '2021-08-01',
+            '2021-11-01', '2021-11-01',
+            np.NaN,
+            '2021-11-01', '2021-11-01',
+            '2021-11-01', '2021-11-01',
+            np.NaN,
+            '2021-11-01', '2021-11-01',
+        ]), index=index_values)
 
         # without series.name
         validation.assert_dataframes_match([
@@ -968,30 +1006,42 @@ class TestDate(unittest.TestCase):
 
         # with series.name
         date_series.name = 'date_day'
-        expected_day.name = 'date_day'
         actual_values = date.floor(date_series, granularity=date.Granularity.DAY)
-
         self.assertEqual(actual_values.name, 'date_day')
+        self.assertTrue(all(actual_values.index.values == index_values))
         validation.assert_dataframes_match([
             pd.DataFrame(expected_day.dt.date),
             pd.DataFrame(actual_values)
         ], ignore_indexes=False)
 
         date_series.name = 'date_month'
-        expected_day.name = 'date_month'
         actual_values = date.floor(date_series, granularity=date.Granularity.MONTH)
         self.assertEqual(actual_values.name, 'date_month')
+        self.assertTrue(all(actual_values.index.values == index_values))
         validation.assert_dataframes_match([
             pd.DataFrame(expected_month.dt.date),
             pd.DataFrame(actual_values)
         ], ignore_indexes=False)
 
         date_series.name = 'date_quarter'
-        expected_day.name = 'date_quarter'
         actual_values = date.floor(date_series, granularity=date.Granularity.QUARTER)
         self.assertEqual(actual_values.name, 'date_quarter')
+        self.assertTrue(all(actual_values.index.values == index_values))
         validation.assert_dataframes_match([
             pd.DataFrame(expected_quarter.dt.date),
+            pd.DataFrame(actual_values)
+        ], ignore_indexes=False)
+
+        date_series.name = 'date_quarter_fiscal'
+        actual_values = date.floor(
+            date_series,
+            granularity=date.Granularity.QUARTER,
+            fiscal_start=2
+        )
+        self.assertEqual(actual_values.name, 'date_quarter_fiscal')
+        self.assertTrue(all(actual_values.index.values == index_values))
+        validation.assert_dataframes_match([
+            pd.DataFrame(expected_quarter_fiscal_2.dt.date),
             pd.DataFrame(actual_values)
         ], ignore_indexes=False)
 

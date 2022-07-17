@@ -48,11 +48,7 @@ def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
         date - the date rounded down to the nearest granularity
     """
     if isinstance(value, pd.Series):
-        return pd.Series(
-            [floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value],
-            name=value.name,
-            index=value.index
-        )
+        return value.apply(lambda x: floor(x, granularity=granularity, fiscal_start=fiscal_start))
 
     if any_none_nan(value):
         return value
@@ -182,12 +178,15 @@ def to_string(value: Union[datetime.datetime, datetime.date],
 
     if granularity == Granularity.QUARTER:
         if fiscal_start == 1:
-            return str(fiscal_quarter(value,
-                                      include_year=True,
-                                      fiscal_start=fiscal_start)).replace('.', '-Q')
+            quarter_abbreviation = '-Q'
+        else:
+            quarter_abbreviation = '-FQ'
 
-        return str(fiscal_quarter(value,
-                                  include_year=True,
-                                  fiscal_start=fiscal_start)).replace('.', '-FQ')
+        result = fiscal_quarter(
+            value,
+            include_year=True,
+            fiscal_start=fiscal_start
+        )
+        return str(result).replace('.', quarter_abbreviation)
 
     raise TypeError('Unrecognized Granularity')
