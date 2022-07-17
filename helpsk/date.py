@@ -116,9 +116,12 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
     fiscal_start = (fiscal_start - 1) % 12
     shifted = np.arange(fiscal_start, 11 + fiscal_start + 1) % 12 + 1
     quarters = np.repeat([1, 2, 3, 4], 3)
-    match_index = np.where(value.month == shifted)
-    assert len(match_index) == 1
-    match_index = int(match_index[0])
+    # .where returns a tuple of arrays; there should only be a single element in the tuple
+    # and a single element in the corresponding array
+    (match_index, *b), *c = np.where(value.month == shifted)
+    assert match_index is not None
+    assert len(b) == 0
+    assert len(c) == 0
     quarter = quarters[match_index]
 
     if include_year:
