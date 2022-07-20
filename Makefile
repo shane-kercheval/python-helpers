@@ -19,9 +19,14 @@ docker_zsh:
 linting:
 	flake8 --max-line-length 110 --ignore=E127 helpsk
 
-tests: linting
+unittest:
 	rm -f tests/test_files/logging/log.log
 	python -m unittest discover tests
+
+doctest:
+	python -m doctest helpsk/text.py
+
+tests: linting unittest doctest	
 
 ## Build package
 build: tests clean
