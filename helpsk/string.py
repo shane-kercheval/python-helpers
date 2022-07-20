@@ -1,4 +1,6 @@
 """Contains a collection of helper functions to manipulate strings.
+
+This module is less concerned with bytes/unicode and text processing, compared with text.py
 """
 from enum import unique, Enum, auto
 from typing import List, Union

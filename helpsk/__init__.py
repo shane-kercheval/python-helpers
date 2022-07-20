@@ -15,5 +15,6 @@ import helpsk.plot
 import helpsk.sklearn_eval
 import helpsk.sklearn_pipeline
 import helpsk.string
+import helpsk.text
 import helpsk.utility
 import helpsk.validation  # noqa
