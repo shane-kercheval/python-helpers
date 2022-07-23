@@ -3,9 +3,10 @@ from os import remove
 import os.path
 import time
 import pandas as pd
+from dataclasses import dataclass
 
 from helpsk.utility import to_pickle, read_pickle, open_yaml, Timer, is_debugging, dataframe_to_pickle, \
-    dataframe_to_csv, object_to_pickle
+    dataframe_to_csv, object_to_pickle, repr
 from tests.helpers import get_test_path
 
 
@@ -84,6 +85,33 @@ class TestValidation(unittest.TestCase):
         os.remove(file_path)
         os.removedirs(output_directory)
         self.assertFalse(os.path.isdir(output_directory))
+
+    def test_repr(self):
+        class Example:
+            def __init__(self, x: int, y: int):
+                self.x = x
+                self.y = y
+
+            def __repr__(self) -> str:
+                return repr(self)
+
+        self.assertEqual(
+            f"{Example(1, 2)!r}",
+            'Example(\n    x = 1,\n    y = 2,\n)'
+        )
+
+        @dataclass
+        class Example:
+            x: int
+            y: int
+
+            def __repr__(self) -> str:
+                return repr(self)
+
+        self.assertEqual(
+            f"{Example(1, 2)!r}",
+            'Example(\n    x = 1,\n    y = 2,\n)'
+        )
 
 
 if __name__ == '__main__':
