@@ -159,6 +159,44 @@ def is_debugging():
     return False
 
 
+def repr(instance: object):
+    """
+    This method can be used to build a standard __repr__ function from within a class.
+
+    This function is modified from:
+        Fluent Python, 2nd ed., by Luciano Ramalho (O'Reilly). Pg. 189
+        Copyright 2022 Luciano Ramalho, 978-1-492-05635-5
+
+    Examples:
+
+    >>> class Example:
+    ...     def __init__(self, x: int, y: int):
+    ...         self.x = x
+    ...         self.y = y
+    ...     def __repr__(self) -> str:
+    ...         return repr(self)
+    >>> print(f"{Example(1, 2)!r}")
+    Example(
+        x = 1,
+        y = 2,
+    )
+    >>>
+
+    Args:
+        instance: the instance e.g. self
+    """
+    cls = instance.__class__
+    cls_name = cls.__name__
+    indent = ' ' * 4
+    rep = [f'{cls_name}(']
+    for field in instance.__dict__.items():
+        field_name = field[0]
+        field_value = field[1]
+        rep += [f'{indent}{field_name} = {field_value!r},']
+    rep += [')']
+    return '\n'.join(rep)
+
+
 class Timer:
     """
     This class provides way to time the duration of code within the context manager.
