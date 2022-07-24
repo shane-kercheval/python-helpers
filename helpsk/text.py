@@ -78,7 +78,7 @@ def normalize_equal(str1: str, str2: str, case_fold: bool = True, method: str = 
     return normalize(method, str1) == normalize(method, str2)
 
 
-def remove_marks(text, latin_only=True):
+def remove_marks(text: str, latin_only: bool = True) -> str:
     """
     Remove all diacritic marks.
 
@@ -149,7 +149,7 @@ _multi_map = str.maketrans({
 _multi_map.update(_single_map)
 
 
-def _dewinize(text):
+def _dewinize(text: str) -> str:
     """
     Replace Win1252 symbols with ASCII chars or sequences
 
@@ -160,7 +160,7 @@ def _dewinize(text):
     return text.translate(_multi_map)
 
 
-def asciize(text):
+def asciize(text: str) -> str:
     """
     This function:
         - removes all diacritic marks from latin base characters

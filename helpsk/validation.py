@@ -1,7 +1,8 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
+from __future__ import annotations
 from collections.abc import Sized
-from typing import List, Union, Callable, Type, Iterable
+from typing import Callable, Type, Iterable
 
 import numpy as np
 import pandas as pd
@@ -11,7 +12,7 @@ from helpsk.exceptions import HelpskAssertionError, HelpskParamTypeError, Helpsk
 from helpsk.utility import suppress_warnings
 
 
-def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame, object]) -> bool:
+def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> bool:
     """Can be used with a single value or a collection of values. Returns `True` if any item in `values` are
     `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
 
@@ -55,7 +56,7 @@ def any_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame, object
     return False
 
 
-def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame, object]) -> None:
+def assert_not_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> None:
     """Raises an HelpskAssertionError if any item in `values` are `None`, `np.Nan`, or if the length of
     `values` is `0`.
 
@@ -68,7 +69,7 @@ def assert_not_none_nan(values: Union[List, np.ndarray, pd.Series, pd.DataFrame,
     assert_false(any_none_nan(values), message='None/NaN Values Found')
 
 
-def any_missing(values: Union[List, pd.Series, pd.DataFrame, object]) -> bool:
+def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
     """Same as `any_none_nan` but checks for empty strings
 
     Args:
@@ -96,7 +97,7 @@ def any_missing(values: Union[List, pd.Series, pd.DataFrame, object]) -> bool:
     return False
 
 
-def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame, object]) -> None:
+def assert_not_any_missing(values: list | pd.Series | pd.DataFrame | object) -> None:
     """Raises an HelpskAssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '')
     or if the length of `values` is `0`.
 
@@ -107,7 +108,7 @@ def assert_not_any_missing(values: Union[List, pd.Series, pd.DataFrame, object])
     assert_false(any_missing(values), message='Missing Values Found')
 
 
-def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
+def any_duplicated(values: list | np.ndarray | pd.Series) -> bool:
     """Returns `True` if any items in `values` are duplicated.
 
     Args:
@@ -120,7 +121,7 @@ def any_duplicated(values: Union[List, np.ndarray, pd.Series]) -> bool:
     return len(values) != len(set(values))
 
 
-def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> None:
+def assert_not_duplicated(values: list | np.ndarray | pd.Series) -> None:
     """Raises an HelpskAssertionError if any items in `values` are duplicated.
 
     Args:
@@ -130,7 +131,7 @@ def assert_not_duplicated(values: Union[List, np.ndarray, pd.Series]) -> None:
     assert_false(any_duplicated(values), message='Duplicate Values Found')
 
 
-def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
+def assert_all(values: list | np.ndarray | pd.Series | pd.DataFrame) -> None:
     """Raises an `HelpskAssertionError` unless all items in `values` are `True`
 
     Args:
@@ -148,7 +149,7 @@ def assert_all(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None
             raise HelpskAssertionError('Not All True')
 
 
-def assert_not_any(values: Union[List, np.ndarray, pd.Series, pd.DataFrame]) -> None:
+def assert_not_any(values: list | np.ndarray | pd.Series | pd.DataFrame) -> None:
     """Raises an `HelpskAssertionError` if any items in `values` are `True`
 
     Args:
@@ -247,7 +248,7 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
         return iterable_a.equals(iterable_b)
 
 
-def dataframes_match(dataframes: List[pd.DataFrame],
+def dataframes_match(dataframes: list[pd.DataFrame],
                      float_tolerance: int = 6,
                      ignore_indexes: bool = True,
                      ignore_column_names: bool = True) -> bool:
@@ -304,7 +305,7 @@ def dataframes_match(dataframes: List[pd.DataFrame],
     return all(first_dataframe_equals_other(x) for x in dataframes[1:])
 
 
-def assert_dataframes_match(dataframes: List[pd.DataFrame],
+def assert_dataframes_match(dataframes: list[pd.DataFrame],
                             float_tolerance: int = 6,
                             ignore_indexes: bool = True,
                             ignore_column_names: bool = True,

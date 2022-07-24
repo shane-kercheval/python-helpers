@@ -2,11 +2,11 @@
 
 This module is less concerned with bytes/unicode and text processing, compared with text.py
 """
+from __future__ import annotations
 from enum import unique, Enum, auto
-from typing import List, Union
 
 
-def collapse(*args: Union[str, List[str]], separate: str = '', surround: str = '') -> str:
+def collapse(*args: str | list[str], separate: str = '', surround: str = '') -> str:
     """Takes a list of strings and concatenates them, separating each string with the value of `separate` and
     surrounding each string with the value of `surround`.
 
