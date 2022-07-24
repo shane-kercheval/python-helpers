@@ -3,36 +3,41 @@
 See documentation in database.py
 """
 from abc import ABCMeta, abstractmethod
+from typing import TypeVar
+import configparser
 import time
 import pandas as pd
 from helpsk.utility import suppress_stdout, suppress_warnings
 
 
-class Configuration(metaclass=ABCMeta):
-    """A basic configuration object will product a dictionary representing the keyword parameters that can
-    be passed to a Database object.
-    """
-    @abstractmethod
-    def get_dictionary(self) -> dict:
-        """
-        Returns:
-             a dictionary to be passed to the Database object
-        """
+ConnectionObject = TypeVar('ConnectionObject')
 
 
 class Database(metaclass=ABCMeta):
     """Base class that wraps the connection/querying logic of various databases.
+
+    **kwargs should contain the names of the underlying connection object and corresponding values.
+
+    For example:
+        - For Redshift, typical keyword arguments might be:
+            - `dbname`, `password`, `database`, `port`, `host`
+        - For Snowflake, typical keyword arguments might be:
+            - 'user', 'account', 'authenticator', 'warehouse', 'database', 'autocommit'
     """
     def __init__(self, **kwargs):
-        self.connection_object = None
+        self._kwargs = kwargs
+        self.connection_object: ConnectionObject = None
 
     @classmethod
-    def from_config(cls, config: Configuration):
+    def from_config(cls, config_path: str, config_key: str) -> 'Database':
         """Takes a Configuration object that contains the connection details to the database.
         """
-        return cls(**config.get_dictionary())
+        config = configparser.ConfigParser()
+        config.read(config_path)
+        config_dict = dict(config[config_key].items())
+        return cls(**config_dict)
 
-    def is_connected(self):
+    def is_connected(self) -> bool:
         """
         Returns:
             True if the database is connected, otherwise False
@@ -40,7 +45,7 @@ class Database(metaclass=ABCMeta):
         return self.connection_object is not None
 
     @abstractmethod
-    def _open_connection_object(self) -> object:
+    def _open_connection_object(self) -> ConnectionObject:
         """Child classes will implement the logic to connect to the database and return the connection object.
 
         The returning value will be stored in self.connection_object

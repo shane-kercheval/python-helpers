@@ -13,167 +13,38 @@ Examples:
     with Redshift.from_config(redshift_config) as redshift:
         redshift.query("SELECT * FROM table LIMIT 100")
 """
-import configparser
-from typing import Union
+from __future__ import annotations
 import pandas as pd
-from helpsk.database_base import Configuration, Database
-
-
-class GenericConfigFile(Configuration):
-    """Class that is used to map a configuration file in the format below, to a dictionary that will be passed
-    into the corresponding Database object.
-
-        [config_key]
-        user=[user]
-        password=[password]
-        database=[database]
-        port=[port]
-        host=[host]
-    """
-    def __init__(self, config_file: str, config_key: str, config_mapping: dict):
-        """
-        Args:
-             config_file:
-                the path to the configuration file
-
-             config_key:
-                the configuration key i.e. keyword of configuration items
-
-             config_mapping:
-                a dictionary containing the mapping to go from the configuration item names to the keys of the
-                dictionary created. The keys should be the same as the Database object's constructor.
-
-                So if the Database constructor is `__init__(user, password, database)`
-
-                and the configuration file is in the format of:
-
-                    [database_config]
-                    user_item=robert
-                    password_item=123
-                    database_item=my_database
-
-                then the config_mapping dict should be
-
-                    {'user': 'user_item',
-                     'password': 'password_item',
-                     'database': 'database_item'}
-
-                and the resulting dict from calling get_dictionary would be
-
-                    {'user': 'robert',
-                     'password': '123',
-                     'database': 'my_database'}
-
-                which would be passed into the Database object, either as
-
-                    config_file = GenericConfigFile(...)
-                    Database(**config_file.get_dictionary())
-
-                or
-
-                    config_file = GenericConfigFile(...)
-                    Database.from_config(config_file)
-        """
-        self._config_file = config_file
-        self._config_key = config_key
-        self._config_mapping = config_mapping
-
-    def get_dictionary(self) -> dict:
-        """logic that builds the dictionary described in the __init__ docstring
-
-        Returns:
-             a dictionary to be passed to the Database object
-        """
-        config = configparser.ConfigParser()
-        config.read(self._config_file)
-        return {key: config[self._config_key][value] for key, value in self._config_mapping.items()
-                if value in config[self._config_key]}
-
-
-class RedshiftConfigFile(GenericConfigFile):
-    """Supplies a standard config_key and config_mapping to the GenericConfigFile object.
-
-    Corresponds to a configuration file in the format of:
-
-        [redshift]
-        user=[user]
-        password=[password]
-        database=[database]
-        port=[port]
-        host=[host]
-    """
-    def __init__(self, config_file: str, config_key: str = 'redshift'):
-        """
-        Args:
-            config_file:
-                the path to the configuration file
-
-            config_key:
-                the configuration key, i.e. the `[xxx]` part of the configuration file.
-                The default value is `redshift`.
-
-        """
-        config_mapping = {
-            'user': 'username',
-            'password': 'password',
-            'database': 'database',
-            'port': 'port',
-            'host': 'host'
-        }
-
-        super().__init__(config_file=config_file, config_key=config_key, config_mapping=config_mapping)
-
-
-class SnowflakeConfigFile(GenericConfigFile):
-    """Supplies a standard config_key and config_mapping to the GenericConfigFile object.
-
-    Corresponds to a configuration file in the format of:
-
-        [snowflake]
-        user=[user]
-        account=[account]
-        authenticator=[authenticator]
-        warehouse=[warehouse]
-        database=[database]
-    """
-    def __init__(self, config_file: str, config_key: str = 'snowflake'):
-        """
-        Args:
-            config_file:
-                the path to the configuration file
-
-            config_key:
-                the configuration key, i.e. the `[xxx]` part of the configuration file.
-                The default value is `snowflake`.
-
-        """
-        config_mapping = {'user': 'username',
-                          'account': 'account',
-                          'authenticator': 'authenticator',
-                          'warehouse': 'warehouse',
-                          'database': 'database',
-                          'autocommit': 'autocommit'}
-
-        super().__init__(config_file=config_file, config_key=config_key, config_mapping=config_mapping)
+from helpsk.database_base import Database, ConnectionObject
 
 
 class Redshift(Database):
     """Wraps logic for connecting to Redshift and querying.
 
     Example:
-        config = RedshiftConfigFile('/path/to/redshift.config')
-        with Redshift.from_config(config) as redshift:
+        Given redshift.config with contents:
+
+            [redshift]
+            dbname=my_username
+            password=my-password-123
+            database=the_database
+            port=1234
+            host=host.address.redshift.amazonaws.com
+
+        with Redshift.from_config('/path/to/redshift.config', 'redshift') as redshift:
+            redshift.query("SELECT * FROM table LIMIT 100")
+
+        or
+
+        with Redshift(dbname='my_username', password=...) as redshift:
             redshift.query("SELECT * FROM table LIMIT 100")
     """
-
-    def __init__(self, *,
-                 user: str, password: str, database: str, host: str, port: Union[str, int]):
+    def __init__(self, **kwargs):
         """Initialization"""
-        super().__init__()
-        self._connection_string = "dbname={} host={} port={} user={} password={}". \
-            format(database, host, port, user, password)
+        super().__init__(**kwargs)
+        self._connection_string = ' '.join([f"{k}={v}" for k, v in kwargs.items()])
 
-    def _open_connection_object(self) -> object:
+    def _open_connection_object(self) -> ConnectionObject:
         """Wraps logic for connecting to redshift
         """
         from psycopg2 import connect
@@ -234,39 +105,23 @@ class Snowflake(Database):
     pip install snowflake-connector-python[pandas]
     ```
     """
-    def __init__(self, *,
-                 user: str, account: str, authenticator: str, warehouse: str, database: str,
-                 autocommit: bool = True):
+    def __init__(self, **kwargs):
         """Initialization"""
-        super().__init__()
-        self.user = user
-        self.account = account
-        self.authenticator = authenticator
-        self.warehouse = warehouse
-        self.database = database
-        # need to check if string because it may be passed through a config
-        if isinstance(autocommit, str):
+        super().__init__(**kwargs)
+
+        if (autocommit := kwargs.get('autocommit')) is not None and isinstance(autocommit, str):
             if autocommit.lower() == 'false':
-                self.autocommit = False
+                self._kwargs['autocommit'] = False
             elif autocommit.lower() == 'true':
-                self.autocommit = True
+                self._kwargs['autocommit'] = True
             else:
                 raise ValueError(f"autocommit needs to be true/false but received `{autocommit}`")
-        else:
-            self.autocommit = autocommit
 
-    def _open_connection_object(self) -> object:
+    def _open_connection_object(self) -> ConnectionObject:
         """Wraps logic for connecting to snowflake
         """
         from snowflake.connector import connect
-        return connect(
-            user=self.user,
-            account=self.account,
-            authenticator=self.authenticator,
-            warehouse=self.warehouse,
-            database=self.database,
-            autocommit=self.autocommit,
-        )
+        return connect(**self._kwargs)
 
     def _close_connection_object(self):
         """Wraps logic for closing the connection to snowflake
