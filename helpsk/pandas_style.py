@@ -1,6 +1,7 @@
 """Collection of helpers methods that help to style tables in Jupyter Notebooks
 """
-from typing import Union, Optional, List
+from __future__ import annotations
+from typing import Optional, TypeVar
 from html import escape
 
 import pandas as pd
@@ -18,8 +19,11 @@ import helpsk.pandas as pandas
 from helpsk.validation import any_none_nan
 
 
-def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
-           subset: Optional[List[str]] = None,
+Subset = TypeVar('Subset')
+
+
+def format(styler: pd.DataFrame | Styler,
+           subset: Optional[list[str]] = None,
            round_by: int = 2,
            fill_missing_value: Optional[str] = '<NA>',
            missing_color: Optional[str] = color.WARNING,
@@ -63,9 +67,7 @@ def format(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noq
                          thousands=thousands)  # noqa
 
 
-def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa,
-                     palette: str = 'Blues',
-                     **kwargs) -> Styler:
+def background_color(styler: pd.DataFrame | Styler, palette: str = 'Blues', **kwargs) -> Styler:
     """Applies a background color to pandas Dataframe.
         Args:
             styler:
@@ -89,7 +91,7 @@ def background_color(styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler
 
 
 def __bar_inverse(style_object, align: str, colors: list[str], width: float = 100, min_value: float = None,
-                  max_value: float = None):
+                  max_value: float = None) -> pd.DataFrame:
     """
     CODE MODIFIED FROM
         https://github.com/pandas-dev/pandas/blob/v1.3.2/pandas/io/formats/style.py#L2178-L2258
@@ -110,7 +112,7 @@ def __bar_inverse(style_object, align: str, colors: list[str], width: float = 10
     normed = width * (style_object.to_numpy(dtype=float) - object_min) / (object_max - object_min + 1e-12)
     zero = -width * object_min / (object_max - object_min + 1e-12)
 
-    def css_bar(start: float, end: float, color: str) -> str:  # noqa
+    def css_bar(start: float, end: float, color: str) -> str:
         """
         Generate CSS code to draw a bar from start to end.
         """
@@ -151,8 +153,8 @@ def __bar_inverse(style_object, align: str, colors: list[str], width: float = 10
 
 
 def bar_inverse(
-        styler: Union[pd.DataFrame, "pandas.io.formats.style.Styler"],  # noqa
-        subset: "Subset" = None,  # noqa
+        styler: pd.DataFrame | Styler,
+        subset: Subset = None,
         axis: Axis = 0,
         color="#d65f5f",
         width: float = 100,
@@ -237,7 +239,7 @@ def bar_inverse(
     return styler
 
 
-def html_escape_dataframe(dataframe: pd.DataFrame):
+def html_escape_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
     """HTML `escapes` all string and categorical columns and indexes in the `dataframe`.
 
     This can be used when displaying pd.DataFrames in Jupyter notebook using `.style`;

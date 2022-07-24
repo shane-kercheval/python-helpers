@@ -1,6 +1,6 @@
 """Contains a collection of date related helper functions.
 """
-from typing import Union
+from __future__ import annotations
 from enum import unique, Enum, auto
 import datetime
 
@@ -20,11 +20,11 @@ class Granularity(Enum):
     QUARTER = auto()
 
 
-def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
+def floor(value: datetime.datetime | datetime.date | pd.Series,
           granularity: Granularity = Granularity.DAY,
-          fiscal_start: int = 1) -> Union[datetime.date, pd.Series]:
-
-    """"Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
+          fiscal_start: int = 1) -> datetime.date | pd.Series:
+    """
+    "Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
 
     For example, if `date` is `2021-03-20` and granularity is `Granularity.QUARTER` then `floor()` will return
     `2021-01-01`.
@@ -75,7 +75,7 @@ def floor(value: Union[datetime.datetime, datetime.date, pd.Series],
     raise ValueError("Unknown Granularity type")
 
 
-def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
+def fiscal_quarter(value: datetime.datetime | datetime.date,
                    include_year: bool = False,
                    fiscal_start: int = 1) -> float:
     """Returns the fiscal quarter (or year and quarter numeric value) for a given date.
@@ -134,7 +134,7 @@ def fiscal_quarter(value: Union[datetime.datetime, datetime.date],
     return quarter
 
 
-def to_string(value: Union[datetime.datetime, datetime.date],
+def to_string(value: datetime.datetime | datetime.date,
               granularity: Granularity = Granularity.DAY,
               fiscal_start: int = 1) -> str:
     """Converts the date to a string.

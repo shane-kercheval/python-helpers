@@ -1,5 +1,5 @@
 """This module contains helper functions for plotting."""
-from typing import Tuple, Optional
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,7 +16,7 @@ STANDARD_WIDTH_HEIGHT = (STANDARD_WIDTH, STANDARD_HEIGHT)
 
 
 def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
-                         figure_size: Tuple[int, int] = STANDARD_WIDTH_HEIGHT,
+                         figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
                          x_axis_rotation: int = 30) -> None:
     """Shows the unique values and corresponding frequencies.
 
@@ -64,9 +64,9 @@ def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
 def plot_correlation_heatmap(dataframe: pd.DataFrame,
                              threshold: Optional[float] = None,
                              title: Optional[str] = None,
-                             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
+                             figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
                              round_by: int = 2,
-                             features_to_highlight: Optional[list] = None) -> None:
+                             features_to_highlight: Optional[list[str]] = None) -> None:
     """Creates a heatmap of the correlations between all of the numeric columns.
 
     Args:
@@ -139,8 +139,8 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
     plt.tight_layout()
 
 
-def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column, inner_column,
-                         figure_size: Tuple[int, int] = STANDARD_WIDTH_HEIGHT,
+def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column: str, inner_column: str,
+                         figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
                          missing_value_replacement: str = '<Missing>'):
     """First attempt at dodged barchart.. It needs some work.
 

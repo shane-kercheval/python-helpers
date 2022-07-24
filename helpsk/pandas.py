@@ -1,7 +1,8 @@
 """This module contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
+from __future__ import annotations
 import datetime
 import math
-from typing import List, Union, Optional, Callable
+from typing import Optional, Callable
 from enum import Enum
 
 import numpy as np
@@ -118,8 +119,7 @@ def is_series_categorical(series: pd.Series) -> bool:
     return is_categorical_dtype(series)
 
 
-def fill_na(series: pd.Series,
-            missing_value_replacement: str = '<Missing>'):
+def fill_na(series: pd.Series, missing_value_replacement: str = '<Missing>') -> pd.Series:
     """Fills missing values with `missing_value_replacement`
 
     This is only necessary if `series` is a categorical object because series.fillna(...) will fail if
@@ -153,8 +153,7 @@ def fill_na(series: pd.Series,
     return series.fillna(missing_value_replacement)
 
 
-def replace_all_bools_with_strings(series: pd.Series,
-                                   replacements: dict = None) -> pd.Series:
+def replace_all_bools_with_strings(series: pd.Series, replacements: dict = None) -> pd.Series:
     """Replaces boolean values (True/False) with string values ('True'/'False').
 
     Args:
@@ -216,7 +215,7 @@ def relocate(df: pd.DataFrame, column: str, before: str = None, after: str = Non
     return df[columns]
 
 
-def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
+def get_numeric_columns(dataframe: pd.DataFrame) -> list[str]:
     """Returns the column names from the dataframe that are numeric (and not boolean).
 
     NOTE: `pandas.api.types.is_numeric_dtype()` returns `True` for `bool` dtypes;
@@ -232,7 +231,7 @@ def get_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
     return [column for column in dataframe.columns if is_series_numeric(dataframe[column])]
 
 
-def get_non_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
+def get_non_numeric_columns(dataframe: pd.DataFrame) -> list[str]:
     """Returns the column names from the dataframe that are not numeric.
 
     NOTE: `pandas.api.types.is_numeric_dtype()` returns `True` for `bool` dtypes;
@@ -245,7 +244,7 @@ def get_non_numeric_columns(dataframe: pd.DataFrame) -> List[str]:
     return [column for column in dataframe.columns if not is_series_numeric(dataframe[column])]
 
 
-def get_date_columns(dataframe: pd.DataFrame) -> List[str]:
+def get_date_columns(dataframe: pd.DataFrame) -> list[str]:
     """Returns the column names from the dataframe that are either Date or Datetime.
 
     Returns:
@@ -254,7 +253,7 @@ def get_date_columns(dataframe: pd.DataFrame) -> List[str]:
     return [column for column in dataframe.columns if is_series_date(dataframe[column])]
 
 
-def get_string_columns(dataframe: pd.DataFrame) -> List[str]:
+def get_string_columns(dataframe: pd.DataFrame) -> list[str]:
     """Returns the column names from the dataframe that are string.
 
     Returns:
@@ -263,7 +262,7 @@ def get_string_columns(dataframe: pd.DataFrame) -> List[str]:
     return [column for column in dataframe.columns if is_series_string(dataframe[column])]
 
 
-def get_categorical_columns(dataframe: pd.DataFrame) -> List[str]:
+def get_categorical_columns(dataframe: pd.DataFrame) -> list[str]:
     """Returns the column names from the dataframe that are categorical.
 
     Returns:
@@ -272,8 +271,8 @@ def get_categorical_columns(dataframe: pd.DataFrame) -> List[str]:
     return [column for column in dataframe.columns if is_series_categorical(dataframe[column])]
 
 
-def reorder_categories(categorical: Union[pd.Series, pd.Categorical],
-                       weights: Optional[Union[pd.Series, np.ndarray]] = None,
+def reorder_categories(categorical: pd.Series | pd.Categorical,
+                       weights: Optional[pd.Series | np.ndarray] = None,
                        weight_function: Callable = np.median,
                        ascending=True,
                        ordered=False) -> pd.Categorical:
@@ -326,10 +325,10 @@ def reorder_categories(categorical: Union[pd.Series, pd.Categorical],
     return results
 
 
-def top_n_categories(categorical: Union[pd.Series, pd.Categorical],
+def top_n_categories(categorical: pd.Series | pd.Categorical,
                      top_n: int = 5,
                      other_category: str = 'Other',
-                     weights: Optional[Union[pd.Series, np.ndarray]] = None,
+                     weights: Optional[pd.Series | np.ndarray] = None,
                      weight_function: Callable = np.median,
                      ordered: bool = False) -> pd.Categorical:
     """Returns copy of `categorical` series, with the top `n` categories retained based on either the count of
@@ -443,7 +442,7 @@ def convert_integer_series_to_categorical(series: pd.Series, mapping: dict,
 def numeric_summary(dataframe: pd.DataFrame,
                     round_by: int = 2,
                     return_style: bool = True,
-                    sort_by_columns: bool = False) -> Union[pd.DataFrame, Styler, None]:
+                    sort_by_columns: bool = False) -> pd.DataFrame | Styler | None:
     """Provides a summary of basic stats for the numeric columns of a DataFrame. Each numeric column in
     `dataframe` will correspond to a row in the pd.DataFrame returned.
 
@@ -559,7 +558,7 @@ def numeric_summary(dataframe: pd.DataFrame,
 def non_numeric_summary(dataframe: pd.DataFrame,
                         return_style: bool = True,
                         unique_freq_value_max_chars: int = 30,
-                        sort_by_columns: bool = False) -> Union[pd.DataFrame, None]:
+                        sort_by_columns: bool = False) -> pd.DataFrame | Styler | None:
     """Provides a summary of basic stats for the non-numeric columns of a DataFrame. Each non-numeric column
     in `dataframe` will correspond to a row in the pd.DataFrame returned.
 
@@ -715,7 +714,7 @@ def count_groups(dataframe: pd.DataFrame,
                  group_sum: Optional[str] = None,
                  sum_round_by: int = 1,
                  remove_first_level_duplicates: bool = True,
-                 return_style: bool = False) -> Union[pd.DataFrame, Styler]:
+                 return_style: bool = False) -> pd.DataFrame | Styler:
     """Show counts of up to 2 groups; optionally aggregate a numeric column based on groups.
 
     Args:

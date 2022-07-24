@@ -1,6 +1,6 @@
 import logging
 import datetime
-from typing import Callable, Union
+from typing import Callable, Optional
 from functools import wraps
 
 
@@ -28,7 +28,7 @@ def log_function_call(function: Callable) -> Callable:
     return wrapper
 
 
-def _log_function(function_name: str, params: Union[dict, None] = None):
+def _log_function(function_name: str, params: Optional[dict] = None):
     """
     This function is meant to be used at the start of the calling function; calls logging.info and passes the
     name of the function and optional parameter names/values.

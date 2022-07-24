@@ -159,7 +159,7 @@ def is_debugging():
     return False
 
 
-def repr(instance: object):
+def repr(instance: object) -> str:
     """
     This method can be used to build a standard __repr__ function from within a class.
 
