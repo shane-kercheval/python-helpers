@@ -39,10 +39,10 @@ class Redshift(Database):
         with Redshift(dbname='my_username', password=...) as redshift:
             redshift.query("SELECT * FROM table LIMIT 100")
     """
-    def __init__(self, **kwargs):
-        """Initialization"""
-        super().__init__(**kwargs)
-        self._connection_string = ' '.join([f"{k}={v}" for k, v in kwargs.items()])
+
+    @property
+    def _connection_string(self) -> str:
+        return ' '.join([f"{k}={v}" for k, v in self._kwargs.items()])
 
     def _open_connection_object(self) -> ConnectionObject:
         """Wraps logic for connecting to redshift

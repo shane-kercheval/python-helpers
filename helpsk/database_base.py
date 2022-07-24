@@ -15,22 +15,54 @@ ConnectionObject = TypeVar('ConnectionObject')
 
 class Database(metaclass=ABCMeta):
     """Base class that wraps the connection/querying logic of various databases.
-
-    **kwargs should contain the names of the underlying connection object and corresponding values.
-
-    For example:
-        - For Redshift, typical keyword arguments might be:
-            - `dbname`, `password`, `database`, `port`, `host`
-        - For Snowflake, typical keyword arguments might be:
-            - 'user', 'account', 'authenticator', 'warehouse', 'database', 'autocommit'
     """
     def __init__(self, **kwargs):
+        """
+        **kwargs should contain the names of the underlying connection object and corresponding values.
+
+        For example:
+            - For Redshift, typical keyword arguments might be:
+                - `dbname`, `password`, `database`, `port`, `host`
+            - For Snowflake, typical keyword arguments might be:
+                - 'user', 'account', 'authenticator', 'warehouse', 'database', 'autocommit'
+        """
         self._kwargs = kwargs
         self.connection_object: ConnectionObject = None
 
     @classmethod
     def from_config(cls, config_path: str, config_key: str) -> 'Database':
-        """Takes a Configuration object that contains the connection details to the database.
+        """
+        Passes key/value pairs found in configuration file into underlying connection. Keys must match
+        corresponding connection string or connection method arguments.
+
+        For example:
+            - For Redshift, typical keys might be:
+                - `dbname`, `password`, `database`, `port`, `host`
+
+            ```
+            [redshift]
+            user=my_username
+            password=my-password-123
+            dbname=the_database
+            host=host.address.redshift.amazonaws.com
+            port=1234
+            ```
+
+            - For Snowflake, typical keys might be:
+                - 'user', 'account', 'authenticator', 'warehouse', 'database', 'autocommit'
+
+            ```
+            [snowflake]
+            user=my.email@address.com
+            account=account.id
+            authenticator=externalbrowser
+            warehouse=WAREHOUSE_NAME
+            database=DATABASE_NAME
+            ```
+
+        Args:
+            config_path: path to the configuration file containing key/value pairs.
+            config_key: name of the configuration key in configuration file e.g. `[redshift]`
         """
         config = configparser.ConfigParser()
         config.read(config_path)
