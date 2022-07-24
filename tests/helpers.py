@@ -79,7 +79,7 @@ def check_plot(file_name: str, plot_function: Callable, set_size_w_h: Union[tupl
     clear()
     if os.path.isfile(file_name):
         os.remove(file_name)
-    assert os.path.isfile(file_name) is False
+    assert not os.path.isfile(file_name)
     plot_function()
     if set_size_w_h is not None:
         fig = plt.gcf()

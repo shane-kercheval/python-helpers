@@ -1,6 +1,7 @@
 import datetime
 import unittest
 from contextlib import contextmanager
+import configparser
 from enum import unique, Enum, auto
 from os import path
 from unittest.mock import patch
@@ -8,7 +9,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 
-from helpsk.database import GenericConfigFile, RedshiftConfigFile, SnowflakeConfigFile, Redshift, Snowflake
+from helpsk.database import Redshift, Snowflake
 from tests.helpers import get_test_path
 
 
@@ -63,71 +64,70 @@ class TestDatabase(unittest.TestCase):
         self.sample_snowflake_autocommit_false_file = get_test_path('database/sample_snowflake_autocommit_false.config')  # noqa
         self.assertTrue(path.isfile(self.sample_snowflake_autocommit_false_file))
 
-    def test_GenericConfigFile(self):
-        config_mapping = {'user_param': 'username',
-                          'password_param': 'password',
-                          'database_param': 'database',
-                          'port_param': 'port',
-                          'host_param': 'host'}
-        config = GenericConfigFile(config_file=self.sample_redshift_file,
-                                   config_key='redshift',
-                                   config_mapping=config_mapping)
-        expected_value = {'user_param': 'my_username',
-                          'password_param': 'my-password-123',
-                          'database_param': 'the_database',
-                          'port_param': '1234',
-                          'host_param': 'host.address.redshift.amazonaws.com'}
-        self.assertEqual(config.get_dictionary(), expected_value)
+    def test_redshift_settings(self):
+        redshift = Redshift(test='value', test2='value2')
+        self.assertEqual({'test': 'value', 'test2': 'value2'}, redshift._kwargs)
+        self.assertEqual('test=value test2=value2', redshift._connection_string)
 
-    def test_RedshiftConfigFile(self):
-        config = RedshiftConfigFile(config_file=self.sample_redshift_file)
-        config_dict = config.get_dictionary()
-        expected_value = {'user': 'my_username',
-                          'password': 'my-password-123',
-                          'database': 'the_database',
-                          'port': '1234',
-                          'host': 'host.address.redshift.amazonaws.com'}
-        self.assertEqual(expected_value, config_dict)
-
-        # test that this can be passed into the redshift database object, which implies that config_dict
-        # contains the proper keyboard arguments
-        Redshift(**config_dict)
-
-    def test_SnowflakeConfigFile(self):
-        config = SnowflakeConfigFile(config_file=self.sample_snowflake_file)
-        config_dict = config.get_dictionary()
-        expected_value = {
-            'user': 'my.email@address.com',
-            'account': 'account.id',
-            'authenticator': 'externalbrowser',
-            'warehouse': 'WAREHOUSE_NAME',
-            'database': 'DATABASE_NAME',
+        redshift = Redshift.from_config(config_path=self.sample_redshift_file, config_key='redshift')
+        expected_kwargs = {
+            'user': 'my_username',
+            'password': 'my-password-123',
+            'dbname': 'the_database',
+            'host': 'host.address.redshift.amazonaws.com',
+            'port': '1234'
         }
-        self.assertEqual(expected_value, config_dict)
+        self.assertEqual(expected_kwargs, redshift._kwargs)
 
-        # test that this can be passed into the snowflake database object, which implies that config_dict
-        # contains the proper keyboard arguments
-        Snowflake(**config_dict)
+        expected_connection_string = 'user=my_username password=my-password-123 dbname=the_database ' \
+            'host=host.address.redshift.amazonaws.com port=1234'
+        self.assertEqual(expected_connection_string, redshift._connection_string)
 
-    def test_SnowflakeConfigFile_auto_commit(self):
-        config = SnowflakeConfigFile(config_file=self.sample_snowflake_file)
-        snowflake = Snowflake.from_config(config=config)
-        self.assertIsInstance(snowflake.autocommit, bool)
-        self.assertTrue(snowflake.autocommit)
+    def test_snowflake_settings(self):
+        snowflake = Snowflake(test='value', test2='value2')
+        self.assertEqual({'test': 'value', 'test2': 'value2'}, snowflake._kwargs)
+        snowflake = Snowflake(test='value', test2='value2', autocommit='FALSE')
+        self.assertEqual({'test': 'value', 'test2': 'value2', 'autocommit': False}, snowflake._kwargs)
+        snowflake = Snowflake(test='value', test2='value2', autocommit='FALSE')
+        self.assertEqual({'test': 'value', 'test2': 'value2', 'autocommit': False}, snowflake._kwargs)
 
-        config = SnowflakeConfigFile(config_file=self.sample_snowflake_autocommit_false_file)
-        self.assertTrue('autocommit' in config.get_dictionary())
-        self.assertEqual(config.get_dictionary()['autocommit'], 'FALSE')
-        snowflake = Snowflake.from_config(config=config)
-        self.assertIsInstance(snowflake.autocommit, bool)
-        self.assertFalse(snowflake.autocommit)
+        snowflake = Snowflake.from_config(config_path=self.sample_snowflake_file, config_key='snowflake')
+        expected_kwargs = {
+           'user': 'my.email@address.com',
+           'account': 'account.id',
+           'authenticator': 'externalbrowser',
+           'warehouse': 'WAREHOUSE_NAME',
+           'database': 'DATABASE_NAME',
+        }
+        self.assertEqual(expected_kwargs, snowflake._kwargs)
 
-        config = SnowflakeConfigFile(config_file=self.sample_snowflake_autocommit_true_file)
-        self.assertTrue('autocommit' in config.get_dictionary())
-        self.assertEqual(config.get_dictionary()['autocommit'], 'TRUE')
-        snowflake = Snowflake.from_config(config=config)
-        self.assertIsInstance(snowflake.autocommit, bool)
-        self.assertTrue(snowflake.autocommit)
+        snowflake = Snowflake.from_config(
+            config_path=self.sample_snowflake_autocommit_false_file,
+            config_key='snowflake'
+        )
+        expected_kwargs = {
+           'user': 'my.email@address.com',
+           'account': 'account.id',
+           'authenticator': 'externalbrowser',
+           'warehouse': 'WAREHOUSE_NAME',
+           'database': 'DATABASE_NAME',
+           'autocommit': False,
+        }
+        self.assertEqual(expected_kwargs, snowflake._kwargs)
+
+        snowflake = Snowflake.from_config(
+            config_path=self.sample_snowflake_autocommit_true_file,
+            config_key='snowflake'
+        )
+        expected_kwargs = {
+           'user': 'my.email@address.com',
+           'account': 'account.id',
+           'authenticator': 'externalbrowser',
+           'warehouse': 'WAREHOUSE_NAME',
+           'database': 'DATABASE_NAME',
+           'autocommit': True,
+        }
+        self.assertEqual(expected_kwargs, snowflake._kwargs)
 
     def test_Snowflake_generate_sql_create_table(self):
         sample_data = pd.DataFrame({'col_a': [np.nan, 2, 3, 4],
@@ -235,8 +235,13 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(sql, expected_value)
 
     def test_Database(self):
-        redshift_config = RedshiftConfigFile(config_file=self.sample_redshift_file)
-        snowflake_config = SnowflakeConfigFile(config_file=self.sample_snowflake_file)
+        redshift_config = configparser.ConfigParser()
+        redshift_config.read(self.sample_redshift_file)
+        redshift_config = dict(redshift_config['redshift'].items())
+
+        snowflake_config = configparser.ConfigParser()
+        snowflake_config.read(self.sample_snowflake_file)
+        snowflake_config = dict(snowflake_config['snowflake'].items())
 
         def test_via_constructor(db_obj, db_mock):
             self.assertFalse(db_obj.is_connected())
@@ -274,15 +279,21 @@ class TestDatabase(unittest.TestCase):
                     self.assertFalse(db_obj.is_connected())
                     self.assertIsNone(db_obj.connection_object)
 
-        test_via_constructor(db_obj=Redshift(**redshift_config.get_dictionary()), db_mock=mock_redshift)
-        test_via_constructor(db_obj=Redshift.from_config(redshift_config), db_mock=mock_redshift)
-        test_via_constructor(db_obj=Snowflake(**snowflake_config.get_dictionary()), db_mock=mock_snowflake)
-        test_via_constructor(db_obj=Snowflake.from_config(snowflake_config), db_mock=mock_snowflake)
+        test_via_constructor(db_obj=Redshift(**redshift_config), db_mock=mock_redshift)
+        test_via_constructor(
+            db_obj=Redshift.from_config(self.sample_redshift_file, 'redshift'),
+            db_mock=mock_redshift
+        )
+        test_via_constructor(db_obj=Snowflake(**snowflake_config), db_mock=mock_snowflake)
+        test_via_constructor(
+            db_obj=Snowflake.from_config(self.sample_snowflake_file, 'snowflake'),
+            db_mock=mock_snowflake
+        )
 
-        def test_context_manager(db_class, db_config, db_mock):
+        def test_context_manager(db_class, db_config_path, db_config_key, db_mock):
             # test context manager
             with db_mock():
-                with db_class.from_config(db_config) as db_object:
+                with db_class.from_config(config_path=db_config_path, config_key=db_config_key) as db_object:
                     self.assertTrue(db_object.is_connected())
                     self.assertIsNotNone(db_object.connection_object)
                     self.assertIsInstance(db_object.connection_object, unittest.mock.MagicMock)
@@ -298,12 +309,22 @@ class TestDatabase(unittest.TestCase):
                 self.assertFalse(db_object.is_connected())
                 self.assertIsNone(db_object.connection_object)
 
-        test_context_manager(db_class=Redshift, db_config=redshift_config, db_mock=mock_redshift)
-        test_context_manager(db_class=Snowflake, db_config=snowflake_config, db_mock=mock_snowflake)
+        test_context_manager(
+            db_class=Redshift,
+            db_config_path=self.sample_redshift_file,
+            db_config_key='redshift',
+            db_mock=mock_redshift
+        )
+        test_context_manager(
+            db_class=Snowflake,
+            db_config_path=self.sample_snowflake_file,
+            db_config_key='snowflake',
+            db_mock=mock_snowflake
+        )
 
         # tests that if failure to connect (i.e. no mock and connection failure) that the object is not in an
         # open state
-        database = Redshift.from_config(redshift_config)
+        database = Redshift.from_config(config_path=self.sample_redshift_file, config_key='redshift')
         with self.assertRaises(Exception):
             database.connect()
         self.assertFalse(database.is_connected())
