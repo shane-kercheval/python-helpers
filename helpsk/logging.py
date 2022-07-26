@@ -71,6 +71,11 @@ class Timer:
 
 
 def log_timer(function: Callable) -> Callable:
+    """
+    This function should be used as a decorator to log the time/duration of a function call.
+
+    Args: function that is decorated
+    """
     @wraps(function)
     def wrapper(*args, **kwargs):
         with Timer(f"FUNCTION={function.__module__}:{function.__name__}", include_message_at_finish=True):
