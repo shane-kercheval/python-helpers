@@ -1,6 +1,7 @@
+from __future__ import annotations
 import logging
 import datetime
-from typing import Callable, Optional
+from typing import Callable
 from functools import wraps
 
 
@@ -28,7 +29,7 @@ def log_function_call(function: Callable) -> Callable:
     return wrapper
 
 
-def _log_function(function_name: str, params: Optional[dict] = None):
+def _log_function(function_name: str, params: dict | None = None):
     """
     This function is meant to be used at the start of the calling function; calls logging.info and passes the
     name of the function and optional parameter names/values.
@@ -71,6 +72,11 @@ class Timer:
 
 
 def log_timer(function: Callable) -> Callable:
+    """
+    This function should be used as a decorator to log the time/duration of a function call.
+
+    Args: function that is decorated
+    """
     @wraps(function)
     def wrapper(*args, **kwargs):
         with Timer(f"FUNCTION={function.__module__}:{function.__name__}", include_message_at_finish=True):
