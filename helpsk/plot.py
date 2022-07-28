@@ -1,5 +1,5 @@
 """This module contains helper functions for plotting."""
-from typing import Optional
+from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -62,11 +62,11 @@ def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
 
 
 def plot_correlation_heatmap(dataframe: pd.DataFrame,
-                             threshold: Optional[float] = None,
-                             title: Optional[str] = None,
+                             threshold: float | None = None,
+                             title: str | None = None,
                              figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
                              round_by: int = 2,
-                             features_to_highlight: Optional[list[str]] = None) -> None:
+                             features_to_highlight: list[str] | None = None) -> None:
     """Creates a heatmap of the correlations between all of the numeric columns.
 
     Args:

@@ -1,7 +1,7 @@
 """Collection of helpers methods that help to style tables in Jupyter Notebooks
 """
 from __future__ import annotations
-from typing import Optional, TypeVar
+from typing import TypeVar
 from html import escape
 
 import pandas as pd
@@ -23,11 +23,11 @@ Subset = TypeVar('Subset')
 
 
 def format(styler: pd.DataFrame | Styler,
-           subset: Optional[list[str]] = None,
+           subset: list[str] | None = None,
            round_by: int = 2,
-           fill_missing_value: Optional[str] = '<NA>',
-           missing_color: Optional[str] = color.WARNING,
-           thousands: Optional[str] = ',',
+           fill_missing_value: str | None = '<NA>',
+           missing_color: str | None = color.WARNING,
+           thousands: str | None = ',',
            hide_index: bool = False) -> Styler:
     """Applies basic formatting to pandas Dataframe.
     Args:

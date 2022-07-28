@@ -4,7 +4,6 @@ from __future__ import annotations
 import math
 import warnings
 from re import match
-from typing import Optional
 import re
 
 import numpy as np
@@ -205,7 +204,7 @@ class MLExperimentResults:
                                searcher: BaseSearchCV,
                                higher_score_is_better: bool = True,
                                description: str = "",
-                               parameter_name_mappings: Optional[dict] = None) -> 'MLExperimentResults':
+                               parameter_name_mappings: dict | None = None) -> 'MLExperimentResults':
         """
         This function extracts the results from a SearchCV object (e.g.
         sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV), which are converted to
@@ -433,7 +432,7 @@ class MLExperimentResults:
     def to_dataframe(self,
                      sort_by_score: bool = True,
                      exclude_zero_variance_params: bool = True,
-                     query: Optional[str] = None) -> pd.DataFrame:
+                     query: str | None = None) -> pd.DataFrame:
         """This function converts the score information from the SearchCV object into a pd.DataFrame.
 
         Args:
@@ -506,7 +505,7 @@ class MLExperimentResults:
                                num_rows: int = 500,
                                primary_score_only: bool = False,
                                exclude_zero_variance_params: bool = True,
-                               query: Optional[str] = None,
+                               query: str | None = None,
                                include_rank: bool = False,
                                return_style: bool = True,
                                sort_by_score: bool = True) -> pd.DataFrame | Styler:
@@ -619,7 +618,7 @@ class MLExperimentResults:
 
         return cv_dataframe
 
-    def to_labeled_dataframe(self, query: Optional[str] = None) -> pd.DataFrame:
+    def to_labeled_dataframe(self, query: str | None = None) -> pd.DataFrame:
         """Returns a pd.DataFrame similar to `to_dataframe()` with additional columns 'Trial Index' and
         'labels' (which are the labels corresponding to the `trial_label` property and collapse all the
         name/values for the hyper-parameters into a single string)
@@ -976,12 +975,12 @@ class MLExperimentResults:
         return self.fit_time_total + self.score_time_total
 
     def plot_performance_across_trials(self,
-                                       size: Optional[str] = None,
-                                       color: Optional[str] = None,
+                                       size: str | None = None,
+                                       color: str | None = None,
                                        color_continuous_scale: list[str] = px.colors.diverging.balance,
-                                       facet_by: Optional[str] = None,
+                                       facet_by: str | None = None,
                                        facet_num_col: int = 3,
-                                       query: Optional[str] = None,
+                                       query: str | None = None,
                                        height: float = 600,
                                        width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1056,7 +1055,7 @@ class MLExperimentResults:
         return fig
 
     def plot_parameter_values_across_trials(self,
-                                            query: Optional[str] = None,
+                                            query: str | None = None,
                                             height: float = 600,
                                             width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1115,7 +1114,7 @@ class MLExperimentResults:
 
     def plot_parallel_coordinates(self,
                                   include_all_scores: bool = True,
-                                  query: Optional[str] = None,
+                                  query: str | None = None,
                                   height: float = 600,
                                   width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1165,7 +1164,7 @@ class MLExperimentResults:
 
     def plot_scatter_matrix(self,
                             include_all_scores: bool = True,
-                            query: Optional[str] = None,
+                            query: str | None = None,
                             height: float = 600,
                             width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1209,7 +1208,7 @@ class MLExperimentResults:
         return fig
 
     def plot_performance_numeric_params(self,
-                                        query: Optional[str] = None,
+                                        query: str | None = None,
                                         height: float = 600,
                                         width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1265,7 +1264,7 @@ class MLExperimentResults:
         return fig
 
     def plot_performance_non_numeric_params(self,
-                                            query: Optional[str] = None,
+                                            query: str | None = None,
                                             height: float = 600,
                                             width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1339,9 +1338,9 @@ class MLExperimentResults:
 
     def plot_score_vs_parameter(self,
                                 parameter,
-                                query: Optional[str] = None,
-                                size: Optional[str] = None,
-                                color: Optional[str] = None,
+                                query: str | None = None,
+                                size: str | None = None,
+                                color: str | None = None,
                                 height: float = 600,
                                 width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1407,8 +1406,8 @@ class MLExperimentResults:
     def plot_parameter_vs_parameter(self,
                                     parameter_x: str,
                                     parameter_y: str,
-                                    query: Optional[str] = None,
-                                    size: Optional[str] = None,
+                                    query: str | None = None,
+                                    size: str | None = None,
                                     height: float = 600,
                                     width: float = 600 * GOLDEN_RATIO) -> plotly.graph_objects.Figure:
         """
@@ -1726,7 +1725,7 @@ class TwoClassEvaluator:
                        dummy_classifier_strategy: str | list | None = 'prior',
                        dummy_classifier_constant: int = 1,
                        return_style: bool = False,
-                       round_by: Optional[int] = None) -> pd.DataFrame | Styler:
+                       round_by: int | None = None) -> pd.DataFrame | Styler:
         """All of the metrics are returned as a DataFrame.
 
         Args:
@@ -2387,7 +2386,7 @@ class RegressionEvaluator:
                        dummy_regressor_strategy: str | list | None = 'mean',
                        dummy_regressor_constant: int = 1,
                        return_style: bool = False,
-                       round_by: Optional[int] = None) -> pd.DataFrame | Styler:
+                       round_by: int | None = None) -> pd.DataFrame | Styler:
         """All of the metrics are returned as a DataFrame.
 
         Args:
@@ -2581,7 +2580,7 @@ class TwoClassModelComparison:
                        dummy_classifier_strategy: str | list | None = 'prior',
                        dummy_classifier_constant: int = 1,
                        return_style: bool = False,
-                       round_by: Optional[int] = None) -> pd.DataFrame | Styler:
+                       round_by: int | None = None) -> pd.DataFrame | Styler:
         """All of the metrics are returned as a DataFrame.
 
         Args:

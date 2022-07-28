@@ -2,7 +2,7 @@
 from __future__ import annotations
 import datetime
 import math
-from typing import Optional, Callable
+from typing import Callable
 from enum import Enum
 
 import numpy as np
@@ -272,7 +272,7 @@ def get_categorical_columns(dataframe: pd.DataFrame) -> list[str]:
 
 
 def reorder_categories(categorical: pd.Series | pd.Categorical,
-                       weights: Optional[pd.Series | np.ndarray] = None,
+                       weights: pd.Series | np.ndarray | None = None,
                        weight_function: Callable = np.median,
                        ascending=True,
                        ordered=False) -> pd.Categorical:
@@ -328,7 +328,7 @@ def reorder_categories(categorical: pd.Series | pd.Categorical,
 def top_n_categories(categorical: pd.Series | pd.Categorical,
                      top_n: int = 5,
                      other_category: str = 'Other',
-                     weights: Optional[pd.Series | np.ndarray] = None,
+                     weights: pd.Series | np.ndarray | None = None,
                      weight_function: Callable = np.median,
                      ordered: bool = False) -> pd.Categorical:
     """Returns copy of `categorical` series, with the top `n` categories retained based on either the count of
@@ -710,8 +710,8 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
 
 def count_groups(dataframe: pd.DataFrame,
                  group_1: str,
-                 group_2: Optional[str] = None,
-                 group_sum: Optional[str] = None,
+                 group_2: str | None = None,
+                 group_sum: str | None = None,
                  sum_round_by: int = 1,
                  remove_first_level_duplicates: bool = True,
                  return_style: bool = False) -> pd.DataFrame | Styler:
