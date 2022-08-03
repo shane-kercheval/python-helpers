@@ -6,7 +6,8 @@ from sklearn.preprocessing import OrdinalEncoder
 
 
 class TransformerChooser(BaseEstimator, TransformerMixin):
-    """Transformer that wraps another Transformer. This allows different transformer objects to be tuned.
+    """Transformer that wraps another Transformer. This allows different transformer objects to be
+    tuned.
     """
     def __init__(self, transformer=None):
         """

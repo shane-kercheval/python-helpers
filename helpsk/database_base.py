@@ -1,8 +1,9 @@
-"""Contains the base/abstract classes that wraps the connection/querying logic of various databases.
+"""Contains the base classes that wraps the connection/querying logic of
+various databases.
 
 See documentation in database.py
 """
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import TypeVar
 import configparser
 import time
@@ -13,12 +14,13 @@ from helpsk.utility import suppress_stdout, suppress_warnings
 ConnectionObject = TypeVar('ConnectionObject')
 
 
-class Database(metaclass=ABCMeta):
+class Database(ABC):
     """Base class that wraps the connection/querying logic of various databases.
     """
     def __init__(self, **kwargs):
         """
-        **kwargs should contain the names of the underlying connection object and corresponding values.
+        **kwargs should contain the names of the underlying connection object and corresponding
+        values.
 
         For example:
             - For Redshift, typical keyword arguments might be:
@@ -32,8 +34,8 @@ class Database(metaclass=ABCMeta):
     @classmethod
     def from_config(cls, config_path: str, config_key: str) -> 'Database':
         """
-        Passes key/value pairs found in configuration file into underlying connection. Keys must match
-        corresponding connection string or connection method arguments.
+        Passes key/value pairs found in configuration file into underlying connection. Keys must
+        match corresponding connection string or connection method arguments.
 
         For example:
             - For Redshift, typical keys might be:
@@ -61,8 +63,11 @@ class Database(metaclass=ABCMeta):
             ```
 
         Args:
-            config_path: path to the configuration file containing key/value pairs.
-            config_key: name of the configuration key in configuration file e.g. `[redshift]`
+            config_path:
+                path to the configuration file containing key/value pairs.
+            config_key:
+                name of the configuration key in configuration file
+                e.g. `[redshift]`
         """
         config = configparser.ConfigParser()
         config.read(config_path)
@@ -78,19 +83,21 @@ class Database(metaclass=ABCMeta):
 
     @abstractmethod
     def _open_connection_object(self) -> ConnectionObject:
-        """Child classes will implement the logic to connect to the database and return the connection object.
+        """Child classes will implement the logic to connect to the database and return the
+        connection object.
 
         The returning value will be stored in self.connection_object
 
         Returns:
-            the connection object (usually returned from the underlying `connect()` method. For example, the
-            returning value from `snowflake.connection.connect()`
+            the connection object (usually returned from the underlying `connect()` method.
+            For example, the returning value from `snowflake.connection.connect()`
         """
 
     @abstractmethod
     def _close_connection_object(self):
-        """Child classes will implement the logic to close the connection to the database, typically by
-        calling `close()` on the connection object returned from _open_connection_object.
+        """Child classes will implement the logic to close the connection to the database,
+        typically by calling `close()` on the connection object returned from
+        _open_connection_object.
 
         For example:
             self.connection_object.close()

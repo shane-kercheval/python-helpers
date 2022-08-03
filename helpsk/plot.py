@@ -15,17 +15,19 @@ STANDARD_HEIGHT = STANDARD_WIDTH / GOLDEN_RATIO
 STANDARD_WIDTH_HEIGHT = (STANDARD_WIDTH, STANDARD_HEIGHT)
 
 
-def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
-                         figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
-                         x_axis_rotation: int = 30) -> None:
+def plot_value_frequency(
+        series: pd.Series, sort_by_frequency: bool = True,
+        figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
+        x_axis_rotation: int = 30) -> None:
     """Shows the unique values and corresponding frequencies.
 
     Args:
         series:
             a Pandas series, either categorical or with integers.
         sort_by_frequency:
-            if True then sort by frequency desc; otherwise sort by index (either numerically ascending if
-            series is numeric, or alphabetically if non-ordered categoric, or by category if ordered categoric
+            if True then sort by frequency desc; otherwise sort by index (either numerically
+            ascending if series is numeric, or alphabetically if non-ordered categoric, or by
+            category if ordered categoric
         figure_size:
             tuple containing `(width, height)` of plot. The default height is defined by
             `STANDARD_HEIGHT`, and the default width is `STANDARD_HEIGHT / GOLDEN_RATIO`
@@ -33,11 +35,15 @@ def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
             the angle to rotate the x-axis text.
     """
     value_frequencies = hpandas.value_frequency(series=series, sort_by_frequency=sort_by_frequency)
-    plot_object = value_frequencies.drop(columns='Percent').plot(kind='bar', rot=10,
-                                                                 ylabel='Frequency',
-                                                                 title=f'Name: `{series.name}`',
-                                                                 legend=False,
-                                                                 figsize=figure_size)
+    plot_object = value_frequencies.\
+        drop(columns='Percent').\
+        plot(
+            kind='bar', rot=10,
+            ylabel='Frequency',
+            title=f'Name: `{series.name}`',
+            legend=False,
+            figsize=figure_size
+        )
     for idx, label in enumerate(list(value_frequencies.index)):
         if pd.isna(label):
             frequency = value_frequencies[value_frequencies.index.isna()]['Frequency'].iloc[0]
@@ -57,29 +63,33 @@ def plot_value_frequency(series: pd.Series, sort_by_frequency: bool = True,
                              ha='center',
                              textcoords='offset points')
 
-    plot_object.set_xticklabels(labels=value_frequencies.index.values, rotation=x_axis_rotation, ha='right')
+    plot_object.set_xticklabels(
+        labels=value_frequencies.index.values, rotation=x_axis_rotation, ha='right'
+    )
     plt.tight_layout()
 
 
-def plot_correlation_heatmap(dataframe: pd.DataFrame,
-                             threshold: float | None = None,
-                             title: str | None = None,
-                             figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
-                             round_by: int = 2,
-                             features_to_highlight: list[str] | None = None) -> None:
+def plot_correlation_heatmap(
+        dataframe: pd.DataFrame,
+        threshold: float | None = None,
+        title: str | None = None,
+        figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
+        round_by: int = 2,
+        features_to_highlight: list[str] | None = None) -> None:
     """Creates a heatmap of the correlations between all of the numeric columns.
 
     Args:
         dataframe:
             dataframe to get correlations from. Automatically chooses all numeric columns.
         threshold:
-            threshold: the heatmap only includes columns that have a correlation value, corresponding to at
-        least one other column, where the absolute value is higher than the threshold.
+            threshold: the heatmap only includes columns that have a correlation value,
+            corresponding to at least one other column, where the absolute value is higher than the
+            threshold.
 
-        So for example, if the threshold is `0.8` then all columns that have a correlation (absolute)
-            value of `>=.80` anywhere in the correlation matrix (i.e. with any other column), will show in
-            the heatmap, even though a specific column might not have high correlations with every other
-            column included.
+        So for example, if the threshold is `0.8` then all columns that have a correlation
+            (absolute) value of `>=.80` anywhere in the correlation matrix (i.e. with any other
+            column), will show in the heatmap, even though a specific column might not have high
+            correlations with every other column included.
         title:
             title of plot
         figure_size:
@@ -96,7 +106,11 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
         features = correlations.columns.values
         correlation_matrix = np.abs(correlations.values)
         np.fill_diagonal(correlation_matrix, np.NaN)
-        meets_threshold = np.apply_along_axis(lambda x: np.any(x >= threshold), 0, correlation_matrix)
+        meets_threshold = np.apply_along_axis(
+            lambda x: np.any(x >= threshold),
+            0,
+            correlation_matrix
+        )
         if not meets_threshold.any():
             raise HelpskParamValueError('correlation `threshold` set too high.')
 
@@ -139,9 +153,12 @@ def plot_correlation_heatmap(dataframe: pd.DataFrame,
     plt.tight_layout()
 
 
-def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column: str, inner_column: str,
-                         figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
-                         missing_value_replacement: str = '<Missing>'):
+def plot_dodged_barchart(
+        dataframe: pd.DataFrame,
+        outer_column: str,
+        inner_column: str,
+        figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
+        missing_value_replacement: str = '<Missing>'):
     """First attempt at dodged barchart.. It needs some work.
 
     args:
@@ -162,11 +179,14 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column: str, inner_colum
     dataframe[outer_column] = hpandas.replace_all_bools_with_strings(dataframe[outer_column])
     dataframe[inner_column] = hpandas.replace_all_bools_with_strings(dataframe[inner_column])
 
-    dataframe[outer_column] = hpandas.fill_na(series=dataframe[outer_column],
-                                              missing_value_replacement=missing_value_replacement)
-
-    dataframe[inner_column] = hpandas.fill_na(series=dataframe[inner_column],
-                                              missing_value_replacement=missing_value_replacement)
+    dataframe[outer_column] = hpandas.fill_na(
+        series=dataframe[outer_column],
+        missing_value_replacement=missing_value_replacement
+    )
+    dataframe[inner_column] = hpandas.fill_na(
+        series=dataframe[inner_column],
+        missing_value_replacement=missing_value_replacement
+    )
 
     outer_labels = dataframe[outer_column].unique().tolist()
     if hpandas.is_series_categorical(dataframe[outer_column]):
@@ -206,14 +226,17 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column: str, inner_colum
 
     ax_list = []
     for index in range(len(inner_labels)):
-        # the 'if' is because it's not guaranteed that every class of the target variable will be found
-        # in each category of 'outer_column', especially if the category is very small in size.
-        counts = [grouped_data[x, inner_labels[index]]
-                  if inner_labels[index] in grouped_data.loc[x].index else 0
-                  for x in outer_labels]
+        # the 'if' is because it's not guaranteed that every class of the target variable will be
+        # found in each category of 'outer_column', especially if the category is very small in
+        # size.
+        counts = [
+            grouped_data[x, inner_labels[index]]
+            if inner_labels[index] in grouped_data.loc[x].index else 0
+            for x in outer_labels
+        ]
 
-        # `starting_offset` is the amount we have to subtract from our inner bars so the start of the
-        # inner/outer are aligned
+        # `starting_offset` is the amount we have to subtract from our inner bars so the start of
+        # the inner/outer are aligned
         starting_offset = (outer_bar_width / 2) - (inner_bar_width / 2)
         # (inner_bar_width * index) is the offset for each of the inner bars
         # i.e. it's the distance we have to add so that we aren't overlapping inner bars
@@ -236,10 +259,11 @@ def plot_dodged_barchart(dataframe: pd.DataFrame, outer_column: str, inner_colum
     plt.tight_layout()
 
 
-def plot_histogram_with_categorical(dataframe: pd.DataFrame,
-                                    numeric_column: str,
-                                    categorical_column: str,
-                                    missing_value_replacement: str = '<Missing>') -> None:
+def plot_histogram_with_categorical(
+        dataframe: pd.DataFrame,
+        numeric_column: str,
+        categorical_column: str,
+        missing_value_replacement: str = '<Missing>') -> None:
     """Plots a categorical histogram within numeric histogram.
 
     Args:
@@ -252,22 +276,33 @@ def plot_histogram_with_categorical(dataframe: pd.DataFrame,
         missing_value_replacement:
             the value
     """
-    cut_dataframe = pd.DataFrame(pd.cut(dataframe[numeric_column],
-                                        bins=10,
-                                        right=True,
-                                        include_lowest=True))
+    cut_dataframe = pd.DataFrame(
+        pd.cut(
+            dataframe[numeric_column],
+            bins=10,
+            right=True,
+            include_lowest=True
+        )
+    )
 
-    cut_dataframe[numeric_column] = hpandas.fill_na(cut_dataframe[numeric_column],
-                                                    missing_value_replacement=missing_value_replacement)
+    cut_dataframe[numeric_column] = hpandas.fill_na(
+        cut_dataframe[numeric_column],
+        missing_value_replacement=missing_value_replacement
+    )
     categories = [str(x) for x in cut_dataframe[numeric_column].cat.categories]
     cut_dataframe[numeric_column] = [str(x) for x in cut_dataframe[numeric_column]]
     cut_dataframe[numeric_column] = cut_dataframe[numeric_column].astype('category')
     # only keep the categories that appear in the data, otherwise we get an error when calling
     # reorder_categories with extra categories
     categories = [x for x in categories if x in cut_dataframe[numeric_column].cat.categories]
-    cut_dataframe[numeric_column] = cut_dataframe[numeric_column].cat.reorder_categories(categories)
+    cut_dataframe[numeric_column] = cut_dataframe[numeric_column].\
+        cat.\
+        reorder_categories(categories)
 
     cut_dataframe[categorical_column] = dataframe[categorical_column].copy()
 
-    plot_dodged_barchart(dataframe=cut_dataframe, outer_column=numeric_column,
-                         inner_column=categorical_column)
+    plot_dodged_barchart(
+        dataframe=cut_dataframe,
+        outer_column=numeric_column,
+        inner_column=categorical_column
+    )

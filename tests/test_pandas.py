@@ -9,7 +9,7 @@ import numpy as np
 from helpsk import pandas as hp
 from helpsk import validation as hv
 from helpsk.utility import redirect_stdout_to_file
-from helpsk.validation import iterables_are_equal, assert_dataframes_match
+from helpsk.validation import iterables_are_equal, dataframes_match
 from tests.helpers import get_data_credit, get_test_path, clean_formatted_dataframe
 
 
@@ -849,7 +849,7 @@ class TestPandas(unittest.TestCase):
             group_sum='credit_amount',
             return_style=False
         )
-        assert_dataframes_match([original, self.credit_data])
+        self.assertTrue(dataframes_match([original, self.credit_data]))
         file_name = get_test_path('pandas/count_groups__credit.txt')
         with redirect_stdout_to_file(file_name):
             hp.print_dataframe(result)
@@ -862,7 +862,7 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(result[('housing', 'Count')].sum(), 1000)
         self.assertEqual(result[('housing', 'Count Perc')].sum(), 2)
         self.assertEqual(result[('housing', 'Sum')].sum(), self.credit_data['credit_amount'].sum())
-        hv.assert_is_close(result[('housing', 'Sum Perc')].sum(), 2)
+        self.assertTrue(hv.is_close(result[('housing', 'Sum Perc')].sum(), 2))
 
         def test_count_groups(group_1, group_2=None, group_sum=None, remove_first_level_duplicates=False):
             counts = hp.count_groups(
@@ -884,27 +884,27 @@ class TestPandas(unittest.TestCase):
 
         results_1 = test_count_groups(group_1='target', remove_first_level_duplicates=False)
         self.assertEqual(results_1[('target', 'Count')].sum(),  data.shape[0])
-        hv.assert_is_close(results_1[('target', 'Count Perc')].sum(), 1)
+        self.assertTrue(hv.is_close(results_1[('target', 'Count Perc')].sum(), 1))
 
         results = test_count_groups(group_1='target', remove_first_level_duplicates=True)
-        assert_dataframes_match([results, results_1])
+        self.assertTrue(dataframes_match([results, results_1]))
 
         results_2 = test_count_groups(group_1='checking_status', remove_first_level_duplicates=False)
         self.assertEqual(results_2[('checking_status', 'Count')].sum(), data.shape[0])
-        hv.assert_is_close(results_2[('checking_status', 'Count Perc')].sum(), 1)
+        self.assertTrue(hv.is_close(results_2[('checking_status', 'Count Perc')].sum(), 1))
 
         results = test_count_groups(group_1='checking_status', remove_first_level_duplicates=True)
-        assert_dataframes_match([results, results_2])
+        self.assertTrue(dataframes_match([results, results_2]))
 
         results_3 = test_count_groups(
             group_1='target',
             group_2='checking_status',
             remove_first_level_duplicates=False
         )
-        assert_dataframes_match([results_1,
-                                 results_3[[('target', 'target'),
-                                            ('target', 'Count'),
-                                            ('target', 'Count Perc')]].drop_duplicates()])
+        self.assertTrue(dataframes_match([
+            results_1,
+            results_3[[('target', 'target'), ('target', 'Count'), ('target', 'Count Perc')]].drop_duplicates()  # noqa
+        ]))
 
         self.assertEqual(results_3[('checking_status', 'Count')].sum(), data.shape[0])
 
@@ -925,28 +925,34 @@ class TestPandas(unittest.TestCase):
             group_2='checking_status',
             remove_first_level_duplicates=True
         )
-        assert_dataframes_match([results_3[[('target', 'target'),
-                                            ('target', 'Count'),
-                                            ('target', 'Count Perc')]].astype(object).drop_duplicates(),
-                                 results[[('target', 'target'),
-                                          ('target', 'Count'),
-                                          ('target', 'Count Perc')]].dropna().astype(object)])
-        assert_dataframes_match([results_3[[('checking_status', 'checking_status'),
-                                            ('checking_status', 'Count'),
-                                            ('checking_status', 'Count Perc')]],
-                                 results[[('checking_status', 'checking_status'),
-                                          ('checking_status', 'Count'),
-                                          ('checking_status', 'Count Perc')]]])
+        self.assertTrue(dataframes_match([
+            results_3[[('target', 'target'),
+                       ('target', 'Count'),
+                       ('target', 'Count Perc')]].astype(object).drop_duplicates(),
+            results[[('target', 'target'),
+                     ('target', 'Count'),
+                     ('target', 'Count Perc')]].dropna().astype(object)
+        ]))
+        self.assertTrue(dataframes_match([
+            results_3[[('checking_status', 'checking_status'),
+                       ('checking_status', 'Count'),
+                       ('checking_status', 'Count Perc')]],
+            results[[('checking_status', 'checking_status'),
+                     ('checking_status', 'Count'),
+                     ('checking_status', 'Count Perc')]]
+        ]))
 
         results = test_count_groups(
             group_1='target',
             group_sum='credit_amount',
             remove_first_level_duplicates=False
         )
-        assert_dataframes_match([results[[('target', 'target'),
-                                          ('target', 'Count'),
-                                          ('target', 'Count Perc')]].astype(object),
-                                 results_1.astype(object)])
+        self.assertTrue(dataframes_match([
+            results[[('target', 'target'),
+                     ('target', 'Count'),
+                     ('target', 'Count Perc')]].astype(object),
+            results_1.astype(object)
+        ]))
         self.assertEqual(results[('target', 'Sum')].sum(), data['credit_amount'].sum())
         self.assertEqual(results[('target', 'Sum Perc')].sum(), 1)
 
@@ -955,17 +961,19 @@ class TestPandas(unittest.TestCase):
             group_sum='credit_amount',
             remove_first_level_duplicates=True
         )
-        assert_dataframes_match([results_x, results])
+        self.assertTrue(dataframes_match([results_x, results]))
 
         results = test_count_groups(
             group_1='checking_status',
             group_sum='credit_amount',
             remove_first_level_duplicates=False
         )
-        assert_dataframes_match([results[[('checking_status', 'checking_status'),
-                                          ('checking_status', 'Count'),
-                                          ('checking_status', 'Count Perc')]].astype(object),
-                                 results_2.astype(object)])
+        self.assertTrue(dataframes_match([
+            results[[('checking_status', 'checking_status'),
+                     ('checking_status', 'Count'),
+                     ('checking_status', 'Count Perc')]].astype(object),
+            results_2.astype(object)
+        ]))
         self.assertEqual(results[('checking_status', 'Sum')].sum(), data['credit_amount'].sum())
         self.assertEqual(results[('checking_status', 'Sum Perc')].sum(), 1)
 
@@ -974,7 +982,7 @@ class TestPandas(unittest.TestCase):
             group_sum='credit_amount',
             remove_first_level_duplicates=True
         )
-        assert_dataframes_match([results_y, results])
+        self.assertTrue(dataframes_match([results_y, results]))
 
         results = test_count_groups(
             group_1='target',
@@ -982,15 +990,17 @@ class TestPandas(unittest.TestCase):
             group_sum='credit_amount',
             remove_first_level_duplicates=False
         )
-        assert_dataframes_match([results_3.astype(object),
-                                 results[[
-                                     ('target', 'target'),
-                                     ('target', 'Count'),
-                                     ('target', 'Count Perc'),
-                                     ('checking_status', 'checking_status'),
-                                     ('checking_status', 'Count'),
-                                     ('checking_status', 'Count Perc')
-                                 ]].astype(object)])
+        self.assertTrue(dataframes_match([
+            results_3.astype(object),
+            results[[
+                ('target', 'target'),
+                ('target', 'Count'),
+                ('target', 'Count Perc'),
+                ('checking_status', 'checking_status'),
+                ('checking_status', 'Count'),
+                ('checking_status', 'Count Perc')
+            ]].astype(object)
+        ]))
         group_2_sum_perc_sum = results.groupby(results[('target', 'target')]). \
             agg({('checking_status', 'Sum Perc'): sum})
         self.assertEqual(len(group_2_sum_perc_sum), 3)
@@ -1027,9 +1037,9 @@ class TestPandas(unittest.TestCase):
         target_counts = results[[('target', 'target'),
                                  ('target', 'Count'),
                                  ('target', 'Count Perc')]].dropna()
-        assert_dataframes_match([target_counts.astype(object), results_1.astype(object)])
-        hv.assert_is_close(results[('target', 'Sum')].sum(), data['credit_amount'].sum())
-        hv.assert_is_close(results[('target', 'Sum Perc')].sum(), 1)
+        self.assertTrue(dataframes_match([target_counts.astype(object), results_1.astype(object)]))
+        self.assertTrue(hv.is_close(results[('target', 'Sum')].sum(), data['credit_amount'].sum()))
+        self.assertTrue(hv.is_close(results[('target', 'Sum Perc')].sum(), 1))
         self.assertTrue((results.loc[results[('target', 'target')] == True, ('target', 'Sum Perc')] == 0).all())  # noqa
 
         results = hp.count_groups(
@@ -1041,7 +1051,3 @@ class TestPandas(unittest.TestCase):
         )
         with open(get_test_path('pandas/count_groups_group_1_na_sum.html'), 'w') as file:
             file.write(clean_formatted_dataframe(results.to_html()))
-
-
-if __name__ == '__main__':
-    unittest.main()

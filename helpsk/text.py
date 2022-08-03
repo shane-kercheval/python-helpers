@@ -1,8 +1,8 @@
 """
 This module provides helper functions when working with text.
 
-This module is more concerned with bytes/unicode and text processing, compared with string.py which is used
-for string manipulation.
+This module is more concerned with bytes/unicode and text processing, compared with string.py which
+is used for string manipulation.
 
 Functions in this file are copied or modified from Chapter 4 of:
         Fluent Python, 2nd ed., by Luciano Ramalho (O'Reilly).
@@ -16,11 +16,11 @@ def normalize_equal(str1: str, str2: str, case_fold: bool = True, method: str = 
     """
     This function compares two strings for equality after normalizing by the given `method`.
 
-    "NFC is the normalization form recommended by the W3C [... and] make comparisons work as expected."
-    (Fluent Python, pg 140.)
+    "NFC is the normalization form recommended by the W3C [... and] make comparisons work as
+    expected." (Fluent Python, pg 140.)
 
-    "NFKC [normalziation ...] may lose or distort information but [it] can produce convenient intermediate
-    representations for searching and indexes". (Fluent Python, pg 140.)
+    "NFKC [normalziation ...] may lose or distort information but [it] can produce convenient
+    intermediate representations for searching and indexes". (Fluent Python, pg 140.)
 
     This function is modified from:
         Fluent Python, 2nd ed., by Luciano Ramalho (O'Reilly). Pg. 144
@@ -104,11 +104,11 @@ def remove_marks(text: str, latin_only: bool = True) -> str:
         latin_only:
             only remove marks from latin characters.
 
-            "Often the reason to remove diacritics is to change Latin text to pure ASCII, but this function
-            [when using `latin_only=False`] also changes non-Latin characters - like Greek letters - which
-            will never become ASCII just by losing their accents. So it [often] makes sense to analyze each
-            base character and to remove attached marks only if the base character is a letter from the Latin
-            alphabet". (Fluent Python pg. 145-146).
+            "Often the reason to remove diacritics is to change Latin text to pure ASCII, but this
+            function [when using `latin_only=False`] also changes non-Latin characters - like Greek
+            letters - which will never become ASCII just by losing their accents. So it [often]
+            makes sense to analyze each base character and to remove attached marks only if the
+            base character is a letter from the Latin alphabet". (Fluent Python pg. 145-146).
 
     """
     if latin_only:
@@ -165,8 +165,8 @@ def asciize(text: str) -> str:
     This function:
         - removes all diacritic marks from latin base characters
         - replaces Win1252 symbols with ASCII chars
-        - replaces common symbols in Westrn text (e.g., curly quotes, em dashes, bullets, etc.) into ASCII
-            equivalents.
+        - replaces common symbols in Westrn text (e.g., curly quotes, em dashes, bullets, etc.)
+            into ASCII equivalents.
 
     This function and the examples below are copied/modified from:
         Fluent Python, 2nd ed., by Luciano Ramalho (O'Reilly). Pg. 147

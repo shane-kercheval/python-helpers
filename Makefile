@@ -17,7 +17,7 @@ docker_zsh:
 	docker exec -it python-helpers-bash-1 /bin/zsh
 
 linting:
-	flake8 --max-line-length 110 --ignore=E127 helpsk
+	flake8 --max-line-length 99 --ignore=E127 helpsk
 
 unittest:
 	rm -f tests/test_files/logging/log.log

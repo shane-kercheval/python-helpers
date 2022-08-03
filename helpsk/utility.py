@@ -48,8 +48,8 @@ def to_pickle(obj, path):
 
 def dataframe_to_pickle(df: pd.DataFrame, output_directory: str, file_name: str) -> str:
     """
-    This function takes a Pandas DataFrame and saves it as a pickled object to the directory with the file
-    name specified. The output directory is created if it does not yet exist.
+    This function takes a Pandas DataFrame and saves it as a pickled object to the directory with
+    the file name specified. The output directory is created if it does not yet exist.
 
     Args:
         df: the Pandas DataFrame to pickle
@@ -64,8 +64,8 @@ def dataframe_to_pickle(df: pd.DataFrame, output_directory: str, file_name: str)
 
 def dataframe_to_csv(df: pd.DataFrame, output_directory: str, file_name: str) -> str:
     """
-    This function takes a Pandas DataFrame and saves it as a csv file to the directory with the file
-    name specified. The output directory is created if it does not yet exist.
+    This function takes a Pandas DataFrame and saves it as a csv file to the directory with the
+    file name specified. The output directory is created if it does not yet exist.
 
     Args:
         df: the Pandas DataFrame to pickle
@@ -80,8 +80,8 @@ def dataframe_to_csv(df: pd.DataFrame, output_directory: str, file_name: str) ->
 
 def object_to_pickle(obj: object, output_directory: str, file_name: str) -> str:
     """
-    This function takes a generic object and saves it as a pickled object to the directory with the file
-    name specified. The output directory is created if it does not yet exist.
+    This function takes a generic object and saves it as a pickled object to the directory with the
+    file name specified. The output directory is created if it does not yet exist.
 
     Args:
         obj: the object to pickle
@@ -119,7 +119,6 @@ def redirect_stdout_to_file(file, mode='w'):
 @contextmanager
 def suppress_stdout():
     """Suppress Output
-
 
     ```
     print("Now you see it")

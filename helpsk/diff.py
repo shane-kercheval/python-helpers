@@ -45,31 +45,37 @@ def _create_html_cell(difference_list: list, is_first_value: bool, change_color:
     else:
         diff = [(x[1:], x[0] != ' ') for x in difference_list if x[0] in [' ', '+']]
 
-    html = [_create_html_change_span(value=x[0], is_change=x[1], change_color=change_color) for x in diff]
+    html = [
+        _create_html_change_span(value=x[0], is_change=x[1], change_color=change_color)
+        for x in diff
+    ]
     return ''.join(html)
 
 
-def diff_dataframes(dataframe_a: pd.DataFrame,
-                    dataframe_b: pd.DataFrame,
-                    change_color: str = '#F1948A') -> str:
+def diff_dataframes(
+        dataframe_a: pd.DataFrame,
+        dataframe_b: pd.DataFrame,
+        change_color: str = '#F1948A') -> str:
     """
-    Returns string as HTML containing highlighted differences between `dataframe_a` and `dataframe_b`.
+    Returns string as HTML containing highlighted differences between `dataframe_a` and
+    `dataframe_b`.
 
-    The HTML will contain a table showing columns that are found in both `dataframe_a` and `dataframe_b`.
+    The HTML will contain a table showing columns that are found in both `dataframe_a` and
+    `dataframe_b`.
 
     The DataFrames should be equal in length.
 
     Args:
         dataframe_a: this dataframe will be represented with values on the top of each html cell.
-        dataframe_b: this dataframe will be represented with values on the bottom of each html cell.
-        change_color: color of background to highlight differences.
+        dataframe_b: this dataframe will be represented with values on the bottom of each html
+        cell. change_color: color of background to highlight differences.
     """
     assert len(dataframe_a) == len(dataframe_b)
     joint_columns = [x for x in dataframe_a.columns if x in dataframe_b.columns]
     assert len(joint_columns) > 0
 
-    html = '<html><head><style> table, th, td { border: 1px solid black; border-collapse: collapse; ' \
-        'white-space: normal;} </style></head><body style="font-family: monospace">'
+    html = '<html><head><style> table, th, td { border: 1px solid black; border-collapse: ' \
+        'collapse; white-space: normal;} </style></head><body style="font-family: monospace">'
     html += '<table><tr>'
     html += '<th>index</th>'
     for column in joint_columns:
@@ -81,8 +87,12 @@ def diff_dataframes(dataframe_a: pd.DataFrame,
         'color:blue; background-color:blue">'
 
     def create_inline_change(diff_list):
-        diff_a = _create_html_cell(difference_list=diff_list, is_first_value=True, change_color=change_color)
-        diff_b = _create_html_cell(difference_list=diff_list, is_first_value=False, change_color=change_color)
+        diff_a = _create_html_cell(
+            difference_list=diff_list, is_first_value=True, change_color=change_color
+        )
+        diff_b = _create_html_cell(
+            difference_list=diff_list, is_first_value=False, change_color=change_color
+        )
         return f"<td>{diff_a}<br>{line_break}{diff_b}</td>"
 
     for index in range(len(dataframe_a)):

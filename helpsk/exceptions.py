@@ -1,5 +1,5 @@
-"""Collection of Exception classes. Used to make debugging easier for external callers of the API and to
-ensure that unit tests that use self.raiseException test for the correct exception types.
+"""Collection of Exception classes. Used to make debugging easier for external callers of the API
+and to ensure that unit tests that use self.raiseException test for the correct exception types.
 """
 
 

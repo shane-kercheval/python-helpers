@@ -1,20 +1,32 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
 from __future__ import annotations
-from collections.abc import Sized
-from typing import Callable, Type, Iterable
+from collections.abc import Sized, Collection, Iterable
+from typing import Callable, Type
 
 import numpy as np
 import pandas as pd
 from pandas.core.dtypes.common import is_categorical
 
-from helpsk.exceptions import HelpskAssertionError, HelpskParamTypeError, HelpskParamValueError
+from helpsk.exceptions import HelpskParamTypeError, HelpskParamValueError
 from helpsk.utility import suppress_warnings
 
 
-def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> bool:
-    """Can be used with a single value or a collection of values. Returns `True` if any item in `values` are
-    `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
+def is_none_nan(value: object, /) -> bool:
+    """Returns True if the value is None or various NaN/NA types.
+    """
+    if value is None \
+            or value is pd.NA \
+            or value is pd.NaT \
+            or (isinstance(value, (np.float64, float, int)) and np.isnan(value)):
+        return True
+
+    return False
+
+
+def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object, /) -> bool:
+    """Can be used with a single value or a collection of values. Returns `True` if any item in
+    `values` are `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
 
     Args:
         values:
@@ -23,7 +35,7 @@ def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) 
     Returns:
         bool - True if any item in `values` are None/np.NaN
     """
-    if values is None or values is np.NaN or values is pd.NA or values is pd.NaT:
+    if is_none_nan(values):
         return True
 
     if isinstance(values, Sized) and not isinstance(values, str) and len(values) == 0:
@@ -39,7 +51,7 @@ def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) 
         if len(values) == 0:
             return True
 
-        return any((any_none_nan(x) for x in values))
+        return any((is_none_nan(x) for x in values))
 
     try:
         if not isinstance(values, str) and None in values:
@@ -54,19 +66,6 @@ def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) 
         return False
 
     return False
-
-
-def assert_not_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> None:
-    """Raises an HelpskAssertionError if any item in `values` are `None`, `np.Nan`, or if the length of
-    `values` is `0`.
-
-    For numeric types only.
-
-    Args:
-        values:
-            A collection of values to check.
-    """
-    assert_false(any_none_nan(values), message='None/NaN Values Found')
 
 
 def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
@@ -97,18 +96,7 @@ def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
     return False
 
 
-def assert_not_any_missing(values: list | pd.Series | pd.DataFrame | object) -> None:
-    """Raises an HelpskAssertionError if any item in `values` are `None`, `np.Nan`, an empty string (i.e. '')
-    or if the length of `values` is `0`.
-
-    Args:
-        values:
-            A collection of values to check.
-    """
-    assert_false(any_missing(values), message='Missing Values Found')
-
-
-def any_duplicated(values: list | np.ndarray | pd.Series) -> bool:
+def any_duplicated(values: Collection) -> bool:
     """Returns `True` if any items in `values` are duplicated.
 
     Args:
@@ -121,88 +109,12 @@ def any_duplicated(values: list | np.ndarray | pd.Series) -> bool:
     return len(values) != len(set(values))
 
 
-def assert_not_duplicated(values: list | np.ndarray | pd.Series) -> None:
-    """Raises an HelpskAssertionError if any items in `values` are duplicated.
-
-    Args:
-        values: list, np.ndarray, pd.Series
-            A collection of values to check.
-    """
-    assert_false(any_duplicated(values), message='Duplicate Values Found')
-
-
-def assert_all(values: list | np.ndarray | pd.Series | pd.DataFrame) -> None:
-    """Raises an `HelpskAssertionError` unless all items in `values` are `True`
-
-    Args:
-        values:
-            A collection of values to check.
-    """
-    if isinstance(values, pd.Series):
-        if not values.all():  # noqa
-            raise HelpskAssertionError('Not All True')
-    elif isinstance(values, pd.DataFrame):
-        if not values.all().all():  # noqa
-            raise HelpskAssertionError('Not All True')
-    else:
-        if not all(values):
-            raise HelpskAssertionError('Not All True')
-
-
-def assert_not_any(values: list | np.ndarray | pd.Series | pd.DataFrame) -> None:
-    """Raises an `HelpskAssertionError` if any items in `values` are `True`
-
-    Args:
-        values:
-            A collection of values to check.
-    """
-    if isinstance(values, pd.Series):
-        assert_false(values.any(), message='Found True')  # noqa
-
-    elif isinstance(values, pd.DataFrame):
-        assert_false(values.any().any(), message='Found True')  # noqa
-
-    else:
-        assert_false(any(values), message='Found True')
-
-
-def assert_true(condition: bool, message: str = 'Condition Not True') -> None:
-    """Raises an HelpskAssertionError if `condition` is not True
-
-    Args:
-        condition:
-            Something that evaluates to True/False
-        message:
-            Message passed to the HelpskAssertionError
-    """
-    if not isinstance(condition, (bool, np.bool_)):
-        raise HelpskParamTypeError('condition should be boolean')
-
-    if not condition:
-        raise HelpskAssertionError(message)
-
-
-def assert_false(condition: bool, message: str = 'Condition True') -> None:
-    """Raises an HelpskAssertionError if `condition` is not False
-
-    Args:
-        condition: bool
-            Something that evaluates to True/False
-        message:
-            Message passed to the HelpskAssertionError
-    """
-    if not isinstance(condition, (bool, np.bool_)):
-        raise HelpskParamTypeError('condition should be boolean')
-
-    if condition:
-        raise HelpskAssertionError(message)
-
-
 def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
     """Compares the equality of the values of two iterables.
 
-    This function will generally give the same result as list equality (e.g. `[x, y, z] == [x, y, z]`)
-    However, in some strange scenarios, `==` will return `False` where it doesn't seem like it should
+    This function will generally give the same result as list equality (e.g.
+    `[x, y, z] == [x, y, z]`). However, in some strange scenarios, `==` will return `False` where
+    it doesn't seem like it should
 
     For example:
 
@@ -214,8 +126,8 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
 
 
     Also, when comparing a series with an ordered Categorical when the values are the same,
-    pd.Series.equals() will return False if the categories have different order. But we only care if the
-    values are the same, so this function will return True.
+    pd.Series.equals() will return False if the categories have different order. But we only care
+    if the values are the same, so this function will return True.
     ```
 
     Args:
@@ -227,17 +139,9 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
     Returns:
         True if iterable_a is equal to iterable_b
     """
-    # seems to be confusion and inconsistencies across stack overflow on how to properly check for category
-    # so this might be overkill but not exactly sure
-    # def is_categorical(series):
-    #     if isinstance(series, (pd.Categorical, pd.CategoricalDtype)):
-    #         return True
-    #     if isinstance(series, pd.Series):
-    #         return series.dtype.name == 'category'
-    #     return False
-
     with suppress_warnings():
-        # if either list-like structure is categorical, then we need to convert both to unordered categorical
+        # if either list-like structure is categorical, then we need to convert both to unordered
+        # categorical
         if is_categorical(iterable_a) or is_categorical(iterable_b):
             iterable_a = pd.Categorical(iterable_a, ordered=False)
             iterable_b = pd.Categorical(iterable_b, ordered=False)
@@ -253,17 +157,17 @@ def dataframes_match(dataframes: list[pd.DataFrame],
                      ignore_indexes: bool = True,
                      ignore_column_names: bool = True) -> bool:
     """
-    Because floating point numbers are difficult to accurate represent, when comparing multiple DataFrames,
-    this function first rounds any numeric columns to the number of decimal points indicated
-    `float_tolerance`.
+    Because floating point numbers are difficult to accurate represent, when comparing multiple
+    DataFrames, this function first rounds any numeric columns to the number of decimal points
+    indicated `float_tolerance`.
 
     Args:
         dataframes:
             Two or more dataframes to compare against each other and test for equality
 
         float_tolerance:
-            numeric columns will be rounded to the number of digits to the right of the decimal specified by
-            this parameter.
+            numeric columns will be rounded to the number of digits to the right of the decimal
+            specified by this parameter.
 
         ignore_indexes:
             if True, the indexes of each DataFrame will be ignored for considering equality
@@ -272,7 +176,8 @@ def dataframes_match(dataframes: list[pd.DataFrame],
             if True, the column names of each DataFrame will be ignored for considering equality
 
     Returns:
-        Returns True if the dataframes match based on the conditions explained above, otherwise returns False
+        Returns True if the dataframes match based on the conditions explained above, otherwise
+        returns False
     """
     if not isinstance(dataframes, list):
         raise HelpskParamTypeError("Expected list of pd.DataFrame's.")
@@ -287,8 +192,9 @@ def dataframes_match(dataframes: list[pd.DataFrame],
             return False
 
         if ignore_indexes or ignore_column_names:
-            # if either of these are True, then we are going to change the index and/or columns, but
-            # python is pass-by-reference so we don't want to change the original DataFrame object.
+            # if either of these are True, then we are going to change the index and/or columns,
+            # but python is pass-by-reference so we don't want to change the original DataFrame
+            # object.
             other_dataframe = other_dataframe.copy()
 
         if ignore_indexes:
@@ -299,49 +205,15 @@ def dataframes_match(dataframes: list[pd.DataFrame],
 
         return first_dataframe.equals(other_dataframe.round(float_tolerance))
 
-    # compare the first dataframe to the rest of the dataframes, after rounding each to the tolerance, and
-    # performing other modifications
+    # compare the first dataframe to the rest of the dataframes, after rounding each to the
+    # tolerance, and performing other modifications
     # check if all results are True
     return all(first_dataframe_equals_other(x) for x in dataframes[1:])
 
 
-def assert_dataframes_match(dataframes: list[pd.DataFrame],
-                            float_tolerance: int = 6,
-                            ignore_indexes: bool = True,
-                            ignore_column_names: bool = True,
-                            message: str = 'Dataframes do not match') -> None:
-    """
-    Raises an assertion error if dataframes don't match.
-
-    Args:
-        dataframes:
-            Two or more dataframes to compare against each other and test for equality
-
-        float_tolerance:
-            numeric columns will be rounded to the number of digits to the right of the decimal specified by
-            this parameter.
-
-        ignore_indexes:
-            if True, the indexes of each DataFrame will be ignored for considering equality
-
-        ignore_column_names:
-            if True, the column names of each DataFrame will be ignored for considering equality
-
-        message:
-            message to pass to HelpskAssertionError
-    """
-    match = dataframes_match(
-        dataframes=dataframes,
-        float_tolerance=float_tolerance,
-        ignore_indexes=ignore_indexes,
-        ignore_column_names=ignore_column_names
-    )
-    if not match:
-        raise HelpskAssertionError(message)
-
-
 def is_close(value_a: float, value_b: float, tolerance: float = 0.000001) -> bool:
-    """Tests whether or not value_a and value_b are "close" (i.e. within the `tolerance` after subtracting)
+    """Tests whether or not value_a and value_b are "close" (i.e. within the `tolerance` after
+    subtracting)
 
     Args:
         value_a:
@@ -356,31 +228,15 @@ def is_close(value_a: float, value_b: float, tolerance: float = 0.000001) -> boo
     return abs(value_a - value_b) <= tolerance
 
 
-def assert_is_close(value_a: float, value_b: float, tolerance: float = 0.000001):
-    """Raises an assert error if value_a and value_b are not "close" (see documentation of `is_close()`
-    function).
-
-    Args:
-          value_a:
-              numeric value to test
-          value_b:
-              numeric value to test
-          tolerance:
-              number of digits to round to
-    """
-    if not is_close(value_a=value_a, value_b=value_b, tolerance=tolerance):
-        raise HelpskAssertionError(f"`{value_a}` and `{value_b}` are not within a tolerance of `{tolerance}`")
-
-
 def raises_exception(function: Callable, exception_type: Type = None) -> bool:
-    """Returns True if `function` raises an Exception; returns False if `function` runs without raising an
-    Exception.
+    """Returns True if `function` raises an Exception; returns False if `function` runs without
+    raising an Exception.
     Args:
         function:
             the function which does or does not raise an exception.
         exception_type:
-            if `exception_type` is provided, `raises_exception` returns true only if the `function` argument
-            raises an Exception **and** the exception has type of `exception_type`.
+            if `exception_type` is provided, `raises_exception` returns true only if the `function`
+            argument raises an Exception **and** the exception has type of `exception_type`.
     """
     try:
         function()
