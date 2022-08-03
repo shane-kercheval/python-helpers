@@ -101,11 +101,5 @@ class TestStrings(unittest.TestCase):
         results = [run_combinations_for_value(value) for value in test_values]
         results = pd.concat(results)
         results['granularity'] = results['granularity'].transform(lambda x: str(x))
-
-        expected_results = pd.read_csv(get_test_path('string/string__format_number__expected_values.csv'))
-
-        hv.assert_dataframes_match([results, expected_results])
-
-
-if __name__ == '__main__':
-    unittest.main()
+        expected_results = pd.read_csv(get_test_path('string/string__format_number__expected_values.csv'))  # noqa
+        self.assertTrue(hv.dataframes_match([results, expected_results]))
