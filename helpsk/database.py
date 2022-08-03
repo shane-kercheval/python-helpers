@@ -1,6 +1,6 @@
-"""This module contains classes that wrap the connection/querying logic of various databases. Database objects
-can be created from the __init__ function or from the .from_config class function by passing in an instance
-of the corresponding configuration class.
+"""This module contains classes that wrap the connection/querying logic of various databases.
+Database objects can be created from the __init__ function or from the .from_config class function
+by passing in an instance of the corresponding configuration class.
 
 Examples:
 
@@ -94,7 +94,7 @@ class Snowflake(Database):
         https://pypi.org/project/snowflake-connector-python/
 
     ```
-    pip install -r ......./snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
+    pip install -r .../snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
     pip install snowflake-connector-python==v2.7.4
     ```
 
@@ -141,8 +141,8 @@ class Snowflake(Database):
         cursor = self.connection_object.cursor()
         cursor.execute(sql)
         dataframe = cursor.fetch_pandas_all()
-        # We need to reset_index because there seems to be a bug in the connector that returns duplicated
-        # index values. This can cause unexpected behavior downstream.
+        # We need to reset_index because there seems to be a bug in the connector that returns
+        # duplicated index values. This can cause unexpected behavior downstream.
         # https://github.com/snowflakedb/snowflake-connector-python/issues/1061
         # https://stackoverflow.com/questions/69911999/none-unique-pandas-dataframe-index-created-using-cur-fetch-pandas-all-after-lo
         dataframe.reset_index(drop=True, inplace=True)
@@ -214,7 +214,6 @@ class Snowflake(Database):
                 the name of the database
         """
         from snowflake.connector.pandas_tools import write_pandas
-
         dataframe = dataframe.copy()
         # snowflake is case sensitive and converts everything to upper-case
         dataframe.columns = dataframe.columns.str.upper()
@@ -228,7 +227,8 @@ class Snowflake(Database):
             )
             _ = self.execute_statement(statement=create_table_sql)
 
-        if not create_table and overwrite:  # if we are creating the table there is nothing to overwrite
+        # if we are creating the table there is nothing to overwrite
+        if not create_table and overwrite:
             final_table_name = ''
             if database:
                 final_table_name += f'{database.upper()}.'

@@ -120,7 +120,6 @@ def redirect_stdout_to_file(file, mode='w'):
 def suppress_stdout():
     """Suppress Output
 
-
     ```
     print("Now you see it")
     with suppress_stdout():

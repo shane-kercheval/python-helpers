@@ -13,7 +13,6 @@ from pandas.io.formats.style import Styler
 from helpsk.exceptions import HelpskParamValueError
 import helpsk.pandas_style as pstyle
 from helpsk import color
-from helpsk.validation import assert_not_any_missing, assert_is_close, assert_true
 
 
 def is_series_numeric(series: pd.Series) -> bool:

@@ -13,154 +13,183 @@ from tests.helpers import subtests_expected_vs_actual
 class TestDate(unittest.TestCase):
 
     def test_fiscal_quarter_date(self):
-        date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
-                       '2021-01-01', '2021-01-15', '2021-01-31',
-                       '2021-02-01', '2021-02-15', '2021-02-28',
-                       '2021-03-01', '2021-03-15', '2021-03-31',
-                       '2021-04-01', '2021-04-15', '2021-04-30',
-                       '2021-05-01', '2021-05-15', '2021-05-31',
-                       '2021-06-01', '2021-06-15', '2021-06-30',
-                       '2021-07-01', '2021-07-15', '2021-07-31',
-                       '2021-08-01', '2021-08-15', '2021-08-31',
-                       '2021-09-01', '2021-09-15', '2021-09-30',
-                       '2021-10-01', '2021-10-15', '2021-10-31',
-                       '2021-11-01', '2021-11-15', '2021-11-30',
-                       '2021-12-01', '2021-12-15', '2021-12-31',
-                       '2022-01-01', '2022-01-15', '2022-01-31']
+        date_values = [
+            '2020-12-01', '2020-12-15', '2020-12-31',
+            '2021-01-01', '2021-01-15', '2021-01-31',
+            '2021-02-01', '2021-02-15', '2021-02-28',
+            '2021-03-01', '2021-03-15', '2021-03-31',
+            '2021-04-01', '2021-04-15', '2021-04-30',
+            '2021-05-01', '2021-05-15', '2021-05-31',
+            '2021-06-01', '2021-06-15', '2021-06-30',
+            '2021-07-01', '2021-07-15', '2021-07-31',
+            '2021-08-01', '2021-08-15', '2021-08-31',
+            '2021-09-01', '2021-09-15', '2021-09-30',
+            '2021-10-01', '2021-10-15', '2021-10-31',
+            '2021-11-01', '2021-11-15', '2021-11-30',
+            '2021-12-01', '2021-12-15', '2021-12-31',
+            '2022-01-01', '2022-01-15', '2022-01-31'
+        ]
 
         test_parameters = dict(include_year=True, fiscal_start=1)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
-        expected = [2020.4, 2020.4, 2020.4,
-                    2021.1, 2021.1, 2021.1,
-                    2021.1, 2021.1, 2021.1,
-                    2021.1, 2021.1, 2021.1,
-                    2021.2, 2021.2, 2021.2,
-                    2021.2, 2021.2, 2021.2,
-                    2021.2, 2021.2, 2021.2,
-                    2021.3, 2021.3, 2021.3,
-                    2021.3, 2021.3, 2021.3,
-                    2021.3, 2021.3, 2021.3,
-                    2021.4, 2021.4, 2021.4,
-                    2021.4, 2021.4, 2021.4,
-                    2021.4, 2021.4, 2021.4,
-                    2022.1, 2022.1, 2022.1]
+        expected = [
+            2020.4, 2020.4, 2020.4,
+            2021.1, 2021.1, 2021.1,
+            2021.1, 2021.1, 2021.1,
+            2021.1, 2021.1, 2021.1,
+            2021.2, 2021.2, 2021.2,
+            2021.2, 2021.2, 2021.2,
+            2021.2, 2021.2, 2021.2,
+            2021.3, 2021.3, 2021.3,
+            2021.3, 2021.3, 2021.3,
+            2021.3, 2021.3, 2021.3,
+            2021.4, 2021.4, 2021.4,
+            2021.4, 2021.4, 2021.4,
+            2021.4, 2021.4, 2021.4,
+            2022.1, 2022.1, 2022.1
+        ]
 
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=False, fiscal_start=1)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
-        expected = [4, 4, 4,
-                    1, 1, 1,
-                    1, 1, 1,
-                    1, 1, 1,
-                    2, 2, 2,
-                    2, 2, 2,
-                    2, 2, 2,
-                    3, 3, 3,
-                    3, 3, 3,
-                    3, 3, 3,
-                    4, 4, 4,
-                    4, 4, 4,
-                    4, 4, 4,
-                    1, 1, 1]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        expected = [
+            4, 4, 4,
+            1, 1, 1,
+            1, 1, 1,
+            1, 1, 1,
+            2, 2, 2,
+            2, 2, 2,
+            2, 2, 2,
+            3, 3, 3,
+            3, 3, 3,
+            3, 3, 3,
+            4, 4, 4,
+            4, 4, 4,
+            4, 4, 4,
+            1, 1, 1
+        ]
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=True, fiscal_start=2)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
-        expected = [2021.4, 2021.4, 2021.4,
-                    2021.4, 2021.4, 2021.4,
-                    2022.1, 2022.1, 2022.1,
-                    2022.1, 2022.1, 2022.1,
-                    2022.1, 2022.1, 2022.1,
-                    2022.2, 2022.2, 2022.2,
-                    2022.2, 2022.2, 2022.2,
-                    2022.2, 2022.2, 2022.2,
-                    2022.3, 2022.3, 2022.3,
-                    2022.3, 2022.3, 2022.3,
-                    2022.3, 2022.3, 2022.3,
-                    2022.4, 2022.4, 2022.4,
-                    2022.4, 2022.4, 2022.4,
-                    2022.4, 2022.4, 2022.4]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        expected = [
+            2021.4, 2021.4, 2021.4,
+            2021.4, 2021.4, 2021.4,
+            2022.1, 2022.1, 2022.1,
+            2022.1, 2022.1, 2022.1,
+            2022.1, 2022.1, 2022.1,
+            2022.2, 2022.2, 2022.2,
+            2022.2, 2022.2, 2022.2,
+            2022.2, 2022.2, 2022.2,
+            2022.3, 2022.3, 2022.3,
+            2022.3, 2022.3, 2022.3,
+            2022.3, 2022.3, 2022.3,
+            2022.4, 2022.4, 2022.4,
+            2022.4, 2022.4, 2022.4,
+            2022.4, 2022.4, 2022.4
+        ]
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=False, fiscal_start=2)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
-        expected = [4, 4, 4,
-                    4, 4, 4,
-                    1, 1, 1,
-                    1, 1, 1,
-                    1, 1, 1,
-                    2, 2, 2,
-                    2, 2, 2,
-                    2, 2, 2,
-                    3, 3, 3,
-                    3, 3, 3,
-                    3, 3, 3,
-                    4, 4, 4,
-                    4, 4, 4,
-                    4, 4, 4]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        expected = [
+            4, 4, 4,
+            4, 4, 4,
+            1, 1, 1,
+            1, 1, 1,
+            1, 1, 1,
+            2, 2, 2,
+            2, 2, 2,
+            2, 2, 2,
+            3, 3, 3,
+            3, 3, 3,
+            3, 3, 3,
+            4, 4, 4,
+            4, 4, 4,
+            4, 4, 4
+        ]
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=True, fiscal_start=12)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
-        expected = [2021.1, 2021.1, 2021.1,  # 2020-Dec
-                    2021.1, 2021.1, 2021.1,  # 2021-Jan
-                    2021.1, 2021.1, 2021.1,  # 2021-Feb
-                    2021.2, 2021.2, 2021.2,  # 2021-Mar
-                    2021.2, 2021.2, 2021.2,  # 2021-Apr
-                    2021.2, 2021.2, 2021.2,  # 2021-May
-                    2021.3, 2021.3, 2021.3,  # 2021-Jun
-                    2021.3, 2021.3, 2021.3,  # 2021-Jul
-                    2021.3, 2021.3, 2021.3,  # 2021-Aug
-                    2021.4, 2021.4, 2021.4,  # 2021-Sep
-                    2021.4, 2021.4, 2021.4,  # 2021-Oct
-                    2021.4, 2021.4, 2021.4,  # 2021-Nov
-                    2022.1, 2022.1, 2022.1,  # 2021-Dec
-                    2022.1, 2022.1, 2022.1]  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        expected = [
+            2021.1, 2021.1, 2021.1,  # 2020-Dec
+            2021.1, 2021.1, 2021.1,  # 2021-Jan
+            2021.1, 2021.1, 2021.1,  # 2021-Feb
+            2021.2, 2021.2, 2021.2,  # 2021-Mar
+            2021.2, 2021.2, 2021.2,  # 2021-Apr
+            2021.2, 2021.2, 2021.2,  # 2021-May
+            2021.3, 2021.3, 2021.3,  # 2021-Jun
+            2021.3, 2021.3, 2021.3,  # 2021-Jul
+            2021.3, 2021.3, 2021.3,  # 2021-Aug
+            2021.4, 2021.4, 2021.4,  # 2021-Sep
+            2021.4, 2021.4, 2021.4,  # 2021-Oct
+            2021.4, 2021.4, 2021.4,  # 2021-Nov
+            2022.1, 2022.1, 2022.1,  # 2021-Dec
+            2022.1, 2022.1, 2022.1,  # 2022-Jan
+        ]
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=False, fiscal_start=12)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
-        expected = [1, 1, 1,  # 2020-Dec
-                    1, 1, 1,  # 2021-Jan
-                    1, 1, 1,  # 2021-Feb
-                    2, 2, 2,  # 2021-Mar
-                    2, 2, 2,  # 2021-Apr
-                    2, 2, 2,  # 2021-May
-                    3, 3, 3,  # 2021-Jun
-                    3, 3, 3,  # 2021-Jul
-                    3, 3, 3,  # 2021-Aug
-                    4, 4, 4,  # 2021-Sep
-                    4, 4, 4,  # 2021-Oct
-                    4, 4, 4,  # 2021-Nov
-                    1, 1, 1,  # 2021-Dec
-                    1, 1, 1]  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        expected = [
+            1, 1, 1,  # 2020-Dec
+            1, 1, 1,  # 2021-Jan
+            1, 1, 1,  # 2021-Feb
+            2, 2, 2,  # 2021-Mar
+            2, 2, 2,  # 2021-Apr
+            2, 2, 2,  # 2021-May
+            3, 3, 3,  # 2021-Jun
+            3, 3, 3,  # 2021-Jul
+            3, 3, 3,  # 2021-Aug
+            4, 4, 4,  # 2021-Sep
+            4, 4, 4,  # 2021-Oct
+            4, 4, 4,  # 2021-Nov
+            1, 1, 1,  # 2021-Dec
+            1, 1, 1,  # 2022-Jan
+        ]
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
     def test_fiscal_quarter_datetime(self):
-        date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
-                       '2021-01-01', '2021-01-15', '2021-01-31',
-                       '2021-02-01', '2021-02-15', '2021-02-28',
-                       '2021-03-01', '2021-03-15', '2021-03-31',
-                       '2021-04-01', '2021-04-15', '2021-04-30',
-                       '2021-05-01', '2021-05-15', '2021-05-31',
-                       '2021-06-01', '2021-06-15', '2021-06-30',
-                       '2021-07-01', '2021-07-15', '2021-07-31',
-                       '2021-08-01', '2021-08-15', '2021-08-31',
-                       '2021-09-01', '2021-09-15', '2021-09-30',
-                       '2021-10-01', '2021-10-15', '2021-10-31',
-                       '2021-11-01', '2021-11-15', '2021-11-30',
-                       '2021-12-01', '2021-12-15', '2021-12-31',
-                       '2022-01-01', '2022-01-15', '2022-01-31']
+        date_values = [
+            '2020-12-01', '2020-12-15', '2020-12-31',
+            '2021-01-01', '2021-01-15', '2021-01-31',
+            '2021-02-01', '2021-02-15', '2021-02-28',
+            '2021-03-01', '2021-03-15', '2021-03-31',
+            '2021-04-01', '2021-04-15', '2021-04-30',
+            '2021-05-01', '2021-05-15', '2021-05-31',
+            '2021-06-01', '2021-06-15', '2021-06-30',
+            '2021-07-01', '2021-07-15', '2021-07-31',
+            '2021-08-01', '2021-08-15', '2021-08-31',
+            '2021-09-01', '2021-09-15', '2021-09-30',
+            '2021-10-01', '2021-10-15', '2021-10-31',
+            '2021-11-01', '2021-11-15', '2021-11-30',
+            '2021-12-01', '2021-12-15', '2021-12-31',
+            '2022-01-01', '2022-01-15', '2022-01-31',
+        ]
 
         test_parameters = dict(include_year=True, fiscal_start=1)
-        results = [date.fiscal_quarter(value=parse(x + ' 23:59:59'), **test_parameters) for x in date_values]
+        results = [date.fiscal_quarter(value=parse(x + ' 23:59:59'), **test_parameters)
+                   for x in date_values]
         expected = [2020.4, 2020.4, 2020.4,
                     2021.1, 2021.1, 2021.1,
                     2021.1, 2021.1, 2021.1,
@@ -175,8 +204,10 @@ class TestDate(unittest.TestCase):
                     2021.4, 2021.4, 2021.4,
                     2021.4, 2021.4, 2021.4,
                     2022.1, 2022.1, 2022.1]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=False, fiscal_start=1)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
@@ -194,8 +225,10 @@ class TestDate(unittest.TestCase):
                     4, 4, 4,
                     4, 4, 4,
                     1, 1, 1]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=True, fiscal_start=2)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
@@ -213,8 +246,10 @@ class TestDate(unittest.TestCase):
                     2022.4, 2022.4, 2022.4,
                     2022.4, 2022.4, 2022.4,
                     2022.4, 2022.4, 2022.4]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=False, fiscal_start=2)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
@@ -232,67 +267,81 @@ class TestDate(unittest.TestCase):
                     4, 4, 4,
                     4, 4, 4,
                     4, 4, 4]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=True, fiscal_start=12)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
-        expected = [2021.1, 2021.1, 2021.1,  # 2020-Dec
-                    2021.1, 2021.1, 2021.1,  # 2021-Jan
-                    2021.1, 2021.1, 2021.1,  # 2021-Feb
-                    2021.2, 2021.2, 2021.2,  # 2021-Mar
-                    2021.2, 2021.2, 2021.2,  # 2021-Apr
-                    2021.2, 2021.2, 2021.2,  # 2021-May
-                    2021.3, 2021.3, 2021.3,  # 2021-Jun
-                    2021.3, 2021.3, 2021.3,  # 2021-Jul
-                    2021.3, 2021.3, 2021.3,  # 2021-Aug
-                    2021.4, 2021.4, 2021.4,  # 2021-Sep
-                    2021.4, 2021.4, 2021.4,  # 2021-Oct
-                    2021.4, 2021.4, 2021.4,  # 2021-Nov
-                    2022.1, 2022.1, 2022.1,  # 2021-Dec
-                    2022.1, 2022.1, 2022.1]  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        expected = [
+            2021.1, 2021.1, 2021.1,  # 2020-Dec
+            2021.1, 2021.1, 2021.1,  # 2021-Jan
+            2021.1, 2021.1, 2021.1,  # 2021-Feb
+            2021.2, 2021.2, 2021.2,  # 2021-Mar
+            2021.2, 2021.2, 2021.2,  # 2021-Apr
+            2021.2, 2021.2, 2021.2,  # 2021-May
+            2021.3, 2021.3, 2021.3,  # 2021-Jun
+            2021.3, 2021.3, 2021.3,  # 2021-Jul
+            2021.3, 2021.3, 2021.3,  # 2021-Aug
+            2021.4, 2021.4, 2021.4,  # 2021-Sep
+            2021.4, 2021.4, 2021.4,  # 2021-Oct
+            2021.4, 2021.4, 2021.4,  # 2021-Nov
+            2022.1, 2022.1, 2022.1,  # 2021-Dec
+            2022.1, 2022.1, 2022.1,  # 2022-Jan
+        ]
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(include_year=False, fiscal_start=12)
         results = [date.fiscal_quarter(value=parse(x), **test_parameters) for x in date_values]
-        expected = [1, 1, 1,  # 2020-Dec
-                    1, 1, 1,  # 2021-Jan
-                    1, 1, 1,  # 2021-Feb
-                    2, 2, 2,  # 2021-Mar
-                    2, 2, 2,  # 2021-Apr
-                    2, 2, 2,  # 2021-May
-                    3, 3, 3,  # 2021-Jun
-                    3, 3, 3,  # 2021-Jul
-                    3, 3, 3,  # 2021-Aug
-                    4, 4, 4,  # 2021-Sep
-                    4, 4, 4,  # 2021-Oct
-                    4, 4, 4,  # 2021-Nov
-                    1, 1, 1,  # 2021-Dec
-                    1, 1, 1]  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        expected = [
+            1, 1, 1,  # 2020-Dec
+            1, 1, 1,  # 2021-Jan
+            1, 1, 1,  # 2021-Feb
+            2, 2, 2,  # 2021-Mar
+            2, 2, 2,  # 2021-Apr
+            2, 2, 2,  # 2021-May
+            3, 3, 3,  # 2021-Jun
+            3, 3, 3,  # 2021-Jul
+            3, 3, 3,  # 2021-Aug
+            4, 4, 4,  # 2021-Sep
+            4, 4, 4,  # 2021-Oct
+            4, 4, 4,  # 2021-Nov
+            1, 1, 1,  # 2021-Dec
+            1, 1, 1,  # 2022-Jan
+        ]
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
     def test_to_string_date(self):
-        date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
-                       '2021-01-01', '2021-01-15', '2021-01-31',
-                       '2021-02-01', '2021-02-15', '2021-02-28',
-                       '2021-03-01', '2021-03-15', '2021-03-31',
-                       '2021-04-01', '2021-04-15', '2021-04-30',
-                       '2021-05-01', '2021-05-15', '2021-05-31',
-                       '2021-06-01', '2021-06-15', '2021-06-30',
-                       '2021-07-01', '2021-07-15', '2021-07-31',
-                       '2021-08-01', '2021-08-15', '2021-08-31',
-                       '2021-09-01', '2021-09-15', '2021-09-30',
-                       '2021-10-01', '2021-10-15', '2021-10-31',
-                       '2021-11-01', '2021-11-15', '2021-11-30',
-                       '2021-12-01', '2021-12-15', '2021-12-31',
-                       '2022-01-01', '2022-01-15', '2022-01-31']
+        date_values = [
+            '2020-12-01', '2020-12-15', '2020-12-31',
+            '2021-01-01', '2021-01-15', '2021-01-31',
+            '2021-02-01', '2021-02-15', '2021-02-28',
+            '2021-03-01', '2021-03-15', '2021-03-31',
+            '2021-04-01', '2021-04-15', '2021-04-30',
+            '2021-05-01', '2021-05-15', '2021-05-31',
+            '2021-06-01', '2021-06-15', '2021-06-30',
+            '2021-07-01', '2021-07-15', '2021-07-31',
+            '2021-08-01', '2021-08-15', '2021-08-31',
+            '2021-09-01', '2021-09-15', '2021-09-30',
+            '2021-10-01', '2021-10-15', '2021-10-31',
+            '2021-11-01', '2021-11-15', '2021-11-30',
+            '2021-12-01', '2021-12-15', '2021-12-31',
+            '2022-01-01', '2022-01-15', '2022-01-31',
+        ]
 
         test_parameters = dict(granularity=date.Granularity.DAY)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=date_values,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=date_values,
+            **test_parameters
+        )
 
         test_parameters = dict(granularity=date.Granularity.MONTH)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
@@ -310,8 +359,10 @@ class TestDate(unittest.TestCase):
                     '2021-Nov', '2021-Nov', '2021-Nov',
                     '2021-Dec', '2021-Dec', '2021-Dec',
                     '2022-Jan', '2022-Jan', '2022-Jan']
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(granularity=date.Granularity.QUARTER, fiscal_start=1)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
@@ -329,8 +380,10 @@ class TestDate(unittest.TestCase):
                     '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Nov
                     '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Dec
                     '2022-Q1', '2022-Q1', '2022-Q1']  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(granularity=date.Granularity.QUARTER, fiscal_start=2)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
@@ -348,8 +401,10 @@ class TestDate(unittest.TestCase):
                     '2022-FQ4', '2022-FQ4', '2022-FQ4',  # 2021-Nov
                     '2022-FQ4', '2022-FQ4', '2022-FQ4',  # 2021-Dec
                     '2022-FQ4', '2022-FQ4', '2022-FQ4']  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(granularity=date.Granularity.QUARTER, fiscal_start=12)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
@@ -367,29 +422,36 @@ class TestDate(unittest.TestCase):
                     '2021-FQ4', '2021-FQ4', '2021-FQ4',  # 2021-Nov
                     '2022-FQ1', '2022-FQ1', '2022-FQ1',  # 2021-Dec
                     '2022-FQ1', '2022-FQ1', '2022-FQ1']  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
     def test_to_string_datetime(self):
-        date_values = ['2020-12-01', '2020-12-15', '2020-12-31',
-                       '2021-01-01', '2021-01-15', '2021-01-31',
-                       '2021-02-01', '2021-02-15', '2021-02-28',
-                       '2021-03-01', '2021-03-15', '2021-03-31',
-                       '2021-04-01', '2021-04-15', '2021-04-30',
-                       '2021-05-01', '2021-05-15', '2021-05-31',
-                       '2021-06-01', '2021-06-15', '2021-06-30',
-                       '2021-07-01', '2021-07-15', '2021-07-31',
-                       '2021-08-01', '2021-08-15', '2021-08-31',
-                       '2021-09-01', '2021-09-15', '2021-09-30',
-                       '2021-10-01', '2021-10-15', '2021-10-31',
-                       '2021-11-01', '2021-11-15', '2021-11-30',
-                       '2021-12-01', '2021-12-15', '2021-12-31',
-                       '2022-01-01', '2022-01-15', '2022-01-31']
+        date_values = [
+            '2020-12-01', '2020-12-15', '2020-12-31',
+            '2021-01-01', '2021-01-15', '2021-01-31',
+            '2021-02-01', '2021-02-15', '2021-02-28',
+            '2021-03-01', '2021-03-15', '2021-03-31',
+            '2021-04-01', '2021-04-15', '2021-04-30',
+            '2021-05-01', '2021-05-15', '2021-05-31',
+            '2021-06-01', '2021-06-15', '2021-06-30',
+            '2021-07-01', '2021-07-15', '2021-07-31',
+            '2021-08-01', '2021-08-15', '2021-08-31',
+            '2021-09-01', '2021-09-15', '2021-09-30',
+            '2021-10-01', '2021-10-15', '2021-10-31',
+            '2021-11-01', '2021-11-15', '2021-11-30',
+            '2021-12-01', '2021-12-15', '2021-12-31',
+            '2022-01-01', '2022-01-15', '2022-01-31',
+        ]
 
         test_parameters = dict(granularity=date.Granularity.DAY)
-        results = [date.to_string(value=parse(x + ' 23:59:59'), **test_parameters) for x in date_values]
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=date_values,
-                                    **test_parameters)
+        results = [date.to_string(value=parse(x + ' 23:59:59'), **test_parameters)
+                   for x in date_values]
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=date_values,
+            **test_parameters
+        )
 
         test_parameters = dict(granularity=date.Granularity.MONTH)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
@@ -407,8 +469,10 @@ class TestDate(unittest.TestCase):
                     '2021-Nov', '2021-Nov', '2021-Nov',
                     '2021-Dec', '2021-Dec', '2021-Dec',
                     '2022-Jan', '2022-Jan', '2022-Jan']
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(granularity=date.Granularity.QUARTER, fiscal_start=1)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
@@ -426,8 +490,10 @@ class TestDate(unittest.TestCase):
                     '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Nov
                     '2021-Q4', '2021-Q4', '2021-Q4',  # 2021-Dec
                     '2022-Q1', '2022-Q1', '2022-Q1']  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(granularity=date.Granularity.QUARTER, fiscal_start=2)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
@@ -445,8 +511,10 @@ class TestDate(unittest.TestCase):
                     '2022-FQ4', '2022-FQ4', '2022-FQ4',  # 2021-Nov
                     '2022-FQ4', '2022-FQ4', '2022-FQ4',  # 2021-Dec
                     '2022-FQ4', '2022-FQ4', '2022-FQ4']  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
         test_parameters = dict(granularity=date.Granularity.QUARTER, fiscal_start=12)
         results = [date.to_string(value=parse(x), **test_parameters) for x in date_values]
@@ -464,22 +532,24 @@ class TestDate(unittest.TestCase):
                     '2021-FQ4', '2021-FQ4', '2021-FQ4',  # 2021-Nov
                     '2022-FQ1', '2022-FQ1', '2022-FQ1',  # 2021-Dec
                     '2022-FQ1', '2022-FQ1', '2022-FQ1']  # 2022-Jan
-        subtests_expected_vs_actual(test_case=self, actual_values=results, expected_values=expected,
-                                    **test_parameters)
+        subtests_expected_vs_actual(
+            test_case=self, actual_values=results, expected_values=expected,
+            **test_parameters
+        )
 
     def test_floor_missing_value(self):
-        self.assertTrue(date.floor(value=pd.NA, granularity=date.Granularity.DAY) is pd.NA)
-        self.assertTrue(date.floor(value=pd.NaT, granularity=date.Granularity.DAY) is pd.NaT)
-        self.assertTrue(date.floor(value=np.NaN, granularity=date.Granularity.DAY) is np.NaN)
-        self.assertTrue(date.floor(value=None, granularity=date.Granularity.DAY) is None)  # noqa
-        self.assertTrue(date.floor(value=pd.NA, granularity=date.Granularity.MONTH) is pd.NA)
-        self.assertTrue(date.floor(value=pd.NaT, granularity=date.Granularity.MONTH) is pd.NaT)
-        self.assertTrue(date.floor(value=np.NaN, granularity=date.Granularity.MONTH) is np.NaN)
-        self.assertTrue(date.floor(value=None, granularity=date.Granularity.MONTH) is None)  # noqa
-        self.assertTrue(date.floor(value=pd.NA, granularity=date.Granularity.QUARTER) is pd.NA)
-        self.assertTrue(date.floor(value=pd.NaT, granularity=date.Granularity.QUARTER) is pd.NaT)
-        self.assertTrue(date.floor(value=np.NaN, granularity=date.Granularity.QUARTER) is np.NaN)
-        self.assertTrue(date.floor(value=None, granularity=date.Granularity.QUARTER) is None)  # noqa
+        self.assertTrue(date.floor(pd.NA, granularity=date.Granularity.DAY) is pd.NA)
+        self.assertTrue(date.floor(pd.NaT, granularity=date.Granularity.DAY) is pd.NaT)
+        self.assertTrue(date.floor(np.NaN, granularity=date.Granularity.DAY) is np.NaN)
+        self.assertTrue(date.floor(None, granularity=date.Granularity.DAY) is None)
+        self.assertTrue(date.floor(pd.NA, granularity=date.Granularity.MONTH) is pd.NA)
+        self.assertTrue(date.floor(pd.NaT, granularity=date.Granularity.MONTH) is pd.NaT)
+        self.assertTrue(date.floor(np.NaN, granularity=date.Granularity.MONTH) is np.NaN)
+        self.assertTrue(date.floor(None, granularity=date.Granularity.MONTH) is None)
+        self.assertTrue(date.floor(pd.NA, granularity=date.Granularity.QUARTER) is pd.NA)
+        self.assertTrue(date.floor(pd.NaT, granularity=date.Granularity.QUARTER) is pd.NaT)
+        self.assertTrue(date.floor(np.NaN, granularity=date.Granularity.QUARTER) is np.NaN)
+        self.assertTrue(date.floor(None, granularity=date.Granularity.QUARTER) is None)
 
     def test_floor_day(self):
         # test datetime
@@ -987,50 +1057,55 @@ class TestDate(unittest.TestCase):
             '2021-11-01', '2021-11-01',
         ]), index=index_values)
 
+        self.assertEqual(
+            expected_day.dt.date.tolist(),
+            list(date.floor(date_series.tolist(), granularity=date.Granularity.DAY))
+        )
+
         # without series.name
-        validation.assert_dataframes_match([
+        self.assertTrue(validation.dataframes_match([
             pd.DataFrame(date_series.dt.date),
             pd.DataFrame(expected_day.dt.date),
             pd.DataFrame(date.floor(date_series, granularity=date.Granularity.DAY))
-        ], ignore_indexes=False)
+        ], ignore_indexes=False))
 
-        validation.assert_dataframes_match([
+        self.assertTrue(validation.dataframes_match([
             pd.DataFrame(expected_month.dt.date),
             pd.DataFrame(date.floor(date_series, granularity=date.Granularity.MONTH))
-        ], ignore_indexes=False)
+        ], ignore_indexes=False))
 
-        validation.assert_dataframes_match([
+        self.assertTrue(validation.dataframes_match([
             pd.DataFrame(expected_quarter.dt.date),
             pd.DataFrame(date.floor(date_series, granularity=date.Granularity.QUARTER))
-        ], ignore_indexes=False)
+        ], ignore_indexes=False))
 
         # with series.name
         date_series.name = 'date_day'
         actual_values = date.floor(date_series, granularity=date.Granularity.DAY)
         self.assertEqual(actual_values.name, 'date_day')
         self.assertTrue(all(actual_values.index.values == index_values))
-        validation.assert_dataframes_match([
+        self.assertTrue(validation.dataframes_match([
             pd.DataFrame(expected_day.dt.date),
             pd.DataFrame(actual_values)
-        ], ignore_indexes=False)
+        ], ignore_indexes=False))
 
         date_series.name = 'date_month'
         actual_values = date.floor(date_series, granularity=date.Granularity.MONTH)
         self.assertEqual(actual_values.name, 'date_month')
         self.assertTrue(all(actual_values.index.values == index_values))
-        validation.assert_dataframes_match([
+        self.assertTrue(validation.dataframes_match([
             pd.DataFrame(expected_month.dt.date),
             pd.DataFrame(actual_values)
-        ], ignore_indexes=False)
+        ], ignore_indexes=False))
 
         date_series.name = 'date_quarter'
         actual_values = date.floor(date_series, granularity=date.Granularity.QUARTER)
         self.assertEqual(actual_values.name, 'date_quarter')
         self.assertTrue(all(actual_values.index.values == index_values))
-        validation.assert_dataframes_match([
+        self.assertTrue(validation.dataframes_match([
             pd.DataFrame(expected_quarter.dt.date),
             pd.DataFrame(actual_values)
-        ], ignore_indexes=False)
+        ], ignore_indexes=False))
 
         date_series.name = 'date_quarter_fiscal'
         actual_values = date.floor(
@@ -1040,11 +1115,7 @@ class TestDate(unittest.TestCase):
         )
         self.assertEqual(actual_values.name, 'date_quarter_fiscal')
         self.assertTrue(all(actual_values.index.values == index_values))
-        validation.assert_dataframes_match([
+        self.assertTrue(validation.dataframes_match([
             pd.DataFrame(expected_quarter_fiscal_2.dt.date),
             pd.DataFrame(actual_values)
-        ], ignore_indexes=False)
-
-
-if __name__ == '__main__':
-    unittest.main()
+        ], ignore_indexes=False))

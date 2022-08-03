@@ -7,8 +7,8 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import make_scorer, f1_score, precision_score, recall_score, SCORERS, roc_auc_score, \
-    fbeta_score, cohen_kappa_score, \
+from sklearn.metrics import make_scorer, f1_score, precision_score, recall_score, SCORERS, \
+    roc_auc_score, fbeta_score, cohen_kappa_score, \
     confusion_matrix, mean_squared_error, mean_absolute_error
 from sklearn.model_selection import train_test_split, GridSearchCV, RepeatedKFold
 from sklearn.pipeline import Pipeline
@@ -45,7 +45,9 @@ class TestSklearnEval(unittest.TestCase):
         y_full = credit_data['target']
         X_full = credit_data.drop(columns='target')  # noqa
         y_full = label_binarize(y_full, classes=['good', 'bad']).flatten()
-        X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)  # noqa
+        X_train, X_test, y_train, y_test = train_test_split(
+            X_full, y_full, test_size=0.2, random_state=42
+        )
         del y_full, X_full
         numeric_columns = hlp.pandas.get_numeric_columns(X_train)
         non_numeric_columns = hlp.pandas.get_non_numeric_columns(X_train)
@@ -67,8 +69,9 @@ class TestSklearnEval(unittest.TestCase):
         ])
         param_grad = [
             {
-                'preparation__non_numeric_pipeline__encoder_chooser__transformer': [OneHotEncoder(),
-                                                                                    CustomOrdinalEncoder()],
+                'preparation__non_numeric_pipeline__encoder_chooser__transformer': [
+                    OneHotEncoder(), CustomOrdinalEncoder()
+                ],
                 'model__min_samples_split': [2],  # test zero-variance params
                 'model__max_features': [100, 'auto'],
                 'model__n_estimators': [10, 50],
@@ -95,8 +98,9 @@ class TestSklearnEval(unittest.TestCase):
 
         param_grad = [
             {
-                'preparation__non_numeric_pipeline__encoder_chooser__transformer': [OneHotEncoder(),
-                                                                                    CustomOrdinalEncoder()],
+                'preparation__non_numeric_pipeline__encoder_chooser__transformer': [
+                    OneHotEncoder(), CustomOrdinalEncoder()
+                ],
                 'model__max_features': [100, 'auto'],
                 'model__n_estimators': [10, 50],
             },
@@ -123,7 +127,9 @@ class TestSklearnEval(unittest.TestCase):
         housing_data.loc[25:75, ['housing_median_age']] = np.nan
         y_full = housing_data['target']
         X_full = housing_data.drop(columns='target')  # noqa
-        X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=0.2, random_state=42)  # noqa
+        X_train, X_test, y_train, y_test = train_test_split(
+            X_full, y_full, test_size=0.2, random_state=42
+        )
         del y_full, X_full
         numeric_pipeline = Pipeline([
             ('imputing', SimpleImputer(strategy='mean')),
@@ -159,12 +165,15 @@ class TestSklearnEval(unittest.TestCase):
 
     def test_MLExperimentResults_invalid_param_name_mapping(self):
         # the keys passed to parameter_name_mappings should match the parameters founds
-        self.assertRaises(HelpskAssertionError,
-                          lambda: MLExperimentResults.
-                          from_sklearn_search_cv(searcher=self.credit_data__grid_search,
-                                                 higher_score_is_better=True,
-                                                 description="test description",
-                                                 parameter_name_mappings={'this_should_fail': 'value'}))
+        self.assertRaises(
+            AssertionError,
+            lambda: MLExperimentResults.from_sklearn_search_cv(
+                searcher=self.credit_data__grid_search,
+                higher_score_is_better=True,
+                description="test description",
+                parameter_name_mappings={'this_should_fail': 'value'}
+            )
+        )
 
     def test_MLExperimentResults_gridsearch_classification(self):
         new_param_column_names = {'model__max_features': 'max_features',
@@ -287,12 +296,12 @@ class TestSklearnEval(unittest.TestCase):
         # ensure the hyper-param columns (now last 3 columns) are in the same order as the mapping
         self.assertEqual(list(cv_dataframe.columns[-3:]), ['max_features', 'n_estimators', 'encoder'])
         self.assertFalse('min_samples_split' in cv_dataframe.columns)
-        hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
+        assert hlp.validation.dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
 
         labeled_dataframe = parser.to_labeled_dataframe()
         self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
         self.assertIsNotNone(labeled_dataframe['label'])
-        hlp.validation.assert_dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
+        assert hlp.validation.dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
                                                            labeled_dataframe.drop(columns=['Trial Index',
                                                                                            'label'])])
 
@@ -537,14 +546,14 @@ class TestSklearnEval(unittest.TestCase):
         with redirect_stdout_to_file(get_test_path('sklearn_eval/credit__grid_search__single_score__dataframe.txt')):  # noqa
             print_dataframe(parser.to_dataframe())
         cv_dataframe = parser.to_dataframe().sort_index()
-        hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
+        assert hlp.validation.dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
                                    grid_search_credit.cv_results_['mean_test_score'])
 
         labeled_dataframe = parser.to_labeled_dataframe()
         self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
         self.assertIsNotNone(labeled_dataframe['label'])
-        hlp.validation.assert_dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
+        assert hlp.validation.dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
                                                            labeled_dataframe.drop(columns=['Trial Index',
                                                                                            'label'])])
 
@@ -750,7 +759,7 @@ class TestSklearnEval(unittest.TestCase):
         with redirect_stdout_to_file(get_test_path('sklearn_eval/housing__grid_search__dataframe.txt')):
             print_dataframe(parser.to_dataframe())
         cv_dataframe = parser.to_dataframe().sort_index()
-        hlp.validation.assert_dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
+        assert hlp.validation.dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
                                    grid_search_housing.cv_results_[f'mean_test_{parser.score_names[0]}'] * -1)
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[1]} Mean'],
@@ -759,7 +768,7 @@ class TestSklearnEval(unittest.TestCase):
         labeled_dataframe = parser.to_labeled_dataframe()
         self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
         self.assertIsNotNone(labeled_dataframe['label'])
-        hlp.validation.assert_dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
+        assert hlp.validation.dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
                                                            labeled_dataframe.drop(columns=['Trial Index',
                                                                                            'label'])])
 

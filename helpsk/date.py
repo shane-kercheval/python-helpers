@@ -3,11 +3,13 @@
 from __future__ import annotations
 from enum import unique, Enum, auto
 import datetime
+from functools import singledispatch
+from collections.abc import Collection
 
 import pandas as pd
 from dateutil import relativedelta
 import numpy as np
-from helpsk.validation import any_none_nan
+from helpsk.validation import is_none_nan
 
 
 @unique
@@ -20,18 +22,20 @@ class Granularity(Enum):
     QUARTER = auto()
 
 
-def floor(value: datetime.datetime | datetime.date | pd.Series,
-          granularity: Granularity = Granularity.DAY,
-          fiscal_start: int = 1) -> datetime.date | pd.Series:
+@singledispatch
+def floor(
+        value: object, /,
+        granularity: Granularity = Granularity.DAY,
+        fiscal_start: int = 1) -> object:
     """
     "Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
 
-    For example, if `date` is `2021-03-20` and granularity is `Granularity.QUARTER` then `floor()` will return
-    `2021-01-01`.
+    For example, if `date` is `2021-03-20` and granularity is `Granularity.QUARTER` then `floor()`
+    will return `2021-01-01`.
 
     If the fiscal year starts on November (`fiscal_start is `11`; i.e. the quarter is November,
-    December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then `floor()`
-    will return `2021-11-01`.
+    December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then
+    `floor()` will return `2021-11-01`.
 
     Args:
         value:
@@ -41,28 +45,30 @@ def floor(value: datetime.datetime | datetime.date | pd.Series,
             the granularity to round down to (i.e. DAY, MONTH, QUARTER)
 
         fiscal_start:
-            Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g. Jan is 1,
-            Feb, 2, etc.) that corresponds to the first month of the fiscal year.
+            Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g.
+            Jan is 1, Feb, 2, etc.) that corresponds to the first month of the fiscal year.
 
     Returns:
         date - the date rounded down to the nearest granularity
     """
-    if isinstance(value, pd.Series):
-        return value.apply(lambda x: floor(x, granularity=granularity, fiscal_start=fiscal_start))
+    if is_none_nan(value):
+        return value
 
-    if any_none_nan(value):
+    raise TypeError(f"date.floor() does not handle type `{type(value)}`")
+
+
+@floor.register(datetime.date)
+def _(value: datetime.date, /,
+      granularity: Granularity = Granularity.DAY,
+      fiscal_start: int = 1) -> datetime.date:
+
+    if value is pd.NaT:
         return value
 
     if granularity == Granularity.DAY:
-        if isinstance(value, datetime.datetime):
-            return value.date()
-
         return value
 
     if granularity == Granularity.MONTH:
-        if isinstance(value, datetime.datetime):
-            return value.replace(day=1).date()
-
         return value.replace(day=1)
 
     if granularity == Granularity.QUARTER:
@@ -72,12 +78,38 @@ def floor(value: datetime.datetime | datetime.date | pd.Series,
         months_to_subtract = relativedelta.relativedelta(months=months_to_subtract)
         return floor(value, granularity=Granularity.MONTH) - months_to_subtract
 
-    raise ValueError("Unknown Granularity type")
+
+@floor.register(datetime.datetime)
+def _(value: datetime.datetime, /,
+      granularity: Granularity = Granularity.DAY,
+      fiscal_start: int = 1) -> datetime.date:
+
+    if value is pd.NaT:
+        return value
+
+    return floor(value.date(), granularity=granularity, fiscal_start=fiscal_start)
 
 
-def fiscal_quarter(value: datetime.datetime | datetime.date,
-                   include_year: bool = False,
-                   fiscal_start: int = 1) -> float:
+@floor.register(Collection)
+def _(value: Collection, /,
+      granularity: Granularity = Granularity.DAY,
+      fiscal_start: int = 1) -> Collection:
+
+    return (floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value)
+
+
+@floor.register(pd.Series)
+def _(value: pd.Series, /,
+      granularity: Granularity = Granularity.DAY,
+      fiscal_start: int = 1) -> pd.Series:
+
+    return value.apply(lambda x: floor(x, granularity=granularity, fiscal_start=fiscal_start))
+
+
+def fiscal_quarter(
+        value: datetime.datetime | datetime.date,
+        include_year: bool = False,
+        fiscal_start: int = 1) -> float:
     """Returns the fiscal quarter (or year and quarter numeric value) for a given date.
 
     For example:
@@ -110,9 +142,9 @@ def fiscal_quarter(value: datetime.datetime | datetime.date,
     Returns:
         date - the date rounded down to the nearest granularity
     """
-
     assert 1 <= fiscal_start <= 12
 
+    # https://github.com/tidyverse/lubridate/blob/master/R/accessors-quarter.r
     fiscal_start = (fiscal_start - 1) % 12
     shifted = np.arange(fiscal_start, 11 + fiscal_start + 1) % 12 + 1
     quarters = np.repeat([1, 2, 3, 4], 3)
@@ -134,9 +166,10 @@ def fiscal_quarter(value: datetime.datetime | datetime.date,
     return quarter
 
 
-def to_string(value: datetime.datetime | datetime.date,
-              granularity: Granularity = Granularity.DAY,
-              fiscal_start: int = 1) -> str:
+def to_string(
+        value: datetime.datetime | datetime.date,
+        granularity: Granularity = Granularity.DAY,
+        fiscal_start: int = 1) -> str:
     """Converts the date to a string.
 
     Examples:
@@ -153,8 +186,8 @@ def to_string(value: datetime.datetime | datetime.date,
         ```
 
     If the fiscal year starts on November (`fiscal_start is `11`; i.e. the quarter is November,
-    December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then `floor()`
-    will return `2021-11-01`.
+    December, January) and the date is `2022-01-28` and granularity is `Granularity.QUARTER` then
+    `floor()` will return `2021-11-01`.
 
     Args:
         value:
@@ -164,11 +197,12 @@ def to_string(value: datetime.datetime | datetime.date,
             the granularity to round down to (i.e. DAY, MONTH, QUARTER)
 
         fiscal_start:
-            Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g. Jan is 1,
-            Feb, 2, etc.) that corresponds to the first month of the fiscal year.
+            Only applicable for `Granularity.QUARTER`. The value should be the month index (e.g.
+            Jan is 1, Feb, 2, etc.) that corresponds to the first month of the fiscal year.
 
-            If fiscal_start start is any other value than `1` quarters will be abbreviated with `F` to denote
-            non-standard / fiscal quarters. For example, "2021-FQ4" is the 4th fiscal quarter of 2021.
+            If fiscal_start start is any other value than `1` quarters will be abbreviated with `F`
+            to denote non-standard / fiscal quarters. For example, "2021-FQ4" is the 4th fiscal
+            quarter of 2021.
 
     Returns:
         date - the date rounded down to the nearest granularity
