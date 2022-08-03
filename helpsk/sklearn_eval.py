@@ -52,7 +52,7 @@ class MLExperimentResults:
 
     Experiment: a collection of trials. An experiment can be a single run using, for example,
     GridSearchCV or BayesSearchCV. If a GridSearchCV experiment has 30 combinations of
-    hyper-parameters to try, each of those combinations is a Trial. The collection of 30 
+    hyper-parameters to try, each of those combinations is a Trial. The collection of 30
     combinations is the experiment.
     """
 
@@ -536,7 +536,8 @@ class MLExperimentResults:
                     axis=1
                 )
 
-            self._dataframe = pd.concat([
+            self._dataframe = pd.concat(
+                [
                     self._dataframe,
                     pd.DataFrame.from_dict(self.trials)[self.parameter_names_original]
                 ],
@@ -839,7 +840,7 @@ class MLExperimentResults:
 
         Args:
             order_from_best_to_worst: if True, returns the labels in order from the best score to
-            the worst score, which should match the ordered of .to_dataframe() or 
+            the worst score, which should match the ordered of .to_dataframe() or
             .to_formatted_dataframe()` using the default values for those functions. If False,
             returns the labels in order that they were ran by the cross validation object.
 
@@ -2029,24 +2030,25 @@ class TwoClassEvaluator:
         )
         return auc_curve
 
-    def _get_threshold_curve_dataframe(self,
-                                       score_threshold_range: tuple[float, float] = (0.1, 0.9),
-                                       threshold_interval: float = 0.025) \
-            -> pd.DataFrame:
+    def _get_threshold_curve_dataframe(
+            self,
+            score_threshold_range: tuple[float, float] = (0.1, 0.9),
+            threshold_interval: float = 0.025) -> pd.DataFrame:
         """
-        Returns a dataframe containing various score thresholds from 0 to 1 (i.e. cutoff point where score
-        will be labeled as a 'positive' event, and various rates (e.g. True Positive Rate, False Positive
-        Rate, etc.) for the corresponding score threshold.
+        Returns a dataframe containing various score thresholds from 0 to 1 (i.e. cutoff point
+        where score will be labeled as a 'positive' event, and various rates (e.g. True Positive
+        Rate, False Positive Rate, etc.) for the corresponding score threshold.
 
-        (A score threshold is the value for which you would predict a positive label if the value of the score
-        is above the threshold (e.g. usually 0.5).
+        (A score threshold is the value for which you would predict a positive label if the value
+        of the score is above the threshold (e.g. usually 0.5).
 
         Args:
             score_threshold_range:
-                range of score thresholds to plot (x-axis); tuple with minimum threshold in first index and
-                maximum threshold in second index.
+                range of score thresholds to plot (x-axis); tuple with minimum threshold in first
+                index and maximum threshold in second index.
             threshold_interval:
-                the interval used to determine the specific points in used in the score_threshold_range
+                the interval used to determine the specific points in used in the
+                score_threshold_range
         """
         def get_threshold_scores(threshold):
             temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
@@ -2087,8 +2089,8 @@ class TwoClassEvaluator:
                 `helpsk.plot.STANDARD_HEIGHT`, and the default width is
                 `helpsk.plot.STANDARD_HEIGHT / helpsk.plot.GOLDEN_RATIO`
             return_plotly:
-                If True, return plotly object. Otherwise, use matplotlib and end function with call:
-                `plt.tight_layout()`
+                If True, return plotly object. Otherwise, use matplotlib and end function with
+                call: `plt.tight_layout()`
             plot_threshold:
                 If True, indicate the score threshold (e.g. 0.5) as a large point.
         """
@@ -2120,8 +2122,7 @@ class TwoClassEvaluator:
             if plot_threshold:
                 fig.add_trace(
                     px.scatter(
-                        data_frame=auc_curve.\
-                            query(f'threshold == {round(self.score_threshold, 2)}'),
+                        data_frame=auc_curve.query(f'threshold == {round(self.score_threshold, 2)}'),  # noqa
                         x='False Positive Rate',
                         y='True Positive Rate',
                         size=[2],
@@ -2373,7 +2374,7 @@ class TwoClassEvaluator:
                         'Score Threshold',
                         'True Pos. Rate (Recall)',
                         'Pos. Predictive Value (Precision)'
-                        ]],
+                    ]],
                     id_vars=['Score Threshold']
                 ),
                 x='Score Threshold',
@@ -2756,8 +2757,7 @@ class TwoClassModelComparison:
             predicted_scores: dict,
             positive_class: str = 'Positive Class',
             negative_class: str = 'Negative Class',
-            score_threshold: float = 0.5
-            ):
+            score_threshold: float = 0.5):
         """
         Args:
             actual_values:

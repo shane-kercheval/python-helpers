@@ -1,4 +1,6 @@
-"""This module contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
+"""This module contains helper functions when working with pandas objects
+(e.g. DataFrames, Series).
+"""
 from __future__ import annotations
 import datetime
 import math
@@ -125,9 +127,9 @@ def is_series_categorical(series: pd.Series) -> bool:
 def fill_na(series: pd.Series, missing_value_replacement: str = '<Missing>') -> pd.Series:
     """Fills missing values with `missing_value_replacement`
 
-    This is only necessary if `series` is a categorical object because series.fillna(...) will fail if
-    `missing_value_replacement` isn't already an existing category. This function adds the value to the
-    categories if it isn't already.
+    This is only necessary if `series` is a categorical object because series.fillna(...) will
+    fail if `missing_value_replacement` isn't already an existing category. This function adds the
+    value to the categories if it isn't already.
 
     Args:
         series:
@@ -138,8 +140,8 @@ def fill_na(series: pd.Series, missing_value_replacement: str = '<Missing>') -> 
         pd.Series will missing values filled with `missing_value_replacement`
 
         NOTE: a side effect of this function is
-            - for series of type categorical: the `missing_value_replacement` will be added to the list of
-                categories if the value isn't already an existing category
+            - for series of type categorical: the `missing_value_replacement` will be added to the
+                list of categories if the value isn't already an existing category
             - for non-categorical dtypes (e.g. bool, float, etc.) the series will be converted to
                 `object` so that strings and other types can coexist.
     """
@@ -149,8 +151,8 @@ def fill_na(series: pd.Series, missing_value_replacement: str = '<Missing>') -> 
         if missing_value_replacement not in series.cat.categories:
             series = series.cat.add_categories(missing_value_replacement)
     else:
-        # if we don't do this, then if, for example, we have boolean values and we try to call `.fillna(...)`
-        # then we will get `TypeError: Need to pass bool-like values.`
+        # if we don't do this, then if, for example, we have boolean values and we try to call
+        # `.fillna(...)` then we will get `TypeError: Need to pass bool-like values.`
         series = series.astype(object)
 
     return series.fillna(missing_value_replacement)

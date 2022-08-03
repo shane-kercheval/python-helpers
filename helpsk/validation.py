@@ -112,8 +112,9 @@ def any_duplicated(values: Collection) -> bool:
 def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
     """Compares the equality of the values of two iterables.
 
-    This function will generally give the same result as list equality (e.g. `[x, y, z] == [x, y, z]`)
-    However, in some strange scenarios, `==` will return `False` where it doesn't seem like it should
+    This function will generally give the same result as list equality (e.g.
+    `[x, y, z] == [x, y, z]`). However, in some strange scenarios, `==` will return `False` where
+    it doesn't seem like it should
 
     For example:
 
@@ -125,8 +126,8 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
 
 
     Also, when comparing a series with an ordered Categorical when the values are the same,
-    pd.Series.equals() will return False if the categories have different order. But we only care if the
-    values are the same, so this function will return True.
+    pd.Series.equals() will return False if the categories have different order. But we only care
+    if the values are the same, so this function will return True.
     ```
 
     Args:
@@ -139,7 +140,8 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
         True if iterable_a is equal to iterable_b
     """
     with suppress_warnings():
-        # if either list-like structure is categorical, then we need to convert both to unordered categorical
+        # if either list-like structure is categorical, then we need to convert both to unordered
+        # categorical
         if is_categorical(iterable_a) or is_categorical(iterable_b):
             iterable_a = pd.Categorical(iterable_a, ordered=False)
             iterable_b = pd.Categorical(iterable_b, ordered=False)
@@ -155,17 +157,17 @@ def dataframes_match(dataframes: list[pd.DataFrame],
                      ignore_indexes: bool = True,
                      ignore_column_names: bool = True) -> bool:
     """
-    Because floating point numbers are difficult to accurate represent, when comparing multiple DataFrames,
-    this function first rounds any numeric columns to the number of decimal points indicated
-    `float_tolerance`.
+    Because floating point numbers are difficult to accurate represent, when comparing multiple
+    DataFrames, this function first rounds any numeric columns to the number of decimal points
+    indicated `float_tolerance`.
 
     Args:
         dataframes:
             Two or more dataframes to compare against each other and test for equality
 
         float_tolerance:
-            numeric columns will be rounded to the number of digits to the right of the decimal specified by
-            this parameter.
+            numeric columns will be rounded to the number of digits to the right of the decimal
+            specified by this parameter.
 
         ignore_indexes:
             if True, the indexes of each DataFrame will be ignored for considering equality
@@ -174,7 +176,8 @@ def dataframes_match(dataframes: list[pd.DataFrame],
             if True, the column names of each DataFrame will be ignored for considering equality
 
     Returns:
-        Returns True if the dataframes match based on the conditions explained above, otherwise returns False
+        Returns True if the dataframes match based on the conditions explained above, otherwise
+        returns False
     """
     if not isinstance(dataframes, list):
         raise HelpskParamTypeError("Expected list of pd.DataFrame's.")
@@ -189,8 +192,9 @@ def dataframes_match(dataframes: list[pd.DataFrame],
             return False
 
         if ignore_indexes or ignore_column_names:
-            # if either of these are True, then we are going to change the index and/or columns, but
-            # python is pass-by-reference so we don't want to change the original DataFrame object.
+            # if either of these are True, then we are going to change the index and/or columns,
+            # but python is pass-by-reference so we don't want to change the original DataFrame
+            # object.
             other_dataframe = other_dataframe.copy()
 
         if ignore_indexes:
@@ -201,8 +205,8 @@ def dataframes_match(dataframes: list[pd.DataFrame],
 
         return first_dataframe.equals(other_dataframe.round(float_tolerance))
 
-    # compare the first dataframe to the rest of the dataframes, after rounding each to the tolerance, and
-    # performing other modifications
+    # compare the first dataframe to the rest of the dataframes, after rounding each to the
+    # tolerance, and performing other modifications
     # check if all results are True
     return all(first_dataframe_equals_other(x) for x in dataframes[1:])
 
@@ -225,14 +229,14 @@ def is_close(value_a: float, value_b: float, tolerance: float = 0.000001) -> boo
 
 
 def raises_exception(function: Callable, exception_type: Type = None) -> bool:
-    """Returns True if `function` raises an Exception; returns False if `function` runs without raising an
-    Exception.
+    """Returns True if `function` raises an Exception; returns False if `function` runs without
+    raising an Exception.
     Args:
         function:
             the function which does or does not raise an exception.
         exception_type:
-            if `exception_type` is provided, `raises_exception` returns true only if the `function` argument
-            raises an Exception **and** the exception has type of `exception_type`.
+            if `exception_type` is provided, `raises_exception` returns true only if the `function`
+            argument raises an Exception **and** the exception has type of `exception_type`.
     """
     try:
         function()

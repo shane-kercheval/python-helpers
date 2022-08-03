@@ -42,11 +42,16 @@ class TestStrings(unittest.TestCase):
 
         self.assertEqual(hs.collapse(['a'], separate=', ', surround="'"), "'a'")
         self.assertEqual(hs.collapse(['a', 'b'], separate=', ', surround="'"), "'a', 'b'")
-        self.assertEqual(hs.collapse(['a', 'b', 'c'], separate=', ', surround="'"), "'a', 'b', 'c'")
+        self.assertEqual(
+            hs.collapse(['a', 'b', 'c'], separate=', ', surround="'"),
+            "'a', 'b', 'c'"
+        )
 
     def test_format_number(self):
-        granularity_options = [hs.RoundTo.AUTO, hs.RoundTo.NONE, hs.RoundTo.THOUSANDS, hs.RoundTo.MILLIONS,
-                               hs.RoundTo.BILLIONS, hs.RoundTo.TRILLIONS]
+        granularity_options = [
+            hs.RoundTo.AUTO, hs.RoundTo.NONE, hs.RoundTo.THOUSANDS, hs.RoundTo.MILLIONS,
+            hs.RoundTo.BILLIONS, hs.RoundTo.TRILLIONS
+        ]
         places = [0, 1, 2, 3, 4, 5]
 
         parameter_combos = list(product(granularity_options, places))

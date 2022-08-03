@@ -34,9 +34,9 @@ def format(styler: pd.DataFrame | Styler,
         styler:
             either pd.Dataframe or pd.Dataframe.style
         subset:
-            A valid 2d input to DataFrame.loc[<subset>], or, in the case of a 1d input or single key,
-            to DataFrame.loc[:, <subset>] where the columns are prioritised, to limit data to before applying
-            the function.
+            A valid 2d input to DataFrame.loc[<subset>], or, in the case of a 1d input or single
+            key, to DataFrame.loc[:, <subset>] where the columns are prioritised, to limit data to
+            before applying the function.
         round_by:
             number of digits to round numeric columns to
         fill_missing_value:
@@ -44,8 +44,8 @@ def format(styler: pd.DataFrame | Styler,
         missing_color:
             The background color for cells that have missing values.
         thousands:
-            the separator used for thousands e.g. `'` will result in `10,000` while ` ` will result in
-            `10 000`.
+            the separator used for thousands e.g. `'` will result in `10,000` while ` ` will
+            result in `10 000`.
         hide_index:
             Hide the index of the dataframe.
     Returns:
@@ -75,7 +75,8 @@ def background_color(styler: pd.DataFrame | Styler, palette: str = 'Blues', **kw
             palette:
                 name of the palette (value passed into seaborn `color_palette()`
             kwargs:
-                additional arguments that will be passed to the pandas `.background_gradient()` function.
+                additional arguments that will be passed to the pandas `.background_gradient()`
+                function.
         Returns:
             styler
         """
@@ -90,8 +91,13 @@ def background_color(styler: pd.DataFrame | Styler, palette: str = 'Blues', **kw
     return styler.background_gradient(cmap=color_map, **kwargs)
 
 
-def __bar_inverse(style_object, align: str, colors: list[str], width: float = 100, min_value: float = None,
-                  max_value: float = None) -> pd.DataFrame:
+def __bar_inverse(
+        style_object,
+        align: str,
+        colors: list[str],
+        width: float = 100,
+        min_value: float = None,
+        max_value: float = None) -> pd.DataFrame:
     """
     CODE MODIFIED FROM
         https://github.com/pandas-dev/pandas/blob/v1.3.2/pandas/io/formats/style.py#L2178-L2258
@@ -109,7 +115,9 @@ def __bar_inverse(style_object, align: str, colors: list[str], width: float = 10
         object_max = max(abs(object_min), abs(object_max))
         object_min = -object_max
     # Transform to percent-range of linear-gradient
-    normed = width * (style_object.to_numpy(dtype=float) - object_min) / (object_max - object_min + 1e-12)
+    normed = width \
+        * (style_object.to_numpy(dtype=float) - object_min) \
+        / (object_max - object_min + 1e-12)
     zero = -width * object_min / (object_max - object_min + 1e-12)
 
     def css_bar(start: float, end: float, color: str) -> str:
@@ -248,7 +256,8 @@ def html_escape_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
     Args:
         pd.DataFrame
     Returns:
-        a copy of the `dataframe` with string values replaced after being html encoded via `html.escape()`
+        a copy of the `dataframe` with string values replaced after being html encoded via
+        `html.escape()`
     """
     def __escape(value):
         if not any_none_nan([value]) and isinstance(value, str):
@@ -257,7 +266,8 @@ def html_escape_dataframe(dataframe: pd.DataFrame) -> pd.DataFrame:
         return value
 
     dataframe = dataframe.copy()
-    columns_to_escape = pandas.get_string_columns(dataframe) + pandas.get_categorical_columns(dataframe)
+    columns_to_escape = pandas.get_string_columns(dataframe) + \
+        pandas.get_categorical_columns(dataframe)
     for column in columns_to_escape:
         dataframe[column] = dataframe[column].apply(__escape)
 

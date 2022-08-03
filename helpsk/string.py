@@ -7,8 +7,8 @@ from enum import unique, Enum, auto
 
 
 def collapse(*args: str | list[str], separate: str = '', surround: str = '') -> str:
-    """Takes a list of strings and concatenates them, separating each string with the value of `separate` and
-    surrounding each string with the value of `surround`.
+    """Takes a list of strings and concatenates them, separating each string with the value of
+    `separate` and surrounding each string with the value of `surround`.
 
     Args:
         *args:
@@ -42,7 +42,8 @@ class RoundTo(Enum):
 def format_number(value: float,
                   granularity: RoundTo = RoundTo.AUTO,
                   places: int = 2) -> str:
-    """Formats numbers in a way that humans would typically want to see at a glance (e.g. on a graph.)
+    """Formats numbers in a way that humans would typically want to see at a glance (e.g. on a
+    graph.)
 
     For example, `123560000` is transformed to `123.56M`
 
@@ -59,8 +60,9 @@ def format_number(value: float,
         places: the number of digits to the right of the decimal to display. (default is `2`)
 
             For example:
-                `format_number(123567000, granularity=RoundTo.MILLIONS, num_digits=2)` -> '123.57M'
-                `format_number(123567000, granularity=RoundTo.MILLIONS, num_digits=3)` -> '123.567M'
+
+            `format_number(123567000, granularity=RoundTo.MILLIONS, num_digits=2)` -> '123.57M'
+            `format_number(123567000, granularity=RoundTo.MILLIONS, num_digits=3)` -> '123.567M'
 
     Returns:
         the formatted number as a string
