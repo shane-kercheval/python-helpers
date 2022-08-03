@@ -15,15 +15,18 @@ from helpsk.utility import suppress_warnings
 def is_none_nan(value: object, /) -> bool:
     """Returns True if the value is None or various NaN/NA types.
     """
-    if value is None or value is np.NaN or value is pd.NA or value is pd.NaT:
+    if value is None \
+            or value is pd.NA \
+            or value is pd.NaT \
+            or (isinstance(value, (np.float64, float, int)) and np.isnan(value)):
         return True
 
     return False
 
 
 def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object, /) -> bool:
-    """Can be used with a single value or a collection of values. Returns `True` if any item in `values` are
-    `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
+    """Can be used with a single value or a collection of values. Returns `True` if any item in
+    `values` are `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
 
     Args:
         values:
@@ -32,7 +35,7 @@ def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object, 
     Returns:
         bool - True if any item in `values` are None/np.NaN
     """
-    if values is None or values is np.NaN or values is pd.NA or values is pd.NaT:
+    if is_none_nan(values):
         return True
 
     if isinstance(values, Sized) and not isinstance(values, str) and len(values) == 0:
@@ -48,7 +51,7 @@ def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object, 
         if len(values) == 0:
             return True
 
-        return any((any_none_nan(x) for x in values))
+        return any((is_none_nan(x) for x in values))
 
     try:
         if not isinstance(values, str) and None in values:
@@ -205,7 +208,8 @@ def dataframes_match(dataframes: list[pd.DataFrame],
 
 
 def is_close(value_a: float, value_b: float, tolerance: float = 0.000001) -> bool:
-    """Tests whether or not value_a and value_b are "close" (i.e. within the `tolerance` after subtracting)
+    """Tests whether or not value_a and value_b are "close" (i.e. within the `tolerance` after
+    subtracting)
 
     Args:
         value_a:
