@@ -1,30 +1,31 @@
+from __future__ import annotations
 import os
 import re
 from importlib import reload
-from typing import Callable, Union
 from unittest import TestCase
 
 import pandas as pd
 from matplotlib import pyplot as plt
 
+from collections.abc import Iterable, Callable
 from helpsk.pandas import print_dataframe
 from helpsk.utility import redirect_stdout_to_file
 
 
 def get_test_path(file) -> str:
-    """Returns the path to /tests folder, adjusting for the difference in the current working directory when
-    debugging vs not debugging.
+    """Returns the path to /tests folder, adjusting for the difference in the current working
+    directory when debugging vs not debugging.
     """
     path = os.getcwd()
     return os.path.join(path, 'tests/test_files', file)
 
 
 def subtests_expected_vs_actual(test_case: TestCase,
-                                expected_values: list,
-                                actual_values: list,
+                                expected_values: Iterable,
+                                actual_values: Iterable,
                                 **kwargs) -> None:
-    """ runs a TestCase.subTest() for each item in expected_values and actual_values and tests that the
-    expected_values are equal to the actual_values via TestCase.assertEqual()
+    """ runs a TestCase.subTest() for each item in expected_values and actual_values and tests that
+    the expected_values are equal to the actual_values via TestCase.assertEqual()
 
     Example (ran within `test_example_file.py -> TestExampleClass -> test_example_function()`):
 
@@ -32,8 +33,13 @@ def subtests_expected_vs_actual(test_case: TestCase,
         expected_values = [1, 2, 3, 4]
         actual_values = [1, 0, 3, -1]
 
-        subTests_actual_expected(test_case=self, expected_values=expected_values, actual_values=actual_values,
-                                 my_param1=True, my_param2='value')
+        subTests_actual_expected(
+            test_case=self,
+            expected_values=expected_values,
+            actual_values=actual_values,
+            my_param1=True,
+            my_param2='value'
+        )
 
         ```
 
@@ -57,8 +63,8 @@ def subtests_expected_vs_actual(test_case: TestCase,
         actual_values:
             a list of actual values
         **kwargs:
-            a variable list of param/value items that will get passed to TestCase.subTest and printed out for
-            failing sub-tests.
+            a variable list of param/value items that will get passed to TestCase.subTest and
+            printed out for failing sub-tests.
     """
     assert len(expected_values) == len(actual_values)
 
@@ -67,7 +73,10 @@ def subtests_expected_vs_actual(test_case: TestCase,
             test_case.assertEqual(expected, actual)
 
 
-def check_plot(file_name: str, plot_function: Callable, set_size_w_h: Union[tuple, None] = (10, 6)):
+def check_plot(
+        file_name: str,
+        plot_function: Callable,
+        set_size_w_h: tuple | None = (10, 6)):
     reload(plt)  # necessary because matplotlib throws strange errors about alpha values
 
     def clear():
@@ -91,9 +100,9 @@ def check_plot(file_name: str, plot_function: Callable, set_size_w_h: Union[tupl
 
 def clean_formatted_dataframe(rendered):
     """`This dataframe changes the random code generated when saving formatted dataframes
-    (i.e df.style.to_html()). This is necessary because it each time unit tests are ran, the html changes,
-    and it is difficult to know if the change/diff occurred because of the random code, or because something
-    actually changed.
+    (i.e df.style.to_html()). This is necessary because it each time unit tests are ran, the html
+    changes, and it is difficult to know if the change/diff occurred because of the random code, or
+    because something actually changed.
 
     For example, it changes the `1ef9B` in
 
@@ -109,7 +118,9 @@ def clean_formatted_dataframe(rendered):
     `"""
     temp = rendered.replace('\n', '')
     if temp.startswith('<style type="text/css"></style>'):
-        code = re.sub('">  <.*', '', temp).replace('<style type="text/css"></style><table id="T', '')
+        code = re.\
+            sub('">  <.*', '', temp).\
+            replace('<style type="text/css"></style><table id="T', '')
     else:
         code = re.sub('_row.*', '_', temp).replace('<style type="text/css">#T', '')
 

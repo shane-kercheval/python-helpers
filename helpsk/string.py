@@ -4,7 +4,7 @@ This module is less concerned with bytes/unicode and text processing, compared w
 """
 from __future__ import annotations
 from enum import unique, Enum, auto
-from typing import Iterable
+from collections.abc import Iterable
 
 
 def collapse(*args: str | Iterable[str], separate: str = '', surround: str = '') -> str:
