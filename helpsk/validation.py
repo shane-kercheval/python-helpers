@@ -1,8 +1,8 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
 from __future__ import annotations
-from collections.abc import Sized, Collection, Iterable
-from typing import Callable, Type
+from collections.abc import Sized, Collection, Iterable, Callable
+from typing import Type
 
 import numpy as np
 import pandas as pd
