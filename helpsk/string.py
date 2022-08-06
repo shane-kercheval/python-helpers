@@ -4,9 +4,10 @@ This module is less concerned with bytes/unicode and text processing, compared w
 """
 from __future__ import annotations
 from enum import unique, Enum, auto
+from typing import Iterable
 
 
-def collapse(*args: str | list[str], separate: str = '', surround: str = '') -> str:
+def collapse(*args: str | Iterable[str], separate: str = '', surround: str = '') -> str:
     """Takes a list of strings and concatenates them, separating each string with the value of
     `separate` and surrounding each string with the value of `surround`.
 
@@ -21,7 +22,7 @@ def collapse(*args: str | list[str], separate: str = '', surround: str = '') -> 
     Returns:
         string surrounded by `surround` and separated by `separate`
     """
-    if len(args) == 1 and isinstance(args[0], list):
+    if len(args) == 1 and isinstance(args[0], Iterable):
         args = args[0]
 
     return separate.join([surround + x + surround for x in args])

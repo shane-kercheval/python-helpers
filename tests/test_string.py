@@ -15,6 +15,9 @@ class TestStrings(unittest.TestCase):
         self.assertEqual(hs.collapse('a', 'b'), 'ab')
         self.assertEqual(hs.collapse('a', 'b', 'c'), 'abc')
 
+        self.assertEqual(hs.collapse('abc', surround="'"), "'a''b''c'")
+        self.assertEqual(hs.collapse('abc', surround="'", separate="-"), "'a'-'b'-'c'")
+
         self.assertEqual(hs.collapse('a', surround="'"), "'a'")
         self.assertEqual(hs.collapse('a', 'b', surround="'"), "'a''b'")
         self.assertEqual(hs.collapse('a', 'b', 'c', surround="'"), "'a''b''c'")
