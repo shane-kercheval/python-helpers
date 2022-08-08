@@ -4,12 +4,16 @@ from __future__ import annotations
 from enum import unique, Enum, auto
 import datetime
 from functools import singledispatch
-from collections.abc import Collection
+from collections.abc import Iterable
+from typing import TypeVar
 
 import pandas as pd
 from dateutil import relativedelta
 import numpy as np
 from helpsk.validation import is_none_nan
+
+
+DateTime = TypeVar('DateTime', datetime.date, datetime.datetime)
 
 
 @unique
@@ -90,19 +94,17 @@ def _(value: datetime.datetime, /,
     return floor(value.date(), granularity=granularity, fiscal_start=fiscal_start)
 
 
-@floor.register(Collection)
-def _(value: Collection, /,
+@floor.register(Iterable)
+def _(value: Iterable[DateTime], /,
       granularity: Granularity = Granularity.DAY,
-      fiscal_start: int = 1) -> Collection:
-
+      fiscal_start: int = 1) -> Iterable[DateTime]:
     return (floor(x, granularity=granularity, fiscal_start=fiscal_start) for x in value)
 
 
 @floor.register(pd.Series)
-def _(value: pd.Series, /,
+def _(value: pd.Series[DateTime], /,
       granularity: Granularity = Granularity.DAY,
-      fiscal_start: int = 1) -> pd.Series:
-
+      fiscal_start: int = 1) -> pd.Series[DateTime]:
     return value.apply(lambda x: floor(x, granularity=granularity, fiscal_start=fiscal_start))
 
 
