@@ -1,7 +1,7 @@
 """A collection of functions that assist in validation/comparison of data and conditions.
 """
 from __future__ import annotations
-from collections.abc import Sized, Collection, Iterable, Callable
+from collections.abc import Sized, Iterable, Callable
 from typing import Type
 
 import numpy as np
@@ -96,7 +96,7 @@ def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
     return False
 
 
-def any_duplicated(values: Collection) -> bool:
+def any_duplicated(values: Iterable) -> bool:
     """Returns `True` if any items in `values` are duplicated.
 
     Args:
