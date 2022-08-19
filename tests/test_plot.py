@@ -13,6 +13,7 @@ from tests.helpers import get_data_credit, check_plot, get_test_path
 
 @unique
 class TestEnum(Enum):
+    __test__ = False
     VALUE_A = auto()
     VALUE_B = auto()
 

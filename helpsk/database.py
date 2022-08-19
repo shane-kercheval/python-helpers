@@ -42,7 +42,7 @@ class Redshift(Database):
 
     @property
     def _connection_string(self) -> str:
-        return ' '.join([f"{k}={v}" for k, v in self._kwargs.items()])
+        return ' '.join(f"{k}={v}" for k, v in self._kwargs.items())
 
     def _open_connection_object(self) -> ConnectionObject:
         """Wraps logic for connecting to redshift
