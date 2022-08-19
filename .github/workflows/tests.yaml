@@ -38,8 +38,7 @@ jobs:
           pip install snowflake-connector-python==v2.7.4
 
       - name: Run tests
-        run: python -m unittest discover tests
+        run: pytest tests
       - name: Run linting
         run: |
-          flake8 --max-line-length 110 --ignore=E127 helpsk
-
+          flake8 --max-line-length 99 --ignore=E127 helpsk

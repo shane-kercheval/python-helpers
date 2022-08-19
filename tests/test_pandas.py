@@ -15,6 +15,7 @@ from tests.helpers import get_data_credit, get_test_path, clean_formatted_datafr
 
 @unique
 class TestEnum(Enum):
+    __test__ = False
     VALUE_A = auto()
     VALUE_B = auto()
 
