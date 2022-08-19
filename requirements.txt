@@ -8,6 +8,7 @@ plotly-express==0.4.1
 psycopg2==2.9.3
 pyarrow==6.0.1
 pypirc==1.0.4
+pytest==7.1.2
 python-dateutil==2.8.2
 PyYAML==6.0
 scikit-learn==1.0.2

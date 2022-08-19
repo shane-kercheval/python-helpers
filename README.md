@@ -24,32 +24,44 @@ pip install helpsk
 - Coding standards should follow PEP 8 (Style Guide for Python Code)
     - https://peps.python.org/pep-0008/
     - Exceptions:
-        - use max line length of `110` rather than the suggested `79`
+        - use max line length of `99` rather than the suggested `79`
 - document all files, classes, functions
     - following existing documentation style
 
 
-### Create Virtual Environment
+### Docker
 
-The following command will install all dependencies as a virtual environment located in `./venv/`
+See `Makefile` for all commands.
 
-```commandline
-make environment
-```
-
-To activate the virtual environment in the terminal, use:
+To build the docker container:
 
 ```commandline
-source .venv/bin/activate
+make docker_build
 ```
 
-to deactivate, simply use:
+To run the terminal inside the docker container:
 
 ```commandline
-source .venv/bin/activate
+make docker_zsh
 ```
 
-To configure PyCharm (etc.) to use the virtual environment, point the environment to `.venv/bin/python3`
+To run the unit tests (including linting and doc-tests) from the commandline inside the docker container:
+
+```commandline
+make tests
+```
+
+To run the unit tests (including linting and doc-tests) from the commandline outside the docker container:
+
+```commandline
+make docker_tests
+```
+
+To build the python package and uploat do PyPI via twine from the commandline outside the docker container:
+
+```commandline
+make all
+```
 
 ### Pre-Check-in
 
