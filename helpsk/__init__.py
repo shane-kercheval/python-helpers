@@ -9,6 +9,7 @@ import helpsk.database_base
 import helpsk.date
 import helpsk.diff
 import helpsk.exceptions
+import helpsk.logging
 import helpsk.pandas
 import helpsk.pandas_style
 import helpsk.plot
