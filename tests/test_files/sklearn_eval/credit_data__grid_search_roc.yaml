@@ -10,20 +10,20 @@ parameter_names:
 - preparation__non_numeric_pipeline__encoder_chooser__transformer
 test_score_averages:
   roc_auc:
-  - .nan
-  - .nan
-  - .nan
-  - .nan
+  - 0.7053210051130954
+  - 0.7009919354087835
+  - 0.7315742039460401
+  - 0.725827941573415
   - 0.7172893577542624
   - 0.705352666593457
   - 0.7468785765163838
   - 0.7447818280808485
 test_score_standard_deviations:
   roc_auc:
-  - .nan
-  - .nan
-  - .nan
-  - .nan
+  - 0.018781568421315727
+  - 0.01137698083638955
+  - 0.01646438617323482
+  - 0.010675095300441985
   - 0.015740207327694582
   - 0.018421060103165368
   - 0.020821625539795562
@@ -41,52 +41,52 @@ trials:
 - model__max_features: 100
   model__n_estimators: 50
   preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-- model__max_features: auto
+- model__max_features: sqrt
   model__n_estimators: 10
   preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- model__max_features: auto
+- model__max_features: sqrt
   model__n_estimators: 10
   preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
-- model__max_features: auto
+- model__max_features: sqrt
   model__n_estimators: 50
   preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()
-- model__max_features: auto
+- model__max_features: sqrt
   model__n_estimators: 50
   preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()
 timings:
   fit time averages:
-  - 0.006165901819864909
-  - 0.008415460586547852
-  - 0.010739644368489584
-  - 0.013097842534383139
-  - 0.010798931121826172
-  - 0.013202667236328125
-  - 0.03476357460021973
-  - 0.03736742337544759
+  - 0.019355932871500652
+  - 0.018629789352416992
+  - 0.07980895042419434
+  - 0.0647428035736084
+  - 0.010698477427164713
+  - 0.013038158416748047
+  - 0.03522451718648275
+  - 0.037386417388916016
   fit time standard deviations:
-  - 7.226360110422412e-05
-  - 5.4594557605682466e-05
-  - 4.2994890547881785e-05
-  - 0.00010456701727354374
-  - 6.445273420081124e-05
-  - 7.006667334284214e-05
-  - 0.0001709487259549758
-  - 3.318065653911911e-05
+  - 0.0001504200599950097
+  - 0.0002095053211182225
+  - 0.0005221511673335015
+  - 0.00024874885749733765
+  - 6.11447469662877e-05
+  - 0.00014843007097252797
+  - 0.0005381647744453791
+  - 0.000553257937249683
   score time averages:
-  - 0.0
-  - 0.0
-  - 0.0
-  - 0.0
-  - 0.003142833709716797
-  - 0.0049190521240234375
-  - 0.004896084467569987
-  - 0.006687720616658528
+  - 0.003140528996785482
+  - 0.005091031392415364
+  - 0.004973173141479492
+  - 0.006742000579833984
+  - 0.0030175050099690757
+  - 0.0047608216603597
+  - 0.005119482676188151
+  - 0.006791512171427409
   score time standard deviations:
-  - 0.0
-  - 0.0
-  - 0.0
-  - 0.0
-  - 3.945377272307893e-05
-  - 2.6509172743974537e-05
-  - 9.825359205960083e-05
-  - 2.4982303243495306e-05
+  - 0.00015285207475342817
+  - 0.00014577553951622207
+  - 0.00020629394022170545
+  - 0.0001649802589268516
+  - 8.708717048519594e-06
+  - 3.323657230219788e-05
+  - 0.00028965815414163266
+  - 0.00032409766882500826
