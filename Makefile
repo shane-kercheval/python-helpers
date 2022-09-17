@@ -56,14 +56,14 @@ remove_env:
 linting:
 	flake8 --max-line-length 99 --ignore=E127 helpsk
 
-unittest:
+unittests:
 	rm -f tests/test_files/logging/log.log
 	python -m unittest discover tests
 
 doctest:
 	python -m doctest helpsk/text.py
 
-tests: linting unittest doctest	
+tests: linting unittests doctest	
 
 ## Build package
 package: tests clean
