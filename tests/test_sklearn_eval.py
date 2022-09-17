@@ -241,12 +241,12 @@ class TestSklearnEval(unittest.TestCase):
             [
                 '{max_features: sqrt, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
                 '{max_features: sqrt, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
+                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
+                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
                 '{max_features: sqrt, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
                 '{max_features: sqrt, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
                 '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
-                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
-                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
-                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'  # noqa
+                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'  # noqa
             ]
         )
         self.assertEqual(
@@ -551,24 +551,32 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.test_score_rankings, parser_from_dict.test_score_rankings)
         self.assertEqual(parser.test_score_rankings, parser_from_yaml.test_score_rankings)
 
-        self.assertEqual(parser.trial_labels(order_from_best_to_worst=True),
-                         ['{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])  # noqa
-        self.assertEqual(parser.trial_labels(order_from_best_to_worst=False),
-                         ['{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])  # noqa
+        self.assertEqual(
+            parser.trial_labels(order_from_best_to_worst=True),
+            [
+                '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'  # noqa
+            ]
+        )
+        self.assertEqual(
+            parser.trial_labels(order_from_best_to_worst=False),
+            [
+                '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'  # noqa
+            ]
+        )
 
         def assert_np_arrays_are_close(array1, array2):
             self.assertEqual(len(array1), len(array2))
@@ -797,16 +805,24 @@ class TestSklearnEval(unittest.TestCase):
         for score in parser.score_names:
             self.assertTrue(all(np.array(parser.test_score_rankings[score]) == grid_search_housing.cv_results_[f'rank_test_{score}']))  # noqa
 
-        self.assertEqual(parser.trial_labels(order_from_best_to_worst=True),
-                         ['{model__max_features: sqrt, model__n_estimators: 50}',
-                          '{model__max_features: sqrt, model__n_estimators: 10}',
-                          '{model__max_features: 2, model__n_estimators: 50}',
-                          '{model__max_features: 2, model__n_estimators: 10}'])
-        self.assertEqual(parser.trial_labels(order_from_best_to_worst=False),
-                         ['{model__max_features: 2, model__n_estimators: 10}',
-                          '{model__max_features: 2, model__n_estimators: 50}',
-                          '{model__max_features: sqrt, model__n_estimators: 10}',
-                          '{model__max_features: sqrt, model__n_estimators: 50}'])
+        self.assertEqual(
+            parser.trial_labels(order_from_best_to_worst=True),
+            [
+                '{model__max_features: 2, model__n_estimators: 50}',
+                '{model__max_features: sqrt, model__n_estimators: 50}',
+                '{model__max_features: 2, model__n_estimators: 10}',
+                '{model__max_features: sqrt, model__n_estimators: 10}',
+            ]
+        )
+        self.assertEqual(
+            parser.trial_labels(order_from_best_to_worst=False),
+            [
+                '{model__max_features: 2, model__n_estimators: 10}',
+                '{model__max_features: 2, model__n_estimators: 50}',
+                '{model__max_features: sqrt, model__n_estimators: 10}',
+                '{model__max_features: sqrt, model__n_estimators: 50}'
+            ]
+        )
 
         def assert_np_arrays_are_close(array1, array2):
             self.assertEqual(len(array1), len(array2))
