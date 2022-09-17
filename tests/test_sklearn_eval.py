@@ -15,7 +15,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
 
 import helpsk as hlp
-from helpsk.exceptions import HelpskAssertionError
 from helpsk.pandas import print_dataframe
 from helpsk.sklearn_eval import MLExperimentResults, TwoClassEvaluator, RegressionEvaluator
 from helpsk.sklearn_pipeline import CustomOrdinalEncoder
