@@ -27,6 +27,7 @@ dependencies:
   - idna=3.3=pyhd3eb1b0_0
   - importlib-metadata=4.11.3=py39hca03da5_0
   - importlib_metadata=4.11.3=hd3eb1b0_0
+  - jinja2=3.0.3=pyhd3eb1b0_0
   - joblib=1.1.0=pyhd3eb1b0_0
   - jpeg=9e=h1a28f6b_0
   - keyring=23.4.0=py39hca03da5_0
@@ -48,6 +49,7 @@ dependencies:
   - libwebp-base=1.2.2=h1a28f6b_0
   - llvm-openmp=14.0.6=hc6e5704_0
   - lz4-c=1.9.3=hc377ac9_0
+  - markupsafe=2.1.1=py39h1a28f6b_0
   - matplotlib=3.5.2=py39hca03da5_0
   - matplotlib-base=3.5.2=py39hc377ac9_0
   - mccabe=0.7.0=pyhd3eb1b0_0
