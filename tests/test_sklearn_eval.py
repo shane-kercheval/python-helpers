@@ -985,11 +985,12 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.best_score, parser_from_yaml.best_score)
 
     def test_MLExperimentResults_plots(self):
-        new_param_column_names = {'model__max_features': 'max_features',
-                                  'model__n_estimators': 'n_estimators',
-                                  'model__min_samples_split': 'min_samples_split',
-                                  'preparation__non_numeric_pipeline__encoder_chooser__transformer':  # noqa
-                                      'encoder'}
+        new_param_column_names = {
+            'model__max_features': 'max_features',
+            'model__n_estimators': 'n_estimators',
+            'model__min_samples_split': 'min_samples_split',
+            'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'encoder'
+        }
         parser = MLExperimentResults.from_sklearn_search_cv(
             searcher=self.credit_data__grid_search,
             higher_score_is_better=True,
