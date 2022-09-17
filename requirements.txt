@@ -1,9 +1,9 @@
-flake8==4.0.*
-Jinja2==3.0.*
-matplotlib==3.5.*
-numpy==1.22.*
+flake8==5.0.*
+Jinja2==3.1.*
+matplotlib==3.6.*
+numpy==1.23.*
 pandas==1.4.*
-plotly==5.5.*
+plotly==5.10.*
 plotly-express==0.4.*
 psycopg2==2.9.*
 pyarrow==6.0.*
@@ -11,9 +11,9 @@ pypirc==1.0.*
 pytest==7.1.*
 python-dateutil==2.8.*
 PyYAML==6.0
-scikit-learn==1.0.*
+scikit-learn==1.1.*
 scikit-optimize==0.9.*
-scipy==1.8.*
-seaborn==0.11.*
+scipy==1.9.*
+seaborn==0.12.*
 statsmodels==0.13.*
 urllib3==1.26.*
