@@ -189,25 +189,25 @@ class MLExperimentResults:
                             'CustomOrdinalEncoder()'
                     },
                     {
-                        'model__max_features': 'auto',
+                        'model__max_features': 'sqrt',
                         'model__n_estimators': 10,
                         'preparation__non_numeric_pipeline__encoder_chooser__transformer':
                             'OneHotEncoder()'
                     },
                     {
-                        'model__max_features': 'auto',
+                        'model__max_features': 'sqrt',
                         'model__n_estimators': 10,
                         'preparation__non_numeric_pipeline__encoder_chooser__transformer':
                             'CustomOrdinalEncoder()'
                     },
                     {
-                        'model__max_features': 'auto',
+                        'model__max_features': 'sqrt',
                         'model__n_estimators': 50,
                         'preparation__non_numeric_pipeline__encoder_chooser__transformer':
                             'OneHotEncoder()'
                     },
                     {
-                        'model__max_features': 'auto',
+                        'model__max_features': 'sqrt',
                         'model__n_estimators': 50,
                         'preparation__non_numeric_pipeline__encoder_chooser__transformer':
                             'CustomOrdinalEncoder()'

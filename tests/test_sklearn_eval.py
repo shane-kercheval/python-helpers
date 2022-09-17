@@ -72,7 +72,7 @@ class TestSklearnEval(unittest.TestCase):
                     OneHotEncoder(), CustomOrdinalEncoder()
                 ],
                 'model__min_samples_split': [2],  # test zero-variance params
-                'model__max_features': [100, 'auto'],
+                'model__max_features': [100, 'sqrt'],
                 'model__n_estimators': [10, 50],
             },
         ]
@@ -100,7 +100,7 @@ class TestSklearnEval(unittest.TestCase):
                 'preparation__non_numeric_pipeline__encoder_chooser__transformer': [
                     OneHotEncoder(), CustomOrdinalEncoder()
                 ],
-                'model__max_features': [100, 'auto'],
+                'model__max_features': [100, 'sqrt'],
                 'model__n_estimators': [10, 50],
             },
         ]
@@ -141,7 +141,7 @@ class TestSklearnEval(unittest.TestCase):
         ])
         param_grad = [
             {
-                'model__max_features': [2, 'auto'],
+                'model__max_features': [2, 'sqrt'],
                 'model__n_estimators': [10, 50]
             },
         ]
@@ -175,20 +175,23 @@ class TestSklearnEval(unittest.TestCase):
         )
 
     def test_MLExperimentResults_gridsearch_classification(self):
-        new_param_column_names = {'model__max_features': 'max_features',
-                                  'model__n_estimators': 'n_estimators',
-                                  'model__min_samples_split': 'min_samples_split',
-                                  'preparation__non_numeric_pipeline__encoder_chooser__transformer':
-                                      'encoder'}
+        new_param_column_names = {
+            'model__max_features': 'max_features',
+            'model__n_estimators': 'n_estimators',
+            'model__min_samples_split': 'min_samples_split',
+            'preparation__non_numeric_pipeline__encoder_chooser__transformer': 'encoder'
+        }
 
         # test grid search object that has multiple scores (classification)
         # passing in parameter mappings
         grid_search_credit = self.credit_data__grid_search
 
-        parser = MLExperimentResults.from_sklearn_search_cv(searcher=grid_search_credit,
-                                                            higher_score_is_better=True,
-                                                            description="test description",
-                                                            parameter_name_mappings=new_param_column_names)
+        parser = MLExperimentResults.from_sklearn_search_cv(
+            searcher=grid_search_credit,
+            higher_score_is_better=True,
+            description="test description",
+            parameter_name_mappings=new_param_column_names
+        )
 
         yaml_file = get_test_path('sklearn_eval/credit_data__grid_search.yaml')
         os.remove(yaml_file)
@@ -217,8 +220,8 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.score_names, parser_from_dict.score_names)
         self.assertEqual(parser.score_names, parser_from_yaml.score_names)
         self.assertEqual(parser.parameter_names_original, list(new_param_column_names.keys()))
-        self.assertEqual(parser.parameter_names_original, parser_from_dict.parameter_names_original)
-        self.assertEqual(parser.parameter_names_original, parser_from_yaml.parameter_names_original)
+        self.assertEqual(parser.parameter_names_original, parser_from_dict.parameter_names_original)  # noqa
+        self.assertEqual(parser.parameter_names_original, parser_from_yaml.parameter_names_original)  # noqa
         self.assertEqual(parser.parameter_names, list(new_param_column_names.values()))
         self.assertEqual(parser.parameter_names, parser_from_dict.parameter_names)
         self.assertEqual(parser.parameter_names, parser_from_yaml.parameter_names)
@@ -236,27 +239,27 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(
             parser.trial_labels(order_from_best_to_worst=True),
             [
-                '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
-                '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
-                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',
+                '{max_features: sqrt, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
+                '{max_features: sqrt, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
+                '{max_features: sqrt, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
+                '{max_features: sqrt, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
+                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
                 '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
-                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'
+                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
+                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'  # noqa
             ]
         )
         self.assertEqual(
             parser.trial_labels(order_from_best_to_worst=False),
             [
-                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',
+                '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
                 '{max_features: 100, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
-                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',
+                '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
                 '{max_features: 100, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
-                '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: auto, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
-                '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',
-                '{max_features: auto, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'  # noqa
+                '{max_features: sqrt, n_estimators: 10, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
+                '{max_features: sqrt, n_estimators: 10, min_samples_split: 2, encoder: CustomOrdinalEncoder()}',  # noqa
+                '{max_features: sqrt, n_estimators: 50, min_samples_split: 2, encoder: OneHotEncoder()}',  # noqa
+                '{max_features: sqrt, n_estimators: 50, min_samples_split: 2, encoder: CustomOrdinalEncoder()}'  # noqa
              ]
         )
 
@@ -272,10 +275,14 @@ class TestSklearnEval(unittest.TestCase):
 
         assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3]))
         assert_np_arrays_are_close(np.array([1, 2, np.nan]), np.array([1, 2, np.nan]))
-        self.assertRaises(AssertionError,
-                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001])))
-        self.assertRaises(AssertionError,
-                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
+        self.assertRaises(
+            AssertionError,
+            lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001]))
+        )
+        self.assertRaises(
+            AssertionError,
+            lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan]))
+        )
 
         cv_dataframe = parser.to_dataframe(exclude_zero_variance_params=False)
         with redirect_stdout_to_file(get_test_path('sklearn_eval/credit__grid_search__all_scores__dataframe__no_exclude.txt')):  # noqa
@@ -293,41 +300,59 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
         cv_dataframe = parser.to_dataframe().sort_index()
         # ensure the hyper-param columns (now last 3 columns) are in the same order as the mapping
-        self.assertEqual(list(cv_dataframe.columns[-3:]), ['max_features', 'n_estimators', 'encoder'])
+        self.assertEqual(
+            list(cv_dataframe.columns[-3:]),
+            ['max_features', 'n_estimators', 'encoder']
+        )
         self.assertFalse('min_samples_split' in cv_dataframe.columns)
-        assert hlp.validation.dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
+        assert hlp.validation.dataframes_match(
+            [parser.to_dataframe(sort_by_score=False), cv_dataframe]
+        )
 
         labeled_dataframe = parser.to_labeled_dataframe()
-        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
+        self.assertTrue(
+            all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1)))
+        )
         self.assertIsNotNone(labeled_dataframe['label'])
-        assert hlp.validation.dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
-                                                           labeled_dataframe.drop(columns=['Trial Index',
-                                                                                           'label'])])
+        assert hlp.validation.dataframes_match(
+            dataframes=[
+                parser.to_dataframe(sort_by_score=False),
+                labeled_dataframe.drop(columns=['Trial Index', 'label'])
+            ]
+        )
 
-        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
-                                   grid_search_credit.cv_results_[f'mean_test_{parser.score_names[0]}'])
-        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[1]} Mean'],
-                                   grid_search_credit.cv_results_[f'mean_test_{parser.score_names[1]}'])
-        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[2]} Mean'],
-                                   grid_search_credit.cv_results_[f'mean_test_{parser.score_names[2]}'])
-        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[3]} Mean'],
-                                   grid_search_credit.cv_results_[f'mean_test_{parser.score_names[3]}'])
+        assert_np_arrays_are_close(
+            cv_dataframe[f'{parser.score_names[0]} Mean'],
+            grid_search_credit.cv_results_[f'mean_test_{parser.score_names[0]}']
+        )
+        assert_np_arrays_are_close(
+            cv_dataframe[f'{parser.score_names[1]} Mean'],
+            grid_search_credit.cv_results_[f'mean_test_{parser.score_names[1]}']
+        )
+        assert_np_arrays_are_close(
+            cv_dataframe[f'{parser.score_names[2]} Mean'],
+            grid_search_credit.cv_results_[f'mean_test_{parser.score_names[2]}']
+        )
+        assert_np_arrays_are_close(
+            cv_dataframe[f'{parser.score_names[3]} Mean'],
+            grid_search_credit.cv_results_[f'mean_test_{parser.score_names[3]}']
+        )
 
         self.assertEqual(list(grid_search_credit.cv_results_['param_model__max_features'].data),
                          cv_dataframe[parser.parameter_names[0]].tolist())
         self.assertEqual(list(grid_search_credit.cv_results_['param_model__n_estimators'].data),
                          cv_dataframe[parser.parameter_names[1]].tolist())
-        encoder_param_name = 'param_preparation__non_numeric_pipeline__encoder_chooser__transformer'
-        encoder_values = [str(x) for x in list(grid_search_credit.cv_results_[encoder_param_name].data)]
+        encoder_param_name = 'param_preparation__non_numeric_pipeline__encoder_chooser__transformer'  # noqa
+        encoder_values = [str(x) for x in list(grid_search_credit.cv_results_[encoder_param_name].data)]  # noqa
         self.assertEqual(encoder_values, cv_dataframe[parser.parameter_names[3]].tolist())
 
         with open(get_test_path('sklearn_eval/credit__grid_search__all_scores.html'), 'w') as file:
             file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().to_html()))
 
-        with open(get_test_path('sklearn_eval/credit__grid_search__all_scores_2.html'), 'w') as file:
+        with open(get_test_path('sklearn_eval/credit__grid_search__all_scores_2.html'), 'w') as file:  # noqa
             file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(exclude_zero_variance_params=False).to_html()))  # noqa
 
-        with open(get_test_path('sklearn_eval/credit__grid_search__primary_score_only.html'), 'w') as file:
+        with open(get_test_path('sklearn_eval/credit__grid_search__primary_score_only.html'), 'w') as file:  # noqa
             file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).to_html()))  # noqa
 
         assert_np_arrays_are_close(parser.primary_score_averages,
@@ -363,12 +388,18 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(list(parser.test_score_standard_deviations.keys()), parser.score_names)
 
         for score in parser.score_names:
-            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
-                                       grid_search_credit.cv_results_[f'std_test_{score}'])
-            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
-                                       np.array(parser_from_dict.test_score_standard_deviations[score]))
-            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
-                                       np.array(parser_from_yaml.test_score_standard_deviations[score]))
+            assert_np_arrays_are_close(
+                np.array(parser.test_score_standard_deviations[score]),
+                grid_search_credit.cv_results_[f'std_test_{score}']
+            )
+            assert_np_arrays_are_close(
+                np.array(parser.test_score_standard_deviations[score]),
+                np.array(parser_from_dict.test_score_standard_deviations[score])
+            )
+            assert_np_arrays_are_close(
+                np.array(parser.test_score_standard_deviations[score]),
+                np.array(parser_from_yaml.test_score_standard_deviations[score])
+            )
 
         self.assertTrue(isinstance(parser.train_score_averages, dict))
         self.assertEqual(list(parser.train_score_averages.keys()), parser.score_names)
@@ -385,12 +416,18 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(list(parser.train_score_standard_deviations.keys()), parser.score_names)
 
         for score in parser.score_names:
-            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
-                                       grid_search_credit.cv_results_[f'std_train_{score}'])
-            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
-                                       np.array(parser_from_dict.train_score_standard_deviations[score]))
-            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
-                                       np.array(parser_from_yaml.train_score_standard_deviations[score]))
+            assert_np_arrays_are_close(
+                np.array(parser.train_score_standard_deviations[score]),
+                grid_search_credit.cv_results_[f'std_train_{score}']
+            )
+            assert_np_arrays_are_close(
+                np.array(parser.train_score_standard_deviations[score]),
+                np.array(parser_from_dict.train_score_standard_deviations[score])
+            )
+            assert_np_arrays_are_close(
+                np.array(parser.train_score_standard_deviations[score]),
+                np.array(parser_from_yaml.train_score_standard_deviations[score])
+            )
 
         self.assertTrue(isinstance(parser.trials, list))
         self.assertEqual(len(parser.trials), parser.number_of_trials)
@@ -445,7 +482,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.parameter_names,
                          ['max_features', 'n_estimators', 'min_samples_split', 'encoder'])
         self.assertEqual(parser.best_params,
-                         {'max_features': 'auto',
+                         {'max_features': 'sqrt',
                           'n_estimators': 50,
                           'min_samples_split': 2,
                           'encoder': 'OneHotEncoder()'})
@@ -493,8 +530,14 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.parameter_names_original,
                          ['model__max_features', 'model__n_estimators',
                           'preparation__non_numeric_pipeline__encoder_chooser__transformer'])
-        self.assertEqual(parser.parameter_names_original, parser_from_dict.parameter_names_original)
-        self.assertEqual(parser.parameter_names_original, parser_from_yaml.parameter_names_original)
+        self.assertEqual(
+            parser.parameter_names_original,
+            parser_from_dict.parameter_names_original
+        )
+        self.assertEqual(
+            parser.parameter_names_original,
+            parser_from_yaml.parameter_names_original
+        )
         self.assertEqual(parser.parameter_names, parser.parameter_names_original)
         self.assertEqual(parser.parameter_names, parser_from_dict.parameter_names)
         self.assertEqual(parser.parameter_names, parser_from_yaml.parameter_names)
@@ -509,10 +552,10 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.test_score_rankings, parser_from_yaml.test_score_rankings)
 
         self.assertEqual(parser.trial_labels(order_from_best_to_worst=True),
-                         ['{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                         ['{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                          '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
                           '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
                           '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
                           '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
@@ -522,10 +565,10 @@ class TestSklearnEval(unittest.TestCase):
                           '{model__max_features: 100, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
                           '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
                           '{model__max_features: 100, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: auto, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
-                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
-                          '{model__max_features: auto, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])  # noqa
+                          '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: sqrt, model__n_estimators: 10, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}',  # noqa
+                          '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: OneHotEncoder()}',  # noqa
+                          '{model__max_features: sqrt, model__n_estimators: 50, preparation__non_numeric_pipeline__encoder_chooser__transformer: CustomOrdinalEncoder()}'])  # noqa
 
         def assert_np_arrays_are_close(array1, array2):
             self.assertEqual(len(array1), len(array2))
@@ -534,27 +577,36 @@ class TestSklearnEval(unittest.TestCase):
                 both_nan = np.isnan(array1[index]) and np.isnan(array2[index])
                 self.assertTrue(is_close or both_nan)
 
-        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                   grid_search_credit.cv_results_['mean_test_score'])
-        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                   np.array(parser_from_dict.test_score_averages[parser.primary_score_name]))
-        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                   np.array(parser_from_yaml.test_score_averages[parser.primary_score_name]))
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_averages[parser.primary_score_name]),
+            grid_search_credit.cv_results_['mean_test_score']
+        )
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_averages[parser.primary_score_name]),
+            np.array(parser_from_dict.test_score_averages[parser.primary_score_name])
+        )
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_averages[parser.primary_score_name]),
+            np.array(parser_from_yaml.test_score_averages[parser.primary_score_name])
+        )
 
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
         with redirect_stdout_to_file(get_test_path('sklearn_eval/credit__grid_search__single_score__dataframe.txt')):  # noqa
             print_dataframe(parser.to_dataframe())
         cv_dataframe = parser.to_dataframe().sort_index()
-        assert hlp.validation.dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
+        assert hlp.validation.dataframes_match(
+            [parser.to_dataframe(sort_by_score=False), cv_dataframe]
+        )
         assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
                                    grid_search_credit.cv_results_['mean_test_score'])
 
         labeled_dataframe = parser.to_labeled_dataframe()
-        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
+        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))  # noqa
         self.assertIsNotNone(labeled_dataframe['label'])
-        assert hlp.validation.dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
-                                                           labeled_dataframe.drop(columns=['Trial Index',
-                                                                                           'label'])])
+        assert hlp.validation.dataframes_match(dataframes=[
+            parser.to_dataframe(sort_by_score=False),
+            labeled_dataframe.drop(columns=['Trial Index', 'label'])
+        ])
 
         self.assertEqual(list(grid_search_credit.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())  # noqa
         self.assertEqual(list(grid_search_credit.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())  # noqa
@@ -573,10 +625,14 @@ class TestSklearnEval(unittest.TestCase):
 
         assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3]))
         assert_np_arrays_are_close(np.array([1, 2, np.nan]), np.array([1, 2, np.nan]))
-        self.assertRaises(AssertionError,
-                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001])))
-        self.assertRaises(AssertionError,
-                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
+        self.assertRaises(
+            AssertionError,
+            lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001]))
+        )
+        self.assertRaises(
+            AssertionError,
+            lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan]))
+        )
 
         assert_np_arrays_are_close(parser.primary_score_averages,
                                    np.array(parser.test_score_averages[parser.primary_score_name]))
@@ -593,25 +649,40 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.numeric_parameters, ['model__n_estimators'])
         self.assertEqual(
             parser.non_numeric_parameters,
-            ['model__max_features', 'preparation__non_numeric_pipeline__encoder_chooser__transformer']
+            [
+                'model__max_features',
+                'preparation__non_numeric_pipeline__encoder_chooser__transformer'
+            ]
         )
 
-        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                   grid_search_credit.cv_results_['mean_test_score'])
-        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                   np.array(parser_from_dict.test_score_averages[parser.primary_score_name]))
-        assert_np_arrays_are_close(np.array(parser.test_score_averages[parser.primary_score_name]),
-                                   np.array(parser_from_yaml.test_score_averages[parser.primary_score_name]))
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_averages[parser.primary_score_name]),
+            grid_search_credit.cv_results_['mean_test_score']
+        )
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_averages[parser.primary_score_name]),
+            np.array(parser_from_dict.test_score_averages[parser.primary_score_name])
+        )
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_averages[parser.primary_score_name]),
+            np.array(parser_from_yaml.test_score_averages[parser.primary_score_name])
+        )
 
         self.assertTrue(isinstance(parser.test_score_standard_deviations, dict))
         self.assertEqual(list(parser.test_score_standard_deviations.keys()), parser.score_names)
 
-        assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
-                                   grid_search_credit.cv_results_['std_test_score'])
-        assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
-                                   np.array(parser_from_dict.test_score_standard_deviations[parser.primary_score_name]))  # noqa
-        assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
-                                   np.array(parser_from_yaml.test_score_standard_deviations[parser.primary_score_name]))  # noqa
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
+            grid_search_credit.cv_results_['std_test_score']
+        )
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
+            np.array(parser_from_dict.test_score_standard_deviations[parser.primary_score_name])
+        )
+        assert_np_arrays_are_close(
+            np.array(parser.test_score_standard_deviations[parser.primary_score_name]),
+            np.array(parser_from_yaml.test_score_standard_deviations[parser.primary_score_name])
+        )
 
         self.assertIsNone(parser.train_score_averages)
         self.assertIsNone(parser.train_score_standard_deviations)
@@ -710,8 +781,8 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.score_names, parser_from_dict.score_names)
         self.assertEqual(parser.score_names, parser_from_yaml.score_names)
 
-        self.assertEqual(parser.parameter_names_original, parser_from_dict.parameter_names_original)
-        self.assertEqual(parser.parameter_names_original, parser_from_yaml.parameter_names_original)
+        self.assertEqual(parser.parameter_names_original, parser_from_dict.parameter_names_original)  # noqa
+        self.assertEqual(parser.parameter_names_original, parser_from_yaml.parameter_names_original)  # noqa
         self.assertEqual(parser.parameter_names, parser.parameter_names_original)
         self.assertEqual(parser.parameter_names, parser_from_dict.parameter_names)
         self.assertEqual(parser.parameter_names, parser_from_yaml.parameter_names)
@@ -727,15 +798,15 @@ class TestSklearnEval(unittest.TestCase):
             self.assertTrue(all(np.array(parser.test_score_rankings[score]) == grid_search_housing.cv_results_[f'rank_test_{score}']))  # noqa
 
         self.assertEqual(parser.trial_labels(order_from_best_to_worst=True),
-                         ['{model__max_features: auto, model__n_estimators: 50}',
-                          '{model__max_features: auto, model__n_estimators: 10}',
+                         ['{model__max_features: sqrt, model__n_estimators: 50}',
+                          '{model__max_features: sqrt, model__n_estimators: 10}',
                           '{model__max_features: 2, model__n_estimators: 50}',
                           '{model__max_features: 2, model__n_estimators: 10}'])
         self.assertEqual(parser.trial_labels(order_from_best_to_worst=False),
                          ['{model__max_features: 2, model__n_estimators: 10}',
                           '{model__max_features: 2, model__n_estimators: 50}',
-                          '{model__max_features: auto, model__n_estimators: 10}',
-                          '{model__max_features: auto, model__n_estimators: 50}'])
+                          '{model__max_features: sqrt, model__n_estimators: 10}',
+                          '{model__max_features: sqrt, model__n_estimators: 50}'])
 
         def assert_np_arrays_are_close(array1, array2):
             self.assertEqual(len(array1), len(array2))
@@ -749,35 +820,44 @@ class TestSklearnEval(unittest.TestCase):
 
         assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3]))
         assert_np_arrays_are_close(np.array([1, 2, np.nan]), np.array([1, 2, np.nan]))
-        self.assertRaises(AssertionError,
-                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001])))
-        self.assertRaises(AssertionError,
-                          lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan])))
+        self.assertRaises(
+            AssertionError,
+            lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, 3.001]))
+        )
+        self.assertRaises(
+            AssertionError,
+            lambda: assert_np_arrays_are_close(np.array([1, 2, 3]), np.array([1, 2, np.nan]))
+        )
 
         self.assertEqual(list(parser.best_trial_indexes), list(parser.to_dataframe().index))
-        with redirect_stdout_to_file(get_test_path('sklearn_eval/housing__grid_search__dataframe.txt')):
+        with redirect_stdout_to_file(get_test_path('sklearn_eval/housing__grid_search__dataframe.txt')):  # noqa
             print_dataframe(parser.to_dataframe())
         cv_dataframe = parser.to_dataframe().sort_index()
-        assert hlp.validation.dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])
-        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[0]} Mean'],
-                                   grid_search_housing.cv_results_[f'mean_test_{parser.score_names[0]}'] * -1)
-        assert_np_arrays_are_close(cv_dataframe[f'{parser.score_names[1]} Mean'],
-                                   grid_search_housing.cv_results_[f'mean_test_{parser.score_names[1]}'] * -1)
+        assert hlp.validation.dataframes_match([parser.to_dataframe(sort_by_score=False), cv_dataframe])  # noqa
+        assert_np_arrays_are_close(
+            cv_dataframe[f'{parser.score_names[0]} Mean'],
+            grid_search_housing.cv_results_[f'mean_test_{parser.score_names[0]}'] * -1
+        )
+        assert_np_arrays_are_close(
+            cv_dataframe[f'{parser.score_names[1]} Mean'],
+            grid_search_housing.cv_results_[f'mean_test_{parser.score_names[1]}'] * -1
+        )
 
         labeled_dataframe = parser.to_labeled_dataframe()
-        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))
+        self.assertTrue(all(labeled_dataframe['Trial Index'] == list(range(1, parser.number_of_trials + 1))))  # noqa
         self.assertIsNotNone(labeled_dataframe['label'])
-        assert hlp.validation.dataframes_match(dataframes=[parser.to_dataframe(sort_by_score=False),
-                                                           labeled_dataframe.drop(columns=['Trial Index',
-                                                                                           'label'])])
+        assert hlp.validation.dataframes_match(dataframes=[
+            parser.to_dataframe(sort_by_score=False),
+            labeled_dataframe.drop(columns=['Trial Index', 'label'])
+        ])
 
         self.assertEqual(list(grid_search_housing.cv_results_['param_model__max_features'].data), cv_dataframe[parser.parameter_names[0]].tolist())  # noqa
         self.assertEqual(list(grid_search_housing.cv_results_['param_model__n_estimators'].data), cv_dataframe[parser.parameter_names[1]].tolist())  # noqa
 
-        with open(get_test_path('sklearn_eval/housing__grid_search__all_scores.html'), 'w') as file:
+        with open(get_test_path('sklearn_eval/housing__grid_search__all_scores.html'), 'w') as file:  # noqa
             file.write(clean_formatted_dataframe(parser.to_formatted_dataframe().to_html()))
 
-        with open(get_test_path('sklearn_eval/housing__grid_search__primary_score_only.html'), 'w') as file:
+        with open(get_test_path('sklearn_eval/housing__grid_search__primary_score_only.html'), 'w') as file:  # noqa
             file.write(clean_formatted_dataframe(parser.to_formatted_dataframe(primary_score_only=True).to_html()))  # noqa
 
         self.assertTrue(isinstance(parser.test_score_averages, dict))
@@ -812,12 +892,18 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(list(parser.test_score_standard_deviations.keys()), parser.score_names)
 
         for score in parser.score_names:
-            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
-                                       grid_search_housing.cv_results_[f'std_test_{score}'])
-            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
-                                       np.array(parser_from_dict.test_score_standard_deviations[score]))
-            assert_np_arrays_are_close(np.array(parser.test_score_standard_deviations[score]),
-                                       np.array(parser_from_yaml.test_score_standard_deviations[score]))
+            assert_np_arrays_are_close(
+                np.array(parser.test_score_standard_deviations[score]),
+                grid_search_housing.cv_results_[f'std_test_{score}']
+            )
+            assert_np_arrays_are_close(
+                np.array(parser.test_score_standard_deviations[score]),
+                np.array(parser_from_dict.test_score_standard_deviations[score])
+            )
+            assert_np_arrays_are_close(
+                np.array(parser.test_score_standard_deviations[score]),
+                np.array(parser_from_yaml.test_score_standard_deviations[score])
+            )
 
         self.assertTrue(isinstance(parser.train_score_averages, dict))
         self.assertEqual(list(parser.train_score_averages.keys()), parser.score_names)
@@ -834,12 +920,18 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(list(parser.train_score_standard_deviations.keys()), parser.score_names)
 
         for score in parser.score_names:
-            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
-                                       grid_search_housing.cv_results_[f'std_train_{score}'])
-            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
-                                       np.array(parser_from_dict.train_score_standard_deviations[score]))
-            assert_np_arrays_are_close(np.array(parser.train_score_standard_deviations[score]),
-                                       np.array(parser_from_yaml.train_score_standard_deviations[score]))
+            assert_np_arrays_are_close(
+                np.array(parser.train_score_standard_deviations[score]),
+                grid_search_housing.cv_results_[f'std_train_{score}']
+            )
+            assert_np_arrays_are_close(
+                np.array(parser.train_score_standard_deviations[score]),
+                np.array(parser_from_dict.train_score_standard_deviations[score])
+            )
+            assert_np_arrays_are_close(
+                np.array(parser.train_score_standard_deviations[score]),
+                np.array(parser_from_yaml.train_score_standard_deviations[score])
+            )
 
         self.assertTrue(isinstance(parser.trials, list))
         self.assertEqual(len(parser.trials), parser.number_of_trials)
@@ -896,29 +988,35 @@ class TestSklearnEval(unittest.TestCase):
         new_param_column_names = {'model__max_features': 'max_features',
                                   'model__n_estimators': 'n_estimators',
                                   'model__min_samples_split': 'min_samples_split',
-                                  'preparation__non_numeric_pipeline__encoder_chooser__transformer':
+                                  'preparation__non_numeric_pipeline__encoder_chooser__transformer':  # noqa
                                       'encoder'}
-        parser = MLExperimentResults.from_sklearn_search_cv(searcher=self.credit_data__grid_search,
-                                                            higher_score_is_better=True,
-                                                            description="test description",
-                                                            parameter_name_mappings=new_param_column_names)
+        parser = MLExperimentResults.from_sklearn_search_cv(
+            searcher=self.credit_data__grid_search,
+            higher_score_is_better=True,
+            description="test description",
+            parameter_name_mappings=new_param_column_names
+        )
         _ = parser.plot_performance_across_trials()
         _ = parser.plot_parameter_values_across_trials()
         _ = parser.plot_parallel_coordinates()
         _ = parser.plot_scatter_matrix()
 
-        parser = MLExperimentResults.from_sklearn_search_cv(searcher=self.credit_data__grid_search__roc_auc,
-                                                            higher_score_is_better=True,
-                                                            description="test description",
-                                                            parameter_name_mappings=None)
+        parser = MLExperimentResults.from_sklearn_search_cv(
+            searcher=self.credit_data__grid_search__roc_auc,
+            higher_score_is_better=True,
+            description="test description",
+            parameter_name_mappings=None
+        )
         _ = parser.plot_performance_across_trials()
         _ = parser.plot_parameter_values_across_trials()
         _ = parser.plot_parallel_coordinates()
         _ = parser.plot_scatter_matrix()
 
-        parser = MLExperimentResults.from_sklearn_search_cv(searcher=self.housing_data__grid_search,
-                                                            higher_score_is_better=False,
-                                                            description="test description")
+        parser = MLExperimentResults.from_sklearn_search_cv(
+            searcher=self.housing_data__grid_search,
+            higher_score_is_better=False,
+            description="test description"
+        )
         _ = parser.plot_performance_across_trials()
         _ = parser.plot_parameter_values_across_trials()
         _ = parser.plot_parallel_coordinates()
@@ -927,10 +1025,10 @@ class TestSklearnEval(unittest.TestCase):
     def test_MLExperimentResults_gridsearch_regression_single_score(self):
         ####
         # set up grid-search on regression model for housing data
-        # this will have the same search parameters as the self.housing_data__grid_search in the setUpClass,
-        # except a single score (rmse, which is the same primary score as the other) rather than multiple
-        # scores therefore, most of the values (e.g. best_score, best_params, should be the same between the
-        # two objects)
+        # this will have the same search parameters as the self.housing_data__grid_search in the
+        # setUpClass, except a single score (rmse, which is the same primary score as the other)
+        # rather than multiple scores therefore, most of the values (e.g. best_score, best_params,
+        # should be the same between the two objects)
         ####
         housing_data = get_data_housing()
         housing_data.loc[0:46, ['median_income']] = np.nan
@@ -950,7 +1048,7 @@ class TestSklearnEval(unittest.TestCase):
         ])
         param_grad = [
             {
-                'model__max_features': [2, 'auto'],
+                'model__max_features': [2, 'sqrt'],
                 'model__n_estimators': [10, 50]
             },
         ]
@@ -978,10 +1076,10 @@ class TestSklearnEval(unittest.TestCase):
         )
         self.assertEqual(results_multi_score.best_score, results_single_score.best_score)
         self.assertEqual(results_multi_score.best_params, results_single_score.best_params)
-        self.assertEqual(results_multi_score.best_score_index, results_single_score.best_score_index)
+        self.assertEqual(results_multi_score.best_score_index, results_single_score.best_score_index)  # noqa
         self.assertEqual(list(results_multi_score.best_trial_indexes), list(results_single_score.best_trial_indexes))  # noqa
-        self.assertEqual(list(results_multi_score.trial_rankings), list(results_single_score.trial_rankings))
-        self.assertEqual(results_multi_score.best_standard_error, results_single_score.best_standard_error)
+        self.assertEqual(list(results_multi_score.trial_rankings), list(results_single_score.trial_rankings))  # noqa
+        self.assertEqual(results_multi_score.best_standard_error, results_single_score.best_standard_error)  # noqa
         self.assertEqual(results_multi_score.parameter_names, results_single_score.parameter_names)
         self.assertEqual(results_multi_score.parameter_names_original, results_single_score.parameter_names_original)  # noqa
         self.assertEqual(results_multi_score.parameter_names_mapping, results_single_score.parameter_names_mapping)  # noqa
@@ -989,14 +1087,14 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(results_multi_score.test_score_averages['RMSE'],
                          results_single_score.test_score_averages['neg_root_mean_squared_error'])
         self.assertEqual(results_multi_score.test_score_standard_deviations['RMSE'],
-                         results_single_score.test_score_standard_deviations['neg_root_mean_squared_error'])
+                         results_single_score.test_score_standard_deviations['neg_root_mean_squared_error'])  # noqa
         self.assertEqual(results_multi_score.test_score_rankings['RMSE'],
                          results_single_score.test_score_rankings['neg_root_mean_squared_error'])
 
         self.assertEqual(results_multi_score.train_score_averages['RMSE'],
                          results_single_score.train_score_averages['neg_root_mean_squared_error'])
         self.assertEqual(results_multi_score.train_score_standard_deviations['RMSE'],
-                         results_single_score.train_score_standard_deviations['neg_root_mean_squared_error'])
+                         results_single_score.train_score_standard_deviations['neg_root_mean_squared_error'])  # noqa
 
         self.assertTrue(all(results_multi_score.primary_score_averages == results_single_score.primary_score_averages))  # noqa
 
@@ -1024,21 +1122,21 @@ class TestSklearnEval(unittest.TestCase):
         self.assertTrue(evaluator.true_positive_rate == evaluator.sensitivity == evaluator.recall)
         self.assertEqual(evaluator.recall, recall_score(y_true=y_true, y_pred=y_pred))
         self.assertEqual(evaluator.true_negative_rate, evaluator.specificity)
-        self.assertEqual(round(evaluator.false_positive_rate, 9), round(1 - evaluator.specificity, 9))
+        self.assertEqual(round(evaluator.false_positive_rate, 9), round(1 - evaluator.specificity, 9))  # noqa
         self.assertEqual(evaluator.positive_predictive_value, evaluator.precision)
         self.assertEqual(evaluator.precision, precision_score(y_true=y_true, y_pred=y_pred))
         self.assertEqual(evaluator.f1_score, f1_score(y_true=y_true, y_pred=y_pred))
         self.assertEqual(evaluator.auc, roc_auc_score(y_true=y_true, y_score=y_score))
-        self.assertEqual(evaluator.fbeta_score(beta=0), fbeta_score(y_true=y_true, y_pred=y_pred, beta=0))
-        self.assertEqual(evaluator.fbeta_score(beta=1), fbeta_score(y_true=y_true, y_pred=y_pred, beta=1))
+        self.assertEqual(evaluator.fbeta_score(beta=0), fbeta_score(y_true=y_true, y_pred=y_pred, beta=0))  # noqa
+        self.assertEqual(evaluator.fbeta_score(beta=1), fbeta_score(y_true=y_true, y_pred=y_pred, beta=1))  # noqa
         self.assertEqual(evaluator.fbeta_score(beta=1), evaluator.f1_score)
-        self.assertEqual(evaluator.fbeta_score(beta=2), fbeta_score(y_true=y_true, y_pred=y_pred, beta=2))
-        self.assertEqual(round(evaluator.kappa, 9), round(cohen_kappa_score(y1=y_true, y2=y_pred), 9))
+        self.assertEqual(evaluator.fbeta_score(beta=2), fbeta_score(y_true=y_true, y_pred=y_pred, beta=2))  # noqa
+        self.assertEqual(round(evaluator.kappa, 9), round(cohen_kappa_score(y1=y_true, y2=y_pred), 9))  # noqa
 
         helper_test_dataframe(file_name=get_test_path('sklearn_eval/get_auc_curve_dataframe.txt'),
                               dataframe=evaluator._get_auc_curve_dataframe())
 
-        helper_test_dataframe(file_name=get_test_path('sklearn_eval/get_threshold_curve_dataframe.txt'),
+        helper_test_dataframe(file_name=get_test_path('sklearn_eval/get_threshold_curve_dataframe.txt'),  # noqa
                               dataframe=evaluator._get_threshold_curve_dataframe())
 
         check_plot(file_name=get_test_path('sklearn_eval/plot_predicted_scores_histogram.png'),
@@ -1072,10 +1170,10 @@ class TestSklearnEval(unittest.TestCase):
             file.write(clean_formatted_dataframe(table_html))
 
         with open(get_test_path('sklearn_eval/all_metrics_df__with_details.html'), 'w') as file:
-            table_html = evaluator.all_metrics_df(return_explanations=True, return_style=True).to_html()
+            table_html = evaluator.all_metrics_df(return_explanations=True, return_style=True).to_html()  # noqa
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path('sklearn_eval/all_metrics_df__with_details__round_3.html'), 'w') as file:
+        with open(get_test_path('sklearn_eval/all_metrics_df__with_details__round_3.html'), 'w') as file:  # noqa
             table_html = evaluator.all_metrics_df(return_explanations=True,
                                                   return_style=True,
                                                   round_by=3).to_html()
@@ -1104,12 +1202,12 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(evaluator.total_observations, len(self.housing_data__y_test))
         self.assertIsInstance(evaluator.all_metrics, dict)
         self.assertIsInstance(evaluator.all_metrics_df(), pd.DataFrame)
-        
+
         evaluator = RegressionEvaluator(
             actual_values=self.housing_data__y_test,
             predicted_values=self.housing_data__y_predictions
         )
-        
+
         self.assertEqual(evaluator.mean_absolute_error,
                          mean_absolute_error(y_true=self.housing_data__y_test,
                                              y_pred=self.housing_data__y_predictions))
@@ -1131,16 +1229,16 @@ class TestSklearnEval(unittest.TestCase):
                                                   dummy_regressor_strategy='mean').to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__dummies.html'), 'w') as file:
+        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__dummies.html'), 'w') as file:  # noqa
             table_html = evaluator.all_metrics_df(return_style=True,
-                                                  dummy_regressor_strategy=['mean', 'median']).to_html()
+                                                  dummy_regressor_strategy=['mean', 'median']).to_html()  # noqa
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__round_3.html'), 'w') as file:
+        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__round_3.html'), 'w') as file:  # noqa
             table_html = evaluator.all_metrics_df(return_style=True, round_by=3).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
-        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__round_0.html'), 'w') as file:
+        with open(get_test_path('sklearn_eval/reg_eval__all_metrics_df__round_0.html'), 'w') as file:  # noqa
             table_html = evaluator.all_metrics_df(return_style=True, round_by=0).to_html()
             file.write(clean_formatted_dataframe(table_html))
 
@@ -1150,7 +1248,7 @@ class TestSklearnEval(unittest.TestCase):
         check_plot(file_name=get_test_path('sklearn_eval/reg_eval__plot_residuals_vs_actuals.png'),
                    plot_function=lambda: evaluator.plot_residuals_vs_actuals())
 
-        check_plot(file_name=get_test_path('sklearn_eval/reg_eval__plot_predictions_vs_actuals.png'),
+        check_plot(file_name=get_test_path('sklearn_eval/reg_eval__plot_predictions_vs_actuals.png'),  # noqa
                    plot_function=lambda: evaluator.plot_predictions_vs_actuals())
 
     def test_plot_confusion_matrix(self):
@@ -1181,7 +1279,7 @@ class TestSklearnEval(unittest.TestCase):
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path('sklearn_eval/plot_precision_recall_auc_curve.png'),
-                   plot_function=lambda: evaluator.plot_precision_recall_auc_curve(return_plotly=False))
+                   plot_function=lambda: evaluator.plot_precision_recall_auc_curve(return_plotly=False))  # noqa
 
     def test_plot_threshold_curves(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
@@ -1201,7 +1299,7 @@ class TestSklearnEval(unittest.TestCase):
                                       score_threshold=0.5)
 
         check_plot(file_name=get_test_path('sklearn_eval/plot_precision_recall_tradeoff.png'),
-                   plot_function=lambda: evaluator.plot_precision_recall_tradeoff(return_plotly=False))
+                   plot_function=lambda: evaluator.plot_precision_recall_tradeoff(return_plotly=False))  # noqa
 
     def test_calculate_lift_gain(self):
         evaluator = TwoClassEvaluator(actual_values=self.credit_data__y_test,
@@ -1213,7 +1311,7 @@ class TestSklearnEval(unittest.TestCase):
         helper_test_dataframe(file_name=get_test_path('sklearn_eval/calculate_lift_gain.txt'),
                               dataframe=evaluator.calculate_lift_gain())
 
-        helper_test_dataframe(file_name=get_test_path('sklearn_eval/calculate_lift_gain__10_buckets.txt'),
+        helper_test_dataframe(file_name=get_test_path('sklearn_eval/calculate_lift_gain__10_buckets.txt'),  # noqa
                               dataframe=evaluator.calculate_lift_gain(num_buckets=10))
 
         with open(get_test_path('sklearn_eval/calculate_lift_gain.html'), 'w') as file:
