@@ -1,5 +1,8 @@
 .PHONY: tests
 
+####
+# docker commands
+####
 docker_build:
 	cp ~/.pypirc ./.pypirc
 	docker compose -f docker-compose.yml build
@@ -26,6 +29,19 @@ docker_package:
 	docker compose run --no-deps --entrypoint "make package" bash
 
 all: docker_build docker_tests, docker_package
+
+####
+# Conda
+####
+# conda activate python_helpers
+env:
+	conda env create -f environment.yml
+
+export_env:
+	conda env export > environment.yml	
+
+remove_env:
+	conda env remove -n $(conda_env_name)
 
 # commands to run inside docker container
 linting:
