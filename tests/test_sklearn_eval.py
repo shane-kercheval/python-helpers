@@ -988,9 +988,9 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(parser.primary_score_name, parser_from_yaml.primary_score_name)
 
         self.assertTrue(all(parser.trial_rankings == grid_search_housing.cv_results_['rank_test_RMSE']))  # noqa
-        self.assertEqual(parser.best_score_index, 3)
+        self.assertEqual(parser.best_score_index, 1)
         self.assertEqual(parser.best_score,
-                         grid_search_housing.cv_results_['mean_test_RMSE'][3] * -1)
+                         grid_search_housing.cv_results_['mean_test_RMSE'][1] * -1)
         self.assertEqual(parser.best_score,
                          np.nanmin(grid_search_housing.cv_results_['mean_test_RMSE'] * -1))
 
