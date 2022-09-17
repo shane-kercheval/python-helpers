@@ -32,6 +32,7 @@ dependencies:
   - jpeg=9e=h1a28f6b_0
   - keyring=23.4.0=py39hca03da5_0
   - kiwisolver=1.4.2=py39hc377ac9_0
+  - krb5=1.19.2=h3b8d789_0
   - lcms2=2.12=hba8e193_0
   - lerc=3.0=hc377ac9_0
   - libbrotlicommon=1.0.9=h1a28f6b_7
@@ -39,11 +40,13 @@ dependencies:
   - libbrotlienc=1.0.9=h1a28f6b_7
   - libcxx=14.0.6=h848a8c0_0
   - libdeflate=1.8=h1a28f6b_5
+  - libedit=3.1.20210910=h1a28f6b_0
   - libffi=3.4.2=hc377ac9_4
   - libgfortran=5.0.0=11_2_0_he6877d6_26
   - libgfortran5=11.2.0=he6877d6_26
   - libopenblas=0.3.20=hea475bc_0
   - libpng=1.6.37=hb8d0fd4_0
+  - libpq=12.9=h65cfe13_3
   - libtiff=4.4.0=had003b8_0
   - libwebp=1.2.2=h68602c7_0
   - libwebp-base=1.2.2=h1a28f6b_0
@@ -67,6 +70,7 @@ dependencies:
   - pkginfo=1.8.2=pyhd3eb1b0_0
   - plotly=5.9.0=py39hca03da5_0
   - plotly_express=0.4.1=py_0
+  - psycopg2=2.8.6=py39hf27765b_2
   - pycodestyle=2.8.0=pyhd3eb1b0_0
   - pycparser=2.21=pyhd3eb1b0_0
   - pyflakes=2.4.0=pyhd3eb1b0_0
