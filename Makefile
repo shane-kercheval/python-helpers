@@ -31,7 +31,7 @@ docker_package:
 all: docker_build docker_tests, docker_package
 
 ####
-# Conda
+# conda commands
 ####
 # conda activate python_helpers
 env:
@@ -43,6 +43,9 @@ export_env:
 remove_env:
 	conda env remove -n $(conda_env_name)
 
+####
+# project commands
+####
 # commands to run inside docker container
 linting:
 	flake8 --max-line-length 99 --ignore=E127 helpsk
