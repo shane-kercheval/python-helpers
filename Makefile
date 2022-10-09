@@ -58,7 +58,7 @@ linting:
 
 unittests:
 	rm -f tests/test_files/logging/log.log
-	python -m unittest discover tests
+	python -m pytest tests
 
 doctest:
 	python -m doctest helpsk/text.py

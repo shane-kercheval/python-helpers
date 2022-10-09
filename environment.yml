@@ -7,6 +7,7 @@ dependencies:
   - abseil-cpp=20211102.0=hdf3f5d2_2
   - arrow-cpp=8.0.0=py39h92c3599_0
   - asn1crypto=1.5.1=pyhd8ed1ab_0
+  - attrs=21.4.0=pyhd3eb1b0_0
   - aws-c-common=0.6.8=h1a28f6b_0
   - aws-c-event-stream=0.1.6=hc377ac9_5
   - aws-checksums=0.1.11=h1a28f6b_1
@@ -20,8 +21,8 @@ dependencies:
   - brotlipy=0.7.0=py39h1a28f6b_1002
   - bzip2=1.0.8=h3422bc3_4
   - c-ares=1.18.1=h3422bc3_0
-  - ca-certificates=2022.9.14=h4653dfc_0
-  - certifi=2022.9.14=pyhd8ed1ab_0
+  - ca-certificates=2022.07.19=hca03da5_0
+  - certifi=2022.9.24=py39hca03da5_0
   - cffi=1.15.1=py39h22df2f2_0
   - charset-normalizer=2.0.4=pyhd3eb1b0_0
   - cmarkgfm=0.4.2=py39h1a28f6b_0
@@ -44,6 +45,7 @@ dependencies:
   - idna=3.3=pyhd3eb1b0_0
   - importlib-metadata=4.11.3=py39hca03da5_0
   - importlib_metadata=4.11.3=hd3eb1b0_0
+  - iniconfig=1.1.1=pyhd3eb1b0_0
   - jinja2=3.0.3=pyhd3eb1b0_0
   - joblib=1.1.0=pyhd3eb1b0_0
   - jpeg=9e=h1a28f6b_0
@@ -87,7 +89,7 @@ dependencies:
   - numexpr=2.8.3=py39h144ceef_0
   - numpy=1.21.5=py39h42add53_3
   - numpy-base=1.21.5=py39hadd41eb_3
-  - openssl=1.1.1q=ha287fd2_0
+  - openssl=1.1.1q=h1a28f6b_0
   - orc=1.7.4=hb613a79_0
   - oscrypto=1.2.1=pyhd3deb0d_0
   - packaging=21.3=pyhd3eb1b0_0
@@ -98,7 +100,9 @@ dependencies:
   - pkginfo=1.8.2=pyhd3eb1b0_0
   - plotly=5.9.0=py39hca03da5_0
   - plotly_express=0.4.1=py_0
+  - pluggy=1.0.0=py39hca03da5_1
   - psycopg2=2.8.6=py39hf27765b_2
+  - py=1.11.0=pyhd3eb1b0_0
   - pyarrow=8.0.0=py39hd776c02_0
   - pycodestyle=2.8.0=pyhd3eb1b0_0
   - pycparser=2.21=pyhd3eb1b0_0
@@ -109,6 +113,7 @@ dependencies:
   - pyopenssl=22.0.0=pyhd3eb1b0_0
   - pyparsing=3.0.9=py39hca03da5_0
   - pysocks=1.7.1=py39hca03da5_0
+  - pytest=7.1.2=py39hca03da5_0
   - python=3.9.13=hbdb9e5c_1
   - python-dateutil=2.8.2=pyhd3eb1b0_0
   - python_abi=3.9=2_cp39
@@ -132,6 +137,7 @@ dependencies:
   - tenacity=8.0.1=py39hca03da5_1
   - threadpoolctl=2.2.0=pyh0d69192_0
   - tk=8.6.12=hb8d0fd4_0
+  - tomli=2.0.1=py39hca03da5_0
   - tornado=6.2=py39h1a28f6b_0
   - tqdm=4.64.0=py39hca03da5_0
   - twine=3.7.1=pyhd3eb1b0_0
