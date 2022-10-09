@@ -192,8 +192,8 @@ class Snowflake(Database):
     def insert_records(self,
                        dataframe: pd.DataFrame,
                        table: str,
-                       create_table: bool = True,
-                       overwrite: bool = True,
+                       create_table: bool = False,
+                       overwrite: bool = False,
                        schema: str = None,
                        database: str = None):
         """
@@ -253,3 +253,51 @@ class Snowflake(Database):
             table_name=table.upper()
         )
         return success, num_rows
+
+
+class Sqlite(Database):
+
+    @property
+    def _connection_string(self) -> str:
+        return f"sqlite:///{self._kwargs['path']}"
+
+    def _open_connection_object(self) -> ConnectionObject:
+        from sqlalchemy import create_engine
+        engine = create_engine(self._connection_string)
+        return engine.connect()
+
+    def _close_connection_object(self):
+        self.connection_object.close()
+
+    def _query(self, sql: str) -> pd.DataFrame:
+        return pd.read_sql(sql, self.connection_object)
+
+    def execute_statement(self, statement: str):
+        self.connection_object.execute(statement)
+
+    def insert_records(self,
+                       dataframe: pd.DataFrame,
+                       table: str,
+                       create_table: bool = False,
+                       overwrite: bool = False,
+                       schema: str = None,
+                       database: str = None):
+        # if_exists{‘fail’, ‘replace’, ‘append’}, default ‘fail’
+        #     How to behave if the table already exists.
+        #     fail: Raise a ValueError.
+        #     replace: Drop the table before inserting new values.
+        #     append: Insert new values to the existing table.
+        if create_table:
+            if_exists = 'fail'
+        elif overwrite:
+            if_exists = 'replace'
+        else:
+            if_exists = 'append'
+
+        _ = dataframe.to_sql(
+            name=table,
+            con=self.connection_object,
+            schema=schema,
+            if_exists=if_exists,
+            index=False
+        )

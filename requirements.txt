@@ -17,3 +17,4 @@ scipy==1.9.*
 seaborn==0.12.*
 statsmodels==0.13.*
 urllib3==1.26.*
+sqlalchemy
