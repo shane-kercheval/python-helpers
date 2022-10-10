@@ -257,7 +257,7 @@ class Sqlite(Database):
     """
     Wraps logic for connecting to Redshift and querying.
 
-        with Sqlite('/path/to/sqlite.db') as db:
+        with Sqlite(path='/path/to/sqlite.db') as db:
             db.query("SELECT * FROM table LIMIT 100")
     """
 
