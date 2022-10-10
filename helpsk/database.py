@@ -19,7 +19,8 @@ from helpsk.database_base import Database, ConnectionObject
 
 
 class Redshift(Database):
-    """Wraps logic for connecting to Redshift and querying.
+    """
+    Wraps logic for connecting to Redshift and querying.
 
     Example:
         Given redshift.config with contents:
@@ -45,14 +46,12 @@ class Redshift(Database):
         return ' '.join(f"{k}={v}" for k, v in self._kwargs.items())
 
     def _open_connection_object(self) -> ConnectionObject:
-        """Wraps logic for connecting to redshift
-        """
+        """Wraps logic for connecting to redshift"""
         from psycopg2 import connect
         return connect(self._connection_string)
 
     def _close_connection_object(self):
-        """Wraps logic for closing the connection to redshift
-        """
+        """Wraps logic for closing the connection to redshift"""
         self.connection_object.close()
 
     def _query(self, sql: str) -> pd.DataFrame:
@@ -118,8 +117,7 @@ class Snowflake(Database):
                 raise ValueError(f"autocommit needs to be true/false but received `{autocommit}`")
 
     def _open_connection_object(self) -> ConnectionObject:
-        """Wraps logic for connecting to snowflake
-        """
+        """Wraps logic for connecting to snowflake"""
         from snowflake.connector import connect
         return connect(**self._kwargs)
 
@@ -256,23 +254,41 @@ class Snowflake(Database):
 
 
 class Sqlite(Database):
+    """
+    Wraps logic for connecting to Redshift and querying.
+
+        with Sqlite('/path/to/sqlite.db') as db:
+            db.query("SELECT * FROM table LIMIT 100")
+    """
 
     @property
     def _connection_string(self) -> str:
         return f"sqlite:///{self._kwargs['path']}"
 
     def _open_connection_object(self) -> ConnectionObject:
+        """Wraps logic for connecting to sqlite"""
         from sqlalchemy import create_engine
         engine = create_engine(self._connection_string)
         return engine.connect()
 
     def _close_connection_object(self):
+        """Wraps logic for closing the connection to sqlite"""
         self.connection_object.close()
 
     def _query(self, sql: str) -> pd.DataFrame:
+        """Wraps logic for querying redshift.
+
+        Args:
+            sql:
+                SQL to execute e.g. "SELECT * FROM table LIMIT 100"
+
+        Returns:
+            a pandas Dataframe with the results from the query
+        """
         return pd.read_sql(sql, self.connection_object)
 
     def execute_statement(self, statement: str):
+        """This method executes a statement without any data returned."""
         self.connection_object.execute(statement)
 
     def insert_records(self,
@@ -282,6 +298,23 @@ class Sqlite(Database):
                        overwrite: bool = False,
                        schema: str = None,
                        database: str = None):
+        """
+        This method inserts rows into a table from a pandas DataFrame.
+
+        Args:
+            dataframe:
+                the pandas dataframe to insert
+            table:
+                the name of the table
+            create_table:
+                if True, creates the table before inserting
+            overwrite:
+                if True, drops all records before inserting
+            schema:
+                the name of the schema
+            database:
+                Not used.
+        """
         # if_exists{‘fail’, ‘replace’, ‘append’}, default ‘fail’
         #     How to behave if the table already exists.
         #     fail: Raise a ValueError.
