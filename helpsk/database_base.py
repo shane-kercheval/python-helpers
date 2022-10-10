@@ -206,7 +206,7 @@ class Database(ABC):
                        dataframe: pd.DataFrame,
                        table: str,
                        create_table: bool = False,
-                       overwrite: bool = True,
+                       overwrite: bool = False,
                        schema: str = None,
                        database: str = None):
         """

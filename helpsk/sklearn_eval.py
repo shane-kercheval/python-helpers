@@ -2477,7 +2477,7 @@ class TwoClassEvaluator:
 
     def plot_predicted_scores_histogram(self):
         """Return a histogram of the predicted scores"""
-        sns.histplot(self._predicted_scores)
+        pd.Series(self._predicted_scores).hist()
         plt.tight_layout()
 
     def plot_actual_vs_predict_histogram(self, plot_threshold: bool = False):
