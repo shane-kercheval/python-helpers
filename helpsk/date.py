@@ -209,6 +209,9 @@ def to_string(
     Returns:
         date - the date rounded down to the nearest granularity
     """
+    if value == '' or is_none_nan(value):
+        return None
+
     if granularity == Granularity.DAY:
         return value.strftime("%Y-%m-%d")
 

@@ -537,6 +537,66 @@ class TestDate(unittest.TestCase):
             **test_parameters
         )
 
+    def test__to_string__handles_none_nat_empty(self):
+        value = ''
+        assert date.to_string(value, granularity=date.Granularity.DAY) is None
+        assert date.to_string(value, granularity=date.Granularity.MONTH) is None
+        assert date.to_string(value, granularity=date.Granularity.QUARTER) is None
+
+        value = None
+        assert date.to_string(value, granularity=date.Granularity.DAY) is None
+        assert date.to_string(value, granularity=date.Granularity.MONTH) is None
+        assert date.to_string(value, granularity=date.Granularity.QUARTER) is None
+
+        value = pd.NaT
+        assert date.to_string(value, granularity=date.Granularity.DAY) is None
+        assert date.to_string(value, granularity=date.Granularity.MONTH) is None
+        assert date.to_string(value, granularity=date.Granularity.QUARTER) is None
+
+        value = np.NaN
+        assert date.to_string(value, granularity=date.Granularity.DAY) is None
+        assert date.to_string(value, granularity=date.Granularity.MONTH) is None
+        assert date.to_string(value, granularity=date.Granularity.QUARTER) is None
+
+        date_values = ['2020-12-01', '2020-12-15', None, pd.NaT]
+        date_series = pd.to_datetime(pd.Series(date_values))
+
+        expected_values = ['2020-12-01', '2020-12-15', pd.NaT, pd.NaT]
+        actual_values = date_series.apply(
+            lambda x: date.to_string(x, granularity=date.Granularity.DAY)
+        )
+        assert actual_values.iloc[0] == expected_values[0]
+        assert actual_values.iloc[1] == expected_values[1]
+        assert actual_values.iloc[2] is None
+        assert actual_values.iloc[3] is None
+
+        expected_values = ['2020-Dec', '2020-Dec', pd.NaT, pd.NaT]
+        actual_values = date_series.apply(
+            lambda x: date.to_string(x, granularity=date.Granularity.MONTH)
+        )
+        assert actual_values.iloc[0] == expected_values[0]
+        assert actual_values.iloc[1] == expected_values[1]
+        assert actual_values.iloc[2] is None
+        assert actual_values.iloc[3] is None
+
+        expected_values = ['2020-Q4', '2020-Q4', pd.NaT, pd.NaT]
+        actual_values = date_series.apply(
+            lambda x: date.to_string(x, granularity=date.Granularity.QUARTER)
+        )
+        assert actual_values.iloc[0] == expected_values[0]
+        assert actual_values.iloc[1] == expected_values[1]
+        assert actual_values.iloc[2] is None
+        assert actual_values.iloc[3] is None
+
+        expected_values = ['2021-FQ4', '2021-FQ4', pd.NaT, pd.NaT]
+        actual_values = date_series.apply(
+            lambda x: date.to_string(x, granularity=date.Granularity.QUARTER, fiscal_start=2)
+        )
+        assert actual_values.iloc[0] == expected_values[0]
+        assert actual_values.iloc[1] == expected_values[1]
+        assert actual_values.iloc[2] is None
+        assert actual_values.iloc[3] is None
+
     def test_floor_missing_value(self):
         self.assertTrue(date.floor(pd.NA, granularity=date.Granularity.DAY) is pd.NA)
         self.assertTrue(date.floor(pd.NaT, granularity=date.Granularity.DAY) is pd.NaT)
