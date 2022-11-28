@@ -44,7 +44,7 @@ env:
 	conda env create -f environment.yml
 
 export_env:
-	conda env export > environment.yml	
+	conda env export --no-builds > environment.yml
 
 remove_env:
 	conda env remove -n $(conda_env_name)
