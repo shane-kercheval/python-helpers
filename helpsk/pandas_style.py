@@ -1,7 +1,6 @@
 """Collection of helpers methods that help to style tables in Jupyter Notebooks
 """
 from __future__ import annotations
-import sys
 from typing import TypeVar
 from html import escape
 
@@ -56,11 +55,7 @@ def format(styler: pd.DataFrame | Styler,
     if isinstance(styler, pd.DataFrame):
         styler = styler.style
 
-    if missing_color:
-        if sys.version_info.minor <= 9:  # remove warning for deprecated `null_color` variable
-            styler = styler.highlight_null(null_color=missing_color)
-        else:
-            styler = styler.highlight_null(color=missing_color)
+    styler = styler.highlight_null(color=missing_color)
 
     if hide_index:
         styler = styler.hide(axis='index')
