@@ -55,8 +55,7 @@ def format(styler: pd.DataFrame | Styler,
     if isinstance(styler, pd.DataFrame):
         styler = styler.style
 
-    if missing_color:
-        styler = styler.highlight_null(null_color=missing_color)
+    styler = styler.highlight_null(color=missing_color)
 
     if hide_index:
         styler = styler.hide(axis='index')

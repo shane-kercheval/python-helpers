@@ -37,19 +37,6 @@ docker_package:
 all: docker_build docker_tests, docker_package
 
 ####
-# conda commands
-####
-# conda activate python_helpers
-env:
-	conda env create -f environment.yml
-
-export_env:
-	conda env export --no-builds > environment.yml
-
-remove_env:
-	conda env remove -n $(conda_env_name)
-
-####
 # project commands
 ####
 # commands to run inside docker container
