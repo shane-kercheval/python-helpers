@@ -100,15 +100,23 @@ class TestStrings(unittest.TestCase):
                                     granularity=row['granularity'],
                                     places=row['places'])
 
-        def run_combinations_for_value(value):
-            result = create_dataframe_combinations(value)
+        def run_combinations_for_value(value, positive=True):
+            result = create_dataframe_combinations(value if positive else value * -1)
             result['result'] = result.apply(apply_format, axis=1)
             return result
 
+        # Positive Values
         results = [run_combinations_for_value(value) for value in test_values]
         results = pd.concat(results)
         results['granularity'] = results['granularity'].transform(lambda x: str(x))
-        expected_results = pd.read_csv(get_test_path('string/string__format_number__expected_values.csv'))  # noqa
+        expected_results = pd.read_csv(get_test_path('string/string__format_number__expected_values_positive.csv'))  # noqa
+        self.assertTrue(hv.dataframes_match([results, expected_results]))
+
+        # Negative Values
+        results = [run_combinations_for_value(value, positive=False) for value in test_values]
+        results = pd.concat(results)
+        results['granularity'] = results['granularity'].transform(lambda x: str(x))
+        expected_results = pd.read_csv(get_test_path('string/string__format_number__expected_values_negative.csv'))  # noqa
         self.assertTrue(hv.dataframes_match([results, expected_results]))
 
     def test_format_number__0(self):
