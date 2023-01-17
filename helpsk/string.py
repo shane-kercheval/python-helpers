@@ -68,6 +68,9 @@ def format_number(value: float,
     Returns:
         the formatted number as a string
     """
+    if value == 0:
+        return '0'
+
     granularity_lookup = {
         RoundTo.THOUSANDS: 1000,
         RoundTo.MILLIONS: 1000000,

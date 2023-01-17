@@ -9,7 +9,6 @@ from tests.helpers import get_test_path
 # noinspection PyMethodMayBeStatic
 class TestStrings(unittest.TestCase):
     def test_collapse(self):
-
         # test *args as different parameters
         self.assertEqual(hs.collapse('a'), 'a')
         self.assertEqual(hs.collapse('a', 'b'), 'ab')
@@ -111,3 +110,11 @@ class TestStrings(unittest.TestCase):
         results['granularity'] = results['granularity'].transform(lambda x: str(x))
         expected_results = pd.read_csv(get_test_path('string/string__format_number__expected_values.csv'))  # noqa
         self.assertTrue(hv.dataframes_match([results, expected_results]))
+
+    def test_format_number__0(self):
+        assert hs.format_number(value=0, granularity=hs.RoundTo.AUTO, places=2) == '0'
+        assert hs.format_number(value=0, granularity=hs.RoundTo.NONE, places=0) == '0'
+        assert hs.format_number(value=0, granularity=hs.RoundTo.THOUSANDS, places=1) == '0'
+        assert hs.format_number(value=0, granularity=hs.RoundTo.MILLIONS, places=2) == '0'
+        assert hs.format_number(value=0, granularity=hs.RoundTo.BILLIONS, places=3) == '0'
+        assert hs.format_number(value=0, granularity=hs.RoundTo.TRILLIONS, places=4) == '0'
