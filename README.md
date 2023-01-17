@@ -2,7 +2,7 @@
 
 Helper package for python.
 
-**NOTE: This package requires Python >=3.9**
+**NOTE: This package is tested on Python `3.9` and `3.10`**
 
 - package source in `/helpsk`
 - unit tests in `/tests`
