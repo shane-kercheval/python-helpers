@@ -15,6 +15,9 @@ scikit-learn
 scikit-optimize
 scipy
 seaborn
-sqlalchemy
+# https://github.com/pandas-dev/pandas/issues/51061
+# https://github.com/pandas-dev/pandas/pull/48576
+# https://stackoverflow.com/questions/75315117/attributeerror-connection-object-has-no-attribute-connect-when-use-df-to-sq
+sqlalchemy==1.4.46
 statsmodels
 urllib3
