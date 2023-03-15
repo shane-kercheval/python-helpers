@@ -1,7 +1,7 @@
 """Collection of helpers methods that help to style tables in Jupyter Notebooks
 """
 from __future__ import annotations
-from typing import TypeVar
+from typing import Optional, TypeVar
 from html import escape
 
 import pandas as pd
@@ -20,6 +20,60 @@ from helpsk.validation import any_none_nan
 
 
 Subset = TypeVar('Subset')
+
+
+def add_bar(
+        df_style: Styler,
+        column_name: str,
+        min_value: Optional[float] = None,
+        max_value: Optional[float] = None,
+        round_by: int = 0,
+        color: str = color.GRAY) -> Styler:
+    """
+    Add bars to a particular column with the ability to specify a min/max value.
+
+    Args:
+        df_style: style object e.g. df.style
+        column_name: name of the column to apply bars
+        min_value: min value of bars
+        max_value: max value of bars
+        round_by: number of decimals to round by
+        color: color of bars
+    """
+    return df_style.\
+        bar(subset=[column_name], color=color, vmin=min_value, vmax=max_value).\
+        format(subset=[column_name], precision=round_by)
+
+
+def add_background_gradient(
+        df_style: Styler,
+        column_name: str,
+        min_value: Optional[float] = None,
+        max_value: Optional[float] = None,
+        round_by: int = 0,
+        color_cmap=None) -> Styler:
+    """
+    Add gradient to a particular column with the ability to specify a min/max value.
+
+    Args:
+        df_style: style object e.g. df.style
+        column_name: name of the column to apply gradient
+        min_value: min value of gradient
+        max_value: max value of gradient
+        round_by: number of decimals to round by
+        color_cmap: cmap of gradient (sns.color_palette("vlag", as_cmap=True) is default)
+    """
+    if not color_cmap:
+        color_cmap = color_palette("vlag", as_cmap=True)
+
+    return df_style.\
+        background_gradient(
+            subset=[column_name],
+            cmap=color_cmap,
+            vmin=min_value,
+            vmax=max_value
+        ).\
+        format(subset=[column_name], precision=round_by)
 
 
 def format(styler: pd.DataFrame | Styler,

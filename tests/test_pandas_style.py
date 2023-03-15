@@ -38,6 +38,43 @@ class TestPandasStyle(unittest.TestCase):
         sample_data['col_g'] = sample_data['col_b'].astype('category')
         cls.sample_data = sample_data
 
+    def test_add_bar(self):
+        test_data = self.sample_data
+        with open(get_test_path('pandas_style/add_bar.html'), 'w') as file:
+            table_html = test_data.style. \
+                pipe(hps.add_bar, column_name='col_a'). \
+                to_html()
+            file.write(clean_formatted_dataframe(table_html))
+
+    def test_add_bar__min_max_color(self):
+        test_data = self.sample_data
+        with open(get_test_path('pandas_style/add_bar__min_max_color.html'), 'w') as file:
+            table_html = test_data.style. \
+                pipe(hps.add_bar, column_name='col_a', min_value=0, max_value=10, color='red'). \
+                to_html()
+            file.write(clean_formatted_dataframe(table_html))
+
+    def test_add_background_gradient(self):
+        test_data = self.sample_data
+        with open(get_test_path('pandas_style/add_background_gradient.html'), 'w') as file:
+            table_html = test_data.style. \
+                pipe(hps.add_background_gradient, column_name='col_a'). \
+                to_html()
+            file.write(clean_formatted_dataframe(table_html))
+
+    def test_add_background_gradient__min_max_color(self):
+        test_data = self.sample_data
+        with open(get_test_path('pandas_style/add_background_gradient__min_max_color.html'), 'w') as file:  # noqa
+            table_html = test_data.style. \
+                pipe(
+                    hps.add_background_gradient,
+                    column_name='col_a',
+                    min_value=0,
+                    max_value=5,
+                ). \
+                to_html()
+            file.write(clean_formatted_dataframe(table_html))
+
     def test_format(self):
         with open(get_test_path('pandas_style/format__default.html'), 'w') as file:
             file.write(clean_formatted_dataframe(hps.format(self.sample_data).to_html()))
