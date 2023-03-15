@@ -1,4 +1,5 @@
 import difflib
+from typing import Union
 import pandas as pd
 
 
@@ -50,6 +51,64 @@ def _create_html_cell(difference_list: list, is_first_value: bool, change_color:
         for x in diff
     ]
     return ''.join(html)
+
+
+def diff_text(
+        text_a: Union[str, list[str]],
+        text_b: Union[str, list[str]],
+        change_color: str = '#F1948A') -> str:
+    """
+    Returns string as HTML containing highlighted differences between `text_a` and
+    `text_b`.
+
+    The HTML will contain a table with a single column that that contains `text_a` on top and
+    `text_b` on the bottom.
+
+    All `new line` characters are removed and replaced with a space.
+
+    Args:
+        text_a: this text will be represented on the top of each html cell.
+        text_b: this text will be represented on the bottom of each html
+        cell. change_color: color of background to highlight differences.
+    """
+    html = '<html><head><style> table, th, td { border: 1px solid black; border-collapse: ' \
+        'collapse; white-space: normal;} </style></head><body style="font-family: monospace">'
+    html += '<table><tr>'
+    html += '<th>index</th>'
+    html += '<th>diff</th>'
+    html += '</tr>'
+
+    line_break = '<hr style="width:25%; text-align:left; margin-left:10px; height:1px; ' \
+        'border-width:0;' \
+        'color:blue; background-color:blue">'
+
+    def create_inline_change(diff_list):
+        diff_a = _create_html_cell(
+            difference_list=diff_list, is_first_value=True, change_color=change_color
+        )
+        diff_b = _create_html_cell(
+            difference_list=diff_list, is_first_value=False, change_color=change_color
+        )
+        return f"<td>{diff_a}<br>{line_break}{diff_b}</td>"
+
+    if isinstance(text_a, str):
+        assert isinstance(text_b, str)
+        text_a = [text_a]
+        text_b = [text_b]
+    else:
+        assert len(text_a) == len(text_b)
+
+    for index in range(len(text_a)):
+        html += '<tr>'
+        html += f"<td>{index}</td>"
+        difference_list = _create_html_difference_list(
+            value_a=text_a[index],
+            value_b=text_b[index]
+        )
+        html += create_inline_change(diff_list=difference_list)
+        html += '</tr>'
+    html += "</table></body></html>"
+    return html
 
 
 def diff_dataframes(

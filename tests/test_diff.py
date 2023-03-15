@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 
 import helpsk.diff as diff
+from helpsk import color
 from tests.helpers import get_test_path
 
 
@@ -41,7 +42,7 @@ class TestDiff(unittest.TestCase):
             '#F1948A";>t</span>'
         )
 
-    def test_diff_dataframes(self):
+    def test__diff_dataframes(self):
         class TestEnum(Enum):
             VALUE_A = auto()
             VALUE_B = auto()
@@ -84,6 +85,41 @@ class TestDiff(unittest.TestCase):
         df_b.index = ['a', 'b', 'c', 'd']
         html_c = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b)
         self.assertEqual(html_a, html_c)
+
+    def test__diff_test__strings(self):
+        results = diff.diff_text(text_a='Hello', text_b='hello')
+        with open(get_test_path('diff/diff_text__hello.html'), 'w') as file:
+            file.write(results)
+
+        results = diff.diff_text(
+            text_a='Hello,\nthis is a message. Thanks! :)',
+            text_b='hello, this is not a message. No Thanks :('
+        )
+        with open(get_test_path('diff/diff_text__new_line.html'), 'w') as file:
+            file.write(results)
+
+        results = diff.diff_text(
+            text_a='Hello,\nthis is a message. Thanks! :)',
+            text_b='hello, this is not a message. No Thanks :(',
+            change_color=color.WARNING
+        )
+        with open(get_test_path('diff/diff_text__color.html'), 'w') as file:
+            file.write(results)
+
+    def test__diff_test__lists(self):
+        results = diff.diff_text(
+            text_a=[
+                'hey',
+                'Hello,\nthis is a message. Thanks! :)',
+            ],
+            text_b=[
+                'Hello',
+                'hello, this is not a message. No Thanks :(',
+            ],
+            change_color=color.WARNING
+        )
+        with open(get_test_path('diff/diff_text__lists.html'), 'w') as file:
+            file.write(results)
 
 
 if __name__ == '__main__':
