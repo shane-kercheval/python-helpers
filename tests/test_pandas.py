@@ -33,20 +33,25 @@ class TestPandas(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.credit_data = get_data_credit()
-        sample_data = pd.DataFrame({'col_a': [np.nan, 2, 3, 4],
-                                    'col_b': [np.nan, 'b', 'd', 'd'],
-                                    'col_c': pd.date_range('2021-01-01', '2021-01-04'),
-                                    'col_d': [None, np.nan,
-                                              datetime.date(2021, 4, 2), datetime.date(2021, 4, 2)],
-                                    'col_e': np.nan,
-                                    'col_f': [1.0, 2.0, 3.0, 4.0],
-                                    'col_h': [np.nan, TestEnum.VALUE_A, TestEnum.VALUE_B, TestEnum.VALUE_B],
-                                    'col_i': [None, np.nan, datetime.datetime(2021, 4, 2, 0, 0, 0),
-                                              datetime.datetime(2021, 4, 2, 0, 0, 0)],
-                                    'col_j': [False, False, True, False],
-                                    'col_k': [None, None, None, None],
-                                    'col_l': [np.nan, np.nan, np.nan, np.nan]
-                                    })
+        sample_data = pd.DataFrame({
+            'col_a': [np.nan, 2, 3, 4],
+            'col_b': [np.nan, 'b', 'd', 'd'],
+            'col_c': pd.date_range('2021-01-01', '2021-01-04'),
+            'col_d': [
+                None, np.nan,
+                datetime.date(2021, 4, 2), datetime.date(2021, 4, 2)
+            ],
+            'col_e': np.nan,
+            'col_f': [1.0, 2.0, 3.0, 4.0],
+            'col_h': [np.nan, TestEnum.VALUE_A, TestEnum.VALUE_B, TestEnum.VALUE_B],
+            'col_i': [
+                None, np.nan, datetime.datetime(2021, 4, 2, 0, 0, 0),
+                datetime.datetime(2021, 4, 2, 0, 0, 0)
+            ],
+            'col_j': [False, False, True, False],
+            'col_k': [None, None, None, None],
+            'col_l': [np.nan, np.nan, np.nan, np.nan]
+        })
         sample_data.loc[0, 'col_c'] = np.nan
         sample_data['col_g'] = sample_data['col_b'].astype('category')
         cls.sample_data = sample_data
@@ -151,7 +156,7 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(list(results), ['False'])
         results = hp.replace_all_bools_with_strings(series=pd.Series([True, False]))
         self.assertEqual(list(results), ['True', 'False'])
-        results = hp.replace_all_bools_with_strings(series=pd.Series([True, False]).astype('category'))
+        results = hp.replace_all_bools_with_strings(series=pd.Series([True, False]).astype('category'))  # noqa 
         self.assertEqual(list(results), ['True', 'False'])
         results = hp.replace_all_bools_with_strings(series=pd.Series([True, False, None]))
         self.assertEqual(list(results), ['True', 'False', None])
@@ -159,7 +164,7 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(list(results), ['True', 'False', np.nan])
         results = hp.replace_all_bools_with_strings(series=pd.Series([None, True, False, None]))
         self.assertEqual(list(results), [None, 'True', 'False', None])
-        results = hp.replace_all_bools_with_strings(series=pd.Series([np.nan, True, False, np.nan]))
+        results = hp.replace_all_bools_with_strings(series=pd.Series([np.nan, True, False, np.nan]))  # noqa
         self.assertEqual(list(results), [np.nan, 'True', 'False', np.nan])
 
         results = hp.replace_all_bools_with_strings(series=pd.Series(['True']))
@@ -168,15 +173,15 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(list(results), ['False'])
         results = hp.replace_all_bools_with_strings(series=pd.Series(['True', 'False']))
         self.assertEqual(list(results), ['True', 'False'])
-        results = hp.replace_all_bools_with_strings(series=pd.Series(['True', 'False']).astype('category'))
+        results = hp.replace_all_bools_with_strings(series=pd.Series(['True', 'False']).astype('category'))  # noqa
         self.assertEqual(list(results), ['True', 'False'])
         results = hp.replace_all_bools_with_strings(series=pd.Series(['True', 'False', None]))
         self.assertEqual(list(results), ['True', 'False', None])
         results = hp.replace_all_bools_with_strings(series=pd.Series(['True', 'False', np.nan]))
         self.assertEqual(list(results), ['True', 'False', np.nan])
-        results = hp.replace_all_bools_with_strings(series=pd.Series([None, 'True', 'False', None]))
+        results = hp.replace_all_bools_with_strings(series=pd.Series([None, 'True', 'False', None]))  # noqa
         self.assertEqual(list(results), [None, 'True', 'False', None])
-        results = hp.replace_all_bools_with_strings(series=pd.Series([np.nan, 'True', 'False', np.nan]))
+        results = hp.replace_all_bools_with_strings(series=pd.Series([np.nan, 'True', 'False', np.nan]))  # noqa
         self.assertEqual(list(results), [np.nan, 'True', 'False', np.nan])
 
         results = hp.replace_all_bools_with_strings(series=pd.Series([], dtype=object))
@@ -185,7 +190,7 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(list(results), ['Whatever'])
         results = hp.replace_all_bools_with_strings(series=pd.Series([True, False, 'Whatever']))
         self.assertEqual(list(results), ['True', 'False', 'Whatever'])
-        results = hp.replace_all_bools_with_strings(series=pd.Series([True, False, TestEnum.VALUE_A]))
+        results = hp.replace_all_bools_with_strings(series=pd.Series([True, False, TestEnum.VALUE_A]))  # noqa
         self.assertEqual(list(results), ['True', 'False', TestEnum.VALUE_A])
         results = hp.replace_all_bools_with_strings(series=pd.Series([None]))
         self.assertEqual(list(results), [None])
@@ -298,7 +303,7 @@ class TestPandas(unittest.TestCase):
         subtest_relocate(column='1', before=None, after='X', expected_order=['A', 'X', '1'])
 
     def test_get_numeric_columns(self):
-        self.assertEqual(hp.get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])
+        self.assertEqual(hp.get_numeric_columns(self.sample_data), ['col_a', 'col_e', 'col_f', 'col_l'])  # noqa
         self.assertEqual(hp.get_numeric_columns(self.sample_data[['col_e']]), ['col_e'])
         self.assertEqual(hp.get_numeric_columns(self.sample_data[['col_d']]), [])
         self.assertEqual(hp.get_numeric_columns(pd.DataFrame()), [])
@@ -317,20 +322,23 @@ class TestPandas(unittest.TestCase):
         categorical[0:50] = np.nan
         original_categorical = categorical.copy()
 
-        original_categories = ['new car', 'used car', 'furniture/equipment', 'radio/tv',
-                               'domestic appliance', 'repairs', 'education', 'vacation', 'retraining',
-                               'business', 'other']
+        original_categories = [
+            'new car', 'used car', 'furniture/equipment', 'radio/tv',
+            'domestic appliance', 'repairs', 'education', 'vacation', 'retraining',
+            'business', 'other']
 
-        expected_categories = list(categorical.value_counts(ascending=True, dropna=True).index.values)
+        expected_categories = list(categorical.value_counts(ascending=True, dropna=True).index.values)  # noqa
         expected_categories_rev = expected_categories.copy()
         expected_categories_rev.reverse()
 
-        # check that the purpose column hasn't changed and that it is not ordered and has original categories
+        # check that the purpose column hasn't changed and that it is not ordered and has original\
+        # categories
         self.assertFalse(categorical.cat.ordered)
         self.assertEqual(list(categorical.cat.categories), original_categories)
 
         # test default weights
-        # also, we are testing a Categorical object; verify it is categorical, then later test non-categorical
+        # also, we are testing a Categorical object; verify it is categorical, then later test
+        # non-categorical
         self.assertEqual(categorical.dtype.name, 'category')
         results = hp.reorder_categories(categorical=categorical, ascending=True, ordered=False)
         self.assertTrue(results is not categorical)  # check that a new object was returned
@@ -352,7 +360,7 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
@@ -370,12 +378,16 @@ class TestPandas(unittest.TestCase):
         weights = self.credit_data['credit_amount'].copy()
         weights[25:75] = np.nan
 
-        original_categories = ['new car', 'used car', 'furniture/equipment', 'radio/tv',
-                               'domestic appliance', 'repairs', 'education', 'vacation', 'retraining',
-                               'business', 'other']
+        original_categories = [
+            'new car', 'used car', 'furniture/equipment', 'radio/tv',
+            'domestic appliance', 'repairs', 'education', 'vacation', 'retraining',
+            'business', 'other'
+        ]
 
-        expected_categories = ['vacation', 'retraining', 'domestic appliance', 'repairs', 'education',
-                               'radio/tv', 'new car', 'furniture/equipment', 'business', 'used car', 'other']
+        expected_categories = [
+            'vacation', 'retraining', 'domestic appliance', 'repairs', 'education',
+            'radio/tv', 'new car', 'furniture/equipment', 'business', 'used car', 'other'
+        ]
         expected_categories_rev = expected_categories.copy()
         expected_categories_rev.reverse()
 
@@ -385,12 +397,14 @@ class TestPandas(unittest.TestCase):
         with self.assertRaises(hv.HelpskParamValueError):
             hp.reorder_categories(categorical=categorical, weights=weights[0:-1])
 
-        # check that the purpose column hasn't changed and that it is not ordered and has original categories
+        # check that the purpose column hasn't changed and that it is not ordered and has original
+        # categories
         self.assertFalse(categorical.cat.ordered)
         self.assertEqual(list(categorical.cat.categories), original_categories)
 
         # test default weights
-        # also, we are testing a Categorical object; verify it is categorical, then later test non-categorical
+        # also, we are testing a Categorical object; verify it is categorical, then later test
+        # non-categorical
         self.assertEqual(categorical.dtype.name, 'category')
         results = hp.reorder_categories(
             categorical=categorical, weights=weights, ascending=True, ordered=False
@@ -402,7 +416,7 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
@@ -417,13 +431,13 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
         series = pd.Series(['a', 'b', 'c'] * 2)
         weights = pd.Series([1, 3, 2] * 2)
-        results = hp.reorder_categories(categorical=series, weights=weights, ascending=False, ordered=True)
+        results = hp.reorder_categories(categorical=series, weights=weights, ascending=False, ordered=True)  # noqa
         self.assertTrue(results is not categorical)  # check that a new object was returned
         self.assertTrue(iterables_are_equal(results, series))
         self.assertEqual(list(results.categories), ['b', 'c', 'a'])
@@ -437,7 +451,7 @@ class TestPandas(unittest.TestCase):
 
         results = hp.top_n_categories(categorical=categorical)
         self.assertTrue(results is not categorical)  # check that a new object was returned
-        self.assertEqual(list(results.categories), list(categorical_counts.index.values[0:5]) + ['Other'])
+        self.assertEqual(list(results.categories), list(categorical_counts.index.values[0:5]) + ['Other'])  # noqa
         self.assertEqual(results.value_counts(dropna=False).sum(), 1000)
 
         result_counts = results.value_counts().head(-1)
@@ -447,12 +461,12 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
-        # if top_n is set to a higher number than there are categories, then we should get back an object
-        # with the same values
+        # if top_n is set to a higher number than there are categories, then we should get back an
+        # object with the same values
         results = hp.top_n_categories(categorical=categorical, top_n=20)
         self.assertTrue(results is not categorical)  # check that a new object was returned
         self.assertTrue(set(results.cat.categories) == set(categorical.cat.categories))  # noqa
@@ -460,7 +474,7 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
@@ -481,7 +495,7 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'new car'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
@@ -501,9 +515,9 @@ class TestPandas(unittest.TestCase):
         with self.assertRaises(hv.HelpskParamValueError):
             hp.top_n_categories(categorical=categorical, weights=weights[0:-1])
 
-        results = hp.top_n_categories(categorical=categorical, weights=weights, weight_function=np.sum)
+        results = hp.top_n_categories(categorical=categorical, weights=weights, weight_function=np.sum)  # noqa
         self.assertTrue(results is not categorical)  # check that a new object was returned
-        self.assertEqual(list(results.categories), list(categorical_counts.index.values[0:5]) + ['Other'])
+        self.assertEqual(list(results.categories), list(categorical_counts.index.values[0:5]) + ['Other'])  # noqa
         self.assertEqual(results.value_counts(dropna=False).sum(), 1000)
 
         result_counts = results.value_counts().head(-1)
@@ -513,11 +527,11 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'vacation'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
-        # if top_n is set to a higher number than there are categories, then we should get back an object
+        # if top_n is set to a higher number than there are categories, then we should get back an object  # noqa
         # with the same values
         results = hp.top_n_categories(
             categorical=categorical,
@@ -531,7 +545,7 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'vacation'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
@@ -551,7 +565,7 @@ class TestPandas(unittest.TestCase):
 
         # check no side effects
         results[0] = 'vacation'
-        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))
+        self.assertEqual(list(categorical.cat.categories), list(original_categorical.cat.categories))  # noqa
         self.assertTrue(iterables_are_equal(categorical, original_categorical))
         self.assertTrue(pd.isna(categorical[0]))
 
@@ -693,22 +707,22 @@ class TestPandas(unittest.TestCase):
 
         self.helper_test_summary(
             get_test_path('pandas/test_non_numeric_summary__style__sample.html'),
-            clean_formatted_dataframe(hp.non_numeric_summary(self.sample_data, return_style=True).to_html())
+            clean_formatted_dataframe(hp.non_numeric_summary(self.sample_data, return_style=True).to_html())  # noqa
         )
 
     def test_convert_integer_series_to_categorical(self):
         # check that function fails if mapping doesn't contains all numbers in data
         with self.assertRaises(hv.HelpskParamValueError):
             mapping = {2: 'a', 3: 'b'}
-            hp.convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)
+            hp.convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)  # noqa
 
         with self.assertRaises(hv.HelpskParamValueError):
             mapping = {2: 'a'}
-            hp.convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)
+            hp.convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)  # noqa
 
         with self.assertRaises(hv.HelpskParamValueError):
             mapping = {}
-            hp.convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)
+            hp.convert_integer_series_to_categorical(series=self.sample_data.col_a, mapping=mapping)  # noqa
 
         # check that series will work even if it doesn't have all the values in mapping
         mapping = {1: 'value not found', 2: 'a', 3: 'b', 4: 'c'}
@@ -749,7 +763,7 @@ class TestPandas(unittest.TestCase):
         self.assertFalse(test_series_unordered.cat.ordered)
         test_series_unordered[0:10] = np.nan
 
-        test_series_ordered = test_series_unordered.cat.reorder_categories(credit_history_order, ordered=True)
+        test_series_ordered = test_series_unordered.cat.reorder_categories(credit_history_order, ordered=True)  # noqa
         self.assertTrue(test_series_ordered.cat.ordered)
 
         results = hp.value_frequency(test_series_unordered, sort_by_frequency=True)
@@ -789,8 +803,8 @@ class TestPandas(unittest.TestCase):
 
         results = hp.value_frequency(test_series_float, sort_by_frequency=True)
         expected_value_counts = test_series_float.value_counts(normalize=False, dropna=False)
-        self.assertTrue(hv.iterables_are_equal(results.index.values, expected_value_counts.index.values))
-        self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, expected_value_counts.values))
+        self.assertTrue(hv.iterables_are_equal(results.index.values, expected_value_counts.index.values))  # noqa
+        self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, expected_value_counts.values))  # noqa
 
         cached_results = results
 
@@ -805,16 +819,16 @@ class TestPandas(unittest.TestCase):
         self.assertTrue(hv.iterables_are_equal(results['Percent'].values, cached_results.loc[results.index.values, 'Percent'].values))  # noqa
 
     def test_value_frequency__missing_category(self):
-        # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
-        # a count of `0` for a category (i.e. category existed but not any values)
+        # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series
+        # that had a count of `0` for a category (i.e. category existed but not any values)
         test_series = self.credit_data['checking_status'].copy()
         test_series[test_series == 'no checking'] = np.nan
 
         results = hp.value_frequency(test_series, sort_by_frequency=True)
         expected_value_counts = test_series.value_counts(normalize=False, dropna=False)
 
-        self.assertTrue(hv.iterables_are_equal(results.index.values, expected_value_counts.index.values))
-        self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, expected_value_counts.values))
+        self.assertTrue(hv.iterables_are_equal(results.index.values, expected_value_counts.index.values))  # noqa
+        self.assertTrue(hv.iterables_are_equal(results['Frequency'].values, expected_value_counts.values))  # noqa
 
         cached_results = results
 
@@ -834,8 +848,8 @@ class TestPandas(unittest.TestCase):
         data.loc[9:20, 'checking_status'] = np.nan
         data.loc[19:30, 'credit_amount'] = np.nan
 
-        # change dataset so that there is an entire category missing (e.g. no target == True and checking
-        # status `<Missing>`
+        # change dataset so that there is an entire category missing (e.g. no target == True and
+        # checking status `<Missing>`
         indexes_to_blank = (data['target'] == True) & (data['checking_status'] == '0<=X<200')  # noqa
         data.loc[indexes_to_blank, 'checking_status'] = np.nan
         # change dataset so there is an entire category with no sum_by
@@ -865,7 +879,7 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(result[('housing', 'Sum')].sum(), self.credit_data['credit_amount'].sum())
         self.assertTrue(hv.is_close(result[('housing', 'Sum Perc')].sum(), 2))
 
-        def test_count_groups(group_1, group_2=None, group_sum=None, remove_first_level_duplicates=False):
+        def test_count_groups(group_1, group_2=None, group_sum=None, remove_first_level_duplicates=False):  # noqa
             counts = hp.count_groups(
                 dataframe=data,
                 group_1=group_1,
@@ -890,7 +904,7 @@ class TestPandas(unittest.TestCase):
         results = test_count_groups(group_1='target', remove_first_level_duplicates=True)
         self.assertTrue(dataframes_match([results, results_1]))
 
-        results_2 = test_count_groups(group_1='checking_status', remove_first_level_duplicates=False)
+        results_2 = test_count_groups(group_1='checking_status', remove_first_level_duplicates=False)  # noqa
         self.assertEqual(results_2[('checking_status', 'Count')].sum(), data.shape[0])
         self.assertTrue(hv.is_close(results_2[('checking_status', 'Count Perc')].sum(), 1))
 

@@ -31,7 +31,10 @@ class TestPandasStyle(unittest.TestCase):
             'col_f': [1.0, 2.0, 3.0, 4.0],
             'col_h': [np.nan, TestEnum.VALUE_A, TestEnum.VALUE_B, TestEnum.VALUE_B],
             'col_i': [
-                None, np.nan, datetime.datetime(2021, 4, 2, 0, 0, 0), datetime.datetime(2021, 4, 2, 0, 0, 0)
+                None,
+                np.nan,
+                datetime.datetime(2021, 4, 2, 0, 0, 0),
+                datetime.datetime(2021, 4, 2, 0, 0, 0)
             ],
         })
         sample_data.loc[0, 'col_c'] = np.nan
@@ -82,11 +85,11 @@ class TestPandasStyle(unittest.TestCase):
     def test_background_color(self):
         with suppress_warnings():
             with open(get_test_path('pandas_style/background_color__default.html'), 'w') as file:
-                file.write(clean_formatted_dataframe(hps.background_color(self.sample_data).to_html()))
+                file.write(clean_formatted_dataframe(hps.background_color(self.sample_data).to_html()))  # noqa
 
     def test_bar_inverse(self):
-        # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
-        # a count of `0` for a category (i.e. category existed but not any values)
+        # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series
+        # that had a count of `0` for a category (i.e. category existed but not any values)
         test_data = self.sample_data.copy()
         test_data.insert(loc=1,
                          column='col_a_copy',
@@ -106,8 +109,8 @@ class TestPandasStyle(unittest.TestCase):
             file.write(clean_formatted_dataframe(table_html))
 
     def test_all_styles(self):
-        # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series that had
-        # a count of `0` for a category (i.e. category existed but not any values)
+        # found a bug when doing `value_frequency(series, sort_by_frequency=False)` with a series
+        # that had a count of `0` for a category (i.e. category existed but not any values)
         test_data = self.credit_data
         test_data.loc[0:5, 'credit_amount'] = np.nan
         test_data.insert(loc=5,
@@ -135,7 +138,7 @@ class TestPandasStyle(unittest.TestCase):
             '&lt;C&gt;': [np.nan, np.nan, '&lt;asdf&gt;']
         }, index=['&lt;1&gt;', '2', '&lt;3&gt;'])
         expected_dataframe['&lt;C&gt;'] = expected_dataframe['&lt;C&gt;'].astype('category')
-        self.assertTrue(dataframes_match([hps.html_escape_dataframe(dataframe), expected_dataframe]))
+        self.assertTrue(dataframes_match([hps.html_escape_dataframe(dataframe), expected_dataframe]))  # noqa
 
         # multi-index
         dataframe = pd.DataFrame({
@@ -155,7 +158,7 @@ class TestPandasStyle(unittest.TestCase):
                                             ('2', '&lt;y&gt;'),
                                             ('&lt;3&gt;', 'z')]))
         expected_dataframe['&lt;C&gt;'] = expected_dataframe['&lt;C&gt;'].astype('category')
-        self.assertTrue(dataframes_match([hps.html_escape_dataframe(dataframe), expected_dataframe]))
+        self.assertTrue(dataframes_match([hps.html_escape_dataframe(dataframe), expected_dataframe]))  # noqa
 
 
 if __name__ == '__main__':

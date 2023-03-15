@@ -22,8 +22,9 @@ class TestEnum(Enum):
 
 @contextmanager
 def mock_redshift():
-    """This is basically a wrapper around mock.patch to hide the mock logic. i.e. This is a context manager
-    that wraps the mock context wrapper
+    """
+    This is basically a wrapper around mock.patch to hide the mock logic. i.e. This is a context
+    manager that wraps the mock context wrapper
     """
     with patch('psycopg2.connect'), patch('pandas.read_sql_query') as pandas_read_mock:
         pandas_read_mock.return_value = pd.DataFrame({'test': ['test']})
@@ -32,8 +33,9 @@ def mock_redshift():
 
 @contextmanager
 def mock_snowflake():
-    """This is basically a wrapper around mock.patch to hide the mock logic. i.e. This is a context manager
-    that wraps the mock context wrapper
+    """
+    This is basically a wrapper around mock.patch to hide the mock logic. i.e. This is a context
+    manager that wraps the mock context wrapper
     """
     with patch('snowflake.connector.connect') as mock_snowflake_connector:
         # mock snowflake logic:
@@ -70,7 +72,7 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual({'test': 'value', 'test2': 'value2'}, redshift._kwargs)
         self.assertEqual('test=value test2=value2', redshift._connection_string)
 
-        redshift = Redshift.from_config(config_path=self.sample_redshift_file, config_key='redshift')
+        redshift = Redshift.from_config(config_path=self.sample_redshift_file, config_key='redshift')  # noqa
         expected_kwargs = {
             'user': 'my_username',
             'password': 'my-password-123',
@@ -80,19 +82,28 @@ class TestDatabase(unittest.TestCase):
         }
         self.assertEqual(expected_kwargs, redshift._kwargs)
 
-        expected_connection_string = 'user=my_username password=my-password-123 dbname=the_database ' \
-            'host=host.address.redshift.amazonaws.com port=1234'
+        expected_connection_string = 'user=my_username password=my-password-123 ' \
+            'dbname=the_database host=host.address.redshift.amazonaws.com port=1234'
         self.assertEqual(expected_connection_string, redshift._connection_string)
 
     def test_snowflake_settings(self):
         snowflake = Snowflake(test='value', test2='value2')
         self.assertEqual({'test': 'value', 'test2': 'value2'}, snowflake._kwargs)
         snowflake = Snowflake(test='value', test2='value2', autocommit='FALSE')
-        self.assertEqual({'test': 'value', 'test2': 'value2', 'autocommit': False}, snowflake._kwargs)
+        self.assertEqual(
+            {'test': 'value', 'test2': 'value2', 'autocommit': False},
+            snowflake._kwargs
+        )
         snowflake = Snowflake(test='value', test2='value2', autocommit='FALSE')
-        self.assertEqual({'test': 'value', 'test2': 'value2', 'autocommit': False}, snowflake._kwargs)
+        self.assertEqual(
+            {'test': 'value', 'test2': 'value2', 'autocommit': False},
+            snowflake._kwargs
+        )
 
-        snowflake = Snowflake.from_config(config_path=self.sample_snowflake_file, config_key='snowflake')
+        snowflake = Snowflake.from_config(
+            config_path=self.sample_snowflake_file,
+            config_key='snowflake'
+        )
         expected_kwargs = {
            'user': 'my.email@address.com',
            'account': 'account.id',
@@ -131,20 +142,25 @@ class TestDatabase(unittest.TestCase):
         self.assertEqual(expected_kwargs, snowflake._kwargs)
 
     def test_Snowflake_generate_sql_create_table(self):
-        sample_data = pd.DataFrame({'col_a': [np.nan, 2, 3, 4],
-                                    'col_b': [np.nan, 'b', 'd', 'd'],
-                                    'col_bb': ['a', 'b', 'd', 'd'],
-                                    'col_c': pd.date_range('2021-01-01', '2021-01-04'),
-                                    'col_d': [datetime.date(2021, 4, 2), datetime.date(2021, 4, 2),
-                                              datetime.date(2021, 4, 2), datetime.date(2021, 4, 2)],
-                                    'col_e': np.nan,
-                                    'col_f': [1.0, 2.0, 3.0, 4.0],
-                                    'col_h': [TestEnum.VALUE_A, TestEnum.VALUE_A,
-                                              TestEnum.VALUE_B, TestEnum.VALUE_B],
-                                    'col_j': [False, False, True, False],
-                                    'col_k': [None, None, None, None],
-                                    'col_l': [np.nan, np.nan, np.nan, np.nan]
-                                    })
+        sample_data = pd.DataFrame({
+            'col_a': [np.nan, 2, 3, 4],
+            'col_b': [np.nan, 'b', 'd', 'd'],
+            'col_bb': ['a', 'b', 'd', 'd'],
+            'col_c': pd.date_range('2021-01-01', '2021-01-04'),
+            'col_d': [
+                datetime.date(2021, 4, 2), datetime.date(2021, 4, 2),
+                datetime.date(2021, 4, 2), datetime.date(2021, 4, 2)
+            ],
+            'col_e': np.nan,
+            'col_f': [1.0, 2.0, 3.0, 4.0],
+            'col_h': [
+                TestEnum.VALUE_A, TestEnum.VALUE_A,
+                TestEnum.VALUE_B, TestEnum.VALUE_B
+            ],
+            'col_j': [False, False, True, False],
+            'col_k': [None, None, None, None],
+            'col_l': [np.nan, np.nan, np.nan, np.nan]
+        })
         sample_data['col_g'] = sample_data['col_b'].astype('category')
 
         sql = Snowflake._generate_sql_create_table(
@@ -250,7 +266,10 @@ class TestDatabase(unittest.TestCase):
 
             # mock connection method so that we can "open" the connection to the database
             with db_mock():
-                """db_obj is a Database object that is in a closed state and has the mock objects set up"""
+                """
+                db_obj is a Database object that is in a closed state and has the mock objects set
+                up
+                """
                 for _ in range(2):  # test that the same object can be opened/closed multiple times
                     # connection should be closed
                     self.assertFalse(db_obj.is_connected())
@@ -264,14 +283,20 @@ class TestDatabase(unittest.TestCase):
                     db_obj.connect()  # test that calling open again doesn't not fail
 
                     # test querying
-                    results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100", show_elapsed_time=False)
+                    results = db_obj.query(
+                        "SELECT * FROM doesnt_exist LIMIT 100",
+                        show_elapsed_time=False
+                    )
                     self.assertIsInstance(results, pd.DataFrame)
                     self.assertEqual(results.iloc[0, 0], 'test')
                     # test connection is still open after querying
                     self.assertTrue(db_obj.is_connected())
                     self.assertIsNotNone(db_obj.connection_object)
                     # test subsequent query
-                    results = db_obj.query("SELECT * FROM doesnt_exist LIMIT 100", show_elapsed_time=False)
+                    results = db_obj.query(
+                        "SELECT * FROM doesnt_exist LIMIT 100",
+                        show_elapsed_time=False
+                    )
                     self.assertIsInstance(results, pd.DataFrame)
                     self.assertEqual(results.iloc[0, 0], 'test')
 
@@ -294,13 +319,16 @@ class TestDatabase(unittest.TestCase):
         def test_context_manager(db_class, db_config_path, db_config_key, db_mock):
             # test context manager
             with db_mock():
-                with db_class.from_config(config_path=db_config_path, config_key=db_config_key) as db_object:
+                with db_class.from_config(config_path=db_config_path, config_key=db_config_key) as db_object:  # noqa
                     self.assertTrue(db_object.is_connected())
                     self.assertIsNotNone(db_object.connection_object)
                     self.assertIsInstance(db_object.connection_object, unittest.mock.MagicMock)
 
                     # test querying
-                    results = db_object.query("SELECT * FROM doesnt_exist LIMIT 100", show_elapsed_time=False)
+                    results = db_object.query(
+                        "SELECT * FROM doesnt_exist LIMIT 100",
+                        show_elapsed_time=False
+                    )
                     self.assertIsInstance(results, pd.DataFrame)
                     self.assertEqual(results.iloc[0, 0], 'test')
                     # test connection is still open after querying
@@ -323,9 +351,12 @@ class TestDatabase(unittest.TestCase):
             db_mock=mock_snowflake
         )
 
-        # tests that if failure to connect (i.e. no mock and connection failure) that the object is not in an
-        # open state
-        database = Redshift.from_config(config_path=self.sample_redshift_file, config_key='redshift')
+        # tests that if failure to connect (i.e. no mock and connection failure) that the object is
+        # not in an open state
+        database = Redshift.from_config(
+            config_path=self.sample_redshift_file,
+            config_key='redshift'
+        )
         with self.assertRaises(Exception):
             database.connect()
         self.assertFalse(database.is_connected())
