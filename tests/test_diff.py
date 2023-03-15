@@ -33,12 +33,12 @@ class TestDiff(unittest.TestCase):
         diff_list = diff._create_html_difference_list(value_a='TesT', value_b='test')
         self.assertEqual(
             diff._create_html_cell(difference_list=diff_list, is_first_value=True),
-            '<span style="background:#F1948A";>T</span><span>e</span><span>s</span><span style="background:'
+            '<span style="background:#F1948A";>T</span><span>e</span><span>s</span><span style="background:'  # noqa
             '#F1948A";>T</span>'
         )
         self.assertEqual(
             diff._create_html_cell(difference_list=diff_list, is_first_value=False),
-            '<span style="background:#F1948A";>t</span><span>e</span><span>s</span><span style="background:'
+            '<span style="background:#F1948A";>t</span><span>e</span><span>s</span><span style="background:'  # noqa
             '#F1948A";>t</span>'
         )
 
@@ -57,7 +57,10 @@ class TestDiff(unittest.TestCase):
             'col_f': [1.0, 2.0, 3.0, 4.0],
             'col_h': [np.nan, TestEnum.VALUE_A, TestEnum.VALUE_B, TestEnum.VALUE_B],
             'col_i': [
-                None, np.nan, datetime.datetime(2021, 4, 2, 0, 0, 0), datetime.datetime(2021, 4, 2, 0, 0, 0)
+                None,
+                np.nan,
+                datetime.datetime(2021, 4, 2, 0, 0, 0),
+                datetime.datetime(2021, 4, 2, 0, 0, 0)
             ],
         })
         df_b = pd.DataFrame({
@@ -70,7 +73,10 @@ class TestDiff(unittest.TestCase):
             'col_f': [1.1, 22.0, 3.0, 4.0],
             'col_h': [np.nan, TestEnum.VALUE_B, TestEnum.VALUE_A, TestEnum.VALUE_B],
             'col_i': [
-                None, np.nan, datetime.datetime(2021, 4, 2, 1, 1, 1), datetime.datetime(2021, 4, 2, 0, 0, 0)
+                None,
+                np.nan,
+                datetime.datetime(2021, 4, 2, 1, 1, 1),
+                datetime.datetime(2021, 4, 2, 0, 0, 0)
             ],
         })
         html_a = diff.diff_dataframes(dataframe_a=df_a, dataframe_b=df_b)
