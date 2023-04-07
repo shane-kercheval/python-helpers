@@ -34,11 +34,17 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
-          pip install snowflake-connector-python==v2.7.4
-
+          if [[ "${{ matrix.python-version }}" != "3.11" ]]; then
+            pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
+            pip install snowflake-connector-python==v2.7.4
+          fi
       - name: Run tests
-        run: pytest tests
+        run: |
+          if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+            pytest tests -k "not test_database.py and not test_database_sqlite.py"
+          else
+            pytest tests
+          fi
       - name: Run linting
         run: |
           flake8 --max-line-length 99 --ignore=E127 helpsk
