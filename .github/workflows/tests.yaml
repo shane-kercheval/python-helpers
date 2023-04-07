@@ -41,7 +41,7 @@ jobs:
       - name: Run tests
         run: |
           if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
-            pytest tests -k "not test_database.py and not test_database_sqlite.py"
+            pytest tests -k "not test_database.py"
           else
             pytest tests
           fi
