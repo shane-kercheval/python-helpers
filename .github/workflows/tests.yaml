@@ -47,11 +47,6 @@ jobs:
       - name: Run tests
         run: |
           pytest tests  
-      # if [[ "${{ matrix.python-version }}" == "3.11" ]]; then
-      #   pytest tests -k "not test_database.py"
-      # else
-      #   pytest tests
-      # fi
     - name: Run linting
         run: |
           flake8 --max-line-length 99 --ignore=E127 helpsk
