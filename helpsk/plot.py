@@ -100,7 +100,7 @@ def plot_correlation_heatmap(
         features_to_highlight:
             feature labels to highlight in red
     """
-    correlations = dataframe.corr()
+    correlations = dataframe.corr(numeric_only=True)
 
     if threshold is not None:
         features = correlations.columns.values

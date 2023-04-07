@@ -6,13 +6,13 @@ from typing import Type
 
 import numpy as np
 import pandas as pd
-from pandas.core.dtypes.common import is_categorical
+from pandas.core.dtypes.common import is_categorical_dtype
 
 from helpsk.exceptions import HelpskParamTypeError, HelpskParamValueError
 from helpsk.utility import suppress_warnings
 
 
-def is_none_nan(value: object, /) -> bool:
+def is_none_nan(value: object) -> bool:
     """Returns True if the value is None or various NaN/NA types.
     """
     if value is None \
@@ -24,7 +24,7 @@ def is_none_nan(value: object, /) -> bool:
     return False
 
 
-def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object, /) -> bool:
+def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> bool:
     """Can be used with a single value or a collection of values. Returns `True` if any item in
     `values` are `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
 
@@ -142,7 +142,12 @@ def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
     with suppress_warnings():
         # if either list-like structure is categorical, then we need to convert both to unordered
         # categorical
-        if is_categorical(iterable_a) or is_categorical(iterable_b):
+        if len(iterable_a) != len(iterable_b):
+            return False
+        if len(iterable_a) == 0 and len(iterable_b) == 0:
+            return True
+
+        if is_categorical_dtype(iterable_a) or is_categorical_dtype(iterable_b):
             iterable_a = pd.Categorical(iterable_a, ordered=False)
             iterable_b = pd.Categorical(iterable_b, ordered=False)
         else:
