@@ -174,10 +174,10 @@ class TestValidation(unittest.TestCase):
         subtest_iterables_are_equal([np.nan], [np.nan], np.float64)
         subtest_iterables_are_equal([1, 2, 3, 4], [1, 2, 3, 4], np.float64)
         subtest_iterables_are_equal([np.nan, 1, 2, 3, 4], [np.nan, 1, 2, 3, 4], np.float64)
-        subtest_iterables_are_equal([np.nan, 1, 2, 3, 4, np.nan], [np.nan, 1, 2, 3, 4, np.nan], np.float64)
+        subtest_iterables_are_equal([np.nan, 1, 2, 3, 4, np.nan], [np.nan, 1, 2, 3, 4, np.nan], np.float64)  # noqa
 
         subtest_iterables_are_equal(iterable_a=['a', 'b', 'c', 'd'], iterable_b=['a', 'b', 'c', 'd'], dtype=str)  # noqa
-        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 'd'], [np.nan, 'a', 'b', 'c', 'd'], str)
+        subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 'd'], [np.nan, 'a', 'b', 'c', 'd'], str)  # noqa
         subtest_iterables_are_equal([np.nan, 'a', 'b', 'c', 'd', np.nan], [np.nan, 'a', 'b', 'c', 'd', np.nan], str)  # noqa
 
         subtest_iterables_are_equal(['a', 'b', 'c', 4], ['a', 'b', 'c', 4], str)
@@ -196,22 +196,22 @@ class TestValidation(unittest.TestCase):
         subtest_iterables_are_not_equal(iterable_a=[], iterable_b=[''], dtype=str)
         subtest_iterables_are_not_equal(iterable_a=[''], iterable_b=[], dtype=str)
 
-        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1, 2, 3, 4], dtype=np.float64)
-        subtest_iterables_are_not_equal(iterable_a=[0, 1, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)
-        subtest_iterables_are_not_equal(iterable_a=[1.000001, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)
-        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1.000001, 2, 3], dtype=np.float64)
-        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1.000001, 2, 3], dtype=np.float64)
-        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[np.nan, 2, 3], dtype=np.float64)
-        subtest_iterables_are_not_equal(iterable_a=[np.nan, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)
-        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[None, 2, 3], dtype=np.float64)
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1, 2, 3, 4], dtype=np.float64)  # noqa
+        subtest_iterables_are_not_equal(iterable_a=[0, 1, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)  # noqa
+        subtest_iterables_are_not_equal(iterable_a=[1.000001, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)  # noqa
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1.000001, 2, 3], dtype=np.float64)  # noqa
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[1.000001, 2, 3], dtype=np.float64)  # noqa
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[np.nan, 2, 3], dtype=np.float64)  # noqa
+        subtest_iterables_are_not_equal(iterable_a=[np.nan, 2, 3], iterable_b=[1, 2, 3], dtype=np.float64)  # noqa
+        subtest_iterables_are_not_equal(iterable_a=[1, 2, 3], iterable_b=[None, 2, 3], dtype=np.float64)  # noqa
 
     def test_iterables_are_equal__ordered(self):
-        # found a bug where two pd.Categorical series will not return True even if they have the same values,
-        # but with different ordered; but we only care about the values
+        # found a bug where two pd.Categorical series will not return True even if they have the
+        # same values, but with different ordered; but we only care about the values
         values = [np.nan, 'a', 'b', 'c', 'd']
         series = pd.Series(values)
         unordered_categorical = pd.Categorical(values=values, ordered=False)
-        ordered_categorical = pd.Categorical(values=values, categories=['d', 'c', 'a', 'b'], ordered=True)
+        ordered_categorical = pd.Categorical(values=values, categories=['d', 'c', 'a', 'b'], ordered=True)  # noqa
 
         self.assertTrue(hv.iterables_are_equal(values, series))
         self.assertTrue(hv.iterables_are_equal(values, unordered_categorical))
@@ -254,7 +254,7 @@ class TestValidation(unittest.TestCase):
         with self.assertRaises(he.HelpskParamValueError):
             hv.dataframes_match(dataframes=[dataframe_1])
 
-        # test that there are no side effects; e.g. we set the index/column values if we ignore them
+        # test that there are no side effects; e.g. we set index/column values if we ignore them
         dataframe_1_original = dataframe_1.copy()
         dataframe_2 = dataframe_1.copy()
         dataframe_2.index = ['a', 'b', 'c', 'd']
@@ -273,11 +273,11 @@ class TestValidation(unittest.TestCase):
 
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1]))
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1, dataframe_1]))
-        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_1.copy()]))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_1.copy()]))  # noqa
 
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6)]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1, dataframe_1.round(5)]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1, dataframe_1.round(5)]))  # noqa
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(5)],
                                             float_tolerance=5))
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.round(6),
@@ -289,69 +289,69 @@ class TestValidation(unittest.TestCase):
         dataframe_2.iat[0, 0] = dataframe_2.iat[0, 0] - 0.000001
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[1, 1]))
         dataframe_2.iat[1, 1] = 'c'
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[2, 2]))
         dataframe_2.iat[2, 2] = hs.RoundTo.MILLIONS
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[2, 3]))
         dataframe_2.iat[2, 3] = dataframe_2.iat[2, 3] + timedelta(seconds=1)
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[2, 3]))
         dataframe_2.iat[2, 3] = dataframe_2.iat[2, 3] + timedelta(seconds=1) - timedelta(seconds=1)
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
-        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[0, 0]))
         dataframe_2.iat[0, 0] = np.NaN
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[1, 1]))
         dataframe_2.iat[1, 1] = np.NaN
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[1, 2]))
         dataframe_2.iat[1, 2] = np.NaN
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[1, 3]))
         dataframe_2.iat[1, 3] = np.NaN
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         dataframe_2.index = ['a', 'b', 'c', 'd']
         dataframe_2.columns = ['a', 'b', 'c', 'd', 'e']
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertTrue(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2, dataframe_2]))
-        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_indexes=False))
+        self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2], ignore_indexes=False))  # noqa
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2],
                                              ignore_column_names=False))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1],

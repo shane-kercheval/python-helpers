@@ -127,6 +127,31 @@ class TestDiff(unittest.TestCase):
         with open(get_test_path('diff/diff_text__lists.html'), 'w') as file:
             file.write(results)
 
+    def test__diff_test__empty_strings(self):
+        results = diff.diff_text(text_a='', text_b='')
+        with open(get_test_path('diff/diff_text__empty_both.html'), 'w') as file:
+            file.write(results)
+
+        results = diff.diff_text(text_a='', text_b='Not Empty')
+        with open(get_test_path('diff/diff_text__empty_a.html'), 'w') as file:
+            file.write(results)
+
+        results = diff.diff_text(text_a='Not Empty', text_b='')
+        with open(get_test_path('diff/diff_text__empty_b.html'), 'w') as file:
+            file.write(results)
+
+        results = diff.diff_text(text_a=[], text_b=[])
+        with open(get_test_path('diff/diff_text__empty_lists.html'), 'w') as file:
+            file.write(results)
+
+        results = diff.diff_text(text_a=[''], text_b=[''])
+        with open(get_test_path('diff/diff_text__empty_list_values.html'), 'w') as file:
+            file.write(results)
+
+        results = diff.diff_text(text_a=[''], text_b=['Not Empty'])
+        with open(get_test_path('diff/diff_text__empty_list_values_a.html'), 'w') as file:
+            file.write(results)
+
 
 if __name__ == '__main__':
     unittest.main()

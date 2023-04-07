@@ -37,7 +37,7 @@ class RoundTo(Enum):
     MILLIONS = 'M'
     BILLIONS = 'B'
     TRILLIONS = 'T'
-    AUTO = auto()
+    AUTO = 'AUTO'
 
 
 def format_number(value: float,

@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         # Run in all these versions of Python
-        python-version: ['3.9', '3.10']
+        python-version: ['3.9', '3.10', '3.11']
 
     steps:
         # Checkout the latest code from the repo
@@ -34,11 +34,19 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
-          pip install snowflake-connector-python==v2.7.4
-
+          if [[ "${{ matrix.python-version }}" == "3.9" ]]; then
+            pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
+            pip install snowflake-connector-python==v2.7.4
+          elif [[ "${{ matrix.python-version }}" == "3.10" ]]; then
+            pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v3.0.2/tested_requirements/requirements_310.reqs
+            pip install snowflake-connector-python==v3.0.2
+          elif [[ "${{ matrix.python-version }}" == "3.11" ]]; then
+            pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v3.0.2/tested_requirements/requirements_311.reqs
+            pip install snowflake-connector-python==v3.0.2
+          fi
       - name: Run tests
-        run: pytest tests
+        run: |
+          pytest tests
       - name: Run linting
         run: |
           flake8 --max-line-length 99 --ignore=E127 helpsk
