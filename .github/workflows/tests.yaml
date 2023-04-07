@@ -37,12 +37,6 @@ jobs:
           if [[ "${{ matrix.python-version }}" == "3.9" ]]; then
             pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
             pip install snowflake-connector-python==v2.7.4
-          elif [[ "${{ matrix.python-version }}" == "3.10" ]]; then
-            pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v3.0.2/tested_requirements/requirements_310.reqs
-            pip install snowflake-connector-python==v3.0.2
-          elif [[ "${{ matrix.python-version }}" == "3.11" ]]; then
-            pip install -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v3.0.2/tested_requirements/requirements_311.reqs
-            pip install snowflake-connector-python==v3.0.2
           fi
       - name: Run tests
         run: |
