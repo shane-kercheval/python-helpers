@@ -516,7 +516,7 @@ class MLExperimentResults:
         if self._dataframe is None:
             for score_name in self.score_names:
                 confidence_intervals = st.t.interval(
-                    alpha=0.95,  # confidence interval
+                    confidence=0.95,  # confidence interval
                     # number_of_splits is sample-size
                     df=self.number_of_splits - 1,  # degrees of freedom
                     loc=self.test_score_averages[score_name],
@@ -2055,11 +2055,11 @@ class TwoClassEvaluator:
                                           predicted_scores=self._predicted_scores,
                                           score_threshold=threshold)
 
-            return threshold,\
-                temp_eval.true_positive_rate,\
-                temp_eval.false_positive_rate,\
-                temp_eval.positive_predictive_value,\
-                temp_eval.false_negative_rate,\
+            return threshold, \
+                temp_eval.true_positive_rate, \
+                temp_eval.false_positive_rate, \
+                temp_eval.positive_predictive_value, \
+                temp_eval.false_negative_rate, \
                 temp_eval.true_negative_rate
 
         threshold_curves = [get_threshold_scores(threshold=x)

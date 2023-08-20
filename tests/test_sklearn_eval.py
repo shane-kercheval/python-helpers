@@ -7,9 +7,10 @@ import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.impute import SimpleImputer
-from sklearn.metrics import make_scorer, f1_score, precision_score, recall_score, SCORERS, \
+from sklearn.metrics import make_scorer, f1_score, precision_score, recall_score, \
     roc_auc_score, fbeta_score, cohen_kappa_score, \
     confusion_matrix, mean_squared_error, mean_absolute_error
+from sklearn.metrics._scorer import _SCORERS
 from sklearn.model_selection import train_test_split, GridSearchCV, RepeatedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import label_binarize, StandardScaler, OneHotEncoder
@@ -81,7 +82,7 @@ class TestSklearnEval(unittest.TestCase):
         # https://stackoverflow.com/questions/60615281/different-result-roc-auc-score-and-plot-roc-curve
         scores = {
             # https://github.com/scikit-learn/scikit-learn/blob/2beed5584/sklearn_eval/metrics/_scorer.py#L537
-            'ROC/AUC': SCORERS['roc_auc'],
+            'ROC/AUC': _SCORERS['roc_auc'],
             'F1': make_scorer(f1_score, greater_is_better=True),
             'Pos. Pred. Val': make_scorer(precision_score, greater_is_better=True),
             'True Pos. Rate': make_scorer(recall_score, greater_is_better=True),
