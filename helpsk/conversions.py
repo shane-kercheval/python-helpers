@@ -8,7 +8,7 @@ def _percent_converted(seconds_to_convert: pd.Series, period_in_seconds: int) ->
     return ((seconds_to_convert > 0) & (seconds_to_convert <= period_in_seconds)).mean()
 
 
-def cohorted_conversion_rate(
+def cohorted_conversion_rates(
         df: pd.DataFrame,
         base_timestamp: str,
         conversion_timestamp: str,
@@ -19,8 +19,6 @@ def cohorted_conversion_rate(
     """
     Calculate the cohorted conversion rate for a given base timestamp and conversion timestamp
 
-    Update the function so that it takes a `current_datetime` value that represents the current date and time. For a cohort where any record in the cohort hasn't had enough time elapse between the base_timestamp and the time to convert based on the intervals, that cohort should have a nan value. So for example, if the cohort for `2020-01-01` has a record where the base_timestamp is `2020-01-25 00:00:00` and current_datime is `2020-02-02 00:00:00` and there intervals [(1, 'days'), (10, 'days')] then the first interval is valid because everyone in the cohort has had enough time to convert (i.e. everyone has had at least 1 day in the cohort), but not everyone has had 5 days (e.g. the timestamp for `2020-01-25 00:00:00` has only been in the cohort for 8 days which is not enough time to know if it will convert in 10 days. So the conversion rate is valid for the first interval but not the second.
-    
     Args:
         base_timestamp:
             The column name for the base timestamp to use for the calculation.
@@ -81,3 +79,117 @@ def cohorted_conversion_rate(
         .sort_values(group_by, ascending=True)
     )
     return conversions
+
+
+def plot_cohorted_conversion_rates(
+        df: pd.DataFrame,
+        base_timestamp: str,
+        conversion_timestamp: str,
+        cohort: str,
+        intervals: list[tuple[int, str]],
+        groups: str | None = None,
+        current_datetime: str | None = None,
+        graph_type: str = 'bar',
+        title: str | None = None,
+        subtitle: str | None = None,
+        x_axis_label: str | None = None,
+        y_axis_label: str | None = None,
+        legend_label: str | None = None,
+        facet_col_wrap: int = 2,
+        bar_mode: str = 'overlay',
+        opacity: float = 0.9,
+        height: int = 700,
+        width: int | None = None,
+        free_y_axis: bool = True) -> pd.DataFrame:
+    """
+    Calculate the cohorted converssion rate for a given base timestamp and conversion timestamp
+
+    Args:
+        base_timestamp:
+            The column name for the base timestamp to use for the calculation.
+        conversion_timestamp:
+            The column name for the conversion timestamp to use for the calculation.
+        cohort:
+            The column name for the cohort (e.g. day, week, month) to use for the calculation.
+        intervals:
+            A list of intervals to calculate the conversion rate for in the form of (value, unit)
+            which represents the number of units to calculate the conversion rate for.
+        groups:
+            The column name for the groups/segments to calculate the conversion rate for.
+        current_datetime:
+            The current datetime to use for calculating whether an interval is valid.
+        graph_type:
+            The type of chart to use for the visualization. Either 'bar' or 'line'
+        bar_mode:
+            Valid options are `overlay` and `group`. Default is `overlay`. If `relative` is passed
+            in it is converted to `overlay`.
+    """
+    import plotly_express as px
+    conversions = cohorted_conversion_rates(
+        df=df,
+        base_timestamp=base_timestamp,
+        conversion_timestamp=conversion_timestamp,
+        cohort=cohort,
+        intervals=intervals,
+        groups=groups,
+        current_datetime=current_datetime,
+    )
+    if not title and not subtitle:
+        title = '<br><sub>This graph shows the cohorted conversion rates over time at various durations relative to the base timestamp.</sub>'  # noqa
+    else:
+        title = title or ''
+        title += f'<br><sub>{subtitle}</sub>'
+
+    columns = [f'{x} {y}' for x, y in intervals]
+    labels = {
+        'value': y_axis_label or 'Conversion Rate',
+        'variable': legend_label or 'Allowed Duration',
+        'cohort': x_axis_label or 'Cohort',
+    }
+    category_orders = {'variable': sorted(columns, reverse=True)}
+    hover_data = {
+        'value': ':.1%',
+        '# of records': ':,',
+    }
+    if bar_mode is None or bar_mode == 'relative':
+        bar_mode = 'overlay'
+
+    if graph_type == 'bar':
+        fig = px.bar(
+            conversions,
+            x='cohort',
+            y=columns,
+            title=title,
+            labels=labels,
+            category_orders=category_orders,
+            facet_col=groups,
+            facet_col_wrap=facet_col_wrap,
+            hover_data=hover_data,
+            barmode=bar_mode,
+            opacity=opacity,
+            height=height,
+            width=width,
+        )
+    elif graph_type == 'line':
+        fig = px.line(
+            conversions,
+            x='cohort',
+            y=columns,
+            title=title,
+            labels=labels,
+            category_orders=category_orders,
+            facet_col=groups,
+            facet_col_wrap=facet_col_wrap,
+            hover_data=hover_data,
+            height=height,
+            width=width,
+        )
+    else:
+        raise ValueError(f'Invalid graph_type: {graph_type}')
+
+    if groups and free_y_axis:
+        fig.update_yaxes(matches=None)
+        fig.for_each_yaxis(lambda yaxis: yaxis.update(showticklabels=True))
+
+    fig.update_yaxes(tickformat=',.0%')
+    return fig

@@ -1,7 +1,7 @@
 
 """Tests for the conversions.py module."""
 import pandas as pd
-from helpsk.conversions import cohorted_conversion_rate
+from helpsk.conversions import cohorted_conversion_rates
 
 
 def test_cohorted_conversion_rate__day_cohort(conversions):
@@ -14,7 +14,7 @@ def test_cohorted_conversion_rate__day_cohort(conversions):
     df['cohort'] = df['created_at'].dt.to_period('D').dt.to_timestamp()
 
     df_copy = df.copy()
-    result = cohorted_conversion_rate(
+    result = cohorted_conversion_rates(
         df=df,
         base_timestamp='created_at',
         conversion_timestamp='conversion_1',
@@ -43,7 +43,7 @@ def test_cohorted_conversion_rate__day_cohort(conversions):
     current_datetime = '2023-01-25 23:59:50'
 
     # Call the conversion_rate function
-    result = cohorted_conversion_rate(
+    result = cohorted_conversion_rates(
         df=df,
         base_timestamp='created_at',
         conversion_timestamp='conversion_1',
@@ -102,7 +102,7 @@ def test_cohorted_conversion_rate__week_cohort(conversions):
     df['cohort'] = df['created_at'].dt.to_period('W').dt.to_timestamp()
 
     df_copy = df.copy()
-    result = cohorted_conversion_rate(
+    result = cohorted_conversion_rates(
         df=df,
         base_timestamp='created_at',
         conversion_timestamp='conversion_1',
@@ -130,7 +130,7 @@ def test_cohorted_conversion_rate__week_cohort(conversions):
     current_datetime = '2023-01-25 23:59:50'
 
     # Call the conversion_rate function
-    result = cohorted_conversion_rate(
+    result = cohorted_conversion_rates(
         df=df,
         base_timestamp='created_at',
         conversion_timestamp='conversion_1',
@@ -182,7 +182,7 @@ def test_cohorted_conversion_rate__groups(conversions):
     df['cohort'] = df['created_at'].dt.to_period('W').dt.to_timestamp()
 
     df_copy = df.copy()
-    result = cohorted_conversion_rate(
+    result = cohorted_conversion_rates(
         df=df,
         base_timestamp='created_at',
         conversion_timestamp='conversion_1',
