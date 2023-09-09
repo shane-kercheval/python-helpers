@@ -138,7 +138,25 @@ def get_data_credit() -> pd.DataFrame:
     # data = credit_g['data']
     # data['target'] = credit_g['target']
     # data.to_pickle(get_test_path('../test_data/credit.pkl'))
-    return pd.read_pickle(get_test_path('../test_data/credit.pkl'))
+    credit = pd.read_csv(get_test_path('../test_data/credit.csv'))
+    credit['purpose'] = credit['purpose'].astype('category')
+    categories = [
+        'new car', 'used car', 'furniture/equipment', 'radio/tv',
+        'domestic appliance', 'repairs', 'education', 'vacation', 'retraining',
+        'business', 'other',
+    ]
+    credit['purpose'] = credit['purpose'].cat.set_categories(categories)
+    credit['credit_history'] = credit['credit_history'].astype('category')
+    categories = [
+        'delayed previously',
+        'critical/other existing credit',
+        'existing paid',
+        'no credits/all paid',
+        'all paid'
+    ]
+    credit['credit_history'] = credit['credit_history'].cat.set_categories(categories)
+    credit['checking_status'] = credit['checking_status'].astype('category')
+    return credit
 
 
 def get_data_titanic() -> pd.DataFrame:
@@ -148,7 +166,7 @@ def get_data_titanic() -> pd.DataFrame:
     # data = titanic['data']
     # data['survived'] = titanic['target']
     # data.to_pickle(get_test_path('../test_data/titanic.pkl'))
-    return pd.read_pickle(get_test_path('../test_data/titanic.pkl'))
+    return pd.read_csv(get_test_path('../test_data/titanic.csv'))
 
 
 def get_data_housing() -> pd.DataFrame:
@@ -159,7 +177,7 @@ def get_data_housing() -> pd.DataFrame:
     # data = housing['data']
     # data['target'] = housing['target']
     # data.to_pickle(get_test_path('../test_data/housing.pkl'))
-    return pd.read_pickle(get_test_path('../test_data/housing.pkl'))
+    return pd.read_csv(get_test_path('../test_data/housing.csv'))
 
 
 def helper_test_dataframe(file_name, dataframe):
