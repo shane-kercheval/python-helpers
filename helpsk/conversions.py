@@ -72,7 +72,7 @@ def cohorted_conversion_rates(
 
     conversions = (
         df
-        .assign(seconds_to_conversion=lambda x: (x[conversion_timestamp] - x[base_timestamp]).dt.total_seconds())
+        .assign(seconds_to_conversion=lambda x: (x[conversion_timestamp] - x[base_timestamp]).dt.total_seconds())  # noqa
         .groupby(group_by)
         .apply(f)
         .reset_index()

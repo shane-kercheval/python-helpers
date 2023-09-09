@@ -1,7 +1,7 @@
 
 """Tests for the conversions.py module."""
 import pandas as pd
-from helpsk.conversions import cohorted_conversion_rates
+from helpsk.conversions import cohorted_conversion_rates, plot_cohorted_conversion_rates
 
 
 def test_cohorted_conversion_rate__day_cohort(conversions):
@@ -230,3 +230,68 @@ def test_cohorted_conversion_rate__groups(conversions):
     assert pd.isna(result['30 days'].iloc[3])
     assert pd.isna(result['30 days'].iloc[4])
     assert pd.isna(result['30 days'].iloc[5])
+
+
+def test_plot_cohorted_conversion_rates(conversions):
+    df = conversions.copy()
+    df['cohort'] = df['created_at'].dt.to_period('W').dt.to_timestamp()
+    _ = plot_cohorted_conversion_rates(
+        df=df,
+        base_timestamp='created_at',
+        conversion_timestamp='conversion_1',
+        cohort='cohort',
+        intervals=[(1, 'seconds'), (1, 'minutes'), (2, 'hours'), (1, 'days'), (30, 'days')],
+        groups=None,
+        current_datetime='2023-01-25 23:59:50',
+    )
+    _ = plot_cohorted_conversion_rates(
+        df=df,
+        base_timestamp='created_at',
+        conversion_timestamp='conversion_1',
+        cohort='cohort',
+        intervals=[(1, 'seconds'), (1, 'minutes'), (2, 'hours'), (1, 'days'), (30, 'days')],
+        groups='segments',
+        current_datetime='2023-01-25 23:59:50',
+    )
+    _ = plot_cohorted_conversion_rates(
+        df=df,
+        base_timestamp='created_at',
+        conversion_timestamp='conversion_1',
+        cohort='cohort',
+        intervals=[(1, 'seconds'), (1, 'minutes'), (2, 'hours'), (1, 'days'), (30, 'days')],
+        groups='segments',
+        current_datetime='2023-01-25 23:59:50',
+        graph_type='bar',
+        title='Title',
+        subtitle='Subtitle',
+        x_axis_label='X Axis Label',
+        y_axis_label='Y Axis Label',
+        legend_label='Legend Label',
+        facet_col_wrap=6,
+        bar_mode='relative',
+        opacity=0.9,
+        height=800,
+        width=100,
+        free_y_axis=False,
+    )
+    _ = plot_cohorted_conversion_rates(
+        df=df,
+        base_timestamp='created_at',
+        conversion_timestamp='conversion_1',
+        cohort='cohort',
+        intervals=[(1, 'seconds'), (1, 'minutes'), (2, 'hours'), (1, 'days'), (30, 'days')],
+        groups='segments',
+        current_datetime='2023-01-25 23:59:50',
+        graph_type='line',
+        title='Title',
+        subtitle='Subtitle',
+        x_axis_label='X Axis Label',
+        y_axis_label='Y Axis Label',
+        legend_label='Legend Label',
+        facet_col_wrap=6,
+        bar_mode='relative',
+        opacity=0.9,
+        height=800,
+        width=100,
+        free_y_axis=True,
+    )
