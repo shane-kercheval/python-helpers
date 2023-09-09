@@ -2,6 +2,7 @@
 init file
 """
 import helpsk.color  # noqa
+import helpsk.conversions
 import helpsk.date
 import helpsk.pandas
 import helpsk.string
