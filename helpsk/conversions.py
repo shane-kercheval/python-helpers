@@ -144,7 +144,7 @@ def plot_cohorted_conversion_rates(
     labels = {
         'value': y_axis_label or 'Conversion Rate',
         'variable': legend_label or 'Allowed Duration',
-        'cohort': x_axis_label or 'Cohort',
+        cohort: x_axis_label or 'Cohort',
     }
     category_orders = {'variable': sorted(columns, reverse=True)}
     hover_data = {
@@ -157,7 +157,7 @@ def plot_cohorted_conversion_rates(
     if graph_type == 'bar':
         fig = px.bar(
             conversions,
-            x='cohort',
+            x=cohort,
             y=columns,
             title=title,
             labels=labels,
@@ -173,7 +173,7 @@ def plot_cohorted_conversion_rates(
     elif graph_type == 'line':
         fig = px.line(
             conversions,
-            x='cohort',
+            x=cohort,
             y=columns,
             title=title,
             labels=labels,
