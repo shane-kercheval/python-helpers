@@ -1,5 +1,5 @@
 """Functions to help with calculating conversation/retension rates."""
-
+from __future__ import annotations
 import datetime
 import pandas as pd
 
