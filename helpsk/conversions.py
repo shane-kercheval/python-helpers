@@ -138,7 +138,8 @@ def plot_cohorted_conversion_rates(
         title = '<br><sub>This graph shows the cohorted conversion rates over time at various durations relative to the base timestamp.</sub>'  # noqa
     else:
         title = title or ''
-        title += f'<br><sub>{subtitle}</sub>'
+        if subtitle:
+            title += f'<br><sub>{subtitle}</sub>'
 
     columns = [f'{x} {y}' for x, y in intervals]
     labels = {
