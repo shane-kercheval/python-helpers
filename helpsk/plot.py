@@ -276,14 +276,14 @@ def plot_histogram_with_categorical(
         missing_value_replacement:
             the value
     """
-    cut_dataframe = pd.DataFrame(
-        pd.cut(
-            dataframe[numeric_column],
+    cut_dataframe = pd.DataFrame({
+        numeric_column: pd.cut(
+            dataframe[numeric_column].values,
             bins=10,
             right=True,
             include_lowest=True
         )
-    )
+    })
 
     cut_dataframe[numeric_column] = hpandas.fill_na(
         cut_dataframe[numeric_column],
