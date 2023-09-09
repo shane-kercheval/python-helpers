@@ -96,6 +96,7 @@ def plot_cohorted_conversion_rates(
         y_axis_label: str | None = None,
         legend_label: str | None = None,
         facet_col_wrap: int = 2,
+        category_orders: dict | None = None,
         bar_mode: str = 'overlay',
         opacity: float = 0.9,
         height: int = 700,
@@ -147,7 +148,10 @@ def plot_cohorted_conversion_rates(
         'variable': legend_label or 'Allowed Duration',
         cohort: x_axis_label or 'Cohort',
     }
-    category_orders = {'variable': sorted(columns, reverse=True)}
+    if category_orders:
+        category_orders['variable'] = sorted(columns, reverse=True)
+    else:
+        category_orders = {'variable': sorted(columns, reverse=True)}
     hover_data = {
         'value': ':.1%',
         '# of records': ':,',

@@ -251,6 +251,7 @@ def test_plot_cohorted_conversion_rates(conversions):
         cohort='cohort',
         intervals=[(1, 'seconds'), (1, 'minutes'), (2, 'hours'), (1, 'days'), (30, 'days')],
         groups='segments',
+        category_orders={},
         current_datetime='2023-01-25 23:59:50',
     )
     _ = plot_cohorted_conversion_rates(
@@ -269,6 +270,7 @@ def test_plot_cohorted_conversion_rates(conversions):
         legend_label='Legend Label',
         facet_col_wrap=6,
         bar_mode='relative',
+        category_orders={'abc': ['a', 'b', 'c']},
         opacity=0.9,
         height=800,
         width=100,
