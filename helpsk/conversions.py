@@ -280,14 +280,14 @@ def retention_matrix(
     df['period'] = (df['event_period'] - df['cohort']).dt.days // num_days_in_internal
     df['period'] = df['period'].astype(int)
 
-    # Group by cohort_week, event_week and user_id, then filter by min_visits
+    # Group by cohort_week, event_week and unique_id, then filter by min_visits
     user_events_by_period = (
         df
         .groupby(['cohort', 'period', unique_id])
         .size()
         .reset_index(name='event_count')
     )
-    assert not user_events_by_period[['user_id', 'period']].duplicated().any()
+    assert not user_events_by_period[[unique_id, 'period']].duplicated().any()
     # for records where period == 0, the user is considered retained by definition so we don't
     # need to filter
     retained_users = user_events_by_period[
