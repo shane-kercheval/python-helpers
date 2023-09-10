@@ -257,7 +257,8 @@ def retention_matrix(
         aggfunc='nunique',
     )
 
-    # Step 3: Calculate the retention rate by dividing the number of active users each week by the cohort size
+    # Step 3: Calculate the retention rate by dividing the number of active users each week by the
+    # cohort size
     cohort_size = cohort_matrix.iloc[:, 0]
     matrix = cohort_matrix.divide(cohort_size, axis=0).fillna(0)
     assert (matrix <= 1).all().all()

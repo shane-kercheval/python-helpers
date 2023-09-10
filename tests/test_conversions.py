@@ -389,4 +389,3 @@ def test_retention_matrix():  # noqa
     assert (retention.drop(columns=['cohort', '# of records']) <= 1).all().all()
     assert (retention['# of records'] > 1).any()
     assert (retention['0'] == 1).all().all()
-
