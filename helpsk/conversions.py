@@ -240,6 +240,8 @@ def retention_matrix(
 
     # Step 1: Determine the cohort of each user (the week of their first event)
     df = df[[timestamp, unique_id]].copy()
+    assert not df.isna().any().any()
+
     df['event_period'] = df[timestamp].dt.to_period(cohort_interval).dt.start_time
     df['cohort'] = (
         df.groupby(unique_id)[timestamp]
@@ -248,6 +250,7 @@ def retention_matrix(
         .dt.start_time
     )
     df['period'] = (df['event_period'] - df['cohort']).dt.days // divide_by
+    df['period'] = df['period'].astype(int)
 
     # Step 2: Create a crosstab of users by cohort week and event week
     cohort_matrix = pd.crosstab(
