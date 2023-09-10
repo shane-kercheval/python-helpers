@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import numpy as np
 import pandas as pd
+from pandas.tseries.offsets import DateOffset
 from helpsk.pandas import relocate
 
 
@@ -224,7 +225,7 @@ def retention_matrix(
         timestamp: str,
         unique_id: str,
         min_events: int = 1,
-        cohort_interval: str = 'week',
+        intervals: str = 'week',
         current_datetime: str | None = None) -> pd.DataFrame:
     """
     Calculate the retention matrix for a given timestamp column and unique ID column.
@@ -243,41 +244,52 @@ def retention_matrix(
         min_events:
             The minimum number of events a user must have in order to be considered retained in
             subsequent weeks.
-        cohort_interval:
-            The interval to use for the cohort. Valid options are 'week' and 'day'. This value
-            also determines the interval to use for the event period.
+        intervals:
+            The intervals to use for the cohort. Valid options are 'month', 'week' and 'day'.
+            This value determines the interval to use for both the cohort and the event period.
+            Meaning, columns returned will be '0', '1', '2', etc. for the number of intervals. If
+            'months', then these numbers represent the number of months since the cohort. If 'week'
+            then these numbers represent the number of weeks since the cohort. And so on.
         current_datetime:
             The current datetime to use to filter out any events that occurred after the current
             datetime. If None, the current UTC datetime is used.
 
     """
     # get the number of weeks between the event week and the cohort week
-    if cohort_interval == 'week':
+    is_month_interval = intervals == 'month'
+    if intervals == 'month':
+        num_days_in_internal = None
+    elif intervals == 'week':
         num_days_in_internal = 7
-    elif cohort_interval == 'day':
+    elif intervals == 'day':
         num_days_in_internal = 1
     else:
-        raise ValueError(f'cohort_interval must be either "week" or "day", not {cohort_interval}')
+        raise ValueError(f'interval must be either "month", "week" or "day", not {intervals}')  # noqa
 
-    cohort_interval = cohort_interval[0].upper()
+    intervals = intervals[0].upper()
 
     if current_datetime is None:
         current_datetime = datetime.datetime.utcnow()
 
-    # Step 1: Determine the cohort of each user (the week of their first event)
     df = df[[timestamp, unique_id]].copy()
     assert not df.isna().any().any()
-
     # filter out any events that occurred after the current datetime
     df = df[df[timestamp] <= current_datetime]
-    df['event_period'] = df[timestamp].dt.to_period(cohort_interval).dt.start_time
+    # Step 1: Determine the cohort of each user (the day/week/month of their first event)
+    df['event_period'] = df[timestamp].dt.to_period(intervals).dt.start_time
     df['cohort'] = (
         df.groupby(unique_id)[timestamp]
         .transform('min')
-        .dt.to_period(cohort_interval)
+        .dt.to_period(intervals)
         .dt.start_time
     )
-    df['period'] = (df['event_period'] - df['cohort']).dt.days // num_days_in_internal
+    if is_month_interval:
+        # calculate the number of months between the cohort and the event
+        df['period'] = (df['event_period'].dt.year - df['cohort'].dt.year) * 12 + \
+            (df['event_period'].dt.month - df['cohort'].dt.month)
+    else:
+        df['period'] = (df['event_period'] - df['cohort']).dt.days // num_days_in_internal
+
     df['period'] = df['period'].astype(int)
 
     # Group by cohort_week, event_week and unique_id, then filter by min_visits
@@ -307,7 +319,11 @@ def retention_matrix(
     assert (matrix <= 1).all().all()
     for row in matrix.index:
         for col in matrix.columns:
-            if row + datetime.timedelta(days=col * num_days_in_internal) > current_datetime:
+            if is_month_interval:
+                offset = {'months': col}
+            else:
+                offset = {'days': col * num_days_in_internal}
+            if row + DateOffset(**offset) > current_datetime:
                 matrix.loc[row, col] = np.nan
 
     # Step 4: Reset index and column names for better readability

@@ -351,8 +351,7 @@ def generate_fake_data():
     base_date = datetime(2023, 1, 1)
     data = []
     for user_id in range(100):
-        for days in range(0, 70, 7):
-            # only append 5% of the time
+        for days in range(0, 70, 1):
             event_datetime = base_date + timedelta(days=days + user_id)
             if event_datetime > base_date + timedelta(days=100):
                 continue
@@ -378,7 +377,7 @@ def test_retention_matrix():  # noqa
         df,
         timestamp='datetime',
         unique_id='user_id',
-        cohort_interval='week',
+        intervals='week',
         current_datetime=df['datetime'].max(),
     )
     assert df.equals(copy_df)
@@ -405,7 +404,7 @@ def test_retention_matrix():  # noqa
         df,
         timestamp='datetime',
         unique_id='user_id',
-        cohort_interval='day',
+        intervals='day',
     )
     assert df.equals(copy_df)
     assert retention_day['cohort'].notna().all()
@@ -432,7 +431,7 @@ def test_retention_matrix():  # noqa
         df,
         timestamp='datetime',
         unique_id='user_id',
-        cohort_interval='week',
+        intervals='week',
         current_datetime=df['datetime'].max(),
         min_events=2,
     )
@@ -467,5 +466,69 @@ def test_retention_matrix():  # noqa
             df,
             timestamp='datetime',
             unique_id='user_id',
-            cohort_interval='week',
+            intervals='week',
         )
+
+
+def test_retention_matrix_by_month():  # noqa
+    df = generate_fake_data()
+    copy_df = df.copy()
+    retention_month = retention_matrix(
+        df,
+        timestamp='datetime',
+        unique_id='user_id',
+        intervals='month',
+        current_datetime=df['datetime'].max(),
+    )
+    assert df.equals(copy_df)
+    assert retention_month['cohort'].notna().all()
+    assert retention_month['# of records'].notna().all()
+    assert (retention_month.drop(columns=['cohort', '# of records']).fillna(0) <= 1).all().all()
+    assert (retention_month['# of records'] > 1).any()
+    assert (retention_month['0'] == 1).all().all()
+    assert retention_month['# of records'].sum() == df['user_id'].nunique()
+    expected_cohort_sizes = (
+        df
+        .groupby('user_id')
+        .agg(min_date=('datetime', 'min'))
+        .assign(cohort=lambda x: x['min_date'].dt.to_period('M').dt.to_timestamp())
+        .groupby('cohort')
+        .size()
+        .sort_index()
+        .values
+        .tolist()
+    )
+    assert retention_month['# of records'].tolist() == expected_cohort_sizes
+
+    retention_month_28 = retention_matrix(
+        df,
+        timestamp='datetime',
+        unique_id='user_id',
+        intervals='month',
+        current_datetime=df['datetime'].max(),
+        min_events=5,
+    )
+    # this could randomly fail if we don't have any retained users in the last month
+    assert retention_month.columns.tolist() == retention_month_28.columns.tolist()
+    assert df.equals(copy_df)
+    assert retention_month_28['cohort'].notna().all()
+    assert retention_month_28['# of records'].notna().all()
+    assert (retention_month_28.drop(columns=['cohort', '# of records']).fillna(0) <= 1).all().all()
+    assert (retention_month_28['# of records'] > 1).any()
+    assert (retention_month_28['0'] == 1).all().all()
+    assert retention_month_28['# of records'].sum() == df['user_id'].nunique()
+    expected_cohort_sizes = (
+        df
+        .groupby('user_id')
+        .agg(min_date=('datetime', 'min'))
+        .assign(cohort=lambda x: x['min_date'].dt.to_period('M').dt.to_timestamp())
+        .groupby('cohort')
+        .size()
+        .sort_index()
+        .values
+        .tolist()
+    )
+    assert retention_month_28['# of records'].tolist() == expected_cohort_sizes
+    _retention_month = retention_month.drop(columns=['cohort', '# of records', '0']).fillna(0)
+    _retention_month_28 = retention_month_28.drop(columns=['cohort', '# of records', '0']).fillna(0)
+    assert (_retention_month > _retention_month_28).any().any()
