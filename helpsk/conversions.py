@@ -81,6 +81,23 @@ def cohorted_conversion_rates(
     return conversions
 
 
+def _sort_intervals(durations):
+    """This is used to display the intervals/durations in the correct order on the graph."""
+    unit_multipliers = {
+        'days': 86400,  # 24 * 60 * 60
+        'hours': 3600,  # 60 * 60
+        'minutes': 60,
+        'seconds': 1,
+    }
+
+    def to_seconds(duration_tuple):
+        value, unit = duration_tuple
+        return value * unit_multipliers[unit]
+
+    sorted_durations = sorted(durations, key=to_seconds, reverse=True)
+    return sorted_durations
+
+
 def plot_cohorted_conversion_rates(
         df: pd.DataFrame,
         base_timestamp: str,
@@ -142,16 +159,16 @@ def plot_cohorted_conversion_rates(
         if subtitle:
             title += f'<br><sub>{subtitle}</sub>'
 
-    columns = [f'{x} {y}' for x, y in intervals]
+    columns = [f'{x} {y}' for x, y in _sort_intervals(intervals)]
     labels = {
         'value': y_axis_label or 'Conversion Rate',
         'variable': legend_label or 'Allowed Duration',
         cohort: x_axis_label or 'Cohort',
     }
     if category_orders:
-        category_orders['variable'] = sorted(columns, reverse=True)
+        category_orders['variable'] = columns
     else:
-        category_orders = {'variable': sorted(columns, reverse=True)}
+        category_orders = {'variable': columns}
     hover_data = {
         'value': ':.1%',
         '# of records': ':,',

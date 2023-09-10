@@ -1,7 +1,7 @@
 
 """Tests for the conversions.py module."""
 import pandas as pd
-from helpsk.conversions import cohorted_conversion_rates, plot_cohorted_conversion_rates
+from helpsk.conversions import _sort_intervals, cohorted_conversion_rates, plot_cohorted_conversion_rates
 
 
 def test_cohorted_conversion_rate__day_cohort(conversions):
@@ -297,3 +297,43 @@ def test_plot_cohorted_conversion_rates(conversions):
         width=100,
         free_y_axis=True,
     )
+
+
+def test__sort_intervals():
+    intervals = [
+        (120, 'seconds'),
+        (30, 'minutes'),
+        (2, 'hours'),
+        (1, 'days'),
+    ]
+    sorted_intervals = _sort_intervals(intervals)
+    assert sorted_intervals == [
+        (1, 'days'),
+        (2, 'hours'),
+        (30, 'minutes'),
+        (120, 'seconds'),
+    ]
+
+    intervals = [
+        (45, 'seconds'),
+        (1, 'hours'),
+        (5, 'minutes'),
+    ]
+    sorted_intervals = _sort_intervals(intervals)
+    assert sorted_intervals == [
+        (1, 'hours'),
+        (5, 'minutes'),
+        (45, 'seconds'),
+    ]
+
+    intervals = [
+        (1, 'days'),
+        (14, 'days'),
+        (7, 'days'),
+    ]
+    sorted_intervals = _sort_intervals(intervals)
+    assert sorted_intervals == [
+        (14, 'days'),
+        (7, 'days'),
+        (1, 'days'),
+    ]
