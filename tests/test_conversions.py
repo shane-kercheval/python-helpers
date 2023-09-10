@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
+import pytest
 from helpsk.conversions import (
     _sort_intervals,
     cohorted_conversion_rates,
@@ -368,7 +369,6 @@ def generate_fake_data():
 
 
 def test_retention_matrix():  # noqa
-
     df = generate_fake_data()
     retention = retention_matrix(
         df,
@@ -389,3 +389,12 @@ def test_retention_matrix():  # noqa
     assert (retention.drop(columns=['cohort', '# of records']) <= 1).all().all()
     assert (retention['# of records'] > 1).any()
     assert (retention['0'] == 1).all().all()
+
+    df.iloc[0, 0] = np.nan
+    with pytest.raises(AssertionError):
+        retention_matrix(
+            df,
+            timestamp='datetime',
+            unique_id='user_id',
+            cohort_interval='week',
+        )
