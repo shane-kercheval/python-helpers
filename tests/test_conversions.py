@@ -1,7 +1,14 @@
 
 """Tests for the conversions.py module."""
+from datetime import datetime, timedelta
 import pandas as pd
-from helpsk.conversions import _sort_intervals, cohorted_conversion_rates, plot_cohorted_conversion_rates
+import numpy as np
+from helpsk.conversions import (
+    _sort_intervals,
+    cohorted_conversion_rates,
+    plot_cohorted_conversion_rates,
+    retention_matrix
+)
 
 
 def test_cohorted_conversion_rate__day_cohort(conversions):
@@ -337,3 +344,49 @@ def test__sort_intervals():
         (7, 'days'),
         (1, 'days'),
     ]
+
+
+def generate_fake_data():
+    base_date = datetime(2023, 1, 1)
+    data = []
+    for user_id in range(100):
+        for days in range(0, 70, 7):
+            # only append 5% of the time
+            if np.random.rand() < 0.5:
+                # print('append', user_id, days)
+                data.append({
+                    'user_id': user_id,
+                    'datetime': base_date + timedelta(days=days + user_id)
+                })
+            if np.random.rand() < 0.5:
+                # print('append', user_id, days)
+                data.append({
+                    'user_id': user_id,
+                    'datetime': base_date + timedelta(days=days + user_id)
+                })
+    return pd.DataFrame(data, columns=['user_id', 'datetime'])
+
+
+def test_retention_matrix():  # noqa
+
+    df = generate_fake_data()
+    retention = retention_matrix(
+        df,
+        timestamp='datetime',
+        unique_id='user_id',
+        cohort_interval='week',
+    )
+    assert (retention.drop(columns=['cohort', '# of records']) <= 1).all().all()
+    assert (retention['# of records'] > 1).any()
+    assert (retention['0'] == 1).all().all()
+
+    retention = retention_matrix(
+        df,
+        timestamp='datetime',
+        unique_id='user_id',
+        cohort_interval='day',
+    )
+    assert (retention.drop(columns=['cohort', '# of records']) <= 1).all().all()
+    assert (retention['# of records'] > 1).any()
+    assert (retention['0'] == 1).all().all()
+

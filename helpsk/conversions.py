@@ -2,6 +2,7 @@
 from __future__ import annotations
 import datetime
 import pandas as pd
+from helpsk.pandas import relocate
 
 
 def _percent_converted(seconds_to_convert: pd.Series, period_in_seconds: int) -> float:
@@ -215,3 +216,57 @@ def plot_cohorted_conversion_rates(
 
     fig.update_yaxes(tickformat=',.0%')
     return fig
+
+
+def retention_matrix(
+        df: pd.DataFrame,
+        timestamp: str,
+        unique_id: str,
+        cohort_interval: str = 'week') -> pd.DataFrame:
+    """
+    Calculate the retention matrix for a given timestamp column and unique ID column.
+    Data is expected to be 'events', meaning that each row represents a single event for a single
+    user. The timestamp column is the time of the event and the unique ID column is the user ID.
+    """
+    # get the number of weeks between the event week and the cohort week
+    if cohort_interval == 'week':
+        divide_by = 7
+    elif cohort_interval == 'day':
+        divide_by = 1
+    else:
+        raise ValueError(f'cohort_interval must be either "week" or "day", not {cohort_interval}')
+
+    cohort_interval = cohort_interval[0].upper()
+
+    # Step 1: Determine the cohort of each user (the week of their first event)
+    df = df[[timestamp, unique_id]].copy()
+    df['event_period'] = df[timestamp].dt.to_period(cohort_interval).dt.start_time
+    df['cohort'] = (
+        df.groupby(unique_id)[timestamp]
+        .transform('min')
+        .dt.to_period(cohort_interval)
+        .dt.start_time
+    )
+    df['period'] = (df['event_period'] - df['cohort']).dt.days // divide_by
+
+    # Step 2: Create a crosstab of users by cohort week and event week
+    cohort_matrix = pd.crosstab(
+        df['cohort'],
+        df['period'],
+        df[unique_id],
+        aggfunc='nunique',
+    )
+
+    # Step 3: Calculate the retention rate by dividing the number of active users each week by the cohort size
+    cohort_size = cohort_matrix.iloc[:, 0]
+    matrix = cohort_matrix.divide(cohort_size, axis=0).fillna(0)
+    assert (matrix <= 1).all().all()
+
+    # Step 4: Reset index and column names for better readability
+    matrix.reset_index(inplace=True)
+    matrix.columns.name = None
+    matrix.columns = matrix.columns.astype(str)
+    matrix['# of records'] = cohort_size.astype(int).values
+    matrix = relocate(matrix, column='# of records', after='cohort')
+    assert (matrix['0'] == 1).all().all()
+    return matrix
