@@ -299,9 +299,12 @@ def retention_matrix(
         .size()
         .reset_index(name='event_count')
     )
+    # weird bug(?) where in some cases pandas returns records with event_count == 0 (i.e.
+    # users with no events in a given period which duplicates the cohort/unique_id)
+    user_events_by_period.query('event_count > 0', inplace=True)
     assert not user_events_by_period[[unique_id, 'period']].duplicated().any()
-    # for records where period == 0, the user is considered retained by definition so we don't
-    # need to filter
+    # for records where period == 0, the user is considered retained by definition (regardless of
+    # number of events) so we don't need to filter
     retained_users = user_events_by_period[
         (user_events_by_period['event_count'] >= min_events) | (user_events_by_period['period'] == 0)  # noqa
     ]
@@ -330,7 +333,7 @@ def retention_matrix(
     matrix.reset_index(inplace=True)
     matrix.columns.name = None
     matrix.columns = matrix.columns.astype(str)
-    matrix['# of records'] = cohort_size.astype(int).values
-    matrix = relocate(matrix, column='# of records', after='cohort')
+    matrix['# of unique ids'] = cohort_size.astype(int).values
+    matrix = relocate(matrix, column='# of unique ids', after='cohort')
     assert (matrix['0'] == 1).all().all()
     return matrix
