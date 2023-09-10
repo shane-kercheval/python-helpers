@@ -351,8 +351,7 @@ def generate_fake_data():
     base_date = datetime(2023, 1, 1)
     data = []
     for user_id in range(100):
-        for days in range(0, 70, 7):
-            # only append 5% of the time
+        for days in range(0, 70, 1):
             event_datetime = base_date + timedelta(days=days + user_id)
             if event_datetime > base_date + timedelta(days=100):
                 continue
