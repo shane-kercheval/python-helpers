@@ -1,6 +1,7 @@
 """Functions to help with calculating conversation/retension rates."""
 from __future__ import annotations
 import datetime
+import numpy as np
 import pandas as pd
 from helpsk.pandas import relocate
 
@@ -222,26 +223,53 @@ def retention_matrix(
         df: pd.DataFrame,
         timestamp: str,
         unique_id: str,
-        cohort_interval: str = 'week') -> pd.DataFrame:
+        min_events: int = 1,
+        cohort_interval: str = 'week',
+        current_datetime: str | None = None) -> pd.DataFrame:
     """
     Calculate the retention matrix for a given timestamp column and unique ID column.
-    Data is expected to be 'events', meaning that each row represents a single event for a single
-    user. The timestamp column is the time of the event and the unique ID column is the user ID.
+
+    Args:
+        df:
+            The dataframe containing the data to calculate the retention matrix for. The data is
+            expected to be 'events', meaning that each row represents a single event for a single
+            user.
+        timestamp:
+            The column name for the timestamp to use for the calculation. The column must not
+            contain any missing values.
+        unique_id:
+            The column name for the unique ID to use for the calculation. The column must not
+            contain any missing values.
+        min_events:
+            The minimum number of events a user must have in order to be considered retained in
+            subsequent weeks.
+        cohort_interval:
+            The interval to use for the cohort. Valid options are 'week' and 'day'. This value
+            also determines the interval to use for the event period.
+        current_datetime:
+            The current datetime to use to filter out any events that occurred after the current
+            datetime. If None, the current UTC datetime is used.
+
     """
     # get the number of weeks between the event week and the cohort week
     if cohort_interval == 'week':
-        divide_by = 7
+        num_days_in_internal = 7
     elif cohort_interval == 'day':
-        divide_by = 1
+        num_days_in_internal = 1
     else:
         raise ValueError(f'cohort_interval must be either "week" or "day", not {cohort_interval}')
 
     cohort_interval = cohort_interval[0].upper()
 
+    if current_datetime is None:
+        current_datetime = datetime.datetime.utcnow()
+
     # Step 1: Determine the cohort of each user (the week of their first event)
     df = df[[timestamp, unique_id]].copy()
     assert not df.isna().any().any()
 
+    # filter out any events that occurred after the current datetime
+    df = df[df[timestamp] <= current_datetime]
     df['event_period'] = df[timestamp].dt.to_period(cohort_interval).dt.start_time
     df['cohort'] = (
         df.groupby(unique_id)[timestamp]
@@ -249,15 +277,27 @@ def retention_matrix(
         .dt.to_period(cohort_interval)
         .dt.start_time
     )
-    df['period'] = (df['event_period'] - df['cohort']).dt.days // divide_by
+    df['period'] = (df['event_period'] - df['cohort']).dt.days // num_days_in_internal
     df['period'] = df['period'].astype(int)
+
+    # Group by cohort_week, event_week and user_id, then filter by min_visits
+    user_events_by_period = (
+        df
+        .groupby(['cohort', 'period', unique_id])
+        .size()
+        .reset_index(name='event_count')
+    )
+    assert not user_events_by_period[['user_id', 'period']].duplicated().any()
+    # for records where period == 0, the user is considered retained by definition so we don't
+    # need to filter
+    retained_users = user_events_by_period[
+        (user_events_by_period['event_count'] >= min_events) | (user_events_by_period['period'] == 0)  # noqa
+    ]
 
     # Step 2: Create a crosstab of users by cohort week and event week
     cohort_matrix = pd.crosstab(
-        df['cohort'],
-        df['period'],
-        df[unique_id],
-        aggfunc='nunique',
+        retained_users['cohort'],
+        retained_users['period'],
     )
 
     # Step 3: Calculate the retention rate by dividing the number of active users each week by the
@@ -265,6 +305,10 @@ def retention_matrix(
     cohort_size = cohort_matrix.iloc[:, 0]
     matrix = cohort_matrix.divide(cohort_size, axis=0).fillna(0)
     assert (matrix <= 1).all().all()
+    for row in matrix.index:
+        for col in matrix.columns:
+            if row + datetime.timedelta(days=col * num_days_in_internal) > current_datetime:
+                matrix.loc[row, col] = np.nan
 
     # Step 4: Reset index and column names for better readability
     matrix.reset_index(inplace=True)
