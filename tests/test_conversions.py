@@ -353,42 +353,113 @@ def generate_fake_data():
     for user_id in range(100):
         for days in range(0, 70, 7):
             # only append 5% of the time
+            event_datetime = base_date + timedelta(days=days + user_id)
+            if event_datetime > base_date + timedelta(days=100):
+                continue
             if np.random.rand() < 0.5:
                 # print('append', user_id, days)
                 data.append({
                     'user_id': user_id,
-                    'datetime': base_date + timedelta(days=days + user_id)
+                    'datetime': event_datetime
                 })
             if np.random.rand() < 0.5:
                 # print('append', user_id, days)
                 data.append({
                     'user_id': user_id,
-                    'datetime': base_date + timedelta(days=days + user_id)
+                    'datetime': event_datetime
                 })
     return pd.DataFrame(data, columns=['user_id', 'datetime'])
 
 
 def test_retention_matrix():  # noqa
     df = generate_fake_data()
-    retention = retention_matrix(
+    copy_df = df.copy()
+    retention_week = retention_matrix(
         df,
         timestamp='datetime',
         unique_id='user_id',
         cohort_interval='week',
+        current_datetime=df['datetime'].max(),
     )
-    assert (retention.drop(columns=['cohort', '# of records']) <= 1).all().all()
-    assert (retention['# of records'] > 1).any()
-    assert (retention['0'] == 1).all().all()
+    assert df.equals(copy_df)
+    assert retention_week['cohort'].notna().all()
+    assert retention_week['# of records'].notna().all()
+    assert (retention_week.drop(columns=['cohort', '# of records']).fillna(0) <= 1).all().all()
+    assert (retention_week['# of records'] > 1).any()
+    assert (retention_week['0'] == 1).all().all()
+    assert retention_week['# of records'].sum() == df['user_id'].nunique()
+    expected_cohort_sizes = (
+        df
+        .groupby('user_id')
+        .agg(min_date=('datetime', 'min'))
+        .assign(cohort=lambda x: x['min_date'].dt.to_period('W').dt.to_timestamp())
+        .groupby('cohort')
+        .size()
+        .sort_index()
+        .values
+        .tolist()
+    )
+    assert retention_week['# of records'].tolist() == expected_cohort_sizes
 
-    retention = retention_matrix(
+    retention_day = retention_matrix(
         df,
         timestamp='datetime',
         unique_id='user_id',
         cohort_interval='day',
     )
-    assert (retention.drop(columns=['cohort', '# of records']) <= 1).all().all()
-    assert (retention['# of records'] > 1).any()
-    assert (retention['0'] == 1).all().all()
+    assert df.equals(copy_df)
+    assert retention_day['cohort'].notna().all()
+    assert retention_day['# of records'].notna().all()
+    assert (retention_day.drop(columns=['cohort', '# of records']).fillna(0) <= 1).all().all()
+    assert (retention_day['# of records'] > 1).any()
+    assert (retention_day['0'] == 1).all().all()
+    assert retention_day['# of records'].sum() == df['user_id'].nunique()
+    expected_cohort_sizes = (
+        df
+        .groupby('user_id')
+        .agg(min_date=('datetime', 'min'))
+        .assign(cohort=lambda x: x['min_date'].dt.to_period('D').dt.to_timestamp())
+        .groupby('cohort')
+        .size()
+        .sort_index()
+        .values
+        .tolist()
+    )
+    assert retention_day['# of records'].tolist() == expected_cohort_sizes
+
+    # test with min_events == 2
+    retention2 = retention_matrix(
+        df,
+        timestamp='datetime',
+        unique_id='user_id',
+        cohort_interval='week',
+        current_datetime=df['datetime'].max(),
+        min_events=2,
+    )
+    assert retention2['cohort'].equals(retention_week['cohort'])
+    assert retention2['# of records'].equals(retention_week['# of records'])
+    assert retention2['0'].equals(retention_week['0'])
+    _retention_2 = retention2.drop(columns=['cohort', '# of records', '0']).fillna(0)
+    _retention_week = retention_week.drop(columns=['cohort', '# of records', '0']).fillna(0)
+    assert (_retention_2 < _retention_week).any().any()
+    assert retention2['cohort'].notna().all()
+    assert retention2['# of records'].notna().all()
+    assert (retention2.drop(columns=['cohort', '# of records']).fillna(0) <= 1).all().all()
+    assert (retention2['# of records'] > 1).any()
+    assert (retention2['0'] == 1).all().all()
+    assert retention2['# of records'].sum() == df['user_id'].nunique()
+    expected_cohort_sizes = (
+        df
+        .groupby('user_id')
+        .agg(min_date=('datetime', 'min'))
+        .assign(cohort=lambda x: x['min_date'].dt.to_period('W').dt.to_timestamp())
+        .groupby('cohort')
+        .size()
+        .sort_index()
+        .values
+        .tolist()
+    )
+    assert retention2['# of records'].tolist() == expected_cohort_sizes
 
     df.iloc[0, 0] = np.nan
     with pytest.raises(AssertionError):
