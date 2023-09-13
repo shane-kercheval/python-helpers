@@ -173,7 +173,7 @@ def plot_cohorted_conversion_rates(
     else:
         category_orders = {'variable': columns}
     hover_data = {
-        'value': ':.1%',
+        'value': ':.2%',
         '# of records': ':,',
     }
     if bar_mode is None or bar_mode == 'relative':
@@ -216,7 +216,7 @@ def plot_cohorted_conversion_rates(
         fig.update_yaxes(matches=None)
         fig.for_each_yaxis(lambda yaxis: yaxis.update(showticklabels=True))
 
-    fig.update_yaxes(tickformat=',.0%')
+    fig.update_yaxes(tickformat=',.1%')
     return fig
 
 
