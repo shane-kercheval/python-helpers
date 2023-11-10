@@ -1,5 +1,8 @@
-"""This module contains helper functions when working with sklearn (scikit-learn) objects;
-in particular, for evaluating models"""
+"""
+Contains helper functions when working with sklearn (scikit-learn) objects in particular, for
+evaluating models.
+"""
+
 from __future__ import annotations
 import math
 import warnings
@@ -11,14 +14,14 @@ import pandas as pd
 import plotly
 import scipy.stats as st
 import seaborn as sns
-from plotly.graph_objs import _figure  # noqa
+from plotly.graph_objs import _figure
 import plotly.express as px
 import yaml
 from matplotlib import pyplot as plt
 from pandas.io.formats.style import Styler
 from sklearn.dummy import DummyClassifier, DummyRegressor
 from sklearn.metrics import confusion_matrix, roc_auc_score, r2_score, average_precision_score
-from sklearn.model_selection._search import BaseSearchCV  # noqa
+from sklearn.model_selection._search import BaseSearchCV
 from sklearn.preprocessing import MinMaxScaler
 
 import helpsk.color as hcolor
@@ -35,7 +38,7 @@ with warnings.catch_warnings():
 
 class MLExperimentResults:
     """
-    This class contains the logic to explore the results of a machine learning experiment. There
+    Contains the logic to explore the results of a machine learning experiment. There
     are also functions that parse the information from a BaseSearchCV object (e.g. GridSearchCV,
     RandomizedSearchCV, BayesSearchCV).
 
@@ -57,7 +60,8 @@ class MLExperimentResults:
     """
 
     def __init__(self, info: dict):
-        """This method creates a MLExperimentResults object from a dictionary.
+        """
+        Creates a MLExperimentResults object from a dictionary.
 
         Args:
             info:
@@ -243,14 +247,14 @@ class MLExperimentResults:
         self._labeled_dataframe = None
 
     @classmethod
-    def from_sklearn_search_cv(
-            cls,
+    def from_sklearn_search_cv(  # noqa: PLR0912, PLR0915
+            cls,  # noqa: ANN102
             searcher: BaseSearchCV,
             higher_score_is_better: bool = True,
             description: str = "",
-            parameter_name_mappings: dict | None = None) -> 'MLExperimentResults':
+            parameter_name_mappings: dict | None = None) -> 'MLExperimentResults':  # noqa: UP037
         """
-        This function extracts the results from a SearchCV object (e.g.
+        Extracts the results from a SearchCV object (e.g.
         sklearn.model_selection.GridSearch/RandomSearch, skopt.BayesSearchCV), which are converted
         to a dictionary with the hierarchy expected by the MLExperimentResults class.
 
@@ -294,7 +298,7 @@ class MLExperimentResults:
                         'prep__numeric__scaling__transformer': 'scaler'
                     }
         """
-        def string_if_not_number(obj):
+        def string_if_not_number(obj):  # noqa: ANN202, ANN001
             if isinstance(obj, (int, float, complex)):
                 return obj
             # convert to a string, but convert e.g. `XGBoostClassifier(parameter=x, etc)` to
@@ -307,14 +311,13 @@ class MLExperimentResults:
             string_value = re.sub(r'LinearSVC\(.+\)', 'LinearSVC()', string_value)
 
             string_value = string_value.replace("PCA(n_components='mle')", "PCA('mle')")
-            string_value = string_value.\
+            return string_value.\
                 replace("OneHotEncoder(handle_unknown='ignore')", "OneHotEncoder()")
-            return string_value
 
         cv_results_dict = {
             'description': description,
             'cross_validation_type': str(type(searcher)),
-            'higher_score_is_better': higher_score_is_better
+            'higher_score_is_better': higher_score_is_better,
         }
 
         if isinstance(searcher.scoring, dict):
@@ -339,7 +342,7 @@ class MLExperimentResults:
             match_value = "split\\d_test_" + score_names[0]
 
         number_of_splits = len(
-            [x for x in searcher.cv_results_.keys() if bool(match(match_value, x))]
+            [x for x in searcher.cv_results_ if bool(match(match_value, x))],
         )
         cv_results_dict['number_of_splits'] = number_of_splits
         cv_results_dict['score_names'] = score_names
@@ -351,7 +354,7 @@ class MLExperimentResults:
         # Note that i'm doing this with nested loops (rather than simply using `set()`) so that I
         # can retain the exact order (set() does not retain order)
         for params in searcher.cv_results_['params']:
-            for key in params.keys():
+            for key in params:
                 if key not in parameter_names:
                     parameter_names += [key]
 
@@ -378,7 +381,7 @@ class MLExperimentResults:
             assert len(test_score_standard_deviations) == number_of_trials
             cv_results_dict['test_score_averages'] = {score_names[0]: test_score_averages}
             cv_results_dict['test_score_standard_deviations'] = {
-                score_names[0]: test_score_standard_deviations
+                score_names[0]: test_score_standard_deviations,
             }
         else:
             averages_dict = {}
@@ -398,7 +401,7 @@ class MLExperimentResults:
         # values
         if not higher_score_is_better:
             averages = cv_results_dict['test_score_averages']
-            for key in averages.keys():
+            for key in averages:
                 cv_results_dict['test_score_averages'][key] = [-1 * x for x in averages[key]]
 
         # convert training scores to dictionaries, if training scores exists
@@ -414,7 +417,7 @@ class MLExperimentResults:
 
                 cv_results_dict['train_score_averages'] = {score_names[0]: train_score_averages}
                 cv_results_dict['train_score_standard_deviations'] = {
-                    score_names[0]: train_score_standard_deviations
+                    score_names[0]: train_score_standard_deviations,
                 }
             else:
                 averages_dict = {}
@@ -436,7 +439,7 @@ class MLExperimentResults:
             # actual values
             if not higher_score_is_better:
                 averages = cv_results_dict['train_score_averages']
-                for key in averages.keys():
+                for key in averages:
                     cv_results_dict['train_score_averages'][key] = [-1 * x for x in averages[key]]
 
         assert len(searcher.cv_results_['params']) == number_of_trials
@@ -463,23 +466,21 @@ class MLExperimentResults:
             'fit time averages': fit_time_averages,
             'fit time standard deviations': fit_time_standard_deviations,
             'score time averages': score_time_averages,
-            'score time standard deviations': score_time_standard_deviations
+            'score time standard deviations': score_time_standard_deviations,
         }
 
         return MLExperimentResults(info=cv_results_dict)
 
     @classmethod
-    def from_yaml_file(cls, yaml_file_name: str) -> 'MLExperimentResults':
-        """This method creates a MLExperimentResults object from a yaml file created by
-        `to_yaml_file()`
-        """
-        with open(yaml_file_name, 'r') as file:
+    def from_yaml_file(cls, yaml_file_name: str) -> 'MLExperimentResults':  # noqa: ANN102, UP037
+        """Creates a MLExperimentResults object from a yaml file created by `to_yaml_file()`."""
+        with open(yaml_file_name) as file:
             cv_dict = yaml.safe_load(file)
 
         return MLExperimentResults(info=cv_dict)
 
-    def to_yaml_file(self, yaml_file_name: str):
-        """This method saves the self._cv_dict dictionary to a yaml file."""
+    def to_yaml_file(self, yaml_file_name: str) -> None:
+        """Saves the self._cv_dict dictionary to a yaml file."""
         with open(yaml_file_name, 'w') as file:
             yaml.dump(self._dict, file, default_flow_style=False, sort_keys=False)
 
@@ -488,8 +489,8 @@ class MLExperimentResults:
             sort_by_score: bool = True,
             exclude_zero_variance_params: bool = True,
             query: str | None = None) -> pd.DataFrame:
-        """This function converts the score information from the SearchCV object into a
-        pd.DataFrame.
+        """
+        Converts the score information from the SearchCV object into a pd.DataFrame.
 
         Args:
             sort_by_score:
@@ -520,7 +521,7 @@ class MLExperimentResults:
                     # number_of_splits is sample-size
                     df=self.number_of_splits - 1,  # degrees of freedom
                     loc=self.test_score_averages[score_name],
-                    scale=self.score_standard_errors(score_name=score_name)
+                    scale=self.score_standard_errors(score_name=score_name),
                 )
 
                 # only give confidence intervals for the primary score
@@ -530,18 +531,18 @@ class MLExperimentResults:
                         pd.DataFrame({
                             score_name + " Mean": self.test_score_averages[score_name],
                             score_name + " 95CI.LO": confidence_intervals[0],
-                            score_name + " 95CI.HI": confidence_intervals[1]
-                        })
+                            score_name + " 95CI.HI": confidence_intervals[1],
+                        }),
                     ],
-                    axis=1
+                    axis=1,
                 )
 
             self._dataframe = pd.concat(
                 [
                     self._dataframe,
-                    pd.DataFrame.from_dict(self.trials)[self.parameter_names_original]
+                    pd.DataFrame.from_dict(self.trials)[self.parameter_names_original],
                 ],
-                axis=1
+                axis=1,
             )
 
             if self.parameter_names_mapping:
@@ -562,8 +563,7 @@ class MLExperimentResults:
             zero_variance_columns = [x for x in self.parameter_names if len(copy[x].unique()) == 1]
             copy = copy.drop(columns=zero_variance_columns)
 
-        copy = copy.dropna(axis=1, how='all')  # drop columns that have all NAs
-        return copy
+        return copy.dropna(axis=1, how='all')  # drop columns that have all NAs
 
     def to_formatted_dataframe(
             self,
@@ -575,7 +575,8 @@ class MLExperimentResults:
             include_rank: bool = False,
             return_style: bool = True,
             sort_by_score: bool = True) -> pd.DataFrame | Styler:
-        """This function converts the score information from the SearchCV object into a
+        """
+        Converts the score information from the SearchCV object into a
         pd.DataFrame or a Styler object, formatted accordingly.
 
         The Hyper-Parameter columns will be highlighted in blue where the primary
@@ -615,7 +616,7 @@ class MLExperimentResults:
         cv_dataframe = self.to_dataframe(
             sort_by_score=sort_by_score,
             exclude_zero_variance_params=exclude_zero_variance_params,
-            query=query
+            query=query,
         )
         cv_dataframe = cv_dataframe.head(num_rows)
 
@@ -628,7 +629,7 @@ class MLExperimentResults:
         score_columns = list(
             cv_dataframe.columns[
                 cv_dataframe.columns.str.endswith((' Mean', ' 95CI.LO', ' 95CI.HI'))
-            ]
+            ],
         )
         if primary_score_only:
             columns_to_drop = [
@@ -643,11 +644,11 @@ class MLExperimentResults:
 
         if include_rank:
             cv_dataframe['rank'] = list(range(1, cv_dataframe.shape[0] + 1))
-            final_columns = ['rank'] + final_columns
+            final_columns = ["rank", *final_columns]
             cv_dataframe = cv_dataframe[final_columns]
 
         if return_style:
-            original_df = cv_dataframe
+            original_data = cv_dataframe
             cv_dataframe = cv_dataframe.style
 
             for score in self.score_names:
@@ -664,21 +665,21 @@ class MLExperimentResults:
                     cv_dataframe.bar(
                         subset=[mean_key],
                         color=mean_color,
-                        vmin=original_df[mean_key].min()
+                        vmin=original_data[mean_key].min(),
                     )
 
                 if ci_low_key in final_columns:
                     cv_dataframe. \
                         bar(
                             subset=[ci_high_key],
-                            color=hcolor.GRAY,  # noqa
-                            vmin=original_df[ci_high_key].min()
+                            color=hcolor.GRAY,
+                            vmin=original_data[ci_high_key].min(),
                         ). \
                         pipe(
                             hstyle.bar_inverse,
                             subset=[ci_low_key],
                             color=hcolor.GRAY,
-                            min_value=original_df[ci_low_key].min()
+                            min_value=original_data[ci_low_key].min(),
                         )
 
                 cv_dataframe.pipe(hstyle.format, round_by=round_by, hide_index=True)
@@ -694,17 +695,18 @@ class MLExperimentResults:
             columns_to_highlight = [x for x in self.parameter_names if x in final_columns]
             cv_dataframe.applymap(
                 highlight_cols,
-                subset=pd.IndexSlice[indexes_within_1_standard_error, columns_to_highlight]
+                subset=pd.IndexSlice[indexes_within_1_standard_error, columns_to_highlight],
             )
 
         return cv_dataframe
 
     def to_labeled_dataframe(self, query: str | None = None) -> pd.DataFrame:
-        """Returns a pd.DataFrame similar to `to_dataframe()` with additional columns 'Trial Index'
+        """
+        Returns a pd.DataFrame similar to `to_dataframe()` with additional columns 'Trial Index'
         and 'labels' (which are the labels corresponding to the `trial_label` property and collapse
-        all the name/values for the hyper-parameters into a single string)
+        all the name/values for the hyper-parameters into a single string).
 
-        This function is mainly used internally to generate graphs, but is useful for users
+        Is mainly used internally to generate graphs, but is useful for users
         creating custom graphs that are not yet implemented by the class.
 
         Args:
@@ -722,7 +724,7 @@ class MLExperimentResults:
         # cache columns to move Iteration column to front
         columns = labeled_dataframe.columns.to_list()
         labeled_dataframe['Trial Index'] = np.arange(1, labeled_dataframe.shape[0] + 1)
-        labeled_dataframe = labeled_dataframe[['Trial Index'] + columns]
+        labeled_dataframe = labeled_dataframe[["Trial Index", *columns]]
         # create the labels that will be used in the plotly hover text
         # only include the labels that correspond to the remaining trials after `query`
         trial_labels = self.trial_labels(order_from_best_to_worst=sort_by_score)
@@ -738,7 +740,7 @@ class MLExperimentResults:
     ####
     @property
     def description(self) -> str:
-        """the description passed to `description`."""
+        """The description passed to `description`."""
         return self._dict['description']
 
     @property
@@ -753,25 +755,29 @@ class MLExperimentResults:
 
     @property
     def number_of_splits(self) -> int:
-        """This is the number of times the model is trained in a single trial i.e. single
-        cross-validation session. For example, a 5-fold 2-repeat CV has 10 splits."""
+        """
+        The number of times the model is trained in a single trial i.e. single cross-validation
+        session. For example, a 5-fold 2-repeat CV has 10 splits.
+        """
         return self._dict['number_of_splits']
 
     @property
     def score_names(self) -> list:
-        """Returns a list of the names of the scores"""
+        """Returns a list of the names of the scores."""
         return self._dict['score_names']
 
     @property
     def parameter_names_original(self) -> list[str]:
-        """Returns the original parameter names (i.e. the path generated by the scikit-learn
+        """
+        Returns the original parameter names (i.e. the path generated by the scikit-learn
         pipelines.
         """
         return self._dict['parameter_names']
 
     @property
     def parameter_names(self) -> list[str]:
-        """This property returns either the original parameter names if no
+        """
+        Returns either the original parameter names if no
         `parameter_names_mapping` was provided, or it returns the new parameter names (i.e. the
         values from `parameter_names_mapping`).
         """
@@ -782,22 +788,21 @@ class MLExperimentResults:
 
     @property
     def parameter_names_mapping(self) -> dict:
-        """The dictionary passed to `parameter_name_mappings` which is used to convert the original
+        """
+        The dictionary passed to `parameter_name_mappings` which is used to convert the original
         names to more friendly names, specified as the the values.
         """
         return self._dict.get('parameter_names_mapping')
 
     @property
     def test_score_rankings(self) -> dict:
-        """The rankings of each of the test scores. See `trial_rankings` documentation for
+        """
+        The rankings of each of the test scores. See `trial_rankings` documentation for
         explanation.
         """
 
-        def get_rankings(score_averages: list):
-            if self.higher_score_is_better:
-                multiplier = -1
-            else:
-                multiplier = 1
+        def get_rankings(score_averages: list) -> list:
+            multiplier = -1 if self.higher_score_is_better else 1
             return list(st.rankdata(np.array(score_averages) * multiplier).astype(int))
 
         return {
@@ -822,7 +827,8 @@ class MLExperimentResults:
 
     @property
     def train_score_standard_deviations(self) -> dict:
-        """The training score standard deviations, from the searcher.cv_results_ object, if
+        """
+        The training score standard deviations, from the searcher.cv_results_ object, if
         provided.
         """
         return self._dict.get('train_score_standard_deviations')
@@ -832,8 +838,9 @@ class MLExperimentResults:
         """The "trials" i.e. the hyper-parameter combinations in order of execution."""
         return self._dict['trials']
 
-    def trial_labels(self, order_from_best_to_worst=True) -> list[str]:
-        """An trial is a set of hyper-parameters that were cross validated. The corresponding label
+    def trial_labels(self, order_from_best_to_worst: bool = True) -> list[str]:
+        """
+        An trial is a set of hyper-parameters that were cross validated. The corresponding label
         for each trial is a single string containing all of the hyper-parameter names and values in
         the format of `{param1: value1, param2: value2}`, excluding hyper-parameters that only have
         a single value.
@@ -847,8 +854,9 @@ class MLExperimentResults:
         Returns:
             a pd.Series the same length as `number_of_trials` containing a str
         """
-        def create_hyper_param_labels(trial) -> list:
-            """Creates a list of strings that represent the name/value pair for each
+        def create_hyper_param_labels(trial) -> list:  # noqa: ANN001
+            """
+            Creates a list of strings that represent the name/value pair for each
             hyper-parameter.
             """
             return [
@@ -861,7 +869,7 @@ class MLExperimentResults:
             ]
         # create_hyper_param_labels(trial=self.trials[0])
 
-        def create_trial_label(trial) -> str:
+        def create_trial_label(trial) -> str:  # noqa: ANN001
             return f"{{{hstring.collapse(create_hyper_param_labels(trial), separate=', ')}}}"
         # create_trial_label(trial=self.trials[0])
 
@@ -882,9 +890,11 @@ class MLExperimentResults:
     ####
     @property
     def number_of_trials(self) -> int:
-        """"A single trial contains the cross validation results for a single set of
+        """
+        "A single trial contains the cross validation results for a single set of
         hyper-parameters. The 'number of trials' is basically the number of combinations of
-        different hyper-parameters that were cross validated."""
+        different hyper-parameters that were cross validated.
+        """
         return len(self.trials)
 
     @property
@@ -903,26 +913,30 @@ class MLExperimentResults:
 
     @property
     def number_of_scores(self) -> int:
-        """The number of scores passed to the SearchCV object"""
+        """The number of scores passed to the SearchCV object."""
         return len(self.score_names)
 
     @property
     def primary_score_name(self) -> str:
-        """The first scorer passed to the SearchCV will be treated as the primary score. This
-        property returns the name of the score."""
+        """
+        The first scorer passed to the SearchCV will be treated as the primary score. This
+        property returns the name of the score.
+        """
         return self.score_names[0]
 
     @property
     def primary_score_averages(self) -> np.array:
-        """The first scorer passed to the SearchCV will be treated as the primary score. This
+        """
+        The first scorer passed to the SearchCV will be treated as the primary score. This
         property returns the average score (across all splits) for each trial. Note that the
         average scores are the weighted averages
-        https://stackoverflow.com/questions/44947574/what-is-the-meaning-of-mean-test-score-in-cv-result
+        https://stackoverflow.com/questions/44947574/what-is-the-meaning-of-mean-test-score-in-cv-result.
         """
         return np.array(self.test_score_averages[self.primary_score_name])
 
     def score_standard_errors(self, score_name: str) -> np.array:
-        """The first scorer passed to the SearchCV will be treated as the primary score. This
+        """
+        The first scorer passed to the SearchCV will be treated as the primary score. This
         property returns the standard error associated with the mean score of each trial, for the
         primary score.
         """
@@ -931,7 +945,8 @@ class MLExperimentResults:
 
     @property
     def trial_rankings(self) -> np.array:
-        """The ranking of the corresponding index, in terms of best to worst "primary" (i.e. first)
+        """
+        The ranking of the corresponding index, in terms of best to worst "primary" (i.e. first)
         score.
 
         For example, assume this property returned the following list :
@@ -952,8 +967,10 @@ class MLExperimentResults:
 
     @property
     def best_trial_indexes(self) -> np.array:
-        """The indexes of best to worst "primary" (i.e. first) scores. See documentation for
-        `trial_rankings` to understand the differences between the two properties."""
+        """
+        The indexes of best to worst "primary" (i.e. first) scores. See documentation for
+        `trial_rankings` to understand the differences between the two properties.
+        """
         return np.argsort(self.trial_rankings)
 
     @property
@@ -989,27 +1006,29 @@ class MLExperimentResults:
 
     @property
     def best_standard_error(self) -> float:
-        """The standard error associated with the best of the primary scores"""
+        """The standard error associated with the best of the primary scores."""
         return self.score_standard_errors(score_name=self.primary_score_name)[self.best_score_index]  # noqa
 
     @property
     def indexes_within_1_standard_error(self) -> list:
-        """Returns the trial indexes where the primary scores (i.e. first scorer
+        """
+        Returns the trial indexes where the primary scores (i.e. first scorer
         passed to SearchCV object; i.e. first column of the to_dataframe() DataFrame) are within 1
-        standard error of the highest primary score."""
+        standard error of the highest primary score.
+        """
         cv_dataframe = self.to_dataframe(sort_by_score=True)
 
         if self.higher_score_is_better:
             return list(
                 cv_dataframe.index[
                     cv_dataframe.iloc[:, 0] >= self.best_score - self.best_standard_error
-                ]
+                ],
             )
 
         return list(
             cv_dataframe.index[
                 cv_dataframe.iloc[:, 0] <= self.best_score + self.best_standard_error
-            ]
+            ],
         )
 
     @property
@@ -1050,13 +1069,14 @@ class MLExperimentResults:
 
     @property
     def trial_fit_times(self) -> np.array:
-        """For each trial, it is the amount of time it took to fit the model.
+        """
+        For each trial, it is the amount of time it took to fit the model.
 
         Calculated by Average fit time for each trial multiplied by the number of splits per trial.
 
         self.fit_time_averages * self.number_of_splits
 
-        Returns:
+        Returns
             array containing the fit time for each trial
         """
         return self.fit_time_averages * self.number_of_splits
@@ -1068,14 +1088,15 @@ class MLExperimentResults:
 
     @property
     def trial_score_times(self) -> np.array:
-        """For each trial, it is the amount of time it took to score the model.
+        """
+        For each trial, it is the amount of time it took to score the model.
 
         Calculated by Average score time for each trial multiplied by the number of splits per
         trial.
 
         self.score_time_averages * self.number_of_splits
 
-        Returns:
+        Returns
             array containing the score time for each trial
         """
         return self.score_time_averages * self.number_of_splits
@@ -1087,12 +1108,12 @@ class MLExperimentResults:
 
     @property
     def average_time_per_trial(self) -> float:
-        """Average time per trial"""
+        """Average time per trial."""
         return float(np.mean(self.trial_fit_times + self.trial_score_times))
 
     @property
     def total_time(self) -> float:
-        """Total time it took across all trials"""
+        """Total time it took across all trials."""
         return self.fit_time_total + self.score_time_total
 
     def plot_performance_across_trials(
@@ -1140,21 +1161,21 @@ class MLExperimentResults:
                 "<br><sup>The size of the point corresponds to the value of <b>" \
                 f"'{size}'</b>.</sup>"
 
-        labeled_df = self.to_labeled_dataframe(query=query)
+        labeled_data = self.to_labeled_dataframe(query=query)
         if facet_by:
-            labeled_df['Trial Index'] = labeled_df.\
+            labeled_data['Trial Index'] = labeled_data.\
                 groupby(facet_by)["Trial Index"].\
                 rank(method="first", ascending=True)
         # only include the columns we need, so that we don't unnecessarily drop rows with NA (i.e.
         # NAs in columns not used in the graph)
         columns = [x for x in ['Trial Index', score_column, size, color, facet_by, 'label']
                    if x is not None]
-        labeled_df = labeled_df[columns]
-        labeled_df.dropna(axis=0, how='any', inplace=True)
-        labeled_df.reset_index(drop=True, inplace=True)
+        labeled_data = labeled_data[columns]
+        labeled_data = labeled_data.dropna(axis=0, how='any')
+        labeled_data = labeled_data.reset_index(drop=True)
 
         fig = px.scatter(
-            data_frame=labeled_df,
+            data_frame=labeled_data,
             x='Trial Index',
             y=score_column,
             size=size,
@@ -1176,7 +1197,7 @@ class MLExperimentResults:
                 "Trial Index: %{x}",
                 score_column + ": " + "%{y}",
                 "<br>Parameters: %{customdata[0]}",
-            ])
+            ]),
         )
         return fig
 
@@ -1203,12 +1224,12 @@ class MLExperimentResults:
 
         score_column = self.primary_score_name + " Mean"
 
-        labeled_df = self.to_labeled_dataframe(query=query)
+        labeled_data = self.to_labeled_dataframe(query=query)
         labeled_long = pd.melt(
-            labeled_df,
+            labeled_data,
             id_vars=['Trial Index', score_column, 'label'],
-            value_vars=[x for x in self.numeric_parameters if x in labeled_df.columns],
-            var_name='parameter'
+            value_vars=[x for x in self.numeric_parameters if x in labeled_data.columns],
+            var_name='parameter',
         )
 
         fig = px.scatter(
@@ -1237,7 +1258,7 @@ class MLExperimentResults:
                 "Parameter Value: %{y}",
                 score_column + ": %{customdata[1]}",
                 "<br>Parameters: %{customdata[0]}",
-            ])
+            ]),
         )
         fig.update_yaxes(matches=None, showticklabels=True)
         return fig
@@ -1278,20 +1299,18 @@ class MLExperimentResults:
         # is not 0-x than the order seems to get messed up
         # https://github.com/plotly/plotly.py/issues/3576
         # https://github.com/plotly/plotly.py/issues/3577
-        df = self.to_dataframe(sort_by_score=False, query=query)
-        numeric_columns = [x for x in self.numeric_parameters if x in df.columns]
-        df = df[numeric_columns + score_columns].dropna(axis=0)
-        df.reset_index(drop=True, inplace=True)
-        fig = px.parallel_coordinates(
-            df,
+        data = self.to_dataframe(sort_by_score=False, query=query)
+        numeric_columns = [x for x in self.numeric_parameters if x in data.columns]
+        data = data[numeric_columns + score_columns].dropna(axis=0)
+        data = data.reset_index(drop=True)
+        return px.parallel_coordinates(
+            data,
             color=primary_score_column,
             color_continuous_scale=color_continuous_scale,
             height=height,
             width=width,
-            title="Parallel Coordinates of Hyper-Parameters and Score Averages<br>"
+            title="Parallel Coordinates of Hyper-Parameters and Score Averages<br>",
         )
-        # plotly.offline.plot(fig, filename='temp.html', auto_open=True)
-        return fig
 
     def plot_scatter_matrix(
             self,
@@ -1328,18 +1347,17 @@ class MLExperimentResults:
         # is not 0-x than the order seems to get messed up
         # https://github.com/plotly/plotly.py/issues/3576
         # https://github.com/plotly/plotly.py/issues/3577
-        df = self.to_dataframe(sort_by_score=False, query=query)
-        columns = [x for x in self.parameter_names if x in df.columns]
-        df = df[score_columns + columns]
-        df.reset_index(drop=True, inplace=True)
-        fig = px.scatter_matrix(
-            df,
+        data = self.to_dataframe(sort_by_score=False, query=query)
+        columns = [x for x in self.parameter_names if x in data.columns]
+        data = data[score_columns + columns]
+        data = data.reset_index(drop=True)
+        return px.scatter_matrix(
+            data,
             color=primary_score_column,
             color_continuous_scale=color_continuous_scale,
             height=height,
-            width=width
+            width=width,
         )
-        return fig
 
     def plot_performance_numeric_params(
             self,
@@ -1364,13 +1382,13 @@ class MLExperimentResults:
 
         primary_score_column = self.primary_score_name + " Mean"
 
-        df = self.to_labeled_dataframe(query=query)
-        columns = [x for x in self.numeric_parameters if x in df.columns]
+        data = self.to_labeled_dataframe(query=query)
+        columns = [x for x in self.numeric_parameters if x in data.columns]
         labeled_long = pd.melt(
-            df,
+            data,
             id_vars=[primary_score_column, 'label'],
             value_vars=columns,
-            var_name='parameter'
+            var_name='parameter',
         )
 
         fig = px.scatter(
@@ -1386,14 +1404,14 @@ class MLExperimentResults:
             title="Variable Performance<br><sup>Numeric Parameters</sup>",
             custom_data=['label', primary_score_column],
             height=height,
-            width=width
+            width=width,
         )
         fig.update_traces(
             hovertemplate="<br>".join([
                 "Parameter Value: %{x}",
                 primary_score_column + ": %{customdata[1]}",
                 "<br>Parameters: %{customdata[0]}",
-            ])
+            ]),
         )
         fig.update_xaxes(matches=None, showticklabels=True)
         return fig
@@ -1421,13 +1439,13 @@ class MLExperimentResults:
 
         primary_score_column = self.primary_score_name + " Mean"
 
-        df = self.to_labeled_dataframe(query=query)
-        columns = [x for x in self.non_numeric_parameters if x in df.columns]
+        data = self.to_labeled_dataframe(query=query)
+        columns = [x for x in self.non_numeric_parameters if x in data.columns]
         labeled_long = pd.melt(
-            df,
+            data,
             id_vars=[primary_score_column, 'label'],
             value_vars=columns,
-            var_name='parameter'
+            var_name='parameter',
         )
 
         scatter = px.scatter(
@@ -1449,7 +1467,7 @@ class MLExperimentResults:
                 "Parameter Value: %{x}",
                 primary_score_column + ": %{customdata[1]}",
                 "<br>Parameters: %{customdata[0]}",
-            ])
+            ]),
         )
         scatter.update_xaxes(matches=None, showticklabels=True)
         fig = px.box(
@@ -1462,7 +1480,7 @@ class MLExperimentResults:
             title="Variable Performance<br><sup>Non-Numeric Parameters</sup>",
             custom_data=['label', primary_score_column],
             height=height,
-            width=width
+            width=width,
         )
         for x in range(len(scatter.data)):
             fig.add_trace(scatter.data[x])
@@ -1472,7 +1490,7 @@ class MLExperimentResults:
 
     def plot_score_vs_parameter(
             self,
-            parameter,
+            parameter: str,
             query: str | None = None,
             size: str | None = None,
             color: str | None = None,
@@ -1507,19 +1525,19 @@ class MLExperimentResults:
         if size:
             title = title \
                 + "<br><sup>The size of the point corresponds to the value of <b>" \
-                + f"'{size}'</b>.</sup>"  # noqa
+                + f"'{size}'</b>.</sup>"
 
-        df = self.to_labeled_dataframe(query=query)
+        data = self.to_labeled_dataframe(query=query)
         # only include the columns we need, so that we don't unnecessarily drop rows with NA (i.e.
         # NAs in columns not used in the graph)
         columns = [
             x for x in [parameter, primary_score_column, size, color, 'label'] if x is not None
         ]
-        df = df[columns]
-        df.dropna(axis=0, how='any', inplace=True)
-        df.reset_index(drop=True, inplace=True)
+        data = data[columns]
+        data = data.dropna(axis=0, how='any')
+        data = data.reset_index(drop=True)
         fig = px.scatter(
-            data_frame=df,
+            data_frame=data,
             x=parameter,
             y=primary_score_column,
             size=size,
@@ -1540,7 +1558,7 @@ class MLExperimentResults:
                 "Parameter Value: %{x}",
                 primary_score_column + ": " + "%{y}",
                 "<br>Parameters: %{customdata[0]}",
-            ])
+            ]),
         )
         return fig
 
@@ -1578,7 +1596,7 @@ class MLExperimentResults:
         title = f"<b>{parameter_y}</b> vs <b>{parameter_x}</b>"
 
         scaled_size = None
-        labeled_df = self.to_labeled_dataframe(query=query)
+        labeled_data = self.to_labeled_dataframe(query=query)
 
         # only include the columns we need, so that we don't unnecessarily drop rows with NA (i.e.
         # NAs in columns not used in the graph)
@@ -1586,9 +1604,9 @@ class MLExperimentResults:
             x for x in [parameter_x, parameter_y, primary_score_column, size, 'label']
             if x is not None
         ]
-        labeled_df = labeled_df[columns]
-        labeled_df.dropna(axis=0, how='any', inplace=True)
-        labeled_df.reset_index(drop=True, inplace=True)
+        labeled_data = labeled_data[columns]
+        labeled_data = labeled_data.dropna(axis=0, how='any')
+        labeled_data = labeled_data.reset_index(drop=True)
 
         if size:
             title = title \
@@ -1598,11 +1616,11 @@ class MLExperimentResults:
                 # need to do this or else the points are all the same size
                 # but only if size has numeric values
                 scaled_size = MinMaxScaler(feature_range=(0.1, 0.9)).\
-                    fit_transform(labeled_df[[size]]).reshape(1, -1)
+                    fit_transform(labeled_data[[size]]).reshape(1, -1)
                 scaled_size = scaled_size.tolist()[0]
 
         fig = px.scatter(
-            data_frame=labeled_df,
+            data_frame=labeled_data,
             x=parameter_x,
             y=parameter_y,
             size=scaled_size,
@@ -1620,19 +1638,20 @@ class MLExperimentResults:
                 parameter_y + ": %{y}",
                 primary_score_column + ": " + "%{customdata[1]}",
                 "<br>Parameters: %{customdata[0]}",
-            ])
+            ]),
         )
         return fig
 
 
 class TwoClassEvaluator:
-    """This class calculates various metrics for Two Class (i.e. 0's/1's) prediction scenarios."""
+    """Calculates various metrics for Two Class (i.e. 0's/1's) prediction scenarios."""
+
     def __init__(self,
                  actual_values: np.ndarray,
                  predicted_scores: np.ndarray,
                  positive_class: str = 'Positive Class',
                  negative_class: str = 'Negative Class',
-                 score_threshold: float = 0.5
+                 score_threshold: float = 0.5,
                  ):
         """
         Args:
@@ -1648,7 +1667,7 @@ class TwoClassEvaluator:
                 not 'negative' in the sense of 'good' but 'negative' as in 'True/False Negative'.
             score_threshold:
                 the score/probability threshold for turning scores into 0's and 1's and
-                corresponding labels
+                corresponding labels.
         """
         assert len(actual_values) == len(predicted_scores)
 
@@ -1686,62 +1705,62 @@ class TwoClassEvaluator:
 
         self.auc = roc_auc_score(y_true=actual_values, y_score=predicted_scores)
         self.average_precision_score = average_precision_score(
-            y_true=actual_values, y_score=predicted_scores
+            y_true=actual_values, y_score=predicted_scores,
         )
 
     @property
     def true_positive_rate(self) -> float:
-        """True Positive Rate"""
+        """True Positive Rate."""
         return 0 if self._actual_positives == 0 else self._true_positives / self._actual_positives
 
     @property
     def true_negative_rate(self) -> float:
-        """True Negative Rate i.e. Specificity"""
+        """True Negative Rate i.e. Specificity."""
         return 0 if self._actual_negatives == 0 else self._true_negatives / self._actual_negatives
 
     @property
     def false_negative_rate(self) -> float:
-        """False Negative Rate"""
+        """False Negative Rate."""
         return 0 if self._actual_positives == 0 else self._false_negatives / self._actual_positives
 
     @property
     def false_positive_rate(self) -> float:
-        """False Positive Rate"""
+        """False Positive Rate."""
         return 0 if self._actual_negatives == 0 else self._false_positives / self._actual_negatives
 
     @property
     def accuracy(self) -> float | None:
-        """accuracy"""
+        """accuracy."""
         return None if self.sample_size == 0 else \
             (self._true_negatives + self._true_positives) / self.sample_size
 
     @property
     def error_rate(self) -> float | None:
-        """error_rate"""
+        """error_rate."""
         return None if self.sample_size == 0 else \
             (self._false_positives + self._false_negatives) / self.sample_size
 
     @property
     def positive_predictive_value(self) -> float:
-        """Positive Predictive Value i.e. Precision"""
+        """Positive Predictive Value i.e. Precision."""
         return 0 if (self._true_positives + self._false_positives) == 0 else \
             self._true_positives / (self._true_positives + self._false_positives)
 
     @property
     def negative_predictive_value(self) -> float:
-        """Negative Predictive Value"""
+        """Negative Predictive Value."""
         return 0 if (self._true_negatives + self._false_negatives) == 0 else \
             self._true_negatives / (self._true_negatives + self._false_negatives)
 
     @property
     def prevalence(self) -> float | None:
-        """Prevalence"""
+        """Prevalence."""
         return None if self.sample_size == 0 else \
             self._actual_positives / self.sample_size
 
     @property
     def kappa(self) -> float | None:
-        """Kappa"""
+        """Kappa."""
         if self.sample_size == 0 or \
                 ((self._true_negatives + self._false_negatives) / self.sample_size) == 0:
             return None
@@ -1763,9 +1782,7 @@ class TwoClassEvaluator:
 
     @property
     def f1_score(self) -> float:
-        """F1 Score
-        https://en.wikipedia.org/wiki/F-score
-        """
+        """F1 Score. https://en.wikipedia.org/wiki/F-score."""
         return self.fbeta_score(beta=1)
 
     def fbeta_score(self, beta: float) -> float:
@@ -1786,22 +1803,22 @@ class TwoClassEvaluator:
 
     @property
     def sensitivity(self) -> float:
-        """Sensitivity i.e. True Positive Rate"""
+        """Sensitivity i.e. True Positive Rate."""
         return self.true_positive_rate
 
     @property
     def specificity(self) -> float:
-        """Specificity i.e. True Negative Rate"""
+        """Specificity i.e. True Negative Rate."""
         return self.true_negative_rate
 
     @property
     def precision(self) -> float:
-        """Precision i.e. Positive Predictive Value"""
+        """Precision i.e. Positive Predictive Value."""
         return self.positive_predictive_value
 
     @property
-    def recall(self):
-        """Recall i.e. True Positive Rate"""
+    def recall(self) -> float:
+        """Recall i.e. True Positive Rate."""
         return self.true_positive_rate
 
     @property
@@ -1877,7 +1894,8 @@ class TwoClassEvaluator:
             dummy_classifier_constant: int = 1,
             return_style: bool = False,
             round_by: int | None = None) -> pd.DataFrame | Styler:
-        """All of the metrics are returned as a DataFrame.
+        """
+        All of the metrics are returned as a DataFrame.
 
         Args:
             return_explanations:
@@ -1924,16 +1942,16 @@ class TwoClassEvaluator:
                 dummy_evaluator = TwoClassEvaluator(
                     actual_values=self._actual_values,
                     predicted_scores=dummy_probabilities,
-                    score_threshold=self.score_threshold
+                    score_threshold=self.score_threshold,
                 )
 
                 dummy_scores = dummy_evaluator.all_metrics_df(
                     return_explanations=False,
                     dummy_classifier_strategy=None,
-                    return_style=False
+                    return_style=False,
                 )
                 column_name = f"Dummy ({strategy})"
-                score_columns = score_columns + [column_name]
+                score_columns = [*score_columns, column_name]
                 dummy_scores = dummy_scores.rename(columns={'Score': column_name})
                 result = pd.concat([result, dummy_scores], axis=1)
 
@@ -1941,7 +1959,7 @@ class TwoClassEvaluator:
             explanations = pd.DataFrame.from_dict(
                 {key: value[1] for key, value in self.all_metrics.items()},
                 orient='index',
-                columns=['Explanation']
+                columns=['Explanation'],
             )
             result = pd.concat([result, explanations], axis=1)
 
@@ -1950,20 +1968,20 @@ class TwoClassEvaluator:
                 result[column] = result[column].round(round_by)
 
         if return_style:
-            subset_scores = [x for x in result.index.values if x != 'Total Observations']
+            subset_scores = [x for x in result.index.to_numpy() if x != 'Total Observations']
 
             subset_scores = pd.IndexSlice[result.loc[subset_scores, :].index, score_columns]
             subset_negative_bad = pd.IndexSlice[
                 result.loc[['False Positive Rate', 'False Negative Rate'], score_columns].index,
-                score_columns
+                score_columns,
             ]
             subset_secondary = pd.IndexSlice[
                 result.loc[['Accuracy', 'Error Rate', '% Positive'], score_columns].index,
-                score_columns
+                score_columns,
             ]
             subset_total_observations = pd.IndexSlice[
                 result.loc[['Total Observations'], score_columns].index,
-                score_columns
+                score_columns,
             ]
 
             result = result.style
@@ -1976,14 +1994,14 @@ class TwoClassEvaluator:
             result = result. \
                 bar(
                     subset=subset_scores, color=hcolor.Colors.PIGMENT_GREEN.value,
-                    vmin=0, vmax=1
+                    vmin=0, vmax=1,
                 ). \
                 bar(subset=subset_negative_bad, color=hcolor.Colors.POPPY.value, vmin=0, vmax=1). \
-                bar(subset=subset_secondary, color=hcolor.GRAY, vmin=0, vmax=1)  # noqa
+                bar(subset=subset_secondary, color=hcolor.GRAY, vmin=0, vmax=1)
 
         return result
 
-    def plot_confusion_matrix(self):
+    def plot_confusion_matrix(self) -> None:
         """Plots a heatmap of the confusion matrix."""
         labels = np.array([
             [
@@ -1993,7 +2011,7 @@ class TwoClassEvaluator:
             [
                 f'False Negatives\n{self._false_negatives}\n{self._false_negatives / self.sample_size:.1%}',  # noqa
                 f'True Positives\n{self._true_positives}\n{self._true_positives / self.sample_size:.1%}'  # noqa
-            ]
+            ],
         ])
 
         axis = plt.subplot()
@@ -2015,20 +2033,19 @@ class TwoClassEvaluator:
         (A score threshold is the value for which you would predict a positive label if the value
         of the score is above the threshold (e.g. usually 0.5).
         """
-        def get_true_pos_false_pos(threshold):
+        def get_true_pos_false_pos(threshold: float) -> tuple[float, float, float]:
             temp_eval = TwoClassEvaluator(
                 actual_values=self._actual_values,
                 predicted_scores=self._predicted_scores,
-                score_threshold=threshold
+                score_threshold=threshold,
             )
             return threshold, temp_eval.true_positive_rate, temp_eval.false_positive_rate
 
         auc_curve = [get_true_pos_false_pos(threshold=x) for x in np.arange(0.0, 1.01, 0.01)]
-        auc_curve = pd.DataFrame(
+        return pd.DataFrame(
             auc_curve,
-            columns=['threshold', 'True Positive Rate', 'False Positive Rate']
+            columns=['threshold', 'True Positive Rate', 'False Positive Rate'],
         )
-        return auc_curve
 
     def _get_threshold_curve_dataframe(
             self,
@@ -2050,7 +2067,7 @@ class TwoClassEvaluator:
                 the interval used to determine the specific points in used in the
                 score_threshold_range
         """
-        def get_threshold_scores(threshold):
+        def get_threshold_scores(threshold: float):  # noqa: ANN202
             temp_eval = TwoClassEvaluator(actual_values=self._actual_values,
                                           predicted_scores=self._predicted_scores,
                                           score_threshold=threshold)
@@ -2062,26 +2079,30 @@ class TwoClassEvaluator:
                 temp_eval.false_negative_rate, \
                 temp_eval.true_negative_rate
 
-        threshold_curves = [get_threshold_scores(threshold=x)
-                            for x in np.arange(score_threshold_range[0],
-                                               score_threshold_range[1] + threshold_interval,
-                                               threshold_interval)]
+        threshold_curves = [
+            get_threshold_scores(threshold=x)
+            for x in np.arange(score_threshold_range[0], score_threshold_range[1] + threshold_interval, threshold_interval)  # noqa: E501
+        ]
 
-        threshold_curves = pd.DataFrame(threshold_curves,
-                                        columns=['Score Threshold',
-                                                 'True Pos. Rate (Recall)',
-                                                 'False Pos. Rate',
-                                                 'Pos. Predictive Value (Precision)',
-                                                 'False Neg. Rate',
-                                                 'True Neg. Rate (Specificity)'])
-        return threshold_curves
+        return pd.DataFrame(
+            threshold_curves,
+            columns=[
+                'Score Threshold',
+                'True Pos. Rate (Recall)',
+                'False Pos. Rate',
+                'Pos. Predictive Value (Precision)',
+                'False Neg. Rate',
+                'True Neg. Rate (Specificity)',
+            ],
+        )
 
     def plot_roc_auc_curve(
             self,
             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
             return_plotly: bool = True,
             plot_threshold: bool = True) -> None | _figure.Figure:
-        """Plots the ROC AUC
+        """
+        Plots the ROC AUC.
 
         Args:
             figure_size:
@@ -2109,7 +2130,7 @@ class TwoClassEvaluator:
                 color_discrete_sequence=[hcolor.Colors.DOVE_GRAY.value],
                 height=550,
                 width=550 * GOLDEN_RATIO,
-                title=title
+                title=title,
             )
             fig.add_trace(
                 px.scatter(
@@ -2117,7 +2138,7 @@ class TwoClassEvaluator:
                     x='False Positive Rate',
                     y='True Positive Rate',
                     color='threshold',
-                ).data[0]
+                ).data[0],
             )
             if plot_threshold:
                 fig.add_trace(
@@ -2126,7 +2147,7 @@ class TwoClassEvaluator:
                         x='False Positive Rate',
                         y='True Positive Rate',
                         size=[2],
-                    ).data[0]
+                    ).data[0],
                 )
             return fig
 
@@ -2134,7 +2155,7 @@ class TwoClassEvaluator:
         axis = sns.lineplot(
             data=auc_curve,
             x='False Positive Rate', y='True Positive Rate',
-            ci=None
+            ci=None,
         )
         axis.set_title(title)
         for i, (x, y, s) in enumerate(zip(auc_curve['False Positive Rate'],
@@ -2146,6 +2167,7 @@ class TwoClassEvaluator:
         axis.set_yticks(np.arange(0, 1.1, .1))
         plt.grid()
         plt.tight_layout()
+        return None
 
     def plot_precision_recall_auc_curve(
             self,
@@ -2154,7 +2176,8 @@ class TwoClassEvaluator:
             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
             return_plotly: bool = True,
             plot_threshold: bool = True) -> None | _figure.Figure:
-        """Plots the ROC AUC
+        """
+        Plots the ROC AUC.
 
         Args:
             score_threshold_range:
@@ -2173,14 +2196,14 @@ class TwoClassEvaluator:
             plot_threshold:
                 If True, indicate the score threshold (e.g. 0.5) as a large point.
         """
-        precision_recall_df = self._get_threshold_curve_dataframe(
+        precision_recall_data = self._get_threshold_curve_dataframe(
             score_threshold_range=score_threshold_range,
-            threshold_interval=threshold_interval
+            threshold_interval=threshold_interval,
         )
-        precision_recall = precision_recall_df[[
+        precision_recall = precision_recall_data[[
             'Score Threshold',
             'Pos. Predictive Value (Precision)',
-            'True Pos. Rate (Recall)'
+            'True Pos. Rate (Recall)',
         ]]
         title = f"Precision/Recall AUC: {self.average_precision_score:.3f}"
 
@@ -2196,7 +2219,7 @@ class TwoClassEvaluator:
                 color_discrete_sequence=[hcolor.Colors.DOVE_GRAY.value],
                 height=550,
                 width=550 * GOLDEN_RATIO,
-                title=title
+                title=title,
             )
             fig.add_trace(
                 px.scatter(
@@ -2204,18 +2227,18 @@ class TwoClassEvaluator:
                     x='True Pos. Rate (Recall)',
                     y='Pos. Predictive Value (Precision)',
                     color='Score Threshold',
-                ).data[0]
+                ).data[0],
             )
             if plot_threshold:
                 fig.add_trace(
                     px.scatter(
                         data_frame=precision_recall.query(
-                            f'`Score Threshold` == {round(self.score_threshold, 2)}'
+                            f'`Score Threshold` == {round(self.score_threshold, 2)}',
                         ),
                         x='True Pos. Rate (Recall)',
                         y='Pos. Predictive Value (Precision)',
                         size=[2],
-                    ).data[0]
+                    ).data[0],
                 )
             return fig
 
@@ -2224,7 +2247,7 @@ class TwoClassEvaluator:
             data=precision_recall,
             x='True Pos. Rate (Recall)',
             y='Pos. Predictive Value (Precision)',
-            ci=None
+            ci=None,
         )
         axis.set_title(title)
         for i, (x, y, s) in enumerate(zip(precision_recall['True Pos. Rate (Recall)'],
@@ -2236,6 +2259,7 @@ class TwoClassEvaluator:
         axis.set_yticks(np.arange(0, 1.1, .1))
         plt.grid()
         plt.tight_layout()
+        return None
 
     def plot_threshold_curves(
             self,
@@ -2244,7 +2268,8 @@ class TwoClassEvaluator:
             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
             return_plotly: bool = True,
             plot_threshold: bool = False) -> None | _figure.Figure:
-        """Plots various scores (e.g. True Positive Rate, False Positive Rate, etc.) for various
+        """
+        Plots various scores (e.g. True Positive Rate, False Positive Rate, etc.) for various
         score thresholds. (A score threshold is the value for which you would predict a positive
         label if the value of the score is above the threshold (e.g. usually 0.5).
 
@@ -2292,23 +2317,23 @@ class TwoClassEvaluator:
                 color_discrete_sequence=custom_colors,
                 labels={
                     'variable': 'Rate Type',
-                    'value': 'Rate'
+                    'value': 'Rate',
                 },
                 height=550,
                 width=550 * GOLDEN_RATIO,
-                title=title
+                title=title,
             )
             if plot_threshold:
                 fig = fig.add_vline(
                     x=round(self.score_threshold, 2),
-                    line_color=hcolor.Colors.BLACK_SHADOW.value
+                    line_color=hcolor.Colors.BLACK_SHADOW.value,
                 )
             return fig
 
         plt.figure(figsize=figure_size)
         axis = sns.lineplot(
             x='Score Threshold', y='value', hue='variable',
-            data=pd.melt(frame=threshold_curves, id_vars=['Score Threshold'])
+            data=pd.melt(frame=threshold_curves, id_vars=['Score Threshold']),
         )
         axis.set_xticks(np.arange(score_threshold_range[0], score_threshold_range[1] + 0.1, 0.1))
         axis.set_yticks(np.arange(0, 1.1, .1))
@@ -2317,15 +2342,16 @@ class TwoClassEvaluator:
             plt.vlines(x=self.score_threshold, ymin=0, ymax=1, colors='black')
         plt.grid()
         plt.tight_layout()
+        return None
 
     def plot_precision_recall_tradeoff(
             self,
             score_threshold_range: tuple[float, float] = (0.1, 0.9),
-            threshold_interval: float = 0.025,
             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
             return_plotly: bool = True,
             plot_threshold: bool = False) -> None | _figure.Figure:
-        """Plots the tradeoff between precision (i.e. positive predict value) and recall (i.e.
+        """
+        Plots the tradeoff between precision (i.e. positive predict value) and recall (i.e.
         True Positive Rate) for various score thresholds. (A score threshold is the value for which
         you would predict a positive label if the value of the score is above the threshold (e.g.
         usually 0.5).
@@ -2348,12 +2374,12 @@ class TwoClassEvaluator:
                 If True, indicate the score threshold (e.g. 0.5) with a vertical line.
         """
         threshold_curves = self._get_threshold_curve_dataframe(
-            score_threshold_range=score_threshold_range
+            score_threshold_range=score_threshold_range,
         )
         threshold_curves = threshold_curves[[
             'Score Threshold',
             'True Pos. Rate (Recall)',
-            'Pos. Predictive Value (Precision)'
+            'Pos. Predictive Value (Precision)',
         ]]
 
         if return_plotly:
@@ -2373,9 +2399,9 @@ class TwoClassEvaluator:
                     frame=threshold_curves[[
                         'Score Threshold',
                         'True Pos. Rate (Recall)',
-                        'Pos. Predictive Value (Precision)'
+                        'Pos. Predictive Value (Precision)',
                     ]],
-                    id_vars=['Score Threshold']
+                    id_vars=['Score Threshold'],
                 ),
                 x='Score Threshold',
                 y='value',
@@ -2383,16 +2409,16 @@ class TwoClassEvaluator:
                 color_discrete_sequence=custom_colors,
                 labels={
                     'variable': 'Rate',
-                    'value': 'Value'
+                    'value': 'Value',
                 },
                 height=550,
                 width=550 * GOLDEN_RATIO,
-                title=title
+                title=title,
             )
             if plot_threshold:
                 fig = fig.add_vline(
                     x=round(self.score_threshold, 2),
-                    line_color=hcolor.Colors.BLACK_SHADOW.value
+                    line_color=hcolor.Colors.BLACK_SHADOW.value,
                 )
             return fig
 
@@ -2406,6 +2432,7 @@ class TwoClassEvaluator:
             plt.vlines(x=self.score_threshold, ymin=0, ymax=1, colors='black')
         plt.grid()
         plt.tight_layout()
+        return None
 
     def calculate_lift_gain(
             self,
@@ -2413,7 +2440,7 @@ class TwoClassEvaluator:
             return_style: bool = False,
             include_all_info: bool = False) -> pd.DataFrame | Styler:
         """
-        https://www.listendata.com/2014/08/excel-template-gain-and-lift-charts.html
+        https://www.listendata.com/2014/08/excel-template-gain-and-lift-charts.html.
 
         Gain is the % of positive (actual) events we have 'captured' i.e. located by looking at the
         top x% of predicted scores, such that the highest scores are looked at first.
@@ -2432,21 +2459,21 @@ class TwoClassEvaluator:
             'predicted_scores': self._predicted_scores,
             'actual_values': self._actual_values,
         })
-        data.sort_values(['predicted_scores'], ascending=False, inplace=True)
+        data = data.sort_values(['predicted_scores'], ascending=False)
 
         # .qcut gets percentiles
         bins = pd.qcut(
             x=data['predicted_scores'],
             q=num_buckets,
-            labels=list(range(100, 0, round(-100 / num_buckets)))
+            labels=list(range(100, 0, round(-100 / num_buckets))),
         )
 
         data['Percentile'] = bins
 
-        def gain_grouping(group):
+        def gain_grouping(group: pd.DataFrame) -> pd.Series:
             results = {
                 '# of Obs.': len(group.actual_values),
-                '# of Pos. Events': sum(group.actual_values == 1)
+                '# of Pos. Events': sum(group.actual_values == 1),
             }
             return pd.Series(results, index=['# of Obs.', '# of Pos. Events'])
 
@@ -2454,12 +2481,12 @@ class TwoClassEvaluator:
         temp = pd.DataFrame({'# of Obs.': 0, '# of Pos. Events': 0}, index=[0])
         temp.index.names = ['Percentile']
         gain_lift_data = pd.concat([gain_lift_data, temp])
-        gain_lift_data.sort_index(ascending=True, inplace=True)
+        gain_lift_data = gain_lift_data.sort_index(ascending=True)
 
         gain_lift_data['Cumul. Pos. Events'] = gain_lift_data['# of Pos. Events'].cumsum()
         gain_lift_data['Gain'] = gain_lift_data['Cumul. Pos. Events'] / self._actual_positives
         gain_lift_data = gain_lift_data.loc[~(gain_lift_data.index == 0), :]
-        gain_lift_data['Lift'] = gain_lift_data['Gain'] / (gain_lift_data.index.values / 100)
+        gain_lift_data['Lift'] = gain_lift_data['Gain'] / (gain_lift_data.index.to_numpy() / 100)
 
         if not include_all_info:
             gain_lift_data = gain_lift_data[['Gain', 'Lift']]
@@ -2475,32 +2502,33 @@ class TwoClassEvaluator:
 
         return gain_lift_data
 
-    def plot_predicted_scores_histogram(self):
-        """Return a histogram of the predicted scores"""
+    def plot_predicted_scores_histogram(self) -> None:
+        """Return a histogram of the predicted scores."""
         pd.Series(self._predicted_scores).hist()
         plt.tight_layout()
 
-    def plot_actual_vs_predict_histogram(self, plot_threshold: bool = False):
-        """Return a histogram of the actual vs predicted scores
+    def plot_actual_vs_predict_histogram(self, plot_threshold: bool = False) -> None:
+        """
+        Return a histogram of the actual vs predicted scores.
 
         plot_threshold:
                 If True, indicate the score threshold (e.g. 0.5) with a vertical line.
         """
-        df = pd.DataFrame({
+        data = pd.DataFrame({
             'Predicted Scores': self._predicted_scores,
             'Labels': [
                 self._positive_class if x == 1 else self._negative_class
                 for x in self._actual_values
-            ]
+            ],
         })
         fig = px.box(
-            df,
+            data,
             x="Predicted Scores",
             y='Labels',
             color="Labels",
             points='all',
             labels={'Labels': ''},
-            title="Distribution of Prediction Scores"
+            title="Distribution of Prediction Scores",
         )
         if plot_threshold:
             fig.add_vline(x=self.score_threshold)
@@ -2509,18 +2537,18 @@ class TwoClassEvaluator:
 
 
 class RegressionEvaluator:
-    """
-    Evaluates models for regression (i.e. numeric outcome) problems.
-    """
-    def __init__(self,
-                 actual_values: np.ndarray,
-                 predicted_values: np.ndarray):
+    """Evaluates models for regression (i.e. numeric outcome) problems."""
+
+    def __init__(
+            self,
+            actual_values: np.ndarray,
+            predicted_values: np.ndarray):
         """
         Args:
             actual_values:
                 the actual values
             predicted_values:
-                the predicted values
+                the predicted values.
         """
         if not isinstance(actual_values, np.ndarray):
             actual_values = np.array(actual_values)
@@ -2546,51 +2574,56 @@ class RegressionEvaluator:
 
     @property
     def mean_absolute_error(self) -> float:
-        """Mean Absolute Error"""
+        """Mean Absolute Error."""
         return self._mean_absolute_error
 
     @property
     def mean_squared_error(self) -> float:
-        """Mean Squared Error"""
+        """Mean Squared Error."""
         return self._mean_squared_error
 
     @property
     def root_mean_squared_error(self) -> float:
-        """Root Mean Squared Error"""
+        """Root Mean Squared Error."""
         return np.sqrt(self.mean_squared_error)
 
     @property
     def rmse_to_st_dev(self) -> float:
-        """The ratio of RMSE to the standard deviation of the actual values.
+        """
+        The ratio of RMSE to the standard deviation of the actual values.
         Gives an indication of how large the errors are to the actual data.
         """
         return self.root_mean_squared_error / self._standard_deviation
 
     @property
     def r_squared(self) -> float:
-        """R Squared"""
+        """R Squared."""
         return self._r_squared
 
     @property
-    def total_observations(self):
+    def total_observations(self) -> int:
         """The total number of observations i.e. sample size."""
         return len(self._actual_values)
 
     @property
     def all_metrics(self) -> dict:
         """Returns a dictionary of the most common error metrics for regression problems."""
-        return {'Mean Absolute Error (MAE)': self.mean_absolute_error,
-                'Root Mean Squared Error (RMSE)': self.root_mean_squared_error,
-                'RMSE to Standard Deviation of Target': self.rmse_to_st_dev,
-                'R Squared': self.r_squared,
-                'Total Observations': self.total_observations}
+        return {
+            'Mean Absolute Error (MAE)': self.mean_absolute_error,
+            'Root Mean Squared Error (RMSE)': self.root_mean_squared_error,
+            'RMSE to Standard Deviation of Target': self.rmse_to_st_dev,
+            'R Squared': self.r_squared,
+            'Total Observations': self.total_observations,
+        }
 
-    def all_metrics_df(self,
-                       dummy_regressor_strategy: str | list | None = 'mean',
-                       dummy_regressor_constant: int = 1,
-                       return_style: bool = False,
-                       round_by: int | None = None) -> pd.DataFrame | Styler:
-        """All of the metrics are returned as a DataFrame.
+    def all_metrics_df(
+            self,
+            dummy_regressor_strategy: str | list | None = 'mean',
+            dummy_regressor_constant: int = 1,
+            return_style: bool = False,
+            round_by: int | None = None) -> pd.DataFrame | Styler:
+        """
+        All of the metrics are returned as a DataFrame.
 
         Args:
             dummy_regressor_strategy:
@@ -2634,7 +2667,7 @@ class RegressionEvaluator:
                 dummy_scores = dummy_evaluator.all_metrics_df(dummy_regressor_strategy=None,
                                                               return_style=False)
                 column_name = f"Dummy ({strategy})"
-                score_columns = score_columns + [column_name]
+                score_columns = [*score_columns, column_name]
                 dummy_scores = dummy_scores.rename(columns={'Score': column_name})
                 result = pd.concat([result, dummy_scores], axis=1)
 
@@ -2645,16 +2678,16 @@ class RegressionEvaluator:
             subset_scores = pd.IndexSlice[
                 result.loc[
                     ['Mean Absolute Error (MAE)', 'Root Mean Squared Error (RMSE)'],
-                    score_columns
+                    score_columns,
                 ].index,
-                score_columns
+                score_columns,
             ]
             subset_secondary = pd.IndexSlice[result.loc[['RMSE to Standard Deviation of Target',
                                                          'R Squared'],
                                                         score_columns].index, score_columns]
             subset_total_observations = pd.IndexSlice[
                 result.loc[['Total Observations'], score_columns].index,
-                score_columns
+                score_columns,
             ]
             result = result.style
             if round_by is not None:
@@ -2666,8 +2699,9 @@ class RegressionEvaluator:
 
         return result
 
-    def plot_residuals_vs_fits(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
-        """Plots residuals vs fitted values
+    def plot_residuals_vs_fits(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT) -> None:
+        """
+        Plots residuals vs fitted values.
 
         Args:
             figure_size:
@@ -2686,8 +2720,9 @@ class RegressionEvaluator:
         plt.xlabel('Fitted Values')
         plt.ylabel('Residuals (Actual - Predicted)')
 
-    def plot_predictions_vs_actuals(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
-        """Plots predictions vs actual values
+    def plot_predictions_vs_actuals(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT) -> object:
+        """
+        Plots predictions vs actual values.
 
         Args:
             figure_size:
@@ -2703,7 +2738,7 @@ class RegressionEvaluator:
         plt.plot(loess_x, loess_y, color='r', alpha=0.5, label='Loess (Predictions vs Actuals)')
         plt.plot(
             self._actual_values, self._actual_values,
-            color='b', alpha=0.5, label='Perfect Prediction'
+            color='b', alpha=0.5, label='Perfect Prediction',
         )
         plt.scatter(x=self._actual_values, y=self._predicted_values, s=8, alpha=0.5)
         plt.title('Predicted Values vs. Actual Values')
@@ -2716,12 +2751,13 @@ class RegressionEvaluator:
             0.99, 0.01,
             'Note: observations above blue line mean model is over-predicting; below means under-'
             'predicting.',
-            horizontalalignment='right'
+            horizontalalignment='right',
         )
         return axis
 
-    def plot_residuals_vs_actuals(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT):
-        """Plots residuals vs actuals values
+    def plot_residuals_vs_actuals(self, figure_size: tuple = STANDARD_WIDTH_HEIGHT) -> None:
+        """
+        Plots residuals vs actuals values.
 
         Args:
             figure_size:
@@ -2743,13 +2779,12 @@ class RegressionEvaluator:
             0.99, 0.01,
             'Note: Actual > Predicted => Under-predicting (positive residual); negative residuals '
             'mean over-predicting',
-            horizontalalignment='right'
+            horizontalalignment='right',
         )
 
 
 class TwoClassModelComparison:
-    """This class compares multiple models trained on Two Class (i.e. 0's/1's) prediction
-    scenarios."""
+    """Compares multiple models trained on Two Class (i.e. 0's/1's) prediction scenarios."""
 
     def __init__(
             self,
@@ -2773,7 +2808,7 @@ class TwoClassModelComparison:
                 not 'negative' in the sense of 'good' but 'negative' as in 'True/False Negative'.
             score_threshold:
                 the score/probability threshold for turning scores into 0's and 1's and
-                corresponding labels
+                corresponding labels.
         """
         assert isinstance(predicted_scores, dict)
 
@@ -2799,7 +2834,8 @@ class TwoClassModelComparison:
             dummy_classifier_constant: int = 1,
             return_style: bool = False,
             round_by: int | None = None) -> pd.DataFrame | Styler:
-        """All of the metrics are returned as a DataFrame.
+        """
+        All of the metrics are returned as a DataFrame.
 
         Args:
             dummy_classifier_strategy:
@@ -2819,9 +2855,8 @@ class TwoClassModelComparison:
             return_style:
                 if True, return styler object; else return dataframe
             round_by:
-                the number of digits to round by; if None, then don't round
+                the number of digits to round by; if None, then don't round.
         """
-
         result = None
         last_key = list(self._evaluators.keys())[-1]
 
@@ -2831,7 +2866,7 @@ class TwoClassModelComparison:
             scores = value.all_metrics_df(
                 return_explanations=False,
                 dummy_classifier_strategy=dummy_strategy,
-                dummy_classifier_constant=dummy_classifier_constant
+                dummy_classifier_constant=dummy_classifier_constant,
             )
             scores = scores.rename(columns={'Score': key})
             result = pd.concat([result, scores], axis=1)
@@ -2840,7 +2875,7 @@ class TwoClassModelComparison:
             'AUC', 'F1 Score',
             'True Positive Rate', 'True Negative Rate',
             'False Positive Rate', 'False Negative Rate',
-            'Positive Predictive Value', 'Negative Predictive Value'
+            'Positive Predictive Value', 'Negative Predictive Value',
         ]]
 
         result = result.transpose()
@@ -2861,7 +2896,7 @@ class TwoClassModelComparison:
             result = result. \
                 bar(
                     subset=positive_scores, color=hcolor.Colors.PIGMENT_GREEN.value,
-                    vmin=0, vmax=1
+                    vmin=0, vmax=1,
                 ). \
                 bar(subset=negative_scores, color=hcolor.Colors.POPPY.value, vmin=0, vmax=1)
 
@@ -2890,16 +2925,16 @@ class TwoClassModelComparison:
                 DummyClassifier.
                 This parameter is useful only for the “constant” dummy_classifier_strategy.
         """
-        score_df = self.all_metrics_df(
+        score_data = self.all_metrics_df(
             dummy_classifier_strategy=dummy_classifier_strategy,
-            dummy_classifier_constant=dummy_classifier_constant
+            dummy_classifier_constant=dummy_classifier_constant,
         ).transpose()
 
-        score_df = score_df.reset_index()
+        score_data = score_data.reset_index()
 
         colors = [e.value for e in hcolor.Colors]
         fig = px.bar(
-            data_frame=score_df.melt(id_vars='index'),
+            data_frame=score_data.melt(id_vars='index'),
             y='variable',
             x='value',
             facet_col='index',
@@ -2909,7 +2944,7 @@ class TwoClassModelComparison:
             barmode='group',
             height=1000,
             labels={'index': 'Score'},
-            title="Model Comparison"
+            title="Model Comparison",
         )
         fig.update_layout(showlegend=False)
         fig.update_yaxes(title=None)
@@ -2920,9 +2955,9 @@ class TwoClassModelComparison:
         result = None
 
         for key, value in self._evaluators.items():
-            auc_df = value._get_auc_curve_dataframe()
-            auc_df['Model'] = key
-            result = pd.concat([result, auc_df], axis=0)
+            auc_data = value._get_auc_curve_dataframe()
+            auc_data['Model'] = key
+            result = pd.concat([result, auc_data], axis=0)
 
         colors = [e.value for e in hcolor.Colors]
         fig = px.line(
@@ -2946,18 +2981,16 @@ class TwoClassModelComparison:
                 custom_data=['threshold', 'Model'],
             )
             scatter_1.data[index]['showlegend'] = False
-            fig.add_trace(
-                scatter_1.data[index]
-            )
+            fig.add_trace(scatter_1.data[index])
             query = f"threshold == 0.5 & Model == '{list(self._evaluators.keys())[index]}'"
             matches = result.query(query)
-            matches.reset_index(drop=True, inplace=True)
+            matches = matches.reset_index(drop=True)
             scatter_2 = px.scatter(
                 data_frame=matches,
                 x='False Positive Rate',
                 y='True Positive Rate',
                 color='Model',
-                color_discrete_sequence=[colors[index]] + colors,
+                color_discrete_sequence=[colors[index], *colors],
                 custom_data=['threshold', 'Model'],
                 size=[2],
             )
@@ -2972,6 +3005,6 @@ class TwoClassModelComparison:
                 "False Positive Rate: %{x}",
                 "True Positive Rate: %{y}",
                 "Threshold: %{customdata[0]}",
-            ])
+            ]),
         )
         return fig

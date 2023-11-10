@@ -34,7 +34,8 @@ def is_series_numeric(series: pd.Series) -> bool:
 
 
 def is_series_bool(series: pd.Series) -> bool:
-    """Tests whether or not a pd.Series is bool.
+    """
+    Tests whether or not a pd.Series is bool.
 
     `is_bool_dtype(np.array([True, False, np.nan]))` evaluates to False, so we must check if any of
     the values in the series are bool
@@ -52,7 +53,7 @@ def is_series_bool(series: pd.Series) -> bool:
     if is_bool_dtype(series):
         return True
 
-    def is_nan(value):
+    def is_nan(value: any) -> bool:
         try:
             if np.isnan(value):
                 return True
@@ -60,7 +61,7 @@ def is_series_bool(series: pd.Series) -> bool:
             return False
 
     are_booleans = [
-        isinstance(x, (bool, np.bool_)) for x in series.values
+        isinstance(x, (bool, np.bool_)) for x in series.to_numpy()
         if x is not None and not is_nan(x)
     ]
 
@@ -112,7 +113,8 @@ def is_series_string(series: pd.Series) -> bool:
 
 
 def is_series_categorical(series: pd.Series) -> bool:
-    """Returns True if the series is of type categorical
+    """
+    Returns True if the series is of type categorical.
 
     Args:
         series: a pandas Series
@@ -124,7 +126,8 @@ def is_series_categorical(series: pd.Series) -> bool:
 
 
 def fill_na(series: pd.Series, missing_value_replacement: str = '<Missing>') -> pd.Series:
-    """Fills missing values with `missing_value_replacement`
+    """
+    Fills missing values with `missing_value_replacement`.
 
     This is only necessary if `series` is a categorical object because series.fillna(...) will
     fail if `missing_value_replacement` isn't already an existing category. This function adds the
@@ -153,12 +156,14 @@ def fill_na(series: pd.Series, missing_value_replacement: str = '<Missing>') -> 
         # if we don't do this, then if, for example, we have boolean values and we try to call
         # `.fillna(...)` then we will get `TypeError: Need to pass bool-like values.`
         series = series.astype(object)
-
     return series.fillna(missing_value_replacement)
 
 
-def replace_all_bools_with_strings(series: pd.Series, replacements: dict = None) -> pd.Series:
-    """Replaces boolean values (True/False) with string values ('True'/'False').
+def replace_all_bools_with_strings(
+        series: pd.Series,
+        replacements: dict | None = None) -> pd.Series:
+    """
+    Replaces boolean values (True/False) with string values ('True'/'False').
 
     Args:
         series:
@@ -177,7 +182,7 @@ def replace_all_bools_with_strings(series: pd.Series, replacements: dict = None)
 
     if is_series:
         categories = list(
-            set(series.cat.categories.to_list() + [replacements[True], replacements[False]])
+            {*series.cat.categories.to_list(), replacements[True], replacements[False]},
         )
         series = pd.Series(series.to_list())
 
@@ -185,14 +190,18 @@ def replace_all_bools_with_strings(series: pd.Series, replacements: dict = None)
     series = series.where(mask, series.replace(replacements))
 
     if is_series:
-        series = pd.Categorical(series, categories=categories)  # noqa
+        series = pd.Categorical(series, categories=categories)
 
     return series
 
 
-def relocate(df: pd.DataFrame, column: str, before: str = None, after: str = None) -> pd.DataFrame:
+def relocate(
+        df: pd.DataFrame,
+        column: str,
+        before: str | None = None,
+        after: str | None = None) -> pd.DataFrame:
     """
-    This function relocates `column` to the position before the column specified in `before` or
+    Relocates `column` to the position before the column specified in `before` or
     after the column specified in `after`. It returns the DataFrame with the column order adjusted
     accordingly.
 
@@ -223,7 +232,8 @@ def relocate(df: pd.DataFrame, column: str, before: str = None, after: str = Non
 
 
 def get_numeric_columns(dataframe: pd.DataFrame) -> list[str]:
-    """Returns the column names from the dataframe that are numeric (and not boolean).
+    """
+    Returns the column names from the dataframe that are numeric (and not boolean).
 
     NOTE: `pandas.api.types.is_numeric_dtype()` returns `True` for `bool` dtypes;
     this function treats booleans as non-numeric.
@@ -239,12 +249,13 @@ def get_numeric_columns(dataframe: pd.DataFrame) -> list[str]:
 
 
 def get_non_numeric_columns(dataframe: pd.DataFrame) -> list[str]:
-    """Returns the column names from the dataframe that are not numeric.
+    """
+    Returns the column names from the dataframe that are not numeric.
 
     NOTE: `pandas.api.types.is_numeric_dtype()` returns `True` for `bool` dtypes;
     this function treats booleans as non-numeric.
 
-    Returns:
+    Returns
         list of column names that correspond to numeric types. NOTE: if a column contains all
         `np.nan` values, it will count as numeric and will not be returned in the list.
     """
@@ -252,27 +263,30 @@ def get_non_numeric_columns(dataframe: pd.DataFrame) -> list[str]:
 
 
 def get_date_columns(dataframe: pd.DataFrame) -> list[str]:
-    """Returns the column names from the dataframe that are either Date or Datetime.
+    """
+    Returns the column names from the dataframe that are either Date or Datetime.
 
-    Returns:
+    Returns
         list of column names that correspond to Date or Datetime types.
     """
     return [column for column in dataframe.columns if is_series_date(dataframe[column])]
 
 
 def get_string_columns(dataframe: pd.DataFrame) -> list[str]:
-    """Returns the column names from the dataframe that are string.
+    """
+    Returns the column names from the dataframe that are string.
 
-    Returns:
+    Returns
         list of column names that correspond to string types.
     """
     return [column for column in dataframe.columns if is_series_string(dataframe[column])]
 
 
 def get_categorical_columns(dataframe: pd.DataFrame) -> list[str]:
-    """Returns the column names from the dataframe that are categorical.
+    """
+    Returns the column names from the dataframe that are categorical.
 
-    Returns:
+    Returns
         list of column names that correspond to categorical types.
     """
     return [column for column in dataframe.columns if is_series_categorical(dataframe[column])]
@@ -282,9 +296,10 @@ def reorder_categories(
         categorical: pd.Series | pd.Categorical,
         weights: pd.Series | np.ndarray | None = None,
         weight_function: Callable = np.median,
-        ascending=True,
-        ordered=False) -> pd.Categorical:
-    """Returns copy of the `categorical` series, with categories reordered based on the number of
+        ascending: bool = True,
+        ordered: bool = False) -> pd.Categorical:
+    """
+    Returns copy of the `categorical` series, with categories reordered based on the number of
     occurrences of the category (if `weights` is set to None`), or (if `weights` is not None) to
     numeric values in `weights` based on the function `weight_function`.
 
@@ -315,7 +330,7 @@ def reorder_categories(
             raise HelpskParamValueError(message)
 
         if isinstance(weights, pd.Series):
-            weights = weights.values
+            weights = weights.to_numpy()
 
         weights = pd.Series(weights, index=categorical)
         # for each categoric value, calculate the associated value of the categoric, based on the
@@ -328,12 +343,11 @@ def reorder_categories(
     # (i.e. series.cat.categories) that doesn't have any associated values in the series)
     assert set(categorical.dropna()).issubset(set(ordered_categories.index.dropna()))
 
-    results = pd.Categorical(
+    return pd.Categorical(
         values=categorical,
         categories=list(ordered_categories.index.values),
-        ordered=ordered
+        ordered=ordered,
     )
-    return results
 
 
 def top_n_categories(
@@ -343,9 +357,10 @@ def top_n_categories(
         weights: pd.Series | np.ndarray | None = None,
         weight_function: Callable = np.median,
         ordered: bool = False) -> pd.Categorical:
-    """Returns copy of `categorical` series, with the top `n` categories retained based on either
+    """
+    Returns copy of `categorical` series, with the top `n` categories retained based on either
     the count of values (if `weight` is None) or based on the values in `weight` determined by
-    `aggregate_function`, and all other categories converted to `other`
+    `aggregate_function`, and all other categories converted to `other`.
 
     similar to `fct_lump()` in R.
 
@@ -368,7 +383,6 @@ def top_n_categories(
         ordered:
             passed to `pd.Categorical` to indicate if returned object should be `ordered`.
     """
-
     # if there are less than (or the same amount of) unique values than top_n; then we don't have
     # to do anything
     if len(categorical.unique()) <= top_n:
@@ -385,7 +399,7 @@ def top_n_categories(
             raise HelpskParamValueError(message)
 
         if isinstance(weights, pd.Series):
-            weights = weights.values
+            weights = weights.to_numpy()
 
         weights = pd.Series(weights, index=categorical)
         # for each categoric value, calculate the associated value of the categoric, based on the
@@ -402,18 +416,20 @@ def top_n_categories(
     final_series[final_series.apply(lambda x: x not in top_categories).fillna(False)] = other_category  # noqa
 
     if other_category not in top_categories:
-        top_categories = top_categories + [other_category]
+        top_categories = [*top_categories, other_category]
 
-    final_series = pd.Categorical(final_series,
-                                  categories=top_categories,
-                                  ordered=ordered)
-    return final_series
+    return pd.Categorical(
+        final_series,
+        categories=top_categories,
+        ordered=ordered,
+    )
 
 
 def convert_integer_series_to_categorical(
         series: pd.Series, mapping: dict,
         ordered: bool = False) -> pd.Series:
-    """Converts a Series object from integers to Categorical for a given mapping of integers to
+    """
+    Converts a Series object from integers to Categorical for a given mapping of integers to
     strings.
 
     Args:
@@ -437,7 +453,7 @@ def convert_integer_series_to_categorical(
     # check that the keys in mapping contains all numbers found in the series
     unique_values = series.unique()
     unique_values = unique_values[~np.isnan(unique_values)]
-    missing_keys = [x for x in unique_values if x not in mapping.keys()]
+    missing_keys = [x for x in unique_values if x not in mapping]
     if missing_keys:
         message = "The following value(s) were found in `series` " \
             f"but not in `mapping` keys `{missing_keys}`"
@@ -454,7 +470,7 @@ def convert_integer_series_to_categorical(
     converted_series = pd.Categorical.from_codes(
         converted_series.astype(int),
         mapping.values(),
-        ordered=ordered
+        ordered=ordered,
     )
     return pd.Series(converted_series)
 
@@ -464,7 +480,8 @@ def numeric_summary(
         round_by: int = 2,
         return_style: bool = True,
         sort_by_columns: bool = False) -> pd.DataFrame | Styler | None:
-    """Provides a summary of basic stats for the numeric columns of a DataFrame. Each numeric
+    """
+    Provides a summary of basic stats for the numeric columns of a DataFrame. Each numeric
     column in `dataframe` will correspond to a row in the pd.DataFrame returned.
 
     Args:
@@ -500,7 +517,7 @@ def numeric_summary(
             columns) that have different units or scales.
         `Skewness`: "unbiased skew"; utilizes `pandas` DataFrame underlying `.skew()` function
             https://pythontic.com/pandas/dataframe-computations/skew
-        `Kurtosis`: "unbiased kurtosis ... using Fisher’s definition of kurtosis"; utilizes
+        `Kurtosis`: "unbiased kurtosis ... using Fisher's definition of kurtosis"; utilizes
             `pandas` DataFrame underlying `.skew()` function
         `Min`: minimum value found
         `10%`: the value found at the 10th percentile of data
@@ -519,8 +536,8 @@ def numeric_summary(
 
     # column, number of nulls in column, percent of nulls in column
     null_data = [(column,
-                  dataframe[column].isnull().sum(),
-                  round(dataframe[column].isnull().sum() / len(dataframe), round_by))
+                  dataframe[column].isna().sum(),
+                  round(dataframe[column].isna().sum() / len(dataframe), round_by))
                  for column in numeric_columns]
     columns, num_nulls, perc_nulls = zip(*null_data)
 
@@ -569,12 +586,12 @@ def numeric_summary(
             pipe(
                 pstyle.format,
                 subset=['# of Non-Nulls', '# of Nulls', '# of Zeros'],
-                round_by=0
+                round_by=0,
             ). \
             pipe(pstyle.format, subset=columns_to_format, round_by=1). \
             highlight_between(
                 left=0.00000001, right=math.inf, subset=['# of Nulls', '# of Zeros'],
-                color=color.WARNING
+                color=color.WARNING,
             ). \
             bar(subset=['% Nulls'], color=color.BAD, vmin=0, vmax=1). \
             bar(subset=['% Zeros'], color=color.GRAY, vmin=0, vmax=1). \
@@ -588,7 +605,8 @@ def non_numeric_summary(dataframe: pd.DataFrame,
                         return_style: bool = True,
                         unique_freq_value_max_chars: int = 30,
                         sort_by_columns: bool = False) -> pd.DataFrame | Styler | None:
-    """Provides a summary of basic stats for the non-numeric columns of a DataFrame. Each
+    """
+    Provides a summary of basic stats for the non-numeric columns of a DataFrame. Each
     non-numeric column in `dataframe` will correspond to a row in the pd.DataFrame returned.
 
     Args:
@@ -628,18 +646,18 @@ def non_numeric_summary(dataframe: pd.DataFrame,
 
     # column, number of nulls in column, percent of nulls in column
     null_data = [(column,
-                  dataframe[column].isnull().sum(),
-                  round(dataframe[column].isnull().sum() / len(dataframe), 3))
+                  dataframe[column].isna().sum(),
+                  round(dataframe[column].isna().sum() / len(dataframe), 3))
                  for column in non_numeric_columns]
     columns, num_nulls, perc_nulls = zip(*null_data)
 
     num_non_nulls = [dataframe[x].count() for x in non_numeric_columns]
 
-    def get_top_value(series: pd.Series):
+    def get_top_value(series: pd.Series) -> str | None:
         counts = series.value_counts()
         return counts.index[0] if len(counts) > 0 else None
 
-    def chop_string(value):
+    def chop_string(value: str) -> str:
         if not isinstance(value, str):
             value = str(value)
 
@@ -649,7 +667,7 @@ def non_numeric_summary(dataframe: pd.DataFrame,
 
     most_frequent_value = [chop_string(get_top_value(dataframe[x])) for x in non_numeric_columns]
 
-    def get_number_of_unique_values(series):
+    def get_number_of_unique_values(series: pd.Series) -> int | None:
         try:
             number_of_uniques = len(series.dropna().unique())
         except TypeError:  # this happens, for example, with lists
@@ -668,7 +686,7 @@ def non_numeric_summary(dataframe: pd.DataFrame,
             '% Nulls': perc_nulls,
             'Most Freq. Value': most_frequent_value,
             '# of Unique': num_unique,
-            '% Unique': perc_unique
+            '% Unique': perc_unique,
         },
         index=columns)
 
@@ -679,17 +697,17 @@ def non_numeric_summary(dataframe: pd.DataFrame,
         results = pstyle.html_escape_dataframe(results)
         results = results.style.format({
             '% Nulls': '{:,.1%}'.format,
-            '% Unique': '{:,.1%}'.format
+            '% Unique': '{:,.1%}'.format,
         })
         results = results. \
             pipe(
                 pstyle.format,
                 subset=['# of Non-Nulls', '# of Nulls'],
-                round_by=0
+                round_by=0,
             ). \
             pipe(pstyle.format, subset=['# of Unique'], round_by=1). \
             highlight_between(
-                left=0.00000001, right=math.inf, subset=['# of Nulls'], color=color.WARNING
+                left=0.00000001, right=math.inf, subset=['# of Nulls'], color=color.WARNING,
             ). \
             bar(subset=['% Nulls'], color=color.BAD, vmin=0, vmax=1). \
             bar(subset=['% Unique'], color=color.GRAY, vmin=0, vmax=1)
@@ -698,7 +716,8 @@ def non_numeric_summary(dataframe: pd.DataFrame,
 
 
 def print_dataframe(dataframe: pd.DataFrame) -> None:
-    """Helper function that prints a DataFrame without replacing columns with `...` when there are
+    """
+    Helper function that prints a DataFrame without replacing columns with `...` when there are
     many columns.
 
     Args:
@@ -709,8 +728,9 @@ def print_dataframe(dataframe: pd.DataFrame) -> None:
         print(dataframe)
 
 
-def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
-    """Shows the unique values and corresponding frequencies.
+def value_frequency(series: pd.Series, sort_by_frequency: bool = True) -> pd.DataFrame:
+    """
+    Shows the unique values and corresponding frequencies.
 
     Args:
         series:
@@ -727,13 +747,13 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
     """
     results = pd.DataFrame({
         'Frequency': series.value_counts(normalize=False, dropna=False),
-        'Percent': series.value_counts(normalize=True, dropna=False)}
+        'Percent': series.value_counts(normalize=True, dropna=False)},
     )
 
     if not sort_by_frequency:
         if series.dtype.name == 'category':
             if series.cat.ordered:
-                results.sort_index(inplace=True)
+                results = results.sort_index()
             else:
                 # pandas sorts non-ordered categories by whatever order the category shows up, not
                 # alphabetically
@@ -745,5 +765,5 @@ def value_frequency(series: pd.Series, sort_by_frequency=True) -> pd.DataFrame:
                 results['temp'] = results['temp'].cat.reorder_categories(values, ordered=True)
                 results = results.sort_values(['temp']).drop(columns='temp')
         else:
-            results.sort_index(inplace=True)
+            results = results.sort_index()
     return results

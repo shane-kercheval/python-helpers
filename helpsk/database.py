@@ -1,9 +1,9 @@
-"""This module contains classes that wrap the connection/querying logic of various databases.
+"""
+Contains classes that wrap the connection/querying logic of various databases.
 Database objects can be created from the __init__ function or from the .from_config class function
 by passing in an instance of the corresponding configuration class.
 
-Examples:
-
+Examples
     with Redshift(user='username', password='asdf', ....) as redshift:
         redshift.query("SELECT * FROM table LIMIT 100")
 
@@ -12,6 +12,7 @@ Examples:
     redshift_config = RedshiftConfigFile('/path/to/redshift.config')
     with Redshift.from_config(redshift_config) as redshift:
         redshift.query("SELECT * FROM table LIMIT 100")
+
 """
 from __future__ import annotations
 import pandas as pd
@@ -46,16 +47,17 @@ class Redshift(Database):
         return ' '.join(f"{k}={v}" for k, v in self._kwargs.items())
 
     def _open_connection_object(self) -> ConnectionObject:
-        """Wraps logic for connecting to redshift"""
+        """Wraps logic for connecting to redshift."""
         from psycopg2 import connect
         return connect(self._connection_string)
 
-    def _close_connection_object(self):
-        """Wraps logic for closing the connection to redshift"""
+    def _close_connection_object(self) -> None:
+        """Wraps logic for closing the connection to redshift."""
         self.connection_object.close()
 
     def _query(self, sql: str) -> pd.DataFrame:
-        """Wraps logic for querying redshift.
+        """
+        Wraps logic for querying redshift.
 
         Args:
             sql:
@@ -66,23 +68,27 @@ class Redshift(Database):
         """
         return pd.read_sql_query(sql, self.connection_object)
 
-    def execute_statement(self, statement: str):
+    def execute_statement(self, statement: str) -> None:
+        """Executes a statement without any data returned."""
         raise NotImplementedError()
 
-    def insert_records(self,
-                       dataframe: pd.DataFrame, table: str, create_table: bool = False,
-                       overwrite: bool = True, schema: str = None,
-                       database: str = None):
+    def insert_records(
+            self,
+            dataframe: pd.DataFrame, table: str, create_table: bool = False,
+            overwrite: bool = True, schema: str | None = None,
+            database: str | None = None) -> None:
+        """Inserts rows into a table from a pandas DataFrame."""
         raise NotImplementedError()
 
 
 class Snowflake(Database):
-    """Wraps logic for connecting to Snowflake and querying.
+    """
+    Wraps logic for connecting to Snowflake and querying.
 
-        Example:
-            config = SnowflakeConfigFile('/path/to/snowflake.config')
-            with Snowflake.from_config(config) as snowflake:
-                snowflake.query("SELECT * FROM table LIMIT 100")
+    Example:
+        config = SnowflakeConfigFile('/path/to/snowflake.config')
+        with Snowflake.from_config(config) as snowflake:
+            snowflake.query("SELECT * FROM table LIMIT 100")
 
     Instructions for installing snowflake dependencies:
         https://docs.snowflake.com/en/user-guide/python-connector-install.html
@@ -104,8 +110,9 @@ class Snowflake(Database):
     pip install snowflake-connector-python[pandas]
     ```
     """
-    def __init__(self, **kwargs):
-        """Initialization"""
+
+    def __init__(self, **kwargs: dict):
+        """Initialization."""
         super().__init__(**kwargs)
 
         if (autocommit := kwargs.get('autocommit')) is not None and isinstance(autocommit, str):
@@ -117,17 +124,17 @@ class Snowflake(Database):
                 raise ValueError(f"autocommit needs to be true/false but received `{autocommit}`")
 
     def _open_connection_object(self) -> ConnectionObject:
-        """Wraps logic for connecting to snowflake"""
+        """Wraps logic for connecting to snowflake."""
         from snowflake.connector import connect
         return connect(**self._kwargs)
 
-    def _close_connection_object(self):
-        """Wraps logic for closing the connection to snowflake
-        """
+    def _close_connection_object(self) -> None:
+        """Wraps logic for closing the connection to snowflake."""
         self.connection_object.close()
 
     def _query(self, sql: str) -> pd.DataFrame:
-        """Wraps logic for querying snowflake.
+        """
+        Wraps logic for querying snowflake.
 
         Args:
             sql:
@@ -143,19 +150,18 @@ class Snowflake(Database):
         # duplicated index values. This can cause unexpected behavior downstream.
         # https://github.com/snowflakedb/snowflake-connector-python/issues/1061
         # https://stackoverflow.com/questions/69911999/none-unique-pandas-dataframe-index-created-using-cur-fetch-pandas-all-after-lo
-        dataframe.reset_index(drop=True, inplace=True)
-        return dataframe
+        return dataframe.reset_index(drop=True)
 
-    def execute_statement(self, statement: str):
-        """This method executes a statement without any data returned."""
+    def execute_statement(self, statement: str) -> None:
+        """Executes a statement without any data returned."""
         cursor = self.connection_object.cursor()
         results = cursor.execute(statement)
-        results = results.fetchall()
-        return results
+        return results.fetchall()
 
     @staticmethod
-    def _generate_sql_create_table(table: str, dataframe: pd.DataFrame,
-                                   database: str = None, schema: str = None):
+    def _generate_sql_create_table(
+            table: str, dataframe: pd.DataFrame,
+            database: str | None = None, schema: str | None = None) -> None:
         # adapted from https://stephenallwright.com/create-snowflake-table-pandas-dataframe/
         final_table_name = ''
         if database:
@@ -167,7 +173,7 @@ class Snowflake(Database):
         create_statement = f"CREATE OR REPLACE TABLE {final_table_name} (\n"
         # Loop through each column finding the datatype and adding it to the statement
         for column in dataframe.columns:
-            if dataframe[column].dtype.name == 'int' or dataframe[column].dtype.name == 'int64':
+            if dataframe[column].dtype.name in ('int', 'int64'):
                 create_statement += f"    {column} int"
             elif dataframe[column].dtype.name == 'object':
                 create_statement += f"    {column} varchar"
@@ -192,10 +198,10 @@ class Snowflake(Database):
                        table: str,
                        create_table: bool = False,
                        overwrite: bool = False,
-                       schema: str = None,
-                       database: str = None):
+                       schema: str | None = None,
+                       database: str | None = None) -> None:
         """
-        This method inserts rows into a table from a pandas DataFrame.
+        Inserts rows into a table from a pandas DataFrame.
 
         Args:
             dataframe:
@@ -248,7 +254,7 @@ class Snowflake(Database):
             df=dataframe,
             database=database,
             schema=schema,
-            table_name=table.upper()
+            table_name=table.upper(),
         )
         return success, num_rows
 
@@ -266,17 +272,18 @@ class Sqlite(Database):
         return f"sqlite:///{self._kwargs['path']}"
 
     def _open_connection_object(self) -> ConnectionObject:
-        """Wraps logic for connecting to sqlite"""
+        """Wraps logic for connecting to sqlite."""
         from sqlalchemy import create_engine
         engine = create_engine(self._connection_string)
         return engine.connect()
 
-    def _close_connection_object(self):
-        """Wraps logic for closing the connection to sqlite"""
+    def _close_connection_object(self) -> None:
+        """Wraps logic for closing the connection to sqlite."""
         self.connection_object.close()
 
     def _query(self, sql: str) -> pd.DataFrame:
-        """Wraps logic for querying redshift.
+        """
+        Wraps logic for querying redshift.
 
         Args:
             sql:
@@ -287,19 +294,20 @@ class Sqlite(Database):
         """
         return pd.read_sql(sql, self.connection_object)
 
-    def execute_statement(self, statement: str):
-        """This method executes a statement without any data returned."""
+    def execute_statement(self, statement: str) -> None:
+        """Executes a statement without any data returned."""
         self.connection_object.execute(statement)
 
-    def insert_records(self,
-                       dataframe: pd.DataFrame,
-                       table: str,
-                       create_table: bool = False,
-                       overwrite: bool = False,
-                       schema: str = None,
-                       database: str = None):
+    def insert_records(
+            self,
+            dataframe: pd.DataFrame,
+            table: str,
+            create_table: bool = False,
+            overwrite: bool = False,
+            schema: str | None = None,
+            database: str | None = None) -> None:  # noqa: ARG002
         """
-        This method inserts rows into a table from a pandas DataFrame.
+        Inserts rows into a table from a pandas DataFrame.
 
         Args:
             dataframe:
@@ -315,7 +323,7 @@ class Sqlite(Database):
             database:
                 Not used.
         """
-        # if_exists{‘fail’, ‘replace’, ‘append’}, default ‘fail’
+        # if_exists{'fail', 'replace', 'append'}, default 'fail'
         #     How to behave if the table already exists.
         #     fail: Raise a ValueError.
         #     replace: Drop the table before inserting new values.
@@ -332,5 +340,5 @@ class Sqlite(Database):
             con=self.connection_object,
             schema=schema,
             if_exists=if_exists,
-            index=False
+            index=False,
         )

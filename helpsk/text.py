@@ -1,5 +1,5 @@
 """
-This module provides helper functions when working with text.
+Provides helper functions when working with text.
 
 This module is more concerned with bytes/unicode and text processing, compared with string.py which
 is used for string manipulation.
@@ -14,7 +14,7 @@ import string
 
 def normalize_equal(str1: str, str2: str, case_fold: bool = True, method: str = 'NFC') -> bool:
     """
-    This function compares two strings for equality after normalizing by the given `method`.
+    Compares two strings for equality after normalizing by the given `method`.
 
     "NFC is the normalization form recommended by the W3C [... and] make comparisons work as
     expected." (Fluent Python, pg 140.)
@@ -71,7 +71,7 @@ def normalize_equal(str1: str, str2: str, case_fold: bool = True, method: str = 
         str2: the second string value
         case_fold: if True, apply case folding (essentially converting text to lower case)
         method: the method; valid values are 'NFC', 'NFD', 'NFKC', 'NFKD'
-    """
+    """  # noqa: RUF002
     if case_fold:
         return (normalize(method, str1).casefold() == normalize(method, str2).casefold())
 
@@ -131,8 +131,8 @@ def remove_marks(text: str, latin_only: bool = True) -> str:
 
 
 _single_map = str.maketrans(
-    """‚ƒ„ˆ‹‘’“”•–—˜›""",
-    """'f"^<''""---~>"""
+    """‚ƒ„ˆ‹‘’“”•–—˜›""",  # noqa: RUF001
+    """'f"^<''""---~>""",
 )
 _multi_map = str.maketrans({
     '€': 'EUR',
@@ -151,7 +151,7 @@ _multi_map.update(_single_map)
 
 def _dewinize(text: str) -> str:
     """
-    Replace Win1252 symbols with ASCII chars or sequences
+    Replace Win1252 symbols with ASCII chars or sequences.
 
     This function is copied from:
         Fluent Python, 2nd ed., by Luciano Ramalho (O'Reilly). Pg. 146-147
@@ -178,7 +178,7 @@ def asciize(text: str) -> str:
     >>> asciize(order)
     '"Herr Voss: - 1⁄2 cup of OEtker(TM) caffe latte - bowl of acai."'
 
-Handling a string with Greek and Latin accented characters:
+    Handling a string with Greek and Latin accented characters:
 
     >>> greek = 'Ζέφυρος, Zéfiro'
     >>> remove_marks(greek, latin_only=False)
@@ -189,7 +189,7 @@ Handling a string with Greek and Latin accented characters:
     'Ζέφυρος, Zéfiro'
     >>> asciize(greek)
     'Ζέφυρος, Zefiro'
-    """
+    """  # noqa: D404, RUF002
     no_marks = remove_marks(_dewinize(text), latin_only=True)
     no_marks = no_marks.replace('ß', 'ss')
     return normalize('NFKC', no_marks)
