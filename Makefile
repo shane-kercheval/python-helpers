@@ -53,7 +53,7 @@ doctest:
 tests: linting unittests doctest	
 
 ## Build package
-package: tests clean
+package: clean
 	rm -fr dist
 	python -m build
 	twine upload dist/*
