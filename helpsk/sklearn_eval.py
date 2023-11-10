@@ -693,7 +693,7 @@ class MLExperimentResults:
             # we might have removed columns (e.g. that don't have any variance) so check that the
             # columns were in the final set
             columns_to_highlight = [x for x in self.parameter_names if x in final_columns]
-            cv_dataframe.applymap(
+            cv_dataframe.map(
                 highlight_cols,
                 subset=pd.IndexSlice[indexes_within_1_standard_error, columns_to_highlight],
             )
