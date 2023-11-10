@@ -1,4 +1,5 @@
-"""Contains a collection of helper functions to manipulate strings.
+"""
+Contains a collection of helper functions to manipulate strings.
 
 This module is less concerned with bytes/unicode and text processing, compared with text.py
 """
@@ -8,7 +9,8 @@ from collections.abc import Iterable
 
 
 def collapse(*args: str | Iterable[str], separate: str = '', surround: str = '') -> str:
-    """Takes a list of strings and concatenates them, separating each string with the value of
+    """
+    Takes a list of strings and concatenates them, separating each string with the value of
     `separate` and surrounding each string with the value of `surround`.
 
     Args:
@@ -30,8 +32,8 @@ def collapse(*args: str | Iterable[str], separate: str = '', surround: str = '')
 
 @unique
 class RoundTo(Enum):
-    """Valid values for rounding numbers; used in e.g. `format_number()`
-    """
+    """Valid values for rounding numbers; used in e.g. `format_number()`."""
+
     NONE = auto()
     THOUSANDS = 'K'
     MILLIONS = 'M'
@@ -43,8 +45,9 @@ class RoundTo(Enum):
 def format_number(value: float,
                   granularity: RoundTo = RoundTo.AUTO,
                   places: int = 2) -> str:
-    """Formats numbers in a way that humans would typically want to see at a glance (e.g. on a
-    graph.)
+    """
+    Formats numbers in a way that humans would typically want to see at a glance (e.g. on a
+    graph.).
 
     For example, `123560000` is transformed to `123.56M`
 
@@ -75,7 +78,7 @@ def format_number(value: float,
         RoundTo.THOUSANDS: 1000,
         RoundTo.MILLIONS: 1000000,
         RoundTo.BILLIONS: 1000000000,
-        RoundTo.TRILLIONS: 1000000000000
+        RoundTo.TRILLIONS: 1000000000000,
     }
 
     if granularity == RoundTo.NONE:

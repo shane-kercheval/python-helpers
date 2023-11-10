@@ -1,5 +1,5 @@
-"""A collection of system and environment related helper functions.
-"""
+"""A collection of system and environment related helper functions."""
+
 import inspect
 import warnings
 import datetime
@@ -13,13 +13,13 @@ from yaml import safe_load
 from contextlib import contextmanager, redirect_stdout
 
 
-def open_yaml(file_path):
+def open_yaml(file_path: str) -> dict[str, any]:
     """Open a yaml file via yaml.safe_load."""
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         return safe_load(f)
 
 
-def read_pickle(path):
+def read_pickle(path: str) -> object:
     """
     Simple helper function that read's from a pickled object.
 
@@ -28,11 +28,10 @@ def read_pickle(path):
             File path where the pickled object will be stored.
     """
     with open(path, 'rb') as handle:
-        unpickled_object = pickle.load(handle)
-    return unpickled_object
+        return pickle.load(handle)
 
 
-def to_pickle(obj, path):
+def to_pickle(obj: object, path: str) -> None:
     """
     Simple helper function that saves a pickled object.
 
@@ -48,7 +47,7 @@ def to_pickle(obj, path):
 
 def dataframe_to_pickle(df: pd.DataFrame, output_directory: str, file_name: str) -> str:
     """
-    This function takes a Pandas DataFrame and saves it as a pickled object to the directory with
+    Takes a Pandas DataFrame and saves it as a pickled object to the directory with
     the file name specified. The output directory is created if it does not yet exist.
 
     Args:
@@ -64,7 +63,7 @@ def dataframe_to_pickle(df: pd.DataFrame, output_directory: str, file_name: str)
 
 def dataframe_to_csv(df: pd.DataFrame, output_directory: str, file_name: str) -> str:
     """
-    This function takes a Pandas DataFrame and saves it as a csv file to the directory with the
+    Takes a Pandas DataFrame and saves it as a csv file to the directory with the
     file name specified. The output directory is created if it does not yet exist.
 
     Args:
@@ -80,7 +79,7 @@ def dataframe_to_csv(df: pd.DataFrame, output_directory: str, file_name: str) ->
 
 def object_to_pickle(obj: object, output_directory: str, file_name: str) -> str:
     """
-    This function takes a generic object and saves it as a pickled object to the directory with the
+    Takes a generic object and saves it as a pickled object to the directory with the
     file name specified. The output directory is created if it does not yet exist.
 
     Args:
@@ -95,11 +94,11 @@ def object_to_pickle(obj: object, output_directory: str, file_name: str) -> str:
 
 
 @contextmanager
-def redirect_stdout_to_file(file, mode='w'):
-    """ Helper context manager that opens a file and redirects standard output to that file.
+def redirect_stdout_to_file(file: str, mode: str = 'w') -> None:
+    """
+    Helper context manager that opens a file and redirects standard output to that file.
 
     Example:
-
     ```
     with redirect_stdout_to_file(file_name):
         print_dataframe(dataframe)
@@ -111,14 +110,14 @@ def redirect_stdout_to_file(file, mode='w'):
         mode:
             the mode of the file e.g. `w` (argument is passed to `open()`)
     """
-    with open(file, mode) as handle:
-        with redirect_stdout(handle):
-            yield
+    with open(file, mode) as handle, redirect_stdout(handle):
+        yield
 
 
 @contextmanager
-def suppress_stdout():
-    """Suppress Output
+def suppress_stdout() -> None:
+    """
+    Suppress Output.
 
     ```
     print("Now you see it")
@@ -138,36 +137,31 @@ def suppress_stdout():
 
 
 @contextmanager
-def suppress_warnings():
-    """Simple Wrapper around warnings.catch_warnings()"""
+def suppress_warnings() -> None:
+    """Simple Wrapper around warnings.catch_warnings()."""
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         yield
 
 
-def is_debugging():
+def is_debugging() -> bool:
     """
-    Returns:
+    Returns
         Returns True if the environment is currently debugging (e.g. set a breakpoint in PyCharm),
-        False if not
+        False if not.
     """
-    for frame in inspect.stack():
-        if frame[1].endswith("pydevd.py"):
-            return True
-
-    return False
+    return any(frame[1].endswith('pydevd.py') for frame in inspect.stack())
 
 
-def repr(instance: object) -> str:
+def repr(instance: object) -> str:  # noqa: A001
     """
-    This method can be used to build a standard __repr__ function from within a class.
+    Method can be used to build a standard __repr__ function from within a class.
 
     This function is modified from:
         Fluent Python, 2nd ed., by Luciano Ramalho (O'Reilly). Pg. 189
         Copyright 2022 Luciano Ramalho, 978-1-492-05635-5
 
     Examples:
-
     >>> class Example:
     ...     def __init__(self, x: int, y: int):
     ...         self.x = x
@@ -197,10 +191,9 @@ def repr(instance: object) -> str:
 
 
 class Timer:
-    """
-    This class provides way to time the duration of code within the context manager.
-    """
-    def __init__(self, message):
+    """Class provides way to time the duration of code within the context manager."""
+
+    def __init__(self, message: str):
         self._message = message
 
     def __enter__(self):
@@ -208,7 +201,7 @@ class Timer:
         self._start = datetime.datetime.now()
         return self
 
-    def __exit__(self, *args):
+    def __exit__(self, *args: tuple):
         self._end = datetime.datetime.now()
         self._interval = self._end - self._start
         print(f'Timer Finished ({self._interval.total_seconds():.2f} seconds)')

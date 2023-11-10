@@ -1,7 +1,5 @@
-"""
-init file
-"""
-import helpsk.color  # noqa
+"""init file."""
+import helpsk.color
 import helpsk.conversions
 import helpsk.date
 import helpsk.pandas

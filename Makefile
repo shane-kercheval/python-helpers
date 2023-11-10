@@ -41,7 +41,7 @@ all: docker_build docker_tests, docker_package
 ####
 # commands to run inside docker container
 linting:
-	flake8 --max-line-length 99 --ignore=E127 helpsk
+	ruff check helpsk
 
 unittests:
 	rm -f tests/test_files/logging/log.log

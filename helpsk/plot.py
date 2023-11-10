@@ -1,4 +1,5 @@
-"""This module contains helper functions for plotting."""
+"""Contains helper functions for plotting."""
+
 from __future__ import annotations
 
 import matplotlib.pyplot as plt
@@ -19,7 +20,8 @@ def plot_value_frequency(
         series: pd.Series, sort_by_frequency: bool = True,
         figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
         x_axis_rotation: int = 30) -> None:
-    """Shows the unique values and corresponding frequencies.
+    """
+    Shows the unique values and corresponding frequencies.
 
     Args:
         series:
@@ -42,7 +44,7 @@ def plot_value_frequency(
             ylabel='Frequency',
             title=f'Name: `{series.name}`',
             legend=False,
-            figsize=figure_size
+            figsize=figure_size,
         )
     for idx, label in enumerate(list(value_frequencies.index)):
         if pd.isna(label):
@@ -56,7 +58,7 @@ def plot_value_frequency(
                              xytext=(0, 2),
                              ha='center',
                              textcoords='offset points')
-        plot_object.annotate("{0:.0f}%".format(percent * 100),
+        plot_object.annotate(f"{percent * 100:.0f}%",
                              xy=(idx, max(frequency - 10, 2)),
                              xytext=(0, 0),
                              color='white',
@@ -64,7 +66,7 @@ def plot_value_frequency(
                              textcoords='offset points')
 
     plot_object.set_xticklabels(
-        labels=value_frequencies.index.values, rotation=x_axis_rotation, ha='right'
+        labels=value_frequencies.index.values, rotation=x_axis_rotation, ha='right',
     )
     plt.tight_layout()
 
@@ -76,7 +78,8 @@ def plot_correlation_heatmap(
         figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
         round_by: int = 2,
         features_to_highlight: list[str] | None = None) -> None:
-    """Creates a heatmap of the correlations between all of the numeric columns.
+    """
+    Creates a heatmap of the correlations between all of the numeric columns.
 
     Args:
         dataframe:
@@ -103,13 +106,13 @@ def plot_correlation_heatmap(
     correlations = dataframe.corr(numeric_only=True)
 
     if threshold is not None:
-        features = correlations.columns.values
+        features = correlations.columns.to_numpy()
         correlation_matrix = np.abs(correlations.values)
         np.fill_diagonal(correlation_matrix, np.NaN)
         meets_threshold = np.apply_along_axis(
             lambda x: np.any(x >= threshold),
             0,
-            correlation_matrix
+            correlation_matrix,
         )
         if not meets_threshold.any():
             raise HelpskParamValueError('correlation `threshold` set too high.')
@@ -130,7 +133,7 @@ def plot_correlation_heatmap(
         sns.heatmap(correlations,
                     mask=mask,
                     annot=True,
-                    fmt='.{}f'.format(round_by),
+                    fmt=f'.{round_by}f',
                     cmap=sns.diverging_palette(220, 10, as_cmap=True),
                     vmin=-1,
                     vmax=1,
@@ -158,10 +161,11 @@ def plot_dodged_barchart(
         outer_column: str,
         inner_column: str,
         figure_size: tuple[int, int] = STANDARD_WIDTH_HEIGHT,
-        missing_value_replacement: str = '<Missing>'):
-    """First attempt at dodged barchart.. It needs some work.
+        missing_value_replacement: str = '<Missing>') -> None:
+    """
+    First attempt at dodged barchart. It needs some work.
 
-    args:
+    Args:
         dataframe:
             pandas data.frame
         outer_column:
@@ -171,7 +175,8 @@ def plot_dodged_barchart(
         figure_size:
             tuple containing `(width, height)` of plot. The default height is defined by
             `STANDARD_HEIGHT`, and the default width is `STANDARD_HEIGHT / GOLDEN_RATIO`
-        missing_value_replacement
+        missing_value_replacement:
+            the value to replace missing values with
     """
     dataframe = dataframe[[outer_column, inner_column]].copy()
 
@@ -181,11 +186,11 @@ def plot_dodged_barchart(
 
     dataframe[outer_column] = hpandas.fill_na(
         series=dataframe[outer_column],
-        missing_value_replacement=missing_value_replacement
+        missing_value_replacement=missing_value_replacement,
     )
     dataframe[inner_column] = hpandas.fill_na(
         series=dataframe[inner_column],
-        missing_value_replacement=missing_value_replacement
+        missing_value_replacement=missing_value_replacement,
     )
 
     outer_labels = dataframe[outer_column].unique().tolist()
@@ -217,7 +222,7 @@ def plot_dodged_barchart(
                          color='black', alpha=0.15)
 
     # from matplotlib.pyplot import cm
-    # colors = cm.rainbow(np.linspace(0, 1, 10)[::-1])  # noqa
+    # colors = cm.rainbow(np.linspace(0, 1, 10)[::-1])
     colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k'] * 100
 
     if len(inner_labels) > len(colors):
@@ -252,10 +257,10 @@ def plot_dodged_barchart(
     axis.set_title(f'`{outer_column}` vs. `{inner_column}`')
     axis.set_xticks(group_locations)
     axis.set_xticklabels(labels=outer_labels, rotation=20, ha='right')
-
-    axis.legend([ax[0] for ax in ax_list] + [ax_totals[0]], inner_labels + ['Total'],
-                title=inner_column)
-
+    axis.legend(
+        [ax[0] for ax in ax_list] + [ax_totals[0]], inner_labels + ['Total'],  # noqa: RUF005
+        title=inner_column,
+    )
     plt.tight_layout()
 
 
@@ -264,7 +269,8 @@ def plot_histogram_with_categorical(
         numeric_column: str,
         categorical_column: str,
         missing_value_replacement: str = '<Missing>') -> None:
-    """Plots a categorical histogram within numeric histogram.
+    """
+    Plots a categorical histogram within numeric histogram.
 
     Args:
         dataframe:
@@ -281,13 +287,13 @@ def plot_histogram_with_categorical(
             dataframe[numeric_column].values,
             bins=10,
             right=True,
-            include_lowest=True
-        )
+            include_lowest=True,
+        ),
     })
 
     cut_dataframe[numeric_column] = hpandas.fill_na(
         cut_dataframe[numeric_column],
-        missing_value_replacement=missing_value_replacement
+        missing_value_replacement=missing_value_replacement,
     )
     categories = [str(x) for x in cut_dataframe[numeric_column].cat.categories]
     cut_dataframe[numeric_column] = [str(x) for x in cut_dataframe[numeric_column]]
@@ -304,5 +310,5 @@ def plot_histogram_with_categorical(
     plot_dodged_barchart(
         dataframe=cut_dataframe,
         outer_column=numeric_column,
-        inner_column=categorical_column
+        inner_column=categorical_column,
     )

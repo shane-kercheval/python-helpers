@@ -1,8 +1,7 @@
-"""A collection of functions that assist in validation/comparison of data and conditions.
-"""
+"""A collection of functions that assist in validation/comparison of data and conditions."""
+
 from __future__ import annotations
 from collections.abc import Sized, Iterable, Callable
-from typing import Type
 
 import numpy as np
 import pandas as pd
@@ -13,8 +12,7 @@ from helpsk.utility import suppress_warnings
 
 
 def is_none_nan(value: object) -> bool:
-    """Returns True if the value is None or various NaN/NA types.
-    """
+    """Returns True if the value is None or various NaN/NA types."""
     if value is None \
             or value is pd.NA \
             or value is pd.NaT \
@@ -24,8 +22,10 @@ def is_none_nan(value: object) -> bool:
     return False
 
 
-def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> bool:
-    """Can be used with a single value or a collection of values. Returns `True` if any item in
+def any_none_nan(  # noqa: PLR0911
+        values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> bool:
+    """
+    Can be used with a single value or a collection of values. Returns `True` if any item in
     `values` are `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
 
     Args:
@@ -42,16 +42,16 @@ def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) 
         return True
 
     if isinstance(values, pd.Series):
-        return values.isnull().any() or values.isna().any()
+        return values.isna().any() or values.isna().any()
 
     if isinstance(values, pd.DataFrame):
-        return values.isnull().any().any() or values.isna().any().any()
+        return values.isna().any().any() or values.isna().any().any()
 
     if isinstance(values, Iterable) and not isinstance(values, str):
         if len(values) == 0:
             return True
 
-        return any((is_none_nan(x) for x in values))
+        return any(is_none_nan(x) for x in values)
 
     try:
         if not isinstance(values, str) and None in values:
@@ -69,7 +69,8 @@ def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) 
 
 
 def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
-    """Same as `any_none_nan` but checks for empty strings
+    """
+    Same as `any_none_nan` but checks for empty strings.
 
     Args:
         values:
@@ -82,10 +83,10 @@ def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
         return True
 
     if isinstance(values, pd.Series):
-        return values.isin(['']).any()  # noqa
+        return values.isin(['']).any()
 
     if isinstance(values, pd.DataFrame):
-        return values.isin(['']).any().any()  # noqa
+        return values.isin(['']).any().any()
 
     if isinstance(values, str) and values.strip() == '':
         return True
@@ -97,7 +98,8 @@ def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
 
 
 def any_duplicated(values: Iterable) -> bool:
-    """Returns `True` if any items in `values` are duplicated.
+    """
+    Returns `True` if any items in `values` are duplicated.
 
     Args:
         values: list, np.ndarray, pd.Series
@@ -110,7 +112,8 @@ def any_duplicated(values: Iterable) -> bool:
 
 
 def iterables_are_equal(iterable_a: Iterable, iterable_b: Iterable) -> bool:
-    """Compares the equality of the values of two iterables.
+    """
+    Compares the equality of the values of two iterables.
 
     This function will generally give the same result as list equality (e.g.
     `[x, y, z] == [x, y, z]`). However, in some strange scenarios, `==` will return `False` where
@@ -192,7 +195,7 @@ def dataframes_match(dataframes: list[pd.DataFrame],
 
     first_dataframe = dataframes[0].round(float_tolerance)
 
-    def first_dataframe_equals_other(other_dataframe):
+    def first_dataframe_equals_other(other_dataframe: pd.DataFrame) -> bool:
         if first_dataframe.shape != other_dataframe.shape:
             return False
 
@@ -217,8 +220,9 @@ def dataframes_match(dataframes: list[pd.DataFrame],
 
 
 def is_close(value_a: float, value_b: float, tolerance: float = 0.000001) -> bool:
-    """Tests whether or not value_a and value_b are "close" (i.e. within the `tolerance` after
-    subtracting)
+    """
+    Tests whether or not value_a and value_b are "close" (i.e. within the `tolerance` after
+    subtracting).
 
     Args:
         value_a:
@@ -233,9 +237,11 @@ def is_close(value_a: float, value_b: float, tolerance: float = 0.000001) -> boo
     return abs(value_a - value_b) <= tolerance
 
 
-def raises_exception(function: Callable, exception_type: Type = None) -> bool:
-    """Returns True if `function` raises an Exception; returns False if `function` runs without
+def raises_exception(function: Callable, exception_type: type | None = None) -> bool:
+    """
+    Returns True if `function` raises an Exception; returns False if `function` runs without
     raising an Exception.
+
     Args:
         function:
             the function which does or does not raise an exception.

@@ -20,9 +20,13 @@ def cohorted_conversion_rates(
         groups: str | None = None,
         current_datetime: str | None = None) -> pd.DataFrame:
     """
-    Calculate the cohorted conversion rate for a given base timestamp and conversion timestamp
+    Calculate the cohorted conversion rate for a given base timestamp and conversion timestamp.
 
     Args:
+        df:
+            The dataframe containing the data to calculate the conversion rate for. The data is
+            expected to be 'events', meaning that each row represents a single event for a single
+            user.
         base_timestamp:
             The column name for the base timestamp to use for the calculation.
         conversion_timestamp:
@@ -37,7 +41,7 @@ def cohorted_conversion_rates(
         current_datetime:
             The current datetime to use for calculating whether an interval is valid.
     """
-    def to_seconds(value, unit):
+    def to_seconds(value: int, unit: str) -> int:
         unit_to_seconds = {
             'seconds': 1,
             'minutes': 60,
@@ -54,8 +58,8 @@ def cohorted_conversion_rates(
     if groups:
         group_by.append(groups)
 
-    def f(x):
-        d = dict()
+    def f(x: pd.Series) -> pd.Series:
+        d = {}
         d['# of records'] = len(x)
         # the number of seconds from the last base timestamp in the cohort to the current datetime
         # if any record in the cohort has not had enough time elapse between the base_timestamp and
@@ -66,14 +70,13 @@ def cohorted_conversion_rates(
             if seconds_from_max_base >= interval_seconds:
                 d[f'{value} {unit}'] = _percent_converted(
                     x['seconds_to_conversion'],
-                    interval_seconds
+                    interval_seconds,
                 )
             else:
                 d[f'{value} {unit}'] = None
-
         return pd.Series(d)
 
-    conversions = (
+    return (
         df
         .assign(seconds_to_conversion=lambda x: (x[conversion_timestamp] - x[base_timestamp]).dt.total_seconds())  # noqa
         .groupby(group_by)
@@ -81,11 +84,10 @@ def cohorted_conversion_rates(
         .reset_index()
         .sort_values(group_by, ascending=True)
     )
-    return conversions
 
 
-def _sort_intervals(durations):
-    """This is used to display the intervals/durations in the correct order on the graph."""
+def _sort_intervals(durations: list[tuple[int, str]]) -> list[tuple[int, str]]:
+    """Used to display the intervals/durations in the correct order on the graph."""
     unit_multipliers = {
         'days': 86400,  # 24 * 60 * 60
         'hours': 3600,  # 60 * 60
@@ -93,12 +95,11 @@ def _sort_intervals(durations):
         'seconds': 1,
     }
 
-    def to_seconds(duration_tuple):
+    def to_seconds(duration_tuple: tuple[int, str]) -> int:
         value, unit = duration_tuple
         return value * unit_multipliers[unit]
 
-    sorted_durations = sorted(durations, key=to_seconds, reverse=True)
-    return sorted_durations
+    return sorted(durations, key=to_seconds, reverse=True)
 
 
 def plot_cohorted_conversion_rates(
@@ -123,9 +124,13 @@ def plot_cohorted_conversion_rates(
         width: int | None = None,
         free_y_axis: bool = True) -> pd.DataFrame:
     """
-    Calculate the cohorted converssion rate for a given base timestamp and conversion timestamp
+    Calculate the cohorted converssion rate for a given base timestamp and conversion timestamp.
 
     Args:
+        df:
+            The dataframe containing the data to calculate the conversion rate for. The data is
+            expected to be 'events', meaning that each row represents a single event for a single
+            user.
         base_timestamp:
             The column name for the base timestamp to use for the calculation.
         conversion_timestamp:
@@ -141,9 +146,31 @@ def plot_cohorted_conversion_rates(
             The current datetime to use for calculating whether an interval is valid.
         graph_type:
             The type of chart to use for the visualization. Either 'bar' or 'line'
+        title:
+            The title of the plot.
+        subtitle:
+            The subtitle of the plot.
+        x_axis_label:
+            The label for the x-axis.
+        y_axis_label:
+            The label for the y-axis.
+        legend_label:
+            The label for the legend.
+        facet_col_wrap:
+            The number of columns in the facet grid.
+        category_orders:
+            A dictionary of category orders for the plot.
         bar_mode:
             Valid options are `overlay` and `group`. Default is `overlay`. If `relative` is passed
             in it is converted to `overlay`.
+        opacity:
+            The opacity of the bars or lines.
+        height:
+            The height of the plot in pixels.
+        width:
+            The width of the plot in pixels.
+        free_y_axis:
+            Whether to allow the y-axis to be free for each facet.
     """
     import plotly_express as px
     conversions = cohorted_conversion_rates(
@@ -264,17 +291,17 @@ def retention_matrix(
     elif intervals == 'day':
         num_days_in_internal = 1
     else:
-        raise ValueError(f'interval must be either "month", "week" or "day", not {intervals}')  # noqa
+        raise ValueError(f'interval must be either "month", "week" or "day", not {intervals}')
 
     intervals = intervals[0].upper()
 
     if current_datetime is None:
         current_datetime = datetime.datetime.utcnow()
 
-    df = df[[timestamp, unique_id]].copy()
+    df = df[[timestamp, unique_id]].copy()  # noqa: PD901
     assert not df.isna().any().any()
     # filter out any events that occurred after the current datetime
-    df = df[df[timestamp] <= current_datetime]
+    df = df[df[timestamp] <= current_datetime]  # noqa: PD901
     # Step 1: Determine the cohort of each user (the day/week/month of their first event)
     df['event_period'] = df[timestamp].dt.to_period(intervals).dt.start_time
     df['cohort'] = (
@@ -301,7 +328,7 @@ def retention_matrix(
     )
     # weird bug(?) where in some cases pandas returns records with event_count == 0 (i.e.
     # users with no events in a given period which duplicates the cohort/unique_id)
-    user_events_by_period.query('event_count > 0', inplace=True)
+    user_events_by_period = user_events_by_period.query('event_count > 0')
     assert not user_events_by_period[[unique_id, 'period']].duplicated().any()
     # for records where period == 0, the user is considered retained by definition (regardless of
     # number of events) so we don't need to filter
@@ -322,18 +349,15 @@ def retention_matrix(
     assert (matrix <= 1).all().all()
     for row in matrix.index:
         for col in matrix.columns:
-            if is_month_interval:
-                offset = {'months': col}
-            else:
-                offset = {'days': col * num_days_in_internal}
+            offset = {'months': col} if is_month_interval else {'days': col * num_days_in_internal}
             if row + DateOffset(**offset) > current_datetime:
                 matrix.loc[row, col] = np.nan
 
     # Step 4: Reset index and column names for better readability
-    matrix.reset_index(inplace=True)
+    matrix = matrix.reset_index()
     matrix.columns.name = None
     matrix.columns = matrix.columns.astype(str)
-    matrix['# of unique ids'] = cohort_size.astype(int).values
+    matrix['# of unique ids'] = cohort_size.astype(int).to_numpy()
     matrix = relocate(matrix, column='# of unique ids', after='cohort')
     assert (matrix['0'] == 1).all().all()
     return matrix

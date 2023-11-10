@@ -1,5 +1,5 @@
-"""Contains a collection of date related helper functions.
-"""
+"""Contains a collection of date related helper functions."""
+
 from __future__ import annotations
 from enum import unique, Enum, auto
 import datetime
@@ -18,9 +18,8 @@ DateTime = TypeVar('DateTime', datetime.date, datetime.datetime)
 
 @unique
 class Granularity(Enum):
-    """
-    Valid values for date granularity
-    """
+    """Valid values for date granularity."""
+
     DAY = auto()
     MONTH = auto()
     QUARTER = auto()
@@ -29,8 +28,8 @@ class Granularity(Enum):
 @singledispatch
 def floor(
         value: object, /,
-        granularity: Granularity = Granularity.DAY,
-        fiscal_start: int = 1) -> object:
+        granularity: Granularity = Granularity.DAY,  # noqa: ARG001
+        fiscal_start: int = 1) -> object:  # noqa: ARG001
     """
     "Rounds" the datetime value down (i.e. floor) to the the nearest granularity.
 
@@ -82,6 +81,8 @@ def _(value: datetime.date, /,
         months_to_subtract = relativedelta.relativedelta(months=months_to_subtract)
         return floor(value, granularity=Granularity.MONTH) - months_to_subtract
 
+    raise TypeError('Unrecognized Granularity')
+
 
 @floor.register(datetime.datetime)
 def _(value: datetime.datetime, /,
@@ -112,7 +113,8 @@ def fiscal_quarter(
         value: datetime.datetime | datetime.date,
         include_year: bool = False,
         fiscal_start: int = 1) -> float:
-    """Returns the fiscal quarter (or year and quarter numeric value) for a given date.
+    """
+    Returns the fiscal quarter (or year and quarter numeric value) for a given date.
 
     For example:
         from dateutil.parser import parse
@@ -172,10 +174,10 @@ def to_string(
         value: datetime.datetime | datetime.date,
         granularity: Granularity = Granularity.DAY,
         fiscal_start: int = 1) -> str:
-    """Converts the date to a string.
+    """
+    Converts the date to a string.
 
     Examples:
-
         ```
         from dateutil.parser import parse
 
@@ -219,16 +221,8 @@ def to_string(
         return value.strftime("%Y-%b")
 
     if granularity == Granularity.QUARTER:
-        if fiscal_start == 1:
-            quarter_abbreviation = '-Q'
-        else:
-            quarter_abbreviation = '-FQ'
-
-        result = fiscal_quarter(
-            value,
-            include_year=True,
-            fiscal_start=fiscal_start
-        )
+        quarter_abbreviation = '-Q' if fiscal_start == 1 else '-FQ'
+        result = fiscal_quarter(value, include_year=True, fiscal_start=fiscal_start)
         return str(result).replace('.', quarter_abbreviation)
 
     raise TypeError('Unrecognized Granularity')

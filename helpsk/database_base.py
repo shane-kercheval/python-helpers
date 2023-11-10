@@ -1,8 +1,10 @@
-"""Contains the base classes that wraps the connection/querying logic of
+"""
+Contains the base classes that wraps the connection/querying logic of
 various databases.
 
 See documentation in database.py
 """
+
 from abc import ABC, abstractmethod
 from typing import TypeVar
 import configparser
@@ -15,9 +17,9 @@ ConnectionObject = TypeVar('ConnectionObject')
 
 
 class Database(ABC):
-    """Base class that wraps the connection/querying logic of various databases.
-    """
-    def __init__(self, **kwargs):
+    """Wraps the connection/querying logic of various databases."""
+
+    def __init__(self, **kwargs: dict):
         """
         **kwargs should contain the names of the underlying connection object and corresponding
         values.
@@ -32,7 +34,7 @@ class Database(ABC):
         self.connection_object: ConnectionObject = None
 
     @classmethod
-    def from_config(cls, config_path: str, config_key: str) -> 'Database':
+    def from_config(cls, config_path: str, config_key: str) -> 'Database':  # noqa: ANN102
         """
         Passes key/value pairs found in configuration file into underlying connection. Keys must
         match corresponding connection string or connection method arguments.
@@ -75,27 +77,25 @@ class Database(ABC):
         return cls(**config_dict)
 
     def is_connected(self) -> bool:
-        """
-        Returns:
-            True if the database is connected, otherwise False
-        """
+        """Returns True if the database is connected, otherwise False."""
         return self.connection_object is not None
 
     @abstractmethod
     def _open_connection_object(self) -> ConnectionObject:
-        """Child classes will implement the logic to connect to the database and return the
+        """
+        Child classes will implement the logic to connect to the database and return the
         connection object.
 
         The returning value will be stored in self.connection_object
 
-        Returns:
-            the connection object (usually returned from the underlying `connect()` method.
-            For example, the returning value from `snowflake.connection.connect()`
+        Returns the connection object (usually returned from the underlying `connect()` method.
+        For example, the returning value from `snowflake.connection.connect()`
         """
 
     @abstractmethod
-    def _close_connection_object(self):
-        """Child classes will implement the logic to close the connection to the database,
+    def _close_connection_object(self) -> None:
+        """
+        Child classes will implement the logic to close the connection to the database,
         typically by calling `close()` on the connection object returned from
         _open_connection_object.
 
@@ -103,8 +103,9 @@ class Database(ABC):
             self.connection_object.close()
         """
 
-    def connect(self):
-        """Call this method to open the connection to the database.
+    def connect(self) -> None:
+        """
+        Call this method to open the connection to the database.
 
         Alternatively you can use the context manager:
 
@@ -117,8 +118,9 @@ class Database(ABC):
             self.connection_object = self._open_connection_object()
             assert self.is_connected()
 
-    def close(self):
-        """Call this method to close the connection to the database.
+    def close(self) -> None:
+        """
+        Call this method to close the connection to the database.
 
         Alternatively you can use the context manager:
 
@@ -133,18 +135,18 @@ class Database(ABC):
             assert not self.is_connected()
 
     def __enter__(self):
-        """Enables the context manager"""
+        """Enables the context manager."""
         self.connect()
         return self
 
-    def __exit__(self, exc_type, exc_value, exc_traceback):
-        """Enables the context manager"""
+    def __exit__(self, exc_type, exc_value, exc_traceback):  # noqa: ANN001
+        """Enables the context manager."""
         self.close()
 
     @abstractmethod
     def _query(self, sql: str) -> pd.DataFrame:
         """
-        Method for child classes to override that contains logic to query
+        Method for child classes to override that contains logic to query.
 
         Args:
             sql:
@@ -155,9 +157,11 @@ class Database(ABC):
         """
 
     def query(self, sql: str, *,
-              show_messages: bool = False, show_warnings: bool = False,
+              show_messages: bool = False,
+              show_warnings: bool = False,
               show_elapsed_time: bool = True) -> pd.DataFrame:
-        """Queries the database and returns the results as a pandas Dataframe
+        """
+        Queries the database and returns the results as a pandas Dataframe.
 
         Args:
             sql:
@@ -170,7 +174,7 @@ class Database(ABC):
                 if True, shows the elapsed execution time for the query
 
         Returns:
-            a pandas Dataframe with the results from the query
+            a pandas Dataframe with the results from the query.
         """
         assert self.is_connected()
         start_time = time.time()
@@ -198,19 +202,20 @@ class Database(ABC):
         return results
 
     @abstractmethod
-    def execute_statement(self, statement: str):
-        """This method executes a statement without any data returned."""
+    def execute_statement(self, statement: str) -> None:
+        """Executes a statement without any data returned."""
 
     @abstractmethod
-    def insert_records(self,
-                       dataframe: pd.DataFrame,
-                       table: str,
-                       create_table: bool = False,
-                       overwrite: bool = False,
-                       schema: str = None,
-                       database: str = None):
+    def insert_records(
+        self,
+        dataframe: pd.DataFrame,
+        table: str,
+        create_table: bool = False,
+        overwrite: bool = False,
+        schema: str | None = None,
+        database: str | None = None) -> None:
         """
-        This method inserts rows into a table from a pandas DataFrame.
+        Inserts rows into a table from a pandas DataFrame.
 
         Args:
             dataframe:
