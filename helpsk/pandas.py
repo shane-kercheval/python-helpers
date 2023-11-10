@@ -1,6 +1,5 @@
-"""This module contains helper functions when working with pandas objects
-(e.g. DataFrames, Series).
-"""
+"""Contains helper functions when working with pandas objects (e.g. DataFrames, Series)."""
+
 from __future__ import annotations
 import datetime
 import math
@@ -9,7 +8,7 @@ from enum import Enum
 
 import numpy as np
 import pandas as pd
-from pandas.api.types import is_bool_dtype, is_numeric_dtype, is_string_dtype, is_categorical_dtype
+from pandas.api.types import is_bool_dtype, is_numeric_dtype, is_string_dtype
 from pandas.io.formats.style import Styler
 
 from helpsk.exceptions import HelpskParamValueError
@@ -18,7 +17,8 @@ from helpsk import color
 
 
 def is_series_numeric(series: pd.Series) -> bool:
-    """Tests whether or not a pd.Series is numeric.
+    """
+    Tests whether or not a pd.Series is numeric.
 
     NOTE: `pandas.api.types.is_numeric_dtype()` returns `True` for `bool` dtypes;
     this function will return `False` for `bool` dtypes
@@ -71,7 +71,8 @@ def is_series_bool(series: pd.Series) -> bool:
 
 
 def is_series_date(series: pd.Series) -> bool:
-    """Returns True if the series contains Dates or DateTimes
+    """
+    Returns True if the series contains Dates or DateTimes.
 
     Args:
         series: a pandas Series
@@ -90,7 +91,8 @@ def is_series_date(series: pd.Series) -> bool:
 
 
 def is_series_string(series: pd.Series) -> bool:
-    """Returns True if the series is of type string
+    """
+    Returns True if the series is of type string.
 
     Args:
         series: a pandas Series
@@ -105,7 +107,7 @@ def is_series_string(series: pd.Series) -> bool:
     first_valid_index = series.index.tolist().index(first_valid_index)
 
     return (is_string_dtype(series) or isinstance(series.iloc[first_valid_index], str)) \
-        and not is_categorical_dtype(series) \
+        and not isinstance(series.dtype, pd.CategoricalDtype) \
         and not isinstance(series.iloc[first_valid_index], Enum)
 
 
@@ -118,7 +120,7 @@ def is_series_categorical(series: pd.Series) -> bool:
     Returns:
         True if the series is of type categorical
     """
-    return is_categorical_dtype(series)
+    return isinstance(series.dtype, pd.CategoricalDtype)
 
 
 def fill_na(series: pd.Series, missing_value_replacement: str = '<Missing>') -> pd.Series:

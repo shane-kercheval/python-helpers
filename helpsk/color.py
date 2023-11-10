@@ -1,11 +1,11 @@
-"""Provides enums and helper functions related to colors/palettes/etc.
-"""
+"""Provides enums and helper functions related to colors/palettes/etc."""
 from enum import unique, Enum
 
 
 @unique
 class Colors(Enum):
-    """Provides hex values for various colors"""
+    """Provides hex values for various colors."""
+
     PASTEL_BLUE = '#7AA9CF'
     TULIP_TREE = '#EBB13E'
     CUSTOM_GREEN = '#41B3A3'

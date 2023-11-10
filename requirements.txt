@@ -11,6 +11,7 @@ pypirc
 pytest
 python-dateutil
 PyYAML
+ruff
 scikit-learn
 scikit-optimize
 scipy
