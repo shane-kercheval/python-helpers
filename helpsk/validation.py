@@ -22,7 +22,8 @@ def is_none_nan(value: object) -> bool:
     return False
 
 
-def any_none_nan(values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> bool:  # noqa: PLR0911
+def any_none_nan(  # noqa: PLR0911
+        values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> bool:
     """
     Can be used with a single value or a collection of values. Returns `True` if any item in
     `values` are `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
