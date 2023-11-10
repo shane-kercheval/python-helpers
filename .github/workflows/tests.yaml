@@ -49,4 +49,4 @@ jobs:
           pytest tests
       - name: Run linting
         run: |
-          flake8 --max-line-length 99 --ignore=E127 helpsk
+          ruff check helpsk
