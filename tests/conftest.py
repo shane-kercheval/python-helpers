@@ -1,9 +1,11 @@
+"""Sets up fixtures for the tests."""
 import pytest
 import pandas as pd
+from tests.helpers import get_test_path
 
 
-@pytest.fixture
-def conversions():
+@pytest.fixture()
+def conversions():  # noqa
     data = {
         'created_at': [
             '2023-01-01 00:00:00',  # Base date for the cohort
@@ -13,7 +15,7 @@ def conversions():
             '2023-01-25 00:00:00',  # Near the end of the month
             '2023-01-30 23:59:59',  # Edge case: Just before the end of the month
             '2023-01-01 00:00:01',  # Edge case: Created just after the base date
-            '2023-01-31 00:00:00'   # Last day of the month
+            '2023-01-31 00:00:00',   # Last day of the month
         ],
         'conversion_1': [
             '2023-01-01 00:00:01',  # Conversion happens in one second
@@ -23,7 +25,7 @@ def conversions():
             '2023-02-01 00:00:00',  # Conversion happens in the next month (checking longer intervals)  # noqa
             None,  # No conversion (edge case)
             '2023-01-01 00:00:00',  # Conversion happens before creation (logical error, edge case)
-            '2023-01-31 00:01:00'   # Conversion happens shortly after creation
+            '2023-01-31 00:01:00',   # Conversion happens shortly after creation
         ],
         'conversion_2': [
             '2023-01-01 00:01:00',  # Normal case, conversion after a minute
@@ -33,7 +35,7 @@ def conversions():
             '2023-02-24 00:00:00',  # Conversion nearly a month later
             '2023-01-31 23:59:59',  # Conversion at the very end of the month
             None,  # No conversion (edge case)
-            '2023-01-31 00:01:00'   # Conversion happens shortly after creation
+            '2023-01-31 00:01:00',   # Conversion happens shortly after creation
         ],
         'conversion_3': [
             '2023-01-01 00:00:02',  # Normal case, conversion in two seconds
@@ -43,7 +45,7 @@ def conversions():
             '2023-02-24 23:59:59',  # Conversion nearly a month later, at the end of the day
             '2023-02-01 00:00:00',  # Conversion in the next month
             '2023-01-01 00:00:00',  # Conversion happens at the same time as creation (edge case)
-            '2023-01-31 00:00:02'   # Conversion happens shortly after creation
+            '2023-01-31 00:00:02',   # Conversion happens shortly after creation
         ],
         'segments': [
             'A',
@@ -54,12 +56,17 @@ def conversions():
             'A',
             'A',
             'A',
-        ]
+        ],
     }
+    data = pd.DataFrame(data)
+    data['created_at'] = pd.to_datetime(data['created_at'])
+    data['conversion_1'] = pd.to_datetime(data['conversion_1'])
+    data['conversion_2'] = pd.to_datetime(data['conversion_2'])
+    data['conversion_3'] = pd.to_datetime(data['conversion_3'])
+    return data
 
-    df = pd.DataFrame(data)
-    df['created_at'] = pd.to_datetime(df['created_at'])
-    df['conversion_1'] = pd.to_datetime(df['conversion_1'])
-    df['conversion_2'] = pd.to_datetime(df['conversion_2'])
-    df['conversion_3'] = pd.to_datetime(df['conversion_3'])
-    return df
+
+
+@pytest.fixture()
+def conversions_2():  # noqa
+    return pd.read_csv(get_test_path('../test_data/conversions.csv'))
