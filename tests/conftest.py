@@ -1,5 +1,7 @@
+"""Sets up fixtures for the tests."""
 import pytest
 import pandas as pd
+from tests.helpers import get_test_path
 
 
 @pytest.fixture()
@@ -54,18 +56,17 @@ def conversions():  # noqa
             'A',
             'A',
             'A',
-        ]
+        ],
     }
-
-    df = pd.DataFrame(data)
-    df['created_at'] = pd.to_datetime(df['created_at'])
-    df['conversion_1'] = pd.to_datetime(df['conversion_1'])
-    df['conversion_2'] = pd.to_datetime(df['conversion_2'])
-    df['conversion_3'] = pd.to_datetime(df['conversion_3'])
-    return df
+    data = pd.DataFrame(data)
+    data['created_at'] = pd.to_datetime(data['created_at'])
+    data['conversion_1'] = pd.to_datetime(data['conversion_1'])
+    data['conversion_2'] = pd.to_datetime(data['conversion_2'])
+    data['conversion_3'] = pd.to_datetime(data['conversion_3'])
+    return data
 
 
 
 @pytest.fixture()
 def conversions_2():  # noqa
-    return pd.read_csv('/code/tests/test_files/conversions/conversions.csv')
+    return pd.read_csv(get_test_path('../test_data/conversions.csv'))
