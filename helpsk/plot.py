@@ -108,7 +108,7 @@ def plot_correlation_heatmap(
     if threshold is not None:
         features = correlations.columns.to_numpy()
         correlation_matrix = np.abs(correlations.values)
-        np.fill_diagonal(correlation_matrix, np.NaN)
+        np.fill_diagonal(correlation_matrix, np.nan)
         meets_threshold = np.apply_along_axis(
             lambda x: np.any(x >= threshold),
             0,

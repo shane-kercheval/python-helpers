@@ -30,7 +30,12 @@ def is_series_numeric(series: pd.Series) -> bool:
     Returns:
         True if the series is numeric (explicitly boolean type is not considered
     """
-    return is_numeric_dtype(series) and not is_series_bool(series)
+    if is_numeric_dtype(series) and not is_series_bool(series):
+        return True
+    # if the series contains nan it might be marked as object
+    if series.dtype == 'object':
+        return is_numeric_dtype(pd.Series(series.dropna().tolist()))
+    return False
 
 
 def is_series_bool(series: pd.Series) -> bool:
@@ -60,11 +65,7 @@ def is_series_bool(series: pd.Series) -> bool:
         except TypeError:
             return False
 
-    are_booleans = [
-        isinstance(x, (bool, np.bool_)) for x in series.to_numpy()
-        if x is not None and not is_nan(x)
-    ]
-
+    are_booleans = [isinstance(x, (bool, np.bool_)) for x in series.dropna()]
     if len(are_booleans) == 0:
         return False
 
@@ -186,7 +187,7 @@ def replace_all_bools_with_strings(
         )
         series = pd.Series(series.to_list())
 
-    mask = series.apply(type) != bool
+    mask = series.apply(type) != bool  # noqa: E721
     series = series.where(mask, series.replace(replacements))
 
     if is_series:

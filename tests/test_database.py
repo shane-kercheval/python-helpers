@@ -348,7 +348,7 @@ class TestDatabase(unittest.TestCase):
             db_class=Snowflake,
             db_config_path=self.sample_snowflake_file,
             db_config_key='snowflake',
-            db_mock=mock_snowflake
+            db_mock=mock_snowflake,
         )
 
         # tests that if failure to connect (i.e. no mock and connection failure) that the object is

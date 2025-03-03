@@ -14,7 +14,7 @@ class TestValidation(unittest.TestCase):
 
     def test_any_none_nan(self):
         self.assertTrue(hv.any_none_nan(None))
-        self.assertTrue(hv.any_none_nan(np.NaN))
+        self.assertTrue(hv.any_none_nan(np.nan))
         self.assertTrue(hv.any_none_nan(pd.NaT))
         self.assertTrue(hv.any_none_nan(pd.NA))
 
@@ -82,7 +82,7 @@ class TestValidation(unittest.TestCase):
 
     def test_any_missing(self):
         self.assertTrue(hv.any_missing(None))
-        self.assertTrue(hv.any_missing(np.NaN))
+        self.assertTrue(hv.any_missing(np.nan))
         self.assertTrue(hv.any_missing(pd.NA))
         self.assertTrue(hv.any_missing(pd.NaT))
         self.assertTrue(hv.any_missing(''))
@@ -320,28 +320,28 @@ class TestValidation(unittest.TestCase):
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[0, 0]))
-        dataframe_2.iat[0, 0] = np.NaN
+        dataframe_2.iat[0, 0] = np.nan
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[1, 1]))
-        dataframe_2.iat[1, 1] = np.NaN
+        dataframe_2.iat[1, 1] = np.nan
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[1, 2]))
-        dataframe_2.iat[1, 2] = np.NaN
+        dataframe_2.iat[1, 2] = np.nan
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa
 
         dataframe_2 = dataframe_1.copy()
         self.assertFalse(pd.isna(dataframe_2.iat[1, 3]))
-        dataframe_2.iat[1, 3] = np.NaN
+        dataframe_2.iat[1, 3] = np.nan
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_2]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_2, dataframe_1]))
         self.assertFalse(hv.dataframes_match(dataframes=[dataframe_1, dataframe_1.copy(), dataframe_2]))  # noqa

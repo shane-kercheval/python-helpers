@@ -2,7 +2,7 @@
 Contains a collection of helper functions to manipulate strings.
 
 This module is less concerned with bytes/unicode and text processing, compared with text.py
-"""
+"""  # noqa: A005
 from __future__ import annotations
 from enum import unique, Enum, auto
 from collections.abc import Iterable

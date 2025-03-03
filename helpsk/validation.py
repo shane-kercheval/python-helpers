@@ -16,7 +16,7 @@ def is_none_nan(value: object) -> bool:
     if value is None \
             or value is pd.NA \
             or value is pd.NaT \
-            or (isinstance(value, (np.float64, float, int)) and np.isnan(value)):
+            or (isinstance(value, (np.float64, float, int)) and np.isnan(value)):  # noqa: SIM103
         return True
 
     return False
@@ -26,14 +26,14 @@ def any_none_nan(  # noqa: PLR0911
         values: list | np.ndarray | pd.Series | pd.DataFrame | object) -> bool:
     """
     Can be used with a single value or a collection of values. Returns `True` if any item in
-    `values` are `None`, `np.Nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
+    `values` are `None`, `np.nan`, `pd.NA`, `pd.NaT` or if the length of `values` is `0`.
 
     Args:
         values:
             A collection of values to check.
 
     Returns:
-        bool - True if any item in `values` are None/np.NaN
+        bool - True if any item in `values` are None/np.nan
     """
     if is_none_nan(values):
         return True
@@ -77,7 +77,7 @@ def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
             A collection of values to check.
 
     Returns:
-        bool - True if any item in `values` are None/np.NaN/''
+        bool - True if any item in `values` are None/np.nan/''
     """
     if any_none_nan(values):
         return True
@@ -91,7 +91,7 @@ def any_missing(values: list | pd.Series | pd.DataFrame | object) -> bool:
     if isinstance(values, str) and values.strip() == '':
         return True
 
-    if isinstance(values, Iterable) and '' in values:
+    if isinstance(values, Iterable) and '' in values:  # noqa: SIM103
         return True
 
     return False

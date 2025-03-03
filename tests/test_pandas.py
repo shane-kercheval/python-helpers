@@ -50,7 +50,7 @@ class TestPandas(unittest.TestCase):
             ],
             'col_j': [False, False, True, False],
             'col_k': [None, None, None, None],
-            'col_l': [np.nan, np.nan, np.nan, np.nan]
+            'col_l': [np.nan, np.nan, np.nan, np.nan],
         })
         sample_data.loc[0, 'col_c'] = np.nan
         sample_data['col_g'] = sample_data['col_b'].astype('category')
@@ -148,6 +148,29 @@ class TestPandas(unittest.TestCase):
         }
         self.assertEqual(expected, actual.to_dict())
         self.assertEqual(hp.get_categorical_columns(self.sample_data), ['col_g'])
+
+    def test_is_series_numeric__object_dtype(self):
+        self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, 1, np.nan], dtype=object)), True)  # noqa: E501
+        self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, 1.0, np.nan], dtype=object)), True)  # noqa: E501
+        self.assertEqual(hp.is_series_numeric(series=pd.Series([None, 1, None], dtype=object)), True)  # noqa: E501
+        self.assertEqual(hp.is_series_numeric(series=pd.Series([None, 1.0, np.nan], dtype=object)), True)  # noqa: E501
+
+    def test_is_series_bool__object_dtype(self):
+        self.assertEqual(hp.is_series_bool(series=pd.Series([np.nan, True, np.nan], dtype=object)), True)
+        self.assertEqual(hp.is_series_bool(series=pd.Series([np.nan, False, np.nan], dtype=object)), True)
+        self.assertEqual(hp.is_series_bool(series=pd.Series([None, True, None], dtype=object)), True)
+        self.assertEqual(hp.is_series_bool(series=pd.Series([np.nan, False, None], dtype=object)), True)
+
+    def test_is_series_date__object_dtype(self):
+        self.assertEqual(hp.is_series_date(series=pd.Series([np.nan, datetime.date(2021, 1, 1), np.nan], dtype=object)), True)
+        self.assertEqual(hp.is_series_date(series=pd.Series([np.nan, datetime.datetime(2021, 1, 1), np.nan], dtype=object)), True)
+        self.assertEqual(hp.is_series_date(series=pd.Series([None, datetime.date(2021, 1, 1), None], dtype=object)), True)
+        self.assertEqual(hp.is_series_date(series=pd.Series([np.nan, datetime.datetime(2021, 1, 1), None], dtype=object)), True)
+
+    def test_is_series_string__object_dtype(self):
+        self.assertEqual(hp.is_series_string(series=pd.Series([np.nan, 'a', np.nan], dtype=object)), True)
+        self.assertEqual(hp.is_series_string(series=pd.Series([None, 'b', None], dtype=object)), True)
+        self.assertEqual(hp.is_series_string(series=pd.Series([np.nan, 'c', None], dtype=object)), True)
 
     def test_replace_all_bools_with_strings(self):
         results = hp.replace_all_bools_with_strings(series=pd.Series([True]))
