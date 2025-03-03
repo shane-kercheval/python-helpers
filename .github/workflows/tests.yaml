@@ -27,6 +27,13 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
         # Display the Python version being used
-      - name: Run linting and tests
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv
+      - name: linting
+        run: |
+          make linting
+      - name: tests
         run: |
           make tests
