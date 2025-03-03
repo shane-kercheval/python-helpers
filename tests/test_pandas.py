@@ -639,6 +639,20 @@ class TestPandas(unittest.TestCase):
             clean_formatted_dataframe(hp.numeric_summary(test_data, return_style=True, sort_by_columns=True).to_html())  # noqa
         )
 
+    def test_numeric_summary__decimal(self):
+        test_data = self.credit_data.copy()
+        new = [Decimal(x) for x in test_data['credit_amount']]
+        new[0] = None
+        test_data['test_decimal1'] = new
+        new = [Decimal(x) for x in test_data['duration']]
+        new[-1] = None
+        test_data['test_decimal2'] = new
+        summary = hp.numeric_summary(test_data, return_style=False)
+        assert summary.loc['test_decimal1', '# of Non-Nulls'] == 999
+        assert summary.loc['test_decimal2', '# of Non-Nulls'] == 999
+        assert summary.loc['test_decimal1', '# of Nulls'] == 1
+        assert summary.loc['test_decimal2', '# of Nulls'] == 1
+
     def test_numeric_summary_style(self):
         test_data = self.credit_data.copy()
         test_data.loc[0:46, ['duration']] = np.nan

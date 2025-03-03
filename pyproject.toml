@@ -1,6 +1,6 @@
 [project]
 name = "helpsk"
-version = "0.1.60"
+version = "0.1.61"
 description = "Python helper functions and classes."
 readme = "README.md"
 requires-python = ">=3.11"
