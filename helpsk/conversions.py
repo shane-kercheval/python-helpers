@@ -1,6 +1,5 @@
 """Functions to help with calculating conversation/retension rates."""
 from __future__ import annotations
-import datetime
 import numpy as np
 import pandas as pd
 from pandas.tseries.offsets import DateOffset
@@ -56,7 +55,7 @@ def cohorted_conversion_rates(
         return value * unit_to_seconds[unit]
 
     if not current_datetime:
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = pd.Timestamp.now(tz='UTC').tz_localize(None)
     current_datetime = pd.to_datetime(current_datetime)
 
     group_by = [cohort]
@@ -85,7 +84,7 @@ def cohorted_conversion_rates(
         df
         .assign(seconds_to_conversion=lambda x: (x[conversion_timestamp] - x[base_timestamp]).dt.total_seconds())  # noqa
         .groupby(group_by)
-        .apply(f)
+        .apply(f, include_groups=False)
         .reset_index()
         .sort_values(group_by, ascending=True)
     )
@@ -320,7 +319,7 @@ def cohorted_adoption_rates(
             datetime. If None, the current UTC datetime is used.
     """
     if current_datetime is None:
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = pd.Timestamp.now(tz='UTC').tz_localize(None)
     elif isinstance(current_datetime, str):
         current_datetime = pd.to_datetime(current_datetime)
 
@@ -377,7 +376,7 @@ def cohorted_adoption_rates(
     adoption_by_cohort = (
         adoption
         .groupby([cohort, 'index', groups] if groups else [cohort, 'index'])
-        .apply(f)
+        .apply(f, include_groups=False)
         .reset_index()
         .sort_values(by=[cohort, 'index'])
     )
@@ -563,7 +562,7 @@ def retention_matrix(
     intervals = intervals[0].upper()
 
     if current_datetime is None:
-        current_datetime = datetime.datetime.utcnow()
+        current_datetime = pd.Timestamp.now(tz='UTC').tz_localize(None)
 
     df = df[[timestamp, unique_id]].copy()  # noqa: PD901
     assert not df.isna().any().any()
@@ -572,7 +571,7 @@ def retention_matrix(
     # Step 1: Determine the cohort of each user (the day/week/month of their first event)
     df['event_period'] = df[timestamp].dt.to_period(intervals).dt.start_time
     df['cohort'] = (
-        df.groupby(unique_id)[timestamp]
+        df.groupby(unique_id, observed=True)[timestamp]
         .transform('min')
         .dt.to_period(intervals)
         .dt.start_time
@@ -589,7 +588,7 @@ def retention_matrix(
     # Group by cohort_week, event_week and unique_id, then filter by min_visits
     user_events_by_period = (
         df
-        .groupby(['cohort', 'period', unique_id])
+        .groupby(['cohort', 'period', unique_id], observed=True)
         .size()
         .reset_index(name='event_count')
     )

@@ -248,7 +248,7 @@ class MLExperimentResults:
 
     @classmethod
     def from_sklearn_search_cv(  # noqa: PLR0912, PLR0915
-            cls,  # noqa: ANN102
+            cls,
             searcher: BaseSearchCV,
             higher_score_is_better: bool = True,
             description: str = "",
@@ -472,7 +472,7 @@ class MLExperimentResults:
         return MLExperimentResults(info=cv_results_dict)
 
     @classmethod
-    def from_yaml_file(cls, yaml_file_name: str) -> 'MLExperimentResults':  # noqa: ANN102, UP037
+    def from_yaml_file(cls, yaml_file_name: str) -> 'MLExperimentResults':  # noqa: UP037
         """Creates a MLExperimentResults object from a yaml file created by `to_yaml_file()`."""
         with open(yaml_file_name) as file:
             cv_dict = yaml.safe_load(file)
@@ -688,7 +688,7 @@ class MLExperimentResults:
             # within 1 standard error of the top primary score (i.e. first column first row).
 
             def highlight_cols(s):   # noqa
-                return 'background-color: %s' % hcolor.Colors.PASTEL_BLUE.value
+                return f'background-color: {hcolor.Colors.PASTEL_BLUE.value}'
 
             # we might have removed columns (e.g. that don't have any variance) so check that the
             # columns were in the final set
@@ -1730,7 +1730,7 @@ class TwoClassEvaluator:
 
     @property
     def accuracy(self) -> float | None:
-        """accuracy."""
+        """Accuracy."""
         return None if self.sample_size == 0 else \
             (self._true_negatives + self._true_positives) / self.sample_size
 

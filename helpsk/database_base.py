@@ -34,7 +34,7 @@ class Database(ABC):
         self.connection_object: ConnectionObject = None
 
     @classmethod
-    def from_config(cls, config_path: str, config_key: str) -> 'Database':  # noqa: ANN102
+    def from_config(cls, config_path: str, config_key: str) -> 'Database':
         """
         Passes key/value pairs found in configuration file into underlying connection. Keys must
         match corresponding connection string or connection method arguments.

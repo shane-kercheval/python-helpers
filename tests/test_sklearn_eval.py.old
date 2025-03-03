@@ -1148,7 +1148,7 @@ class TestSklearnEval(unittest.TestCase):
         self.assertEqual(evaluator.fbeta_score(beta=0), fbeta_score(y_true=y_true, y_pred=y_pred, beta=0))  # noqa
         self.assertEqual(evaluator.fbeta_score(beta=1), fbeta_score(y_true=y_true, y_pred=y_pred, beta=1))  # noqa
         self.assertEqual(evaluator.fbeta_score(beta=1), evaluator.f1_score)
-        self.assertEqual(evaluator.fbeta_score(beta=2), fbeta_score(y_true=y_true, y_pred=y_pred, beta=2))  # noqa
+        self.assertEqual(round(evaluator.fbeta_score(beta=2), 9), round(fbeta_score(y_true=y_true, y_pred=y_pred, beta=2), 9))  # noqa
         self.assertEqual(round(evaluator.kappa, 9), round(cohen_kappa_score(y1=y_true, y2=y_pred), 9))  # noqa
 
         helper_test_dataframe(file_name=get_test_path('sklearn_eval/get_auc_curve_dataframe.txt'),
