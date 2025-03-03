@@ -279,6 +279,7 @@ class Sqlite(Database):
 
     def _close_connection_object(self) -> None:
         """Wraps logic for closing the connection to sqlite."""
+        self.connection_object.commit()
         self.connection_object.close()
 
     def _query(self, sql: str) -> pd.DataFrame:
@@ -296,7 +297,8 @@ class Sqlite(Database):
 
     def execute_statement(self, statement: str) -> None:
         """Executes a statement without any data returned."""
-        self.connection_object.execute(statement)
+        from sqlalchemy import text
+        self.connection_object.execute(text(statement))
 
     def insert_records(
             self,
