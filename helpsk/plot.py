@@ -203,7 +203,7 @@ def plot_dodged_barchart(
         categories = list(dataframe[inner_column].cat.categories)
         inner_labels = [x for x in categories if x in inner_labels]
 
-    grouped_data = dataframe.groupby([outer_column, inner_column]).size()
+    grouped_data = dataframe.groupby([outer_column, inner_column], observed=False).size()
 
     outer_totals = [grouped_data[index].sum() for index in outer_labels]
     group_locations = np.arange(len(outer_labels))  # the x locations for the groups
