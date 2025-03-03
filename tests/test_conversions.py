@@ -350,8 +350,8 @@ def test_cohorted_adoption_rate__month_cohort_check_num_conversions(conversions_
 
     expected_conversions = (
         expected_conversions
-        .groupby('cohort')
-        .apply(lambda x: x['converted'].sum())
+        .groupby('cohort', observed=True)
+        .apply(lambda x: x['converted'].sum(), include_groups=True)
         .reset_index(name='expected_conversions')
     )
     df_copy = data.copy()
@@ -696,7 +696,7 @@ def test_retention__duplicate_user_cohort_bug():  # noqa
     assert retention['# of unique ids'].sum() == data['categories'].nunique()
     expected_cohort_sizes = (
         data
-        .groupby('categories')
+        .groupby('categories', observed=True)
         .agg(min_date=('datetimes', 'min'))
         .assign(cohort=lambda x: x['min_date'].dt.to_period('W').dt.to_timestamp())
         .groupby('cohort')
@@ -724,7 +724,7 @@ def test_retention__duplicate_user_cohort_bug():  # noqa
     assert retention['# of unique ids'].sum() == data['categories'].nunique()
     expected_cohort_sizes = (
         data
-        .groupby('categories')
+        .groupby('categories', observed=True)
         .agg(min_date=('datetimes', 'min'))
         .assign(cohort=lambda x: x['min_date'].dt.to_period('W').dt.to_timestamp())
         .groupby('cohort')
