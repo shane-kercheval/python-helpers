@@ -34,7 +34,15 @@ def is_series_numeric(series: pd.Series) -> bool:
         return True
     # if the series contains nan it might be marked as object
     if series.dtype == 'object':
-        return is_numeric_dtype(pd.Series(series.dropna().tolist()))
+        try:
+            sample = series.dropna().head(1000)
+            if len(sample) == 0:
+                return False
+            pd.to_numeric(sample, errors='raise')
+            # if we get here, then the series is numeric; but we need to check if it's bool
+            return not is_series_bool(sample)
+        except (ValueError, TypeError):
+            return False
     return False
 
 
@@ -336,9 +344,13 @@ def reorder_categories(
         weights = pd.Series(weights, index=categorical)
         # for each categoric value, calculate the associated value of the categoric, based on the
         # func e.g. if func is np.median, get the median value associated with categoric value
-        ordered_categories = weights.groupby(level=0).agg(weight_function)\
-            .fillna(0).sort_values(ascending=ascending)
-
+        ordered_categories = (
+            weights
+            .groupby(level=0, observed=False)
+            .agg(weight_function)
+            .fillna(0)
+            .sort_values(ascending=ascending)
+        )
     # check that the unique values in categorical are a subset of the categories that we are
     # setting (subset because for categorical series there might be a category set on the series
     # (i.e. series.cat.categories) that doesn't have any associated values in the series)
@@ -405,8 +417,14 @@ def top_n_categories(
         weights = pd.Series(weights, index=categorical)
         # for each categoric value, calculate the associated value of the categoric, based on the
         # func e.g. if func is np.median, get the median value associated with categoric value
-        top_categories = weights.groupby(level=0).agg(weight_function).fillna(0).\
-            sort_values(ascending=False).head(top_n)
+        top_categories = (
+            weights
+            .groupby(level=0, observed=False)
+            .agg(weight_function)
+            .fillna(0)
+            .sort_values(ascending=False)
+            .head(top_n)
+        )
         top_categories = list(top_categories.index.values)
 
     # TODO: this needs to be clean up; Categorical is causing issues

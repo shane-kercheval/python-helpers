@@ -1,3 +1,4 @@
+from decimal import Decimal
 import os
 import unittest
 from enum import Enum, unique, auto
@@ -154,6 +155,13 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, 1.0, np.nan], dtype=object)), True)  # noqa: E501
         self.assertEqual(hp.is_series_numeric(series=pd.Series([None, 1, None], dtype=object)), True)  # noqa: E501
         self.assertEqual(hp.is_series_numeric(series=pd.Series([None, 1.0, np.nan], dtype=object)), True)  # noqa: E501
+
+    def test_is_series_numeric__Decimal_type(self):
+        self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, Decimal(1), np.nan], dtype=object)), True)  # noqa: E501
+        self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, Decimal(1.0), np.nan], dtype=object)), True)  # noqa: E501
+        self.assertEqual(hp.is_series_numeric(series=pd.Series([None, Decimal(1), None], dtype=object)), True)  # noqa: E501
+        self.assertEqual(hp.is_series_numeric(series=pd.Series([None, Decimal(1.0), np.nan], dtype=object)), True)  # noqa: E501
+
 
     def test_is_series_bool__object_dtype(self):
         self.assertEqual(hp.is_series_bool(series=pd.Series([np.nan, True, np.nan], dtype=object)), True)
@@ -658,7 +666,7 @@ class TestPandas(unittest.TestCase):
 
         self.helper_test_summary(
             get_test_path('pandas/test_non_numeric_summary__credit.txt'),
-            hp.non_numeric_summary(credit_data, return_style=False, sort_by_columns=False)
+            hp.non_numeric_summary(credit_data, return_style=False, sort_by_columns=False),
         )
 
         self.helper_test_summary(
