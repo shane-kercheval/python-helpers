@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 import datetime
+from decimal import Decimal
 import math
 from collections.abc import Callable
 from enum import Enum
@@ -553,39 +554,32 @@ def numeric_summary(
     if not numeric_columns:
         return None
 
-    # column, number of nulls in column, percent of nulls in column
-    null_data = [(column,
-                  dataframe[column].isna().sum(),
-                  round(dataframe[column].isna().sum() / len(dataframe), round_by))
-                 for column in numeric_columns]
-    columns, num_nulls, perc_nulls = zip(*null_data)
-
-    # column, number of 0's, percent of 0's
-    zeros_data = [(sum(dataframe[column] == 0),
-                   round(sum(dataframe[column] == 0) / len(dataframe), round_by))
-                  for column in numeric_columns]
-    num_zeros, perc_zeros = zip(*zeros_data)
-    results = pd.DataFrame(
-        {'# of Non-Nulls': [dataframe[x].count() for x in numeric_columns],
-         '# of Nulls': num_nulls,
-         '% Nulls': perc_nulls,
-         '# of Zeros': num_zeros,
-         '% Zeros': perc_zeros,
-         'Mean': [round(dataframe[x].mean(), round_by) for x in numeric_columns],
-         'St Dev.': [round(dataframe[x].std(), round_by) for x in numeric_columns],
-         'Coef of Var': [round(dataframe[x].std() / dataframe[x].mean(), round_by)
-                         if dataframe[x].mean() != 0 else np.nan
-                         for x in numeric_columns],
-         'Skewness': [round(dataframe[x].skew(), round_by) for x in numeric_columns],
-         'Kurtosis': [round(dataframe[x].kurt(), round_by) for x in numeric_columns],
-         'Min': [round(dataframe[x].min(), round_by) for x in numeric_columns],
-         '10%': [round(dataframe[x].quantile(q=0.10), round_by) for x in numeric_columns],
-         '25%': [round(dataframe[x].quantile(q=0.25), round_by) for x in numeric_columns],
-         '50%': [round(dataframe[x].quantile(q=0.50), round_by) for x in numeric_columns],
-         '75%': [round(dataframe[x].quantile(q=0.75), round_by) for x in numeric_columns],
-         '90%': [round(dataframe[x].quantile(q=0.90), round_by) for x in numeric_columns],
-         'Max': [round(dataframe[x].max(), round_by) for x in numeric_columns]},
-        index=columns)
+    results_data = {}
+    for column in numeric_columns:
+        # Check if column contains Decimal objects
+        has_decimal = dataframe[column].apply(lambda x: isinstance(x, Decimal) if pd.notna(x) else False).any()  # noqa: E501
+        # Convert to float if column contains Decimal objects
+        col_data = dataframe[column].astype(float) if has_decimal else dataframe[column]
+        results_data[column] = {
+            '# of Non-Nulls': col_data.count(),
+            '# of Nulls': col_data.isna().sum(),
+            '% Nulls': round(col_data.isna().sum() / len(dataframe), round_by),
+            '# of Zeros': sum(col_data == 0),
+            '% Zeros': round(sum(col_data == 0) / len(dataframe), round_by),
+            'Mean': round(col_data.mean(), round_by),
+            'St Dev.': round(col_data.std(), round_by),
+            'Coef of Var': round(col_data.std() / col_data.mean(), round_by) if col_data.mean() != 0 else np.nan,  # noqa: E501
+            'Skewness': round(col_data.skew(), round_by),
+            'Kurtosis': round(col_data.kurt(), round_by),
+            'Min': round(col_data.min(), round_by),
+            '10%': round(col_data.quantile(q=0.10), round_by),
+            '25%': round(col_data.quantile(q=0.25), round_by),
+            '50%': round(col_data.quantile(q=0.50), round_by),
+            '75%': round(col_data.quantile(q=0.75), round_by),
+            '90%': round(col_data.quantile(q=0.90), round_by),
+            'Max': round(col_data.max(), round_by)
+        }
+    results = pd.DataFrame(results_data).T
 
     if sort_by_columns:
         results = results.sort_index()
