@@ -54,10 +54,39 @@ def cohorted_conversion_rates(
         }
         return value * unit_to_seconds[unit]
 
-    if not current_datetime:
-        current_datetime = pd.Timestamp.now(tz='UTC').tz_localize(None)
-    current_datetime = pd.to_datetime(current_datetime)
+    # Only copy the columns we need
+    if groups:
+        df_copy = df[[base_timestamp, conversion_timestamp, cohort, groups]].copy()
+    else:
+        df_copy = df[[base_timestamp, conversion_timestamp, cohort]].copy()
 
+    # Normalize current_datetime
+    if not current_datetime:
+        current_datetime = pd.Timestamp.now(tz='UTC')
+    else:
+        current_datetime = pd.to_datetime(current_datetime)
+
+    # Make current_datetime timezone-naive if it has timezone info
+    if hasattr(current_datetime, 'tzinfo') and current_datetime.tzinfo is not None:
+        current_datetime = current_datetime.tz_localize(None)
+
+    # Make all datetime columns timezone-naive
+    for col in [base_timestamp, conversion_timestamp, cohort]:
+        if pd.api.types.is_datetime64_any_dtype(df_copy[col]):
+            # Check if any timestamps in the column have timezone info
+            has_tz = False
+            for ts in df_copy[col]:
+                if pd.notna(ts) and hasattr(ts, 'tzinfo') and ts.tzinfo is not None:
+                    has_tz = True
+                    break
+            if has_tz:
+                # Remove timezone info from all timestamps in the column using apply
+                # This is more robust than df.dt when dealing with mixed timezone data
+                df_copy[col] = df_copy[col].apply(
+                    lambda x: x.tz_localize(None) if pd.notna(x) and hasattr(x, 'tzinfo') and x.tzinfo is not None else x,  # noqa: E501
+                )
+
+    # Keep the original behavior from here on
     group_by = [cohort]
     if groups:
         group_by.append(groups)
@@ -65,9 +94,6 @@ def cohorted_conversion_rates(
     def f(x: pd.Series) -> pd.Series:
         d = {}
         d['# of records'] = len(x)
-        # the number of seconds from the last base timestamp in the cohort to the current datetime
-        # if any record in the cohort has not had enough time elapse between the base_timestamp and
-        # the time to convert based on the intervals, that cohort should have a nan value
         seconds_from_max_base = (current_datetime - x[base_timestamp].max()).total_seconds()
         for value, unit in intervals:
             interval_seconds = to_seconds(value, unit)
@@ -80,9 +106,16 @@ def cohorted_conversion_rates(
                 d[f'{value} {unit}'] = None
         return pd.Series(d)
 
+    # Calculate seconds_to_conversion more safely using apply
+    def calculate_time_diff(row):  # noqa: ANN001, ANN202
+        if pd.isna(row[conversion_timestamp]) or pd.isna(row[base_timestamp]):
+            return pd.NA
+        return (row[conversion_timestamp] - row[base_timestamp]).total_seconds()
+
+    df_copy['seconds_to_conversion'] = df_copy.apply(calculate_time_diff, axis=1)
+
     return (
-        df
-        .assign(seconds_to_conversion=lambda x: (x[conversion_timestamp] - x[base_timestamp]).dt.total_seconds())  # noqa
+        df_copy
         .groupby(group_by)
         .apply(f, include_groups=False)
         .reset_index()
@@ -274,7 +307,7 @@ def plot_cohorted_conversion_rates(
     return fig
 
 
-def cohorted_adoption_rates(
+def cohorted_adoption_rates(  # noqa: PLR0912, PLR0915
         df: pd.DataFrame,
         base_timestamp: str,
         conversion_timestamp: str,
@@ -323,30 +356,76 @@ def cohorted_adoption_rates(
     elif isinstance(current_datetime, str):
         current_datetime = pd.to_datetime(current_datetime)
 
+    # Make current_datetime timezone-naive if it has timezone info
+    if hasattr(current_datetime, 'tzinfo') and current_datetime.tzinfo is not None:
+        current_datetime = current_datetime.tz_localize(None)
+
     all_columns = [cohort, base_timestamp, conversion_timestamp]
     if groups:
         all_columns.append(groups)
 
     data = df[all_columns].copy()
+
+    # Make all datetime columns timezone-naive to handle mixed timezone data
+    for col in [base_timestamp, conversion_timestamp, cohort]:
+        if pd.api.types.is_datetime64_any_dtype(data[col]):
+            # Check if any timestamps in the column have timezone info
+            has_tz = False
+            for ts in data[col]:
+                if pd.notna(ts) and hasattr(ts, 'tzinfo') and ts.tzinfo is not None:
+                    has_tz = True
+                    break
+
+            if has_tz:
+                # Remove timezone info from all timestamps in the column
+                data[col] = data[col].apply(
+                    lambda x: x.tz_localize(None) if pd.notna(x) and hasattr(x, 'tzinfo') and x.tzinfo is not None else x,  # noqa: E501
+                )
+
     # get most recent x cohorts; need to remove NAs
     cohorts = data[cohort].unique()
     cohorts = cohorts[~pd.isna(cohorts)]
-    cohorts = sorted(cohorts)[-last_x_cohorts:]
+
+    # Convert all cohorts to timezone-naive before sorting to handle mixed timezone data
+    cohorts_naive = []
+    cohorts_original = {}  # Keep mapping of naive to original for filtering
+
+    for timestamp in cohorts:
+        if pd.notna(timestamp):
+            if hasattr(timestamp, 'tzinfo') and timestamp.tzinfo is not None:
+                naive_ts = timestamp.tz_localize(None)
+                cohorts_naive.append(naive_ts)
+                cohorts_original[naive_ts] = timestamp
+            else:
+                cohorts_naive.append(timestamp)
+                cohorts_original[timestamp] = timestamp
+
+    # Sort the naive timestamps and get the last X
+    sorted_naive_cohorts = sorted(cohorts_naive)[-last_x_cohorts:]
+
+    # Map back to original timestamps for filtering
+    cohorts = [cohorts_original[ts] for ts in sorted_naive_cohorts]
     data = data[data[cohort].isin(cohorts)]
-    # calculate the difference between the base timestamp and the conversion timestamp based on
-    # the units passed in
-    if units == 'seconds':
-        diff = (data[conversion_timestamp] - data[base_timestamp]).dt.total_seconds()
-    elif units == 'minutes':
-        diff = (data[conversion_timestamp] - data[base_timestamp]).dt.total_seconds() / 60
-    elif units == 'hours':
-        diff = (data[conversion_timestamp] - data[base_timestamp]).dt.total_seconds() / 3600
-    elif units == 'days':
-        diff = (data[conversion_timestamp] - data[base_timestamp]).dt.total_seconds() / 86400
-    elif units == 'weeks':
-        diff = (data[conversion_timestamp] - data[base_timestamp]).dt.total_seconds() / 604800
-    else:
+
+    # calculate the difference between the base timestamp and the conversion timestamp
+    # handle cases where conversion_timestamp is None using row-wise approach
+    def calculate_diff(row):  # noqa: ANN001, ANN202
+        if pd.isna(row[conversion_timestamp]):
+            return pd.NA
+        diff_seconds = (row[conversion_timestamp] - row[base_timestamp]).total_seconds()
+        if units == 'seconds':
+            return diff_seconds
+        if units == 'minutes':
+            return diff_seconds / 60
+        if units == 'hours':
+            return diff_seconds / 3600
+        if units == 'days':
+            return diff_seconds / 86400
+        if units == 'weeks':
+            return diff_seconds / 604800
         raise ValueError(f'Invalid units: {units}')
+
+    diff = data.apply(calculate_diff, axis=1)
 
     columns = [cohort, base_timestamp]
     if groups:
@@ -355,13 +434,35 @@ def cohorted_adoption_rates(
     adoption = pd.DataFrame()
     for i in range(0, n_units + 1):
         temp = data[columns].copy()
-        temp['conversion'] = (diff <= i) & (diff > 0)  # ensure conversion happened after base
+        # Handle NaN values properly in conversion calculation
+        diff_valid = diff.copy()
+        diff_valid = pd.Series(
+            [(d <= i) and (d > 0) if pd.notna(d) else False for d in diff],
+            index=diff.index,
+        )
+        temp['conversion'] = diff_valid
         temp['index'] = i
         time_delta = pd.Timedelta(
             i * 7 if units == 'weeks' else i,
             'days' if units == 'weeks' else units,
         )
         cutoff_datetime = temp[base_timestamp] + time_delta
+
+        # Ensure cutoff_datetime has the same tzinfo status as current_datetime
+        if hasattr(current_datetime, 'tzinfo') and current_datetime.tzinfo is None:
+            # If current_datetime is naive, we need naive comparison
+            has_tz = False
+            for ts in cutoff_datetime:
+                if pd.notna(ts) and hasattr(ts, 'tzinfo') and ts.tzinfo is not None:
+                    has_tz = True
+                    break
+
+            if has_tz:
+                # Convert any tz-aware timestamps to naive for comparison
+                cutoff_datetime = cutoff_datetime.apply(
+                    lambda x: x.tz_localize(None) if pd.notna(x) and hasattr(x, 'tzinfo') and x.tzinfo is not None else x,  # noqa: E501
+                )
+
         temp['is_valid'] = cutoff_datetime < current_datetime
         adoption = pd.concat([adoption, temp], axis=0)
 
@@ -513,7 +614,7 @@ def plot_cohorted_adoption_rates(
     return fig
 
 
-def retention_matrix(
+def retention_matrix(  # noqa: PLR0912, PLR0915
         df: pd.DataFrame,
         timestamp: str,
         unique_id: str,
@@ -548,6 +649,35 @@ def retention_matrix(
             datetime. If None, the current UTC datetime is used.
 
     """
+    # Copy needed columns
+    df_copy = df[[timestamp, unique_id]].copy()
+    assert not df_copy.isna().any().any()
+
+    # Normalize current_datetime
+    if current_datetime is None:
+        current_datetime = pd.Timestamp.now(tz='UTC')
+    elif isinstance(current_datetime, str):
+        current_datetime = pd.to_datetime(current_datetime)
+
+    # Make current_datetime timezone-naive if it has timezone info
+    if hasattr(current_datetime, 'tzinfo') and current_datetime.tzinfo is not None:
+        current_datetime = current_datetime.tz_localize(None)
+
+    # Make timestamp column timezone-naive if it has timezone info
+    if pd.api.types.is_datetime64_any_dtype(df_copy[timestamp]):
+        # Check if any timestamps in the column have timezone info
+        has_tz = False
+        for ts in df_copy[timestamp]:
+            if pd.notna(ts) and hasattr(ts, 'tzinfo') and ts.tzinfo is not None:
+                has_tz = True
+                break
+
+        if has_tz:
+            # Remove timezone info from all timestamps in the column
+            df_copy[timestamp] = df_copy[timestamp].apply(
+                lambda x: x.tz_localize(None) if pd.notna(x) and hasattr(x, 'tzinfo') and x.tzinfo is not None else x,  # noqa: E501
+            )
+
     # get the number of weeks between the event week and the cohort week
     is_month_interval = intervals == 'month'
     if intervals == 'month':
@@ -564,30 +694,58 @@ def retention_matrix(
     if current_datetime is None:
         current_datetime = pd.Timestamp.now(tz='UTC').tz_localize(None)
 
-    df = df[[timestamp, unique_id]].copy()  # noqa: PD901
-    assert not df.isna().any().any()
-    # filter out any events that occurred after the current datetime
-    df = df[df[timestamp] <= current_datetime]  # noqa: PD901
+    df_copy = df_copy[[timestamp, unique_id]].copy()
+    assert not df_copy.isna().any().any()
+    # Filter out any events that occurred after the current datetime, handling mixed timezone data
+    # Create a filtered copy to avoid the mixed timezone comparison issue
+    filtered_indices = []
+    for idx, row in df_copy.iterrows():
+        ts = row[timestamp]
+        # If timestamps have different timezone properties, convert to naive for comparison
+        if pd.notna(ts):
+            if (hasattr(ts, 'tzinfo') and ts.tzinfo is not None and
+                current_datetime.tzinfo is None):
+                ts = ts.tz_localize(None)
+            elif (ts.tzinfo is None and hasattr(current_datetime, 'tzinfo') and
+                  current_datetime.tzinfo is not None):
+                ts_compare = current_datetime.tz_localize(None)
+                if ts <= ts_compare:
+                    filtered_indices.append(idx)
+                continue
+
+            if ts <= current_datetime:
+                filtered_indices.append(idx)
+
+    df_copy = df_copy.loc[filtered_indices]
     # Step 1: Determine the cohort of each user (the day/week/month of their first event)
-    df['event_period'] = df[timestamp].dt.to_period(intervals).dt.start_time
-    df['cohort'] = (
-        df.groupby(unique_id, observed=True)[timestamp]
-        .transform('min')
-        .dt.to_period(intervals)
-        .dt.start_time
+    # Check if we have data after filtering
+    if df_copy.empty:
+        # Return an empty dataframe with appropriate columns
+        return pd.DataFrame(columns=['cohort', '# of unique ids', '0'])
+
+    # First, make all timestamps timezone-naive to ensure consistent processing
+    df_copy['timestamp_naive'] = df_copy[timestamp].apply(
+        lambda x: x.tz_localize(None) if pd.notna(x) and hasattr(x, 'tzinfo') and x.tzinfo is not None else x,  # noqa: E501
     )
+
+    # Now all timestamps are naive, we can safely convert to periods
+    df_copy['event_period'] = pd.to_datetime(df_copy['timestamp_naive']).dt.to_period(intervals).dt.start_time  # noqa: E501
+
+    # Get min timestamp per user, then convert to period start - using the naive timestamps
+    min_timestamps = df_copy.groupby(unique_id, observed=True)['timestamp_naive'].transform('min')
+    df_copy['cohort'] = pd.to_datetime(min_timestamps).dt.to_period(intervals).dt.start_time
     if is_month_interval:
         # calculate the number of months between the cohort and the event
-        df['period'] = (df['event_period'].dt.year - df['cohort'].dt.year) * 12 + \
-            (df['event_period'].dt.month - df['cohort'].dt.month)
+        df_copy['period'] = (df_copy['event_period'].dt.year - df_copy['cohort'].dt.year) * 12 + \
+            (df_copy['event_period'].dt.month - df_copy['cohort'].dt.month)
     else:
-        df['period'] = (df['event_period'] - df['cohort']).dt.days // num_days_in_internal
+        df_copy['period'] = (df_copy['event_period'] - df_copy['cohort']).dt.days // num_days_in_internal  # noqa: E501
 
-    df['period'] = df['period'].astype(int)
+    df_copy['period'] = df_copy['period'].astype(int)
 
     # Group by cohort_week, event_week and unique_id, then filter by min_visits
     user_events_by_period = (
-        df
+        df_copy
         .groupby(['cohort', 'period', unique_id], observed=True)
         .size()
         .reset_index(name='event_count')
@@ -616,7 +774,13 @@ def retention_matrix(
     for row in matrix.index:
         for col in matrix.columns:
             offset = {'months': col} if is_month_interval else {'days': col * num_days_in_internal}
-            if row + DateOffset(**offset) > current_datetime:
+
+            # Ensure consistent timezone handling for comparison
+            cutoff_date = row + DateOffset(**offset)
+            if hasattr(cutoff_date, 'tzinfo') and cutoff_date.tzinfo is not None and current_datetime.tzinfo is None:  # noqa: E501
+                cutoff_date = cutoff_date.tz_localize(None)
+
+            if cutoff_date > current_datetime:
                 matrix.loc[row, col] = np.nan
 
     # Step 4: Reset index and column names for better readability
