@@ -577,7 +577,7 @@ def numeric_summary(
             '50%': round(col_data.quantile(q=0.50), round_by),
             '75%': round(col_data.quantile(q=0.75), round_by),
             '90%': round(col_data.quantile(q=0.90), round_by),
-            'Max': round(col_data.max(), round_by)
+            'Max': round(col_data.max(), round_by),
         }
     results = pd.DataFrame(results_data).T
 
