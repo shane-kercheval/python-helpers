@@ -45,8 +45,7 @@ To run linting, the unit tests in `/tests`, and the doctests, run:
 make tests
 ```
 
-To build the package and publish it to PyPI, set `UV_PUBLISH_TOKEN`, then run:
+To publish a new version to PyPI:
 
-```commandline
-make package
-```
+1. Set `version` in `pyproject.toml` and merge the change to `main`.
+2. Create a GitHub release whose tag is the version, for example `v0.2.0`. The `publish.yaml` workflow builds the package and uploads it to PyPI through trusted publishing, so it needs no API token.
