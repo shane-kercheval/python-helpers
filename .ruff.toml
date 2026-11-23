@@ -9,10 +9,14 @@ select = [
 ignore = [
     "ANN204", "ANN206",
     "D105", "D107", "D203", "D205", "D212", "D401", "D407", "D413",
-    "PLR0913", "PLR2004"
+    "PLR0913", "PLR0917", "PLR2004",
+    # TypeVars are module-level and shared across functions.
+    "UP046", "UP047",
 ]
 
 [lint.per-file-ignores]
+# Database drivers are optional dependencies, imported only when a connector is used.
+"helpsk/database.py" = ["PLC0415"]
 "tests/*" = [
     # ignore same warnings as above
     "ANN101", "ANN204", "ANN206",

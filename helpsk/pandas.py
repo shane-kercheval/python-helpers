@@ -39,6 +39,10 @@ def is_series_numeric(series: pd.Series) -> bool:
             sample = series.dropna().head(1000)
             if len(sample) == 0:
                 return False
+            # `pd.to_numeric` parses strings such as '1' and '', but the values are still strings
+            # and fail in numeric operations like `mean()`.
+            if any(isinstance(value, str) for value in sample):
+                return False
             pd.to_numeric(sample, errors='raise')
             # if we get here, then the series is numeric; but we need to check if it's bool
             return not is_series_bool(sample)
@@ -344,11 +348,13 @@ def reorder_categories(
 
         weights = pd.Series(weights, index=categorical)
         # for each categoric value, calculate the associated value of the categoric, based on the
-        # func e.g. if func is np.median, get the median value associated with categoric value
+        # func e.g. if func is np.median, get the median value associated with categoric value.
+        # Missing weights are skipped: pandas 3 passes them to `weight_function` unchanged, so
+        # e.g. `np.median` would return NaN for any category with a missing weight.
         ordered_categories = (
             weights
             .groupby(level=0, observed=False)
-            .agg(weight_function)
+            .agg(lambda x: weight_function(x.dropna()) if x.notna().any() else np.nan)
             .fillna(0)
             .sort_values(ascending=ascending)
         )

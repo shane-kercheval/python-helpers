@@ -2,6 +2,7 @@
 from __future__ import annotations
 import numpy as np
 import pandas as pd
+import plotly.express as px
 from pandas.tseries.offsets import DateOffset
 from helpsk.pandas import relocate
 
@@ -219,7 +220,6 @@ def plot_cohorted_conversion_rates(
         free_y_axis:
             Whether to allow the y-axis to be free for each facet.
     """
-    import plotly_express as px
     conversions = cohorted_conversion_rates(
         df=df,
         base_timestamp=base_timestamp,
@@ -556,7 +556,6 @@ def plot_cohorted_adoption_rates(
         free_y_axis:
             Whether to allow the y-axis to be free for each facet.
     """
-    import plotly_express as px
     conversions = cohorted_adoption_rates(
         df=df,
         base_timestamp=base_timestamp,

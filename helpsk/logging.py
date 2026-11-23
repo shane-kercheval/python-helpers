@@ -1,4 +1,4 @@
-"""Contains functions that are useful for logging."""  # noqa: A005
+"""Contains functions that are useful for logging."""
 
 from __future__ import annotations
 import logging

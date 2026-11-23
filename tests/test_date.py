@@ -562,8 +562,10 @@ class TestDate(unittest.TestCase):
         date_series = pd.to_datetime(pd.Series(date_values))
 
         expected_values = ['2020-12-01', '2020-12-15', pd.NaT, pd.NaT]
-        actual_values = date_series.apply(
-            lambda x: date.to_string(x, granularity=date.Granularity.DAY)
+        actual_values = pd.Series(
+            [date.to_string(x, granularity=date.Granularity.DAY)
+             for x in date_series],
+            dtype=object,
         )
         assert actual_values.iloc[0] == expected_values[0]
         assert actual_values.iloc[1] == expected_values[1]
@@ -571,8 +573,10 @@ class TestDate(unittest.TestCase):
         assert actual_values.iloc[3] is None
 
         expected_values = ['2020-Dec', '2020-Dec', pd.NaT, pd.NaT]
-        actual_values = date_series.apply(
-            lambda x: date.to_string(x, granularity=date.Granularity.MONTH)
+        actual_values = pd.Series(
+            [date.to_string(x, granularity=date.Granularity.MONTH)
+             for x in date_series],
+            dtype=object,
         )
         assert actual_values.iloc[0] == expected_values[0]
         assert actual_values.iloc[1] == expected_values[1]
@@ -580,8 +584,10 @@ class TestDate(unittest.TestCase):
         assert actual_values.iloc[3] is None
 
         expected_values = ['2020-Q4', '2020-Q4', pd.NaT, pd.NaT]
-        actual_values = date_series.apply(
-            lambda x: date.to_string(x, granularity=date.Granularity.QUARTER)
+        actual_values = pd.Series(
+            [date.to_string(x, granularity=date.Granularity.QUARTER)
+             for x in date_series],
+            dtype=object,
         )
         assert actual_values.iloc[0] == expected_values[0]
         assert actual_values.iloc[1] == expected_values[1]
@@ -589,8 +595,10 @@ class TestDate(unittest.TestCase):
         assert actual_values.iloc[3] is None
 
         expected_values = ['2021-FQ4', '2021-FQ4', pd.NaT, pd.NaT]
-        actual_values = date_series.apply(
-            lambda x: date.to_string(x, granularity=date.Granularity.QUARTER, fiscal_start=2)
+        actual_values = pd.Series(
+            [date.to_string(x, granularity=date.Granularity.QUARTER, fiscal_start=2)
+             for x in date_series],
+            dtype=object,
         )
         assert actual_values.iloc[0] == expected_values[0]
         assert actual_values.iloc[1] == expected_values[1]

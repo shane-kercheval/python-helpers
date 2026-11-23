@@ -156,6 +156,24 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(hp.is_series_numeric(series=pd.Series([None, 1, None], dtype=object)), True)  # noqa: E501
         self.assertEqual(hp.is_series_numeric(series=pd.Series([None, 1.0, np.nan], dtype=object)), True)  # noqa: E501
 
+    def test_is_series_numeric__strings(self) -> None:
+        # `pd.to_numeric` parses these, but the values are strings.
+        self.assertFalse(hp.is_series_numeric(series=pd.Series(['1', '22', None])))
+        self.assertFalse(hp.is_series_numeric(series=pd.Series(['1.5', '', np.nan])))
+        self.assertFalse(hp.is_series_numeric(series=pd.Series(['', '', ''])))
+        self.assertFalse(hp.is_series_numeric(series=pd.Series(['1', '2'], dtype='string')))
+
+    def test_numeric_summary__strings_that_parse_as_numbers(self) -> None:
+        data = pd.DataFrame({
+            'numbers': [1.0, 2.0, 3.0],
+            'empty_strings': ['', '', ''],
+            'digit_strings': ['1', '2', None],
+        })
+        numeric = hp.numeric_summary(data, return_style=False)
+        self.assertEqual(numeric.index.tolist(), ['numbers'])
+        non_numeric = hp.non_numeric_summary(data, return_style=False)
+        self.assertEqual(non_numeric.index.tolist(), ['empty_strings', 'digit_strings'])
+
     def test_is_series_numeric__Decimal_type(self):
         self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, Decimal(1), np.nan], dtype=object)), True)  # noqa: E501
         self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, Decimal(1.0), np.nan], dtype=object)), True)  # noqa: E501
@@ -206,12 +224,13 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(list(results), ['True', 'False'])
         results = hp.replace_all_bools_with_strings(series=pd.Series(['True', 'False']).astype('category'))  # noqa
         self.assertEqual(list(results), ['True', 'False'])
+        # pandas 3 stores None in a string Series as NaN when the Series is created.
         results = hp.replace_all_bools_with_strings(series=pd.Series(['True', 'False', None]))
-        self.assertEqual(list(results), ['True', 'False', None])
+        self.assertEqual(list(results), ['True', 'False', np.nan])
         results = hp.replace_all_bools_with_strings(series=pd.Series(['True', 'False', np.nan]))
         self.assertEqual(list(results), ['True', 'False', np.nan])
         results = hp.replace_all_bools_with_strings(series=pd.Series([None, 'True', 'False', None]))  # noqa
-        self.assertEqual(list(results), [None, 'True', 'False', None])
+        self.assertEqual(list(results), [np.nan, 'True', 'False', np.nan])
         results = hp.replace_all_bools_with_strings(series=pd.Series([np.nan, 'True', 'False', np.nan]))  # noqa
         self.assertEqual(list(results), [np.nan, 'True', 'False', np.nan])
 
@@ -676,7 +695,7 @@ class TestPandas(unittest.TestCase):
     def test_non_numeric_summary(self):
         credit_data = self.credit_data.copy()
         credit_data['purpose'] = credit_data['purpose']. \
-            replace({'radio/tv': '1111111111222222222233333333334444444444'})
+            cat.rename_categories({'radio/tv': '1111111111222222222233333333334444444444'})
 
         self.helper_test_summary(
             get_test_path('pandas/test_non_numeric_summary__credit.txt'),
@@ -701,7 +720,7 @@ class TestPandas(unittest.TestCase):
     def test_non_numeric_summary__nan_column(self):
         test_data = self.credit_data.copy()
         test_data['purpose'] = test_data['purpose']. \
-            replace({'radio/tv': '1111111111222222222233333333334444444444'})
+            cat.rename_categories({'radio/tv': '1111111111222222222233333333334444444444'})
         test_data['all_missing'] = None
         self.helper_test_summary(
             get_test_path('pandas/test_non_numeric_summary__credit__all_missing.txt'),
@@ -737,7 +756,7 @@ class TestPandas(unittest.TestCase):
     def test_non_numeric_summary2(self):
         test_data = self.credit_data.copy()
         test_data['purpose'] = test_data['purpose']. \
-            replace({'radio/tv': '1111111111222222222233333333334444444444'})
+            cat.rename_categories({'radio/tv': '1111111111222222222233333333334444444444'})
         test_data.loc[25:75, ['checking_status']] = np.nan
 
         self.helper_test_summary(

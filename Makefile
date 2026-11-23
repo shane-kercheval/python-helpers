@@ -8,7 +8,6 @@ build-env:
 ####
 # project commands
 ####
-# commands to run inside docker container
 linting:
 	uv run ruff check helpsk
 

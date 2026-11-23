@@ -2,7 +2,7 @@
 
 Helper package for python.
 
-**NOTE: This package is tested on Python `3.10`, `3.11`**
+helpsk supports Python 3.12 through 3.15. CI runs the tests on each of those versions.
 
 - package source in `/helpsk`
 - unit tests in `/tests`
@@ -29,54 +29,24 @@ pip install helpsk
     - following existing documentation style
 
 
-### Docker
+### Development
 
-See `Makefile` for all commands.
+The project uses [uv](https://docs.astral.sh/uv/). See the `Makefile` for all commands.
 
-To build the docker container:
-
-```commandline
-make docker_build
-```
-
-To run the terminal inside the docker container:
+To install the dependencies, run:
 
 ```commandline
-make docker_zsh
+make build-env
 ```
 
-To run the unit tests (including linting and doc-tests) from the commandline inside the docker container:
+To run linting, the unit tests in `/tests`, and the doctests, run:
 
 ```commandline
 make tests
 ```
 
-To run the unit tests (including linting and doc-tests) from the commandline outside the docker container:
+To build the package and publish it to PyPI, set `UV_PUBLISH_TOKEN`, then run:
 
 ```commandline
-make docker_tests
-```
-
-To build the python package and uploat do PyPI via twine from the commandline outside the docker container:
-
-```commandline
-make all
-```
-
-### Pre-Check-in
-
-#### Unit Tests
-
-The unit tests in this project are all found in the `/tests` directory.
-
-In the terminal, in the project directory, either run the Makefile command,
-
-```commandline
-make tests
-```
-
-or the python command for running all tests
-
-```commandline
-python -m unittest discover ./tests
+make package
 ```

@@ -90,20 +90,8 @@ class Snowflake(Database):
         with Snowflake.from_config(config) as snowflake:
             snowflake.query("SELECT * FROM table LIMIT 100")
 
-    Instructions for installing snowflake dependencies:
+    Instructions for installing the connector and its pandas support:
         https://docs.snowflake.com/en/user-guide/python-connector-install.html
-
-    I used v2.7.4, and python v3.9 (requirements_39):
-
-    This page shows the latest versions:
-        https://pypi.org/project/snowflake-connector-python/
-
-    ```
-    pip install -r .../snowflake-connector-python/v2.7.4/tested_requirements/requirements_39.reqs
-    pip install snowflake-connector-python==v2.7.4
-    ```
-
-    Additionally:
         https://docs.snowflake.com/en/user-guide/python-connector-pandas.html#installation
 
     ```
@@ -177,7 +165,7 @@ class Snowflake(Database):
                 create_statement += f"    {column} int"
             elif dataframe[column].dtype.name == 'object':
                 create_statement += f"    {column} varchar"
-            elif dataframe[column].dtype.name == 'datetime64[ns]':
+            elif pd.api.types.is_datetime64_dtype(dataframe[column]):
                 create_statement += f"    {column} datetime"
             elif dataframe[column].dtype.name == 'float64':
                 create_statement += f"    {column} float8"

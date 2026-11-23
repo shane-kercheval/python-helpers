@@ -1,7 +1,6 @@
 """Contains functions to help with comparing two strings or two dataframes."""
 
 import difflib
-from typing import Union
 import pandas as pd
 
 
@@ -13,7 +12,8 @@ def _create_html_difference_list(value_a: str, value_b: str) -> str:
         value_a: string to compare
         value_b: another string to compare
     """
-    diff = list(difflib.unified_diff(a=value_a, b=value_b, n=1000))
+    # Character-level diff; Python 3.14+ rejects a plain str here.
+    diff = list(difflib.unified_diff(a=list(value_a), b=list(value_b), n=1000))
     return [" " + char for char in value_a] if len(diff) == 0 else diff[3:]
 
 
@@ -60,8 +60,8 @@ def _create_html_cell(
 
 
 def diff_text(
-        text_a: Union[str, list[str]],
-        text_b: Union[str, list[str]],
+        text_a: str | list[str],
+        text_b: str | list[str],
         change_color: str = '#F1948A') -> str:
     """
     Returns string as HTML containing highlighted differences between `text_a` and

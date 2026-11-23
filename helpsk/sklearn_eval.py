@@ -2100,7 +2100,7 @@ class TwoClassEvaluator:
             self,
             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
             return_plotly: bool = True,
-            plot_threshold: bool = True) -> None | _figure.Figure:
+            plot_threshold: bool = True) -> _figure.Figure | None:
         """
         Plots the ROC AUC.
 
@@ -2175,7 +2175,7 @@ class TwoClassEvaluator:
             threshold_interval: float = 0.025,
             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
             return_plotly: bool = True,
-            plot_threshold: bool = True) -> None | _figure.Figure:
+            plot_threshold: bool = True) -> _figure.Figure | None:
         """
         Plots the ROC AUC.
 
@@ -2267,7 +2267,7 @@ class TwoClassEvaluator:
             threshold_interval: float = 0.025,
             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
             return_plotly: bool = True,
-            plot_threshold: bool = False) -> None | _figure.Figure:
+            plot_threshold: bool = False) -> _figure.Figure | None:
         """
         Plots various scores (e.g. True Positive Rate, False Positive Rate, etc.) for various
         score thresholds. (A score threshold is the value for which you would predict a positive
@@ -2349,7 +2349,7 @@ class TwoClassEvaluator:
             score_threshold_range: tuple[float, float] = (0.1, 0.9),
             figure_size: tuple = STANDARD_WIDTH_HEIGHT,
             return_plotly: bool = True,
-            plot_threshold: bool = False) -> None | _figure.Figure:
+            plot_threshold: bool = False) -> _figure.Figure | None:
         """
         Plots the tradeoff between precision (i.e. positive predict value) and recall (i.e.
         True Positive Rate) for various score thresholds. (A score threshold is the value for which

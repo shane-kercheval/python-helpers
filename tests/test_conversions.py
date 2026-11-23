@@ -351,7 +351,7 @@ def test_cohorted_adoption_rate__month_cohort_check_num_conversions(conversions_
     expected_conversions = (
         expected_conversions
         .groupby('cohort', observed=True)
-        .apply(lambda x: x['converted'].sum(), include_groups=True)
+        .apply(lambda x: x['converted'].sum(), include_groups=False)
         .reset_index(name='expected_conversions')
     )
     df_copy = data.copy()
