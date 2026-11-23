@@ -1,0 +1,25 @@
+name: Publish to PyPI
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    # PyPI's trusted publisher for helpsk names this workflow file and this environment;
+    # renaming either breaks publishing until PyPI's setting is updated to match.
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.4.0
+      - name: Build
+        run: uv build
+      - name: Publish
+        run: uv publish
