@@ -39,6 +39,10 @@ def is_series_numeric(series: pd.Series) -> bool:
             sample = series.dropna().head(1000)
             if len(sample) == 0:
                 return False
+            # `pd.to_numeric` parses strings such as '1' and '', but the values are still strings
+            # and fail in numeric operations like `mean()`.
+            if any(isinstance(value, str) for value in sample):
+                return False
             pd.to_numeric(sample, errors='raise')
             # if we get here, then the series is numeric; but we need to check if it's bool
             return not is_series_bool(sample)

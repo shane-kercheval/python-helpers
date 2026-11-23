@@ -156,6 +156,24 @@ class TestPandas(unittest.TestCase):
         self.assertEqual(hp.is_series_numeric(series=pd.Series([None, 1, None], dtype=object)), True)  # noqa: E501
         self.assertEqual(hp.is_series_numeric(series=pd.Series([None, 1.0, np.nan], dtype=object)), True)  # noqa: E501
 
+    def test_is_series_numeric__strings(self) -> None:
+        # `pd.to_numeric` parses these, but the values are strings.
+        self.assertFalse(hp.is_series_numeric(series=pd.Series(['1', '22', None])))
+        self.assertFalse(hp.is_series_numeric(series=pd.Series(['1.5', '', np.nan])))
+        self.assertFalse(hp.is_series_numeric(series=pd.Series(['', '', ''])))
+        self.assertFalse(hp.is_series_numeric(series=pd.Series(['1', '2'], dtype='string')))
+
+    def test_numeric_summary__strings_that_parse_as_numbers(self) -> None:
+        data = pd.DataFrame({
+            'numbers': [1.0, 2.0, 3.0],
+            'empty_strings': ['', '', ''],
+            'digit_strings': ['1', '2', None],
+        })
+        numeric = hp.numeric_summary(data, return_style=False)
+        self.assertEqual(numeric.index.tolist(), ['numbers'])
+        non_numeric = hp.non_numeric_summary(data, return_style=False)
+        self.assertEqual(non_numeric.index.tolist(), ['empty_strings', 'digit_strings'])
+
     def test_is_series_numeric__Decimal_type(self):
         self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, Decimal(1), np.nan], dtype=object)), True)  # noqa: E501
         self.assertEqual(hp.is_series_numeric(series=pd.Series([np.nan, Decimal(1.0), np.nan], dtype=object)), True)  # noqa: E501
