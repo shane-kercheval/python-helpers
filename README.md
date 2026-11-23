@@ -2,7 +2,7 @@
 
 Helper package for python.
 
-**NOTE: This package is tested on Python `3.10`, `3.11`**
+helpsk supports Python 3.12 through 3.15. CI runs the tests on each of those versions.
 
 - package source in `/helpsk`
 - unit tests in `/tests`
