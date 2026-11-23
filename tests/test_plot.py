@@ -92,10 +92,11 @@ class TestPlot(unittest.TestCase):
     def test_plot_dodged_barchart__boolean(self):
         """There is a bug where using a boolean series fails"""
         test_series = self.credit_data.copy()
-        test_series['all_paid'] = test_series['credit_history'] == 'all paid'
+        # object dtype so the column can hold missing values (pandas 3 rejects NaN in bool).
+        test_series['all_paid'] = (test_series['credit_history'] == 'all paid').astype(object)
         test_series.loc[0:10, 'all_paid'] = np.nan
 
-        test_series['own_telephone'] = test_series['own_telephone'] == 'yes'
+        test_series['own_telephone'] = (test_series['own_telephone'] == 'yes').astype(object)
         test_series.loc[5:15, 'own_telephone'] = None
 
         original = test_series.copy()

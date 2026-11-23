@@ -348,11 +348,13 @@ def reorder_categories(
 
         weights = pd.Series(weights, index=categorical)
         # for each categoric value, calculate the associated value of the categoric, based on the
-        # func e.g. if func is np.median, get the median value associated with categoric value
+        # func e.g. if func is np.median, get the median value associated with categoric value.
+        # Missing weights are skipped: pandas 3 passes them to `weight_function` unchanged, so
+        # e.g. `np.median` would return NaN for any category with a missing weight.
         ordered_categories = (
             weights
             .groupby(level=0, observed=False)
-            .agg(weight_function)
+            .agg(lambda x: weight_function(x.dropna()) if x.notna().any() else np.nan)
             .fillna(0)
             .sort_values(ascending=ascending)
         )

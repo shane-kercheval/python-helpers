@@ -1,15 +1,14 @@
 import os
+import os.path
+
+import pandas as pd
 import pytest
-from sqlalchemy.exc import OperationalError
 
 from helpsk.database import Sqlite
 from helpsk.validation import dataframes_match
 
-import os.path
 
-
-def test_sqlite():
-    import pandas as pd
+def test_sqlite() -> None:
     df = pd.DataFrame({
         'column_1': ['a', None, 'c'],
         'column_2': [1, 2, None],
@@ -21,7 +20,8 @@ def test_sqlite():
         with Sqlite(path=db_path) as db:
             assert os.path.exists(db_path)
 
-            with pytest.raises(OperationalError):
+            # pandas 3 wraps the SQLAlchemy OperationalError in its own DatabaseError.
+            with pytest.raises(pd.errors.DatabaseError):
                 db.query("SELECT * FROM TEST_TABLE")
 
             db.insert_records(
@@ -66,7 +66,8 @@ def test_sqlite():
             ])
 
             db.execute_statement("DROP TABLE TEST_TABLE;")
-            with pytest.raises(OperationalError):
+            # pandas 3 wraps the SQLAlchemy OperationalError in its own DatabaseError.
+            with pytest.raises(pd.errors.DatabaseError):
                 db.query("SELECT * FROM TEST_TABLE")
     finally:
         os.remove(db_path)

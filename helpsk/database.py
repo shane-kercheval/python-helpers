@@ -177,7 +177,7 @@ class Snowflake(Database):
                 create_statement += f"    {column} int"
             elif dataframe[column].dtype.name == 'object':
                 create_statement += f"    {column} varchar"
-            elif dataframe[column].dtype.name == 'datetime64[ns]':
+            elif pd.api.types.is_datetime64_dtype(dataframe[column]):
                 create_statement += f"    {column} datetime"
             elif dataframe[column].dtype.name == 'float64':
                 create_statement += f"    {column} float8"

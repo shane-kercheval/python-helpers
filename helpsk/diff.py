@@ -13,7 +13,8 @@ def _create_html_difference_list(value_a: str, value_b: str) -> str:
         value_a: string to compare
         value_b: another string to compare
     """
-    diff = list(difflib.unified_diff(a=value_a, b=value_b, n=1000))
+    # Character-level diff; Python 3.14+ rejects a plain str here.
+    diff = list(difflib.unified_diff(a=list(value_a), b=list(value_b), n=1000))
     return [" " + char for char in value_a] if len(diff) == 0 else diff[3:]
 
 
