@@ -1,7 +1,6 @@
 """Contains functions to help with comparing two strings or two dataframes."""
 
 import difflib
-from typing import Union
 import pandas as pd
 
 
@@ -61,8 +60,8 @@ def _create_html_cell(
 
 
 def diff_text(
-        text_a: Union[str, list[str]],
-        text_b: Union[str, list[str]],
+        text_a: str | list[str],
+        text_b: str | list[str],
         change_color: str = '#F1948A') -> str:
     """
     Returns string as HTML containing highlighted differences between `text_a` and
